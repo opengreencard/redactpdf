@@ -29,6 +29,10 @@ jobs:
       DB_USER: redaction
       DB_PASS: redaction
       AUTH_SECRET: ci-only-secret
+      # Jest globalSetup only recreates tables when this is set. The MariaDB
+      # service starts empty, so CI tests fail with table-not-found errors
+      # without it.
+      SETUP_TEST_DB: 'true'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
