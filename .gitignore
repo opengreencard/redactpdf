@@ -26,6 +26,9 @@ coverage/
 # Generated Kubernetes configuration
 k8s/config/
 
+# Local project specs (copied from planning docs, not versioned)
+spec/
+
 # Local files
 .DS_Store
 *.log
