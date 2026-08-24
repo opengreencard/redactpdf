@@ -3,11 +3,6 @@ import type { AdapterUser } from '@auth/core/adapters';
 import db from '../db';
 import { WithOptionalId } from '../db/types';
 
-export enum UserRole {
-  administrator = 'Administrator',
-  normal = 'Normal',
-}
-
 /**
  * A user, as created by Next-Auth: based on
  * https://authjs.dev/concepts/database-models
@@ -22,7 +17,6 @@ export interface UserAttributes extends Omit<AdapterUser, 'id' | 'email'> {
   email: string | null;
   /** Hashed bcrypt password */
   password: string | null;
-  role: UserRole;
 }
 
 export interface UserCreationAttributes extends WithOptionalId<UserAttributes> {}
@@ -48,16 +42,11 @@ const User = db.define<UserInstance>('User', {
   emailVerified: { type: DataTypes.DATE },
   image: { type: DataTypes.STRING },
 
-  // Lines below these are NOT from sequelize-adapter/models.js, and are
-  // added for our own application
+  // This field is not from sequelize-adapter/models.js and is added for
+  // password-based authentication.
   password: {
     type: DataTypes.STRING(60),
     allowNull: true,
-  },
-  role: {
-    type: DataTypes.ENUM(...Object.values(UserRole)),
-    allowNull: false,
-    defaultValue: UserRole.normal,
   },
 });
 

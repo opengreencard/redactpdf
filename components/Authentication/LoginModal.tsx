@@ -19,7 +19,7 @@ export interface LoginModalProps extends Pick<
  * login methods, and also handles starting OAuth, etc.
  */
 const LoginModal: React.FunctionComponent<LoginModalProps> = React.memo(
-  function LoginModal(props: LoginModalProps) {
+  function LoginModal({ isOpen, onClose }: LoginModalProps) {
     const router = useRouter();
 
     const { call: handleLogin, state: loginFormState } = useAPICall(
@@ -38,10 +38,11 @@ const LoginModal: React.FunctionComponent<LoginModalProps> = React.memo(
               'We could not find a user with the matching email and password.'
             );
           } else {
+            onClose();
             router.push('/');
           }
         },
-        [router]
+        [onClose, router]
       )
     );
 
@@ -53,15 +54,17 @@ const LoginModal: React.FunctionComponent<LoginModalProps> = React.memo(
       useMemoizedCallback(
         async (credentials: EmailAndPassword) => {
           await signUpClient(credentials);
+          onClose();
           router.push('/');
         },
-        [router]
+        [onClose, router]
       )
     );
 
     return (
       <LoginModalInner
-        {...props}
+        isOpen={isOpen}
+        onClose={onClose}
         onLogin={handleLogin}
         onSignUp={handleSignUp}
         onGoogleClick={handleGoogleClick}

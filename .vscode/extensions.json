@@ -1,0 +1,13 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "ms-vsliveshare.vsliveshare",
+    "ziyasal.vscode-open-in-github",
+    "ionutvmi.path-autocomplete",
+    "esbenp.prettier-vscode",
+    "timonwong.shellcheck",
+    "Orta.vscode-jest",
+    "eamodio.gitlens",
+    "stkb.rewrap"
+  ]
+}

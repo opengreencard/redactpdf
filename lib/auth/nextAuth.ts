@@ -129,7 +129,8 @@ export const {
 
 /**
  * Narrowed `auth()` result whose session user carries our full
- * {@link UserAttributes} (id, role, …) instead of the generic next-auth user.
+ * {@link UserAttributes} (id, password, …) instead of the generic next-auth
+ * user.
  */
 export const getAuthState = nextAuthResult.auth as () => Promise<
   (Session & { user: UserAttributes }) | null

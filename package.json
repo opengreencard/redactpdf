@@ -17,6 +17,7 @@
     "storybook:build": "storybook build",
     "swc-node": "node -r @swc-node/register",
     "init-db-dev": "yarn swc-node scripts/initializeDatabases.ts",
+    "init-db-prod": "APP_MODE=production yarn swc-node scripts/initializeDatabases.ts",
     "shellcheck": "find . -name '*.sh' -not -path './node_modules/*' -exec shellcheck --external-sources {} +",
     "prepare": "if command -v git >/dev/null 2>&1 && git rev-parse --git-dir >/dev/null 2>&1; then lefthook install; fi",
     "postinstall": "patch-package"

@@ -1,24 +1,16 @@
 {
   "compilerOptions": {
-    "types": [
-      "node",
-      "jest",
-      "jest-dom"
-    ],
+    "types": ["node", "jest", "jest-dom"],
     "target": "es2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "react-jsx",
@@ -29,7 +21,6 @@
       }
     ],
     "useUnknownInCatchVariables": false,
-    "baseUrl": ".",
     "typeRoots": [
       "types",
       "node_modules/@types",
@@ -37,7 +28,6 @@
     ]
   },
   "compilerOptionComments": {
-    "paths": "Avoid using {*: ['node_modules/*', 'types/*']} in paths since it will break resolution of packages inside node_modules: e.g., if node_modules/some-package/index.js has require('another-package'), and we have separate versions at 1) node_modules/some-package/node_modules/another-package, and 2) node_modules/another-package, then (2) will be picked up by the {*: ...} pattern.",
     "typeRoots": "After adding typeRoots, in order to avoid an error for \"Cannot find type definition file for '@testing-library/jest-dom'\", we need to add node_modules/@testing-library to the typeRoots. See https://github.com/testing-library/jest-dom/issues/559#issuecomment-1857877035 and https://stackoverflow.com/a/77669315/309011",
     "useUnknownInCatchVariables": "We've never gotten an error in our other projects from a non-Error thrown, so the extra type safety provided by treating catch (err) as unknown is probably not needed"
   },
@@ -49,13 +39,11 @@
     "**/*.eslintrc.cjs",
     ".next/dev/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ],
+  "exclude": ["node_modules"],
   "ts-node": {
     "compilerOptions": {
       "useUnknownInCatchVariables": false,
-      "module": "commonjs"
+      "module": "NodeNext"
     }
   }
 }

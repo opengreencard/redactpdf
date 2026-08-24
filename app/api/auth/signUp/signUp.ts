@@ -1,5 +1,5 @@
 import { hash } from 'bcrypt';
-import User, { UserAttributes, UserRole } from '../../../../lib/models/User';
+import User, { UserAttributes } from '../../../../lib/models/User';
 import { PartialInstance } from '../../../../lib/db/types';
 import { ApplicationError } from '../../../../lib/errors/applicationError';
 import { signInOnServer } from '../../../../lib/auth/nextAuth';
@@ -31,7 +31,6 @@ export async function signUpServer({
   await User.create({
     email,
     password: await hash(password, bcryptDifficulty),
-    role: UserRole.normal,
   });
 
   await signInOnServer('credentials', { email, password, redirect: false });

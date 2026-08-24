@@ -6,6 +6,7 @@ const db = new Sequelize({
   // Note: these will be changed down the line:
   // https://www.notion.so/wanderlog/Change-database-to-use-credentials-in-environment-variables-b3780a5967b04a89a9a51c56c6875e59?pvs=4
   host: config.db.host,
+  port: config.db.port,
   dialect: 'mariadb',
   username: config.db.username,
   password: config.db.password,

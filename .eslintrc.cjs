@@ -129,6 +129,13 @@ const commonNoRestrictedSyntaxRules = [
     .slice(1)
     .filter((item) => item.selector !== 'ForOfStatement'),
   {
+    // Bad: function Component(props) { return <Text>{props.label}</Text>; }
+    // Good: function Component({ label }) { return <Text>{label}</Text>; }
+    selector: 'MemberExpression[object.type="Identifier"][object.name="props"]',
+    message:
+      'Destructure component props before using them instead of accessing `props.someProperty` directly.',
+  },
+  {
     // Bad: <Box m={16} p={8} />
     // Good: <Box m="md" p="sm" />
     selector:

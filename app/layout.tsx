@@ -24,8 +24,11 @@ export interface RootLayoutProps {
 export default function RootLayout(props: RootLayoutProps): React.ReactElement {
   const { children } = props;
 
+  // Mantine's ColorSchemeScript sets data-mantine-color-scheme on <html> in
+  // the browser based on the stored color-scheme preference. That client-side
+  // attribute can differ from the server-rendered markup during hydration.
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <ColorSchemeScript />
       </head>

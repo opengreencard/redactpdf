@@ -17,6 +17,7 @@ interface Config {
   isTest: boolean;
   db: {
     host: string | undefined;
+    port: number;
     dialect: string;
     username: string | undefined;
     password: string | undefined;
@@ -37,6 +38,7 @@ interface Config {
 }
 
 const dbHost = process.env.DB_HOST ?? '127.0.0.1';
+const dbPort = Number(process.env.DB_PORT ?? '3306');
 const dbDatabase = process.env.DB_DATABASE ?? 'redaction_development';
 
 const config: Config = {
@@ -44,6 +46,7 @@ const config: Config = {
     (environment as string) === 'test' || (environment as string) === 'ci',
   db: {
     host: dbHost,
+    port: dbPort,
     dialect: 'mariadb',
     username: process.env.DB_USER ?? 'redaction',
     password: process.env.DB_PASS ?? 'redaction',
