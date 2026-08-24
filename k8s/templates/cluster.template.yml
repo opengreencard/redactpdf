@@ -1,0 +1,131 @@
+# Cluster configuration: Deployments + Service for the redaction app.
+#
+# This template is filled by k8s/fill-templates.sh. Non-sensitive values are
+# hardcoded in the Deployment's env block. Sensitive values come from the
+# redaction-env Secret via envFrom.
+#
+# Comments with "Keep in sync" indicate literal strings that must match across
+# multiple committed files. Template-substituted values (%VAR%) do not need
+# these comments since they all come from k8s/variables.sh.
+
+apiVersion: v1
+kind: List
+metadata: {}
+items:
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: redaction
+      namespace: default
+    spec:
+      type: ClusterIP
+      ports:
+        - port: 3000
+          targetPort: 3000
+          name: http
+      selector:
+        app: redaction
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: redaction
+      namespace: default
+    spec:
+      replicas: %REPLICAS%
+      selector:
+        matchLabels:
+          app: redaction
+      template:
+        metadata:
+          labels:
+            app: redaction
+        spec:
+          <<: &commonSpec
+            imagePullSecrets:
+              - name: regcred
+            terminationGracePeriodSeconds: 30
+          containers:
+            - <<: &commonContainer
+                # Keep image in sync with GitHub Actions workflow (build-image job) and
+                # k8s/update-deployment.sh.
+                image: redaction/redaction:%REVISION%
+                env:
+                  - &commonNodeEnv
+                    name: NODE_ENV
+                    value: production
+                  - &commonAppMode
+                    name: APP_MODE
+                    value: production
+                # All sensitive values (DB_PASS, auth secrets, Google OAuth,
+                # S3 keys, and SMTP credentials) are injected from the redaction-env
+                # Secret.
+                envFrom:
+                  - secretRef:
+                      name: redaction-env
+                resources:
+                  requests:
+                    memory: '1G'
+                    cpu: 1
+                  limits:
+                    memory: '2G'
+              name: redaction
+              ports:
+                - containerPort: 3000
+                  name: http
+              env:
+                - *commonNodeEnv
+                - *commonAppMode
+
+                # Non-sensitive production configuration (DB_HOST, DB_PORT,
+                # DB_USER, DB_DATABASE, and
+                # S3_BUCKET_PREFIX) is loaded from .env.production, which is
+                # intentionally included in the Docker image.
+                #
+                # This remains an explicit deployment override because it
+                # must match the cluster's configured domain.
+                - name: NEXTAUTH_URL
+                  value: https://%DOMAIN%
+              readinessProbe:
+                httpGet:
+                  path: /
+                  port: 3000
+                initialDelaySeconds: 10
+                periodSeconds: 10
+              livenessProbe:
+                httpGet:
+                  path: /
+                  port: 3000
+                initialDelaySeconds: 30
+                periodSeconds: 30
+
+  - apiVersion: apps/v1
+    kind: Deployment
+    metadata:
+      name: redaction-background-worker
+      namespace: default
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          app: redaction-background-worker
+      template:
+        metadata:
+          labels:
+            app: redaction-background-worker
+        spec:
+          <<: *commonSpec
+          containers:
+            - <<: *commonContainer
+              name: redaction-background-worker
+              command:
+                - node
+                - -r
+                - '@swc-node/register'
+                - scripts/workers/redactionBackgroundWorker.ts
+              resources:
+                requests:
+                  memory: '256M'
+                  cpu: '100m'
+                limits:
+                  memory: '512M'

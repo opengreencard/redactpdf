@@ -1,0 +1,49 @@
+---
+description: Use TestCommon files for shared module-specific test fixture builders.
+globs: '**/*.test.ts,**/*.test.tsx'
+alwaysApply: true
+---
+
+When multiple test files (even across directories) need the same fixture builder
+for a specific module's types, extract it to a `XXXTestCommon.ts` file adjacent
+to the primary module rather than duplicating the helper.
+
+This is distinct from `FakeData`/`ClientFakeData` in `lib/testUtilities/` —
+those provide general-purpose model builders. TestCommon files provide
+module-specific test fixtures whose shape is tightly coupled to the module's
+types and test data files.
+
+## Example
+
+```typescript
+// lib/pdf/combineFilesIntoPDFTestCommon.ts
+
+import type { EvidenceSection } from './evidence/evidenceTransform';
+
+export function _makeTestEvidenceSections<DataT>(files: {
+  passport: DataT;
+  birthCertificate: DataT;
+  travelHistory: DataT;
+  passportStamps: DataT;
+}): EvidenceSection<DataT>[] {
+  return [
+    { title: 'Photo identification (passport)', /* ... */ },
+    { title: 'Birth certificate', /* ... */ },
+    // ...
+  ];
+}
+```
+
+```typescript
+// lib/pdf/combineFilesIntoPDF.test.ts — imports from common
+import { _makeTestEvidenceSections } from './combineFilesIntoPDFTestCommon';
+
+// lib/pdf/evidence/generateEvidencePDFs.test.ts — imports from common
+import { _makeTestEvidenceSections } from '../combineFilesIntoPDFTestCommon';
+```
+
+## Naming
+
+- File: `XXXTestCommon.ts` adjacent to the primary non-test module
+- Exports: underscore-prefixed (`_make*`) to signal testing-only use, consistent
+  with the codebase convention

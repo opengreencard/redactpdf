@@ -1,0 +1,7 @@
+.section[data-position="left"] {
+  margin-inline-end: auto;
+}
+
+.section[data-position="right"] {
+  margin-inline-start: auto;
+}

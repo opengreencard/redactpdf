@@ -1,0 +1,19 @@
+---
+description: Patterns for writing idempotent shell scripts that manage K8s/infra resources.
+globs: 'k8s/**/*.sh'
+alwaysApply: true
+---
+
+Make infrastructure shell scripts safe to re-run. Use these patterns instead
+of their non-idempotent equivalents:
+
+Some examples:
+
+| Instead of                          | Use                                                                |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| `kubectl create secret …`           | `kubectl create … --dry-run=client -o yaml \| kubectl apply -f -`  |
+| `doctl kubernetes cluster create …` | Check first: `if doctl … get …; then echo exists; else create; fi` |
+| `helm install …`                    | `helm upgrade --install …`                                         |
+| `kubectl create namespace …`        | `kubectl create namespace … 2>/dev/null \|\| true`                 |
+
+Add a comment explaining the mechanism when it's not obvious.

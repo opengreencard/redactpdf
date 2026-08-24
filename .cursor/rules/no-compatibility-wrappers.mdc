@@ -1,0 +1,19 @@
+---
+description: Avoid compatibility wrappers and duplicate entry points unless required by an external contract.
+alwaysApply: true
+---
+
+# Avoid Compatibility Wrappers
+
+Do not add backward-compatibility wrappers, aliases, duplicate entry points, or
+pass-through APIs in Shell or TypeScript by default.
+
+Prefer one canonical implementation:
+
+- Update all repository callers, documentation, tests, and package scripts.
+- Remove obsolete names instead of forwarding them to the new name.
+- Keep a wrapper only when an external contract requires it, such as a
+  third-party callback signature, deployed interface, or explicitly requested
+  user-facing compatibility.
+- If compatibility may be required but the contract is unclear, ask before
+  preserving the old entry point.

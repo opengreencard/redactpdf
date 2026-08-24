@@ -1,0 +1,31 @@
+# Dependencies and generated output
+node_modules/
+.next/
+out/
+dist/
+coverage/
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
+
+# Yarn generated state
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
+
+# Environment files may contain credentials. Commit only the example files.
+.env
+.env.development
+.env.production
+.env.test
+.env.*.local
+!.env.*.example
+
+# Generated Kubernetes configuration
+k8s/config/
+
+# Local files
+.DS_Store
+*.log

@@ -1,0 +1,45 @@
+---
+description: Preview front-end changes using Storybook. Applies to *.tsx
+alwaysApply: true
+---
+
+After making a front-end change, make sure it has a Storybook story of the below
+format:
+
+```tsx
+// YourComponent.stories.tsx, adjacent to YourComponent.tsx
+import React from 'react';
+import { Meta, StoryFn } from '@storybook/react';
+import YourComponent, { YourComponentProps } from './YourComponent';
+
+const defaultProps: YourComponentProps = {};
+
+const metadata: Meta = {
+  title: 'YourComponent',
+  component: YourComponent,
+  args: defaultProps,
+};
+export default metadata;
+
+const Template: StoryFn<YourComponentProps> = (args) => (
+  <YourComponent {...args} />
+);
+
+export const Default: StoryFn<YourComponentProps> = Template.bind({});
+
+export const SomethingElse: Story<YourComponentProps> = Template.bind({});
+SomethingElse.args = { someProp: 'abc' };
+```
+
+Then, preview it using Storybook by visiting:
+`http://localhost:6006/iframe.html?path=/story/{title-lowercase}--{story-name-kebab}`
+
+Where:
+
+- `{title-lowercase}` is the Storybook title in lowercase (e.g., `LandingPageInner` → `landingpageinner`)
+- `{story-name-kebab}` is the exported story name in kebab-case (e.g., `LoggedIn` → `logged-in`)
+
+Example: `http://localhost:6006/iframe.html?path=/story/landingpageinner--logged-in`
+
+After making a front-end change, load the `storybook-preview` skill to start
+Storybook if needed and verify the component renders as intended.

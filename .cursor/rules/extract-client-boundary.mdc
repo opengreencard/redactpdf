@@ -1,0 +1,45 @@
+---
+description: Prefer extracting interactive state into a 'use client' boundary component rather than making the parent a client component.
+globs: '**/*.ts,**/*.tsx'
+alwaysApply: true
+---
+
+When adding React hooks (`useState`, `useEffect`, `useCallback`, etc.) or
+event handlers to a component that doesn't already have `'use client'`, prefer
+extracting the interactive piece into its own `'use client'` component rather
+than adding `'use client'` to the entire parent. This keeps the parent
+RSC-compatible and isolates the client boundary.
+
+## Examples
+
+```tsx
+// Avoid — making the entire shell a client component for one interactive piece
+'use client';
+
+function LandingPageShell() {
+  const [showContact, setShowContact] = useState(false);
+  const handleContactClick = useMemoizedCallback(() => setShowContact(true), []);
+  return (
+    <footer>
+      {showContact ? <Text>support@example.com</Text> : <Anchor onClick={handleContactClick}>Contact us</Anchor>}
+    </footer>
+  );
+}
+
+// Prefer — extract the interactive piece into its own 'use client' component
+// FooterContactAnchor.tsx
+'use client';
+
+function FooterContactAnchor() {
+  const [showContact, setShowContact] = useState(false);
+  const handleContactClick = useMemoizedCallback(() => setShowContact(true), []);
+  return showContact ? <Text>support@example.com</Text> : <Anchor onClick={handleContactClick}>Contact us</Anchor>;
+}
+
+// LandingPageShell.tsx — remains RSC-compatible
+import FooterContactAnchor from './FooterContactAnchor';
+
+function LandingPageShell() {
+  return <footer><FooterContactAnchor /></footer>;
+}
+```

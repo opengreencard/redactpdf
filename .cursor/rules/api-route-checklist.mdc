@@ -1,0 +1,21 @@
+---
+description: Checklist for API route work. Applies to app/**/route.ts and related server API files.
+globs: 'app/**/route.ts,app/**/route.tsx,app/api/**/*.ts'
+alwaysApply: false
+---
+
+For API changes, keep this shape:
+
+1. Put business logic in a server function.
+2. Keep `route.ts` thin (parse/validate/auth/call function).
+3. Test the server function (`*.test.ts`) for behavior + auth + errors.
+4. Do **not** add `route.test.ts` unless explicitly requested.
+
+## Example
+
+- Good:
+  - `listFormSets.ts` (logic)
+  - `route.ts` (thin wrapper)
+  - `listFormSets.test.ts` (tests)
+- Avoid:
+  - `route.test.ts` as the primary test surface

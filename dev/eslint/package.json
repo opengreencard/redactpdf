@@ -1,0 +1,16 @@
+{
+  "name": "eslint-plugin-redaction",
+  "private": true,
+  "version": "1.0.0",
+  "main": "dist/rules/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/eslint": "^8.56.0",
+    "@types/node": "^20.11.22",
+    "@typescript-eslint/parser": "^7.0.0",
+    "@typescript-eslint/utils": "^7.0.0",
+    "typescript": "^5.7.2"
+  }
+}

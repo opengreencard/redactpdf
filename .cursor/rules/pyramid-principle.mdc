@@ -1,0 +1,22 @@
+---
+description: Always apply Pyramid Principle structure to keep exported-first layouts.
+alwaysApply: true
+---
+
+Apply the Pyramid Principle in every file:
+
+- Always put exported APIs (functions, constants, components, and default exports) before internal implementation details.
+- Make the conclusion/entry point visible first, then place the supporting logic and internal types below it.
+- Keep supporting blocks in logical groups (2nd-level points), then detail subpoints only as needed.
+- Keep internals ordered by necessity so readers can scan top-down from intent to mechanism.
+- Keep type declarations and helpers as focused as possible; when practical, use interfaces instead of object type aliases.
+
+## Ordering details
+
+- Types can be defined right before the function that uses them, or immediately
+  after the first type/interface that reference them.
+- Internal helper functions should be defined after the exported function that calls them.
+- For type-only files (no runtime functions): order by dependency chain.
+  Foundational shared types (like `InputPaths`) first, then base interfaces,
+  then primary public interfaces that extend them, then supporting enums and
+  leaf types, then peripheral wrapper aliases.

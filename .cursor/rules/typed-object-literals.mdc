@@ -1,0 +1,25 @@
+---
+description: Document and enforce typed object literal patterns for safer TS code.
+globs: '**/*.ts,**/*.tsx'
+alwaysApply: true
+---
+
+Type object literals explicitly when declaring or returning them.
+
+## Examples
+
+- Variable:
+
+  - Avoid: `const value = { id: 1 }`
+  - Prefer: `const value: MyType = { id: 1 }`
+
+- Arrow return:
+
+  - Avoid: `items.map((item) => ({ id: item.id }))`
+  - Prefer: `items.map((item): MyType => ({ id: item.id }))`
+
+- Function return:
+  - Avoid: `function build() { return { id: 1 }; }`
+  - Prefer: `function build(): MyType { return { id: 1 }; }`
+
+Use a narrow inline type if it is local-only; avoid `any`.

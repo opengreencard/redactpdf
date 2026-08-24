@@ -1,0 +1,58 @@
+---
+description: Guidelines for using Mantine components in React components. Applies to *.tsx
+alwaysApply: true
+---
+
+Prefer using Mantine components (Grid, Box, Stack, Group, Container, etc.) and their native props over using the `style` prop or inline styles.
+
+When styling components:
+
+- Use `Box` for wrapper elements that need spacing, padding, or other layout properties
+- Use `Stack` for vertical layouts with spacing
+- Use `Group` for horizontal layouts with spacing
+- Use `Grid` for grid-based layouts
+- Use `Container` for page-level containers with max-width constraints
+- Prefer Mantine component props like `p`, `m`, `px`, `py`, `mt`, `mb`, `gap`, `spacing`, etc. over inline styles
+- Use `sx` prop for more complex styling when needed, but prefer component props when possible
+
+Examples:
+
+```tsx
+// ❌ Avoid
+<div style={{ padding: 16, marginTop: 8 }}>
+  <div style={{ display: 'flex', gap: 12 }}>
+    {items}
+  </div>
+</div>
+
+// ✅ Prefer
+<Box p="md" mt="sm">
+  <Group gap="md">
+    {items}
+  </Group>
+</Box>
+```
+
+```tsx
+// ❌ Avoid
+<div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+  {children}
+</div>
+
+// ✅ Prefer
+<Stack gap="md">
+  {children}
+</Stack>
+```
+
+```tsx
+// ❌ Avoid
+<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 16px' }}>
+  {content}
+</div>
+
+// ✅ Prefer
+<Container size={1200} px="md">
+  {content}
+</Container>
+```

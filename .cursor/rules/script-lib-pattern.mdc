@@ -1,0 +1,38 @@
+---
+description: Use .lib.ts files for executable scripts so the core logic is testable and reusable.
+globs: 'scripts/**/*.ts'
+alwaysApply: true
+---
+
+Split executable scripts into two files:
+
+- **`scriptName.lib.ts`** — the core function (exported, testable, importable).
+- **`scriptName.lib.test.ts`** — tests for the core function.
+- **`scriptName.ts`** — thin executable runner that parses CLI args and calls the lib function.
+
+This keeps the script importable without side effects (no top-level process exit or console logging).
+
+## Example
+
+```typescript
+// scripts/cron/cleanup.lib.ts
+export async function cleanup(options: { dryRun: boolean }): Promise<void> {
+  // core logic
+}
+
+// scripts/cron/cleanup.ts
+import { cleanup } from './cleanup.lib';
+
+async function main() {
+  const { dryRun } = parseArgs();
+  await cleanup({ dryRun });
+}
+
+main().catch((err) => { console.error(err); process.exit(1); });
+```
+
+## Why
+
+- `scriptName.ts` files are meant to be run directly (via `yarn swc-node`). Importing them executes side effects immediately.
+- `.lib.ts` files can be safely imported from other modules, including tests.
+- Core logic in `.lib.ts` gets a `.lib.test.ts` companion for unit tests.

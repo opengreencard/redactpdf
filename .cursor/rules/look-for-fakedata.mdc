@@ -1,0 +1,13 @@
+---
+description: When writing tests or stories, look for fake data. Applies to *.test.ts*,*.stories.tsx
+alwaysApply: true
+---
+
+When writing tests or Storybook stories and we need to create an object of a
+certain type, prefer calling functions in `lib/testUtilities/ClientFakeData.ts`
+or `lib/testUtilities/FakeData.ts`. Examples are:
+
+- `ClientFakeData.makeFormDefinition()`
+- `FakeData.makeDBUser()`
+- `FakeData.makeDBFilledFormSet()`
+- `FakeData.makeDBUploadedFile()`

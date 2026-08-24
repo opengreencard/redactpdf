@@ -1,0 +1,32 @@
+---
+description: Guidance for when using FakeData or ClientFakeData. Applies to **/*.test.ts, **/*.test.tsx, **/*.stories.tsx
+alwaysApply: true
+---
+
+## Minimal Test Fixtures
+
+When using `FakeData` or `ClientFakeData` builders in tests, only specify the fields that are relevant to what you're testing. Rely on the sensible defaults provided by the builders for everything else.
+
+**Example: Testing duplicate field ID detection**
+
+Only specify the `id` field - the test is about duplicate IDs:
+
+```typescript
+const formDefinition = ClientFakeData.makeFormDefinition({
+  fields: [
+    ClientFakeData.makeFormField({ id: 'duplicateId' }),
+    ClientFakeData.makeFormField({ id: 'duplicateId' }),
+  ],
+});
+```
+
+## Parallel Creation
+
+When creating multiple independent fixtures, prefer `Promise.all` over sequential `await`:
+
+```typescript
+const [user, formSet] = await Promise.all([
+  FakeData.makeDBUser(),
+  FakeData.makeDBFilledFormSet(),
+]);
+```

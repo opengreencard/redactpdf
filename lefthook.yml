@@ -1,0 +1,26 @@
+# Run quick repo hygiene checks before allowing a commit.
+pre-commit:
+  # Keep hooks fast and independent so multiple checks can run together.
+  parallel: true
+  commands:
+    # Reject trailing whitespace / conflict markers / missing newlines in staged hunks.
+    # Excludes patch files and the vendored Yarn release, since their generated
+    # content can contain intentional spacing that looks like a diff error.
+    # Also excludes common binary files where whitespace checks don't apply.
+    git-diff-check:
+      run: git --no-pager diff --check --cached -- ':!*.patch' ':!.yarn/releases/*' ':!*.pdf' ':!*.png' ':!*.jpg' ':!*.jpeg' ':!*.gif' ':!*.ico' ':!*.zip' ':!*.tar' ':!*.gz' ':!*.woff' ':!*.woff2' ':!*.ttf' ':!*.eot'
+    # Detect files that differ only by case (prevents collisions on case-insensitive
+    # filesystems used by some teammates and CI systems).
+    git-case-conflicts:
+      run: 'test -z "$(git ls-files | awk ''{ lowerPath = tolower($0); if (lowerPath in firstPathByLowerPath && firstPathByLowerPath[lowerPath] != $0) { print firstPathByLowerPath[lowerPath]; print $0 } else { firstPathByLowerPath[lowerPath] = $0 } }'' | sort -u)"'
+
+# Run lint on push so issues surface before remote review/CI starts.
+pre-push:
+  parallel: true
+  commands:
+    # Lint only changed TypeScript files between current branch and origin/main.
+    # Then drop ignored paths via the helper before invoking eslint.
+    eslint-fix:
+      files: git diff --name-only "$(git merge-base HEAD origin/main)" HEAD
+      glob: '*.{ts,tsx}'
+      run: 'files="$(node dev/filterESLintIgnoredFiles.js {files})"; if [ -n "$files" ]; then ./node_modules/.bin/eslint --cache --ext .ts,.tsx $files; fi'

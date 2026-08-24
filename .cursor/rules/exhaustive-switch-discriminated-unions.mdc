@@ -1,0 +1,74 @@
+---
+description: Use switch/getUnreachableError for discriminated union exhaustion, not if/continue or if/return.
+globs: '**/*.ts,**/*.tsx'
+alwaysApply: true
+---
+
+When branching on a discriminated union's `.type` property (e.g., `output.type`), use a `switch` statement with `getUnreachableError` in the `default` case. This ensures exhaustiveness — adding a new union member causes a compile error at the `default` branch rather than silently falling through.
+
+## Examples
+
+```ts
+// Avoid — adding a new union member silently falls through
+for (const output of Object.values(outputs)) {
+  if (output.type !== 'form') continue;
+  // process form output
+}
+```
+
+```ts
+// Avoid — adding a new union member silently returns
+for (const output of Object.values(outputs)) {
+  if (output.type === 'form') {
+    // process form output
+    continue;
+  }
+  if (output.type === 'evidence') {
+    // process evidence output
+    continue;
+  }
+  // missing default!
+}
+```
+
+```ts
+// Prefer — adding a new union member causes a TypeScript error
+import { getUnreachableError } from 'lib/typescript/getUnreachableError';
+
+for (const output of Object.values(outputs)) {
+  switch (output.type) {
+    case 'form': {
+      // process form output
+      break;
+    }
+    case 'evidence': {
+      // process evidence output
+      break;
+    }
+    default:
+      throw getUnreachableError(output);
+  }
+}
+```
+
+```ts
+// Also OK — if/else if/else with getUnreachableError for non-throwing paths
+function process(output: FormSetPDFOutput): Result | null {
+  if (output.type === 'form') {
+    return processForm(output);
+  } else if (output.type === 'evidence') {
+    return processEvidence(output);
+  } else {
+    // Exhaustive: all variants handled above
+    getUnreachableError(output);
+    return null; // unreachable but satisfies TypeScript
+  }
+}
+```
+
+## Exceptions
+
+- Early returns/continues are acceptable when the function is genuinely
+  handling only a subset of variants and making that choice explicitly
+  (e.g., a helper that only processes form-type outputs). In that case,
+  document the intentional subset in a comment.

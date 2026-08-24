@@ -1,0 +1,20 @@
+---
+description: When trying to lint a typescript file. Applies to \*.ts, \*.tsx
+alwaysApply: true
+---
+
+After completing a related batch of edits, run `yarn eslint --fix` on all changed
+files together. Do not stop to lint after each individual file edit.
+
+If you run into ESLint errors, try running `yarn eslint --fix` on the affected
+files and then
+re-reading the file: it could save manually fixing them.
+
+If an ESLint error is caused by a debugging change, don't make any changes and
+don't add a `//eslint-disable-next-line` comment. Just leave it as is. For
+example:
+
+```ts
+// This fails `no-console`. Don't make any changes to this!
+console.log('Debug log!');
+```

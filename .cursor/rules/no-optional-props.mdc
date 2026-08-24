@@ -1,0 +1,31 @@
+---
+description: Avoid optional React props and function parameters that can be accidentally forgotten; options/config objects may be optional when they have sensible defaults.
+globs: '**/*.ts,**/*.tsx'
+alwaysApply: true
+---
+
+Avoid optional `?` for:
+
+- React props
+- Function parameters
+
+when omitting them would be a mistake or when there is no clear default. Prefer required + nullable in those cases.
+
+Options and config objects may use optional properties when the option is genuinely optional and has a sensible default. Function overloads or destructured defaults (e.g. `options = {}`) are also fine for options.
+
+## Examples
+
+- Avoid: `name?: string`
+- Prefer: `name: string | null`
+
+- Avoid: `function load(id?: string)`
+- Prefer: `function load(id: string | null)`
+
+- OK: `options: { timeoutMs?: number }` when the function has a clear default timeout.
+- OK: `function doWork(data: Payload, options: { onProgress?: (p: number) => void } = {})`
+
+## Exceptions
+
+- **Framework signatures**: If optional is required by a framework (e.g., React's `onClick`), keep it and add a brief comment explaining why.
+- **Testing-only props**: Props used exclusively for testing convenience (e.g., `onActiveItemIdChange` in a table of contents that is normally a link in production) may be optional.
+- **Styling props with defaults**: Props like `width`, `gap`, `p`, `m`, `style`, etc. that have sensible defaults for the vast majority of cases and are unlikely to be "forgotten" may be optional.

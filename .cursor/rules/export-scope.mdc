@@ -1,0 +1,59 @@
+---
+description: Only export symbols used across multiple files; keep symbols local otherwise. Applies to **/*.ts, **/*.tsx
+globs: '**/*.ts,**/*.tsx'
+alwaysApply: true
+---
+
+Keep symbols defined as close as possible to where they're used, following the
+Pyramid Principle. Avoid exporting symbols unless they are used in multiple
+files.
+
+## When to export
+
+- The symbol is imported by **more than one other file** (not counting tests).
+- If a symbol is only exported for testing, use one of these patterns:
+  1. **Underscore prefix**: `export const _helperName` signals testing-only
+     (consistent with `_make*` conventions in TestCommon files,
+     `_pendingSaveButtonTestId`, etc.).
+  2. **Comment**: Add `// Exported for tests.` directly above the export.
+
+## When NOT to export
+
+- Internal helper functions used only within the same module.
+- Symbols that maintain encapsulation boundaries.
+- Implementation details that tests don't need to access directly.
+
+## Examples
+
+```typescript
+// Good: module-private helper — only used within this file
+function opsIncludeFormContentChanges(
+  ops: TypedOp<FormState<Record<string, any>, string>>[]
+): boolean {
+  return ops.some((op) => op.p.length > 0 && op.p[0] === 'values');
+}
+
+// Good: exported for cross-file reuse (imported by multiple modules)
+export function sanitizeViewMode(
+  viewMode: ViewMode,
+  formIds: string[],
+  firstFormId: string,
+  pdfNames: string[]
+): ViewMode {
+  /* ... */
+}
+
+// Good: exported for tests (underscore convention)
+/** HTML ID for button that appears when save is pending. Exported for tests */
+export const _pendingSaveButtonTestId = 'forms-page-pending-save-button';
+
+// Good: also exported for tests (comment convention)
+/**
+ * Do X...
+ * Exported for tests.
+ */
+export function _computeInternalState(data: RawData): ComputedState {}
+
+// Avoid: exporting a helper only used in this file
+export function opsIncludeFormContentChanges(ops) {}
+```

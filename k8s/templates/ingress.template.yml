@@ -1,0 +1,41 @@
+# Ingress configuration for the redaction app.
+#
+# Routes traffic from redactpdf.ai and www.redactpdf.ai (redirected)
+# to the redaction Service. TLS certificates are managed by cert-manager.
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: redaction-ingress
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
+    nginx.ingress.kubernetes.io/load-balance: ewma
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/server-snippet: |
+      # Keep redirect target in sync with NEXTAUTH_URL in
+      # k8s/templates/cluster.template.yml.
+      if ($host = 'www.%DOMAIN%') {
+        return 301 https://%DOMAIN%$request_uri;
+      }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        # Keep hosts in sync with k8s/variables.sh (DOMAIN).
+        - '%DOMAIN%'
+        - 'www.%DOMAIN%'
+      secretName: redaction-tls
+  rules:
+    - host: '%DOMAIN%'
+      http: &redaction-rules
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: redaction
+                port:
+                  number: 3000
+    - host: 'www.%DOMAIN%'
+      http: *redaction-rules

@@ -1,0 +1,103 @@
+---
+description: Prefer ClientFakeData builders for structured test fixtures
+globs: '**/*.test.ts,**/*.test.tsx'
+---
+
+# Client Fake Data Makers
+
+- Use `lib/testUtilities/ClientFakeData.ts` builders for medium to large fixture payloads, especially for:
+  - `FormDefinition`
+  - form `fields`, field inputs, and list items
+  - form rows and related nested object graphs
+- Keep hand-written object literals for tiny, one-off assertions where the full model is unnecessary.
+- Prefer builders so fixtures communicate intent (`shape + override`) and stay resilient when shape evolves.
+
+## Minimal Test Fixtures
+
+When using `ClientFakeData` builders in tests, only specify the fields that are relevant to what you're testing. Rely on the sensible defaults provided by the builders for everything else.
+
+**Example: Testing duplicate field ID detection**
+
+Only specify the `id` field - the test is about duplicate IDs:
+
+```typescript
+const formDefinition = ClientFakeData.makeFormDefinition({
+  fields: [
+    ClientFakeData.makeFormField({ id: 'duplicateId' }),
+    ClientFakeData.makeFormField({ id: 'duplicateId' }),
+  ],
+});
+```
+
+**Example: Testing duplicate path detection**
+
+Only specify the `path` field - the test is about duplicate paths:
+
+```typescript
+const form1 = ClientFakeData.makeFormDefinition({
+  fields: [ClientFakeData.makeFormField({ path: ['user', 'name'] })],
+});
+```
+
+## Share Fixtures Between Tests
+
+When multiple tests in the same `describe` block need similar fixtures, define
+them either outside or inside the `describe` at the most local scope possible,
+and place them _after_ the `it()` blocks per the Pyramid Principle.
+
+```typescript
+describe('getInvalidFormsForFormSetSummary', () => {
+  it('returns no rows when all fields pass validation', () => {
+    const result = getInvalidFormsForFormSetSummary({
+      forms,
+      values: { name: 'ok' },
+    });
+    expect(result).toEqual([]);
+  });
+
+  it('returns rows for forms with validation errors', () => {
+    const result = getInvalidFormsForFormSetSummary({
+      forms,
+      values: { name: '' },
+    });
+    expect(result).toHaveLength(2);
+  });
+
+  // Shared fixtures defined after the tests (Pyramid Principle)
+  const requiredNameField = ClientFakeData.makeFormField({
+    path: ['name'],
+    input: { type: FormFieldType.text, required: FormFieldRequired.required },
+  });
+
+  const forms = ClientFakeData.makeFormSetDefinition<FormId, Values>({
+    forms: {
+      formA: ClientFakeData.makeFormDefinition({
+        title: 'Form A',
+        fields: [requiredNameField],
+      }),
+      formB: ClientFakeData.makeFormDefinition({
+        title: 'Form B',
+        fields: [requiredNameField],
+      }),
+    },
+  });
+});
+```
+
+Only lift fixtures to module scope if they are needed across multiple `describe` blocks. Keep them as local as possible otherwise.
+
+## Type Annotations
+
+Use explicit type annotations instead of `typeof` when typing collections of test fixtures:
+
+```typescript
+// Good - explicit type
+const forms: Record<string, FormDefinition<string, any, any>> = {
+  testForm: formDefinition,
+};
+
+// Avoid - typeof inference
+const forms: Record<string, typeof formDefinition> = {
+  testForm: formDefinition,
+};
+```

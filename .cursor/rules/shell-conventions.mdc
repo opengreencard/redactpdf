@@ -1,0 +1,92 @@
+---
+description: Shell script conventions: variable naming, shared defaults, prerequisite validation, and prompt UX.
+globs: '**/*.sh'
+alwaysApply: true
+---
+
+## Variable naming
+
+- **local variables**: camelCase; abbreviations and acronyms are written in
+  all-caps (`dbPass`, `itemFQN`, `tempOpEnv`, `serverIP`, `dnsIP`).
+- **CLI-flag variables**: SCREAMING_CASE when derived from `--some-flag` (`NAME`,
+  `OVERWRITE`, `REVISION`).
+- **exported/env variables**: SCREAMING_CASE (`OP_VAULT`, `OP_ACCOUNT`,
+  `NODE_ENV`).
+- **`DIR`**: keep as `DIR` — this is a standard shell pattern used across the
+  repo by sourced scripts. It always points to the directory containing the
+  current script.
+
+## Prerequisite validation
+
+Scripts that mutate infrastructure should validate prerequisites early, before
+any destructive operations. Group checks in a function called first:
+
+- External service auth (doctl, docker, op CLI)
+- Context/account correctness (doctl team, kubectl context)
+- Required tools installed
+- Required flags provided
+
+See `k8s/setup-cluster.sh`'s `check_installs` for a concrete example.
+
+## Shared defaults
+
+When the same default value appears in 3 or more shell scripts in the same
+directory, extract it into a `variables.sh` file that each script sources.
+Follow the existing pattern in `k8s/variables.sh` and
+`k8s/1password/variables.sh`:
+
+```bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+if [ -f "$DIR/variables.sh" ]; then
+  # shellcheck source=variables.sh
+  . "$DIR/variables.sh"
+fi
+
+NAME="$OP_ITEM_NAME"
+```
+
+Prefer sourcing shared shell variables over reading another file as text. When
+the value cannot be sourced directly, use one explicit value and add comments
+at both locations identifying the files that must stay synchronized. Avoid
+duplicating or reconstructing a fixed value from another file's contents.
+
+## Prompts for external credentials
+
+When using `read -rep` to prompt for credentials that come from an external
+service (e.g., API keys, OAuth client IDs), include the management URL inline
+in the prompt text so the user can find the credential:
+
+```bash
+read -rep 'DigitalOcean Spaces access key ID (https://cloud.digitalocean.com/spaces/access_keys?i=30dfb5): ' s3AccessKeyId
+```
+
+## Quoting
+
+- **Prefer single quotes** for string literals that don't need variable
+  expansion (e.g., `echo 'Entering...'` not `echo "Entering..."`).
+- Use double quotes only when the string contains `$variable` or
+  `$(command substitution)`.
+- **Avoid `echo ""`** — if you need a blank line, use `echo` without quotes,
+  or just omit it when it doesn't improve readability.
+
+## Multi-line messages
+
+Use `cat <<END` (or `cat <<'END'` when no variable expansion is needed) for
+multi-line output instead of multiple `echo` calls:
+
+```bash
+# Prefer
+cat <<END
+Done! Secrets saved to $itemFQN.
+
+Next steps:
+  bash k8s/1password/fill-secrets-template.sh
+END
+
+# Avoid
+echo "Done! Secrets saved to $itemFQN."
+echo
+echo 'Next steps:'
+echo '  bash k8s/1password/fill-secrets-template.sh'
+```

@@ -1,0 +1,5 @@
+# Kubernetes namespace for the redaction application.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: default

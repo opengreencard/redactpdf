@@ -1,0 +1,54 @@
+---
+description: Comment guidelines: Keep comments intentional, high-signal, and up to date
+alwaysApply: true
+---
+
+# Commenting guidelines
+
+- When code is unintuitive, hacky, or hard to read, add a comment that explains
+  both what you’re doing and why. Examples are also very helpful.
+- When you add a **larger new function** (roughly more than ~20 lines) or logic
+  that is easy to misread, add a JSDoc (or focused block comment) that
+  summarizes behavior, **why** it exists, and **concrete examples**—especially
+  inputs/outputs or representative error messages. Prefer “what would go wrong”
+  and “what does this return” over restating the implementation line by line.
+  See [Code tells you how, comments tell you why](https://blog.codinghorror.com/code-tells-you-how-comments-tell-you-why/).
+- Don’t write comments that only describe what the code does; write ones that answer “why” and likely reader questions.
+- If logic came from docs/StackOverflow/blog posts/PRs, add a brief source comment so future readers can follow up on intent.
+- Use JSDoc (`/** ... */`) for API documentation that IDEs or documentation
+  tools should consume. Use `//` for explanatory comments, including comments
+  before declarations.
+- For multi-line explanatory comments, use consecutive `//` lines rather than
+  `/* ... */` blocks:
+
+```ts
+{
+  // We only need this constant in one place right now because...
+  // Keeping it local avoids expanding the module's public API.
+}
+```
+
+- In React JSX, use the syntax-required block comment form for multi-line
+  comments, with the opening and closing delimiters on their own lines and a
+  leading `*` on each content line:
+
+```tsx
+{/*
+ * Explain why this JSX is structured this way.
+ * Include relevant context or a source link when useful.
+ */}
+```
+
+- Keep a one-line JSX comment inline as `{/* Explain the JSX here */}`.
+- Add a JSDoc comment before each React component, long function, or exported
+  variable, and add comments for non-obvious props.
+- If a prop’s type/name is ambiguous, err on the side of adding a clearer comment.
+- When disabling ESLint for a specific line, always include the reason and rule name:
+
+```tsx
+// Grayscale background, so dark-mode handling is intentionally skipped.
+// eslint-disable-next-line no-restricted-syntax
+const containerStyles = getContainerStyles(theme);
+```
+
+- Avoid file-wide ESLint disables; prefer `eslint-disable-line` / `eslint-disable-next-line` with explicit rule names.

@@ -1,0 +1,54 @@
+---
+description: Performance patterns for tests: shared beforeAll and parallel setup.
+globs: '**/*.test.ts,**/*.test.tsx'
+alwaysApply: true
+---
+
+When multiple `it()` blocks in the same `describe` need the same expensive or
+side-effectful computation, compute it once in `beforeAll` and store the result
+in a `let` variable that each `it()` reads. This avoids repeating the
+computation for each test case.
+
+## Example
+
+```typescript
+// Avoid — each it() recomputes the expensive operation
+it('returns annotated PDF', async () => {
+  const annotatedPDF = await annotatePDFFormFields(pdfBuffer);
+  expect(annotatedPDF.length).toBeGreaterThan(0);
+});
+it('handles rich text fields', async () => {
+  const annotatedPDF = await annotatePDFFormFields(pdfBuffer);
+  expect(annotatedPDF).toBeInstanceOf(Buffer);
+});
+
+// Prefer — compute once in beforeAll
+describe(annotatePDFFormFields, () => {
+  let annotatedPDF: Uint8Array;
+
+  beforeAll(async () => {
+    annotatedPDF = await annotatePDFFormFields(pdfBuffer);
+  }, 30000);
+
+  it('returns annotated PDF', () => {
+    expect(annotatedPDF.length).toBeGreaterThan(0);
+  });
+  it('handles rich text fields', () => {
+    expect(annotatedPDF).toBeInstanceOf(Buffer);
+  });
+});
+```
+
+## Timeouts
+
+Use the 2nd argument of `beforeAll`/`it` for timeouts, not `jest.setTimeout()`:
+
+```typescript
+beforeAll(async () => { /* ... */ }, 30000);
+it('handles slow work', () => { /* ... */ }, 15000);
+```
+
+## Parallel Fixture Creation
+
+When creating multiple independent test fixtures, use `Promise.all` instead of
+sequential `await`. This is already covered in `.cursor/rules/use-fakedata.mdc`.
