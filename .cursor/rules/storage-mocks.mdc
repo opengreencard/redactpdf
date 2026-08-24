@@ -1,0 +1,21 @@
+---
+description: Use the shared in-memory DigitalOcean Spaces mock in tests
+alwaysApply: true
+---
+
+# DigitalOcean Spaces test behavior
+
+- `lib/testUtilities/setup.ts` already mocks `lib/storage/storageAPI` globally.
+- Do not add another `jest.mock` or module replacement for `storageAPI` in an
+  individual test. A second mock can replace the shared in-memory behavior.
+- Exercise storage wrappers through their normal APIs. Verify writes by reading
+  the object back and comparing its bytes; verify cleanup by confirming the
+  object is no longer readable.
+- When a failure path must be simulated, configure the existing global mock
+  function rather than replacing the `storageAPI` module:
+
+```ts
+jest.mocked(putObject).mockRejectedValue(new Error('storage unavailable'));
+```
+
+- Tests must never make real DigitalOcean Spaces/S3 reads or writes.

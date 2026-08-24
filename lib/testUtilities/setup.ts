@@ -14,6 +14,8 @@ jest.mock('../auth/nextAuth', () => ({
 }));
 
 // We mock all S3/DigitalOcean spaces calls by default
+// This is the canonical global mock; individual tests must reuse it.
+// eslint-disable-next-line no-restricted-syntax
 jest.mock('../storage/storageAPI');
 
 afterAll(async () => {
