@@ -18,9 +18,9 @@ pre-commit:
 pre-push:
   parallel: true
   commands:
-    # Lint only changed TypeScript files between current branch and origin/main.
-    # Then drop ignored paths via the helper before invoking eslint.
+    # Lint TypeScript files changed since origin/main. On the first push,
+    # origin/main does not exist yet, so compare against the root commit.
     eslint-fix:
-      files: git diff --name-only "$(git merge-base HEAD origin/main)" HEAD
+      files: git diff --name-only "$(git merge-base HEAD origin/main 2>/dev/null || git rev-list --max-parents=0 HEAD)" HEAD
       glob: '*.{ts,tsx}'
       run: 'files="$(node dev/filterESLintIgnoredFiles.js {files})"; if [ -n "$files" ]; then ./node_modules/.bin/eslint --cache --ext .ts,.tsx $files; fi'
