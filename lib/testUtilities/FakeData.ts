@@ -1,0 +1,31 @@
+import Redaction, {
+  generateRedactionKey,
+  RedactionCreationAttributes,
+} from '../models/Redaction';
+import { RedactionStatus } from '../models/redactionTypes';
+import { RequiredWithUndefined } from '../typescript/requiredWithUndefined';
+
+/** Create a database redaction row with sensible test defaults. */
+async function makeDBRedaction(
+  options: Partial<RedactionCreationAttributes> = {}
+) {
+  const creationAttributes: RequiredWithUndefined<RedactionCreationAttributes> =
+    {
+      id: options.id,
+      key: options.key ?? generateRedactionKey(),
+      pageCount: options.pageCount ?? 1,
+      redactionBoundingBoxes: options.redactionBoundingBoxes ?? [],
+      status: options.status ?? RedactionStatus.redacting,
+    };
+
+  return Redaction.create(creationAttributes);
+}
+
+// Keep the builder collection inferred so its public keys stay synchronized
+// with the builders defined in this module.
+// eslint-disable-next-line no-restricted-syntax
+const FakeData = {
+  makeDBRedaction,
+};
+
+export default FakeData;
