@@ -77,6 +77,7 @@ export function makeGETAPIRoute<
   responseFormat,
 }: {
   responseFormat?: APIRouteResponseFormat.json;
+  additionalHeaders?: Record<string, string>;
   apiFunc: (
     request: TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
@@ -99,6 +100,7 @@ export function makeGETAPIRoute<
   responseFormat,
 }: {
   responseFormat: APIRouteResponseFormat.raw;
+  additionalHeaders?: Record<string, string>;
   apiFunc: (
     request: TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
@@ -121,6 +123,7 @@ export function makeGETAPIRoute<
   responseFormat,
 }: {
   responseFormat: APIRouteResponseFormat.redirect;
+  additionalHeaders?: Record<string, string>;
   apiFunc: (
     request: TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
@@ -143,9 +146,11 @@ export function makeGETAPIRoute<
   makeQueryAndPathParams,
   makeRequiredAuthParams,
   responseFormat = APIRouteResponseFormat.json,
+  additionalHeaders = {},
 }: {
   apiFunc: (request: any) => Promise<ResponseT>;
   responseFormat?: APIRouteResponseFormat;
+  additionalHeaders?: Record<string, string>;
 } & MakeGETAPIRouteAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
@@ -164,8 +169,10 @@ export function makeGETAPIRoute<
       context,
     });
 
-    return runFunctionAndHandleErrors(responseFormat, () =>
-      apiFunc(requestParams)
+    return runFunctionAndHandleErrors(
+      responseFormat,
+      () => apiFunc(requestParams),
+      additionalHeaders
     );
   };
 }

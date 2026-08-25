@@ -21,17 +21,22 @@ export type AppRouteHandlerFn = (
  * if it fails
  */
 export async function runFunctionAndHandleErrorsJSON<ResponseT>(
-  func: () => Promise<ResponseT>
+  func: () => Promise<ResponseT>,
+  // Polling endpoints can use this to prevent stale status or edited data from
+  // being served by a browser or intermediary cache.
+  additionalHeaders: Record<string, string> = {}
 ): Promise<NextResponse> {
   const result = await runFunctionAndHandleErrorsBase(func);
 
   if (result.success) {
     // We can't serialize undefined, so we return null instead
-    return NextResponse.json(result.data ?? null);
+    return NextResponse.json(result.data ?? null, {
+      headers: additionalHeaders,
+    });
   } else {
     return NextResponse.json(
       { success: false, message: result.message } satisfies FailureResponse,
-      { status: result.statusCode }
+      { headers: additionalHeaders, status: result.statusCode }
     );
   }
 }
@@ -131,7 +136,8 @@ export enum APIRouteResponseFormat {
  */
 export async function runFunctionAndHandleErrors<ResponseT>(
   responseFormat: APIRouteResponseFormat,
-  func: () => Promise<ResponseT>
+  func: () => Promise<ResponseT>,
+  additionalHeaders: Record<string, string> = {}
 ): Promise<NextResponse> {
   switch (responseFormat) {
     case APIRouteResponseFormat.raw:
@@ -141,7 +147,7 @@ export async function runFunctionAndHandleErrors<ResponseT>(
         func as () => Promise<RedirectResponse>
       );
     case APIRouteResponseFormat.json:
-      return runFunctionAndHandleErrorsJSON(func);
+      return runFunctionAndHandleErrorsJSON(func, additionalHeaders);
     default:
       throw getUnreachableError(responseFormat);
   }
