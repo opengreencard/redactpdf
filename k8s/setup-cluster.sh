@@ -18,7 +18,7 @@ Required:
 
 Optional (override k8s/variables.sh defaults; mostly useful for testing
          against a non-production cluster):
-  --cluster-name <name> Cluster name (default: ogc-production).
+  --cluster-name <name> Cluster name (default: redaction-production).
   --region <region>     DO region (default: sfo3).
   --acme-email <email>  Email for Let's Encrypt expiry notices.
   --replicas <num>      Number of replicas (default: 2).
@@ -34,7 +34,7 @@ Example:
 
 Testing a different cluster:
   bash setup-cluster.sh --revision $(git rev-parse HEAD) \
-      --cluster-name ogc-testing --region nyc1
+      --cluster-name redaction-testing --region nyc1
 END
 }
 
@@ -89,7 +89,7 @@ function check_installs {
 # shellcheck source=k8s/1password/variables.sh
 . "$DIR/1password/variables.sh"
 
-CLUSTER_NAME="${CLUSTER_NAME:-ogc-production}"
+CLUSTER_NAME="${CLUSTER_NAME:-redaction-production}"
 REGION="${REGION:-sfo3}"
 REVISION=""
 REPLICAS="${REPLICAS:-2}"
@@ -117,7 +117,9 @@ END
   exit 1
 fi
 
-image="redaction/redaction:$REVISION"
+# Keep image in sync with GitHub Actions workflow (build-image job),
+# k8s/templates/cluster.template.yml, and k8s/update-deployment.sh.
+image="opengreencard/redactpdf:$REVISION"
 
 check_installs kubectl doctl docker jq helm
 

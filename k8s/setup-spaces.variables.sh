@@ -1,7 +1,10 @@
 #!/bin/bash
+# Variables appear unused here because consumers source this file.
+# shellcheck disable=SC2034
 set -euo pipefail
 
-# Shared constants for DigitalOcean Spaces setup. Sourced by setup-spaces.sh.
+# Shared constants for DigitalOcean Spaces setup. Sourced by setup-spaces.sh
+# and setup-spaces.lib.sh.
 
 SPACES_REGION='sfo3'
 SPACES_ENDPOINT="https://${SPACES_REGION}.digitaloceanspaces.com"

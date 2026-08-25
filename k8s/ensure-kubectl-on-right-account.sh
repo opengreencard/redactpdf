@@ -1,14 +1,17 @@
 #!/bin/bash
 set -euo pipefail
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # shellcheck source=k8s/ensure-doctl-on-right-account.sh
-. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/ensure-doctl-on-right-account.sh"
+. "$DIR/ensure-doctl-on-right-account.sh"
+# shellcheck source=k8s/variables.sh
+. "$DIR/variables.sh"
 
 # The DigitalOcean context name is generated from the region and cluster name,
-# while users may rename the kubectl context. Keep the cluster identifier here
-# so context lookup does not depend on the context's display name.
-expectedCluster='do-sfo3-ogc-production'
-clusterName='ogc-production'
+# while users may rename the kubectl context. Derive it from variables.sh so
+# context lookup does not depend on the context's display name.
+expectedCluster="do-${REGION}-${CLUSTER_NAME}"
+clusterName="$CLUSTER_NAME"
 
 # Verify the DigitalOcean account and cluster only when credentials need to be
 # downloaded. Callers that already have a reachable context do not need doctl.

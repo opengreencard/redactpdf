@@ -16,6 +16,7 @@ RUN node .yarn/releases/yarn-4.14.1.cjs install
 COPY . .
 
 ENV NODE_ENV=production
+ENV APP_MODE=production
 
 RUN node .yarn/releases/yarn-4.14.1.cjs build
 

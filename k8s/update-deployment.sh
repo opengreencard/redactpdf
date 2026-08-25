@@ -32,7 +32,7 @@ done
 
 # Keep IMAGE in sync with GitHub Actions workflow (build-image job) and
 # k8s/templates/cluster.template.yml.
-image="redaction/redaction"
+image="opengreencard/redactpdf"
 
 bash "$DIR/ensure-kubectl-on-right-account.sh"
 

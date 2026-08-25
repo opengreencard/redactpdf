@@ -13,7 +13,11 @@ export enum S3Bucket {
   data = 'data',
 }
 
-/** Convert a bucket enum value to the actual bucket name */
+/**
+ * Convert a bucket enum value to the actual bucket name.
+ * Keep in sync with NEXT_PUBLIC_S3_FILES_BUCKET in .env.*.nonsecret
+ * (`redaction-${S3_BUCKET_PREFIX}-files`).
+ */
 export function getS3Bucket(bucket: S3Bucket): string {
   return `redaction-${config.s3.bucketPrefix}-${bucket}`;
 }

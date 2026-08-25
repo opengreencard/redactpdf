@@ -11,8 +11,9 @@ function print_help_and_exit {
 Usage:
   bash k8s/1password/run-in-env.sh --env <environment> -- <command> [args...]
 
-Sources the selected .env file and its matching 1Password pointers, then
-executes the command with the corresponding APP_MODE.
+Sources the selected non-secret env file, optional local secret env file,
+and matching 1Password pointers, then executes the command with the
+corresponding APP_MODE.
 
 Options:
   --env <environment>  production or development.
@@ -43,10 +44,12 @@ fi
 
 case "$ENVIRONMENT" in
   production)
+    nonsecretEnvFile="$DIR/../../.env.production.nonsecret"
     envFile="$DIR/../../.env.production"
     opSecretsFile="$DIR/op-secrets.production.env"
     ;;
   development)
+    nonsecretEnvFile="$DIR/../../.env.development.nonsecret"
     envFile="$DIR/../../.env.development"
     opSecretsFile="$DIR/op-secrets.development.env"
     ;;
@@ -66,10 +69,14 @@ fi
 # shellcheck source=k8s/1password/check.sh
 . "$DIR/check.sh"
 
-# Source committed non-secret values and export them for the child command.
+# Source committed non-secret values, then any local secret env file.
 set -a
 # shellcheck source=/dev/null
-. "$envFile"
+. "$nonsecretEnvFile"
+if [ -f "$envFile" ]; then
+  # shellcheck source=/dev/null
+  . "$envFile"
+fi
 set +a
 
 export APP_MODE="$ENVIRONMENT"

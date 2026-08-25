@@ -1,0 +1,38 @@
+# Docker build context exclusions.
+#
+# Each pattern below excludes files from the Docker build context, keeping the
+# image smaller and the build faster. See Docker docs:
+# https://docs.docker.com/build/building/context/#files-remaining
+
+# Dependencies: installed fresh in the container to get the correct platform
+# binaries (see https://docs.docker.com/build/guide/mounts/#example-nodejs)
+node_modules
+
+# Git history: not needed at runtime and would leak commit history into the
+# image (see https://docs.docker.com/build/building/context/#.dockerignore-file)
+.git
+
+# Next.js build output: rebuilt inside the Dockerfile
+.next
+
+# Yarn Berry cache: only needed during local development
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# Only the committed production non-secret file is safe to include in the
+# image. Gitignored secret files (.env.production, .env.development, .env.test)
+# and other environment files remain excluded.
+.env*
+!.env.production.nonsecret
+
+# Infrastructure files: only needed for cluster management, not at runtime
+k8s/
+sysadmin/
+
+# Storybook: development-only UI catalog
+storybook
+
+# Documentation: not needed at runtime
+*.md

@@ -1,11 +1,47 @@
 name: CI
 
+# Prefer the latest major version of each GitHub Action (checkout@v7, setup-node@v7,
+# docker/*-action@v4/v7, and so on). Bump action versions deliberately when a
+# release adds a feature or fix we need — do not pin to old majors by default.
+
 on:
-  push:
   pull_request:
+  # Limit push to main so a commit on a PR branch does not trigger both
+  # pull_request and push. Feature-branch pushes without an open PR skip CI
+  # until a PR is opened; merges to main still run checks and build-image.
+  push:
+    branches: [main]
 
 jobs:
-  checks:
+  # Static analysis (typecheck + lint) runs separately from tests and shellcheck
+  # so each job can use its own runner in parallel. On public repos, standard
+  # GitHub-hosted minutes are free/unlimited; splitting jobs reduces wall-clock
+  # time to roughly the slowest job instead of the sum of all checks.
+  static-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 26
+          cache: yarn
+      - run: corepack enable
+      - run: yarn install --immutable
+      - run: yarn typecheck
+      - run: yarn lint
+
+  # Shellcheck only needs checkout and the apt package — no Node, yarn install, or DB.
+  shellcheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - run: sudo apt-get update && sudo apt-get install -y shellcheck
+      # Keep in sync with the "shellcheck" script in package.json.
+      - run: find . -name '*.sh' -not -path './node_modules/*' -exec shellcheck --external-sources {} +
+
+  # Tests need MariaDB and yarn install; keeping them isolated avoids blocking
+  # lint/typecheck/shellcheck on DB startup and Jest runtime.
+  test:
     runs-on: ubuntu-latest
     services:
       mariadb:
@@ -34,24 +70,41 @@ jobs:
       # without it.
       SETUP_TEST_DB: 'true'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version: 26
           cache: yarn
       - run: corepack enable
       - run: yarn install --immutable
-      - run: yarn typecheck
-      - run: yarn lint
       - run: yarn jest
 
   docker:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/build-push-action@v6
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
         with:
           context: .
           push: false
-          tags: redaction/redaction:ci
+          # Keep image in sync with k8s/templates/cluster.template.yml,
+          # k8s/update-deployment.sh, and the build-image job below.
+          tags: opengreencard/redactpdf:ci
+
+  build-image:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: docker-hub
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v7
+        with:
+          context: .
+          push: true
+          tags: opengreencard/redactpdf:${{ github.sha }}
