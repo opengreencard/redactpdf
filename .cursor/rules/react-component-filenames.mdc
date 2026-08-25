@@ -1,0 +1,33 @@
+---
+description: PascalCase filenames for React components; camelCase for non-component helpers
+globs: 'components/**/*.ts,components/**/*.tsx,lib/**/*.tsx'
+alwaysApply: true
+---
+
+# React component filenames
+
+Match the filename to what the file primarily exports:
+
+| Export | Filename | Example |
+|--------|----------|---------|
+| React component (default or named) | **PascalCase** `.tsx` | `BrandMarkIcon.tsx`, `LandingPageHeaderActions.tsx` |
+| Non-component helper, hook, or util | **camelCase** `.ts` / `.tsx` | `useUploadState.ts`, `formatPrice.ts` |
+
+## Examples
+
+```
+components/LandingPage/
+  LandingPageInner.tsx          # exports LandingPageInner component
+  LandingPageHeaderActions.tsx  # exports LandingPageHeaderActions component
+  landingPageTestCommon.ts      # test fixture helpers only (if added)
+```
+
+## Exceptions
+
+- Next.js app router files keep framework names: `page.tsx`, `layout.tsx`,
+  `icon.tsx`, `route.ts`
+- `*.stories.tsx`, `*.test.tsx`, `*.module.css` follow their own conventions
+- `index.ts` barrel files
+
+ESLint does not enforce this split (helpers and components both live under
+`components/`), so follow this rule when adding or renaming files.

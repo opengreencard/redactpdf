@@ -5,6 +5,23 @@ alwaysApply: true
 
 Prefer using Mantine components (Grid, Box, Stack, Group, Container, etc.) and their native props over using the `style` prop or inline styles.
 
+Be prescriptive about color and size on our visual components. Prefer a
+short list of named options (`size: 'sm' | 'lg'`, `color: 'blue' | 'gray'`)
+over `size: number`, hex strings, or one-off Mantine knobs (`px={4}`,
+`size="compact-sm"`). Map tokens to pixels inside the component so call sites
+stay in sync and engineers or AI have fewer choices. ImageResponse canvases
+that must match a fixed PNG size are the exception.
+
+```tsx
+// Avoid — every caller picks a pixel size
+size: number
+<HomeIcon size={14} />
+
+// Prefer — callers pick from a short list
+size: 'sm' | 'lg'
+<HomeIcon size="sm" />
+```
+
 When styling components:
 
 - Use `Box` for wrapper elements that need spacing, padding, or other layout properties

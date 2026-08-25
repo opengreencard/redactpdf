@@ -11,6 +11,8 @@ export const size: { width: number; height: number } = {
 export const contentType = 'image/png';
 
 /** Tab favicon: blue “r” square with “p” beside it. */
+// Next.js requires `export default function` for app/icon.tsx.
+// eslint-disable-next-line no-restricted-syntax
 export default function Icon(): ImageResponse {
   // size=32 → _getBrandMarkLayout yields a ~15px blue square (was a hard-coded 20
   // with less padding; the smaller tile leaves more breathing room at the edges).

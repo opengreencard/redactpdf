@@ -49,28 +49,21 @@ export function _getBrandMarkLayout(size: number): BrandMarkLayout {
  * Transparent PNG background — browsers and iOS supply their own tile/backdrop.
  * Inline styles only — rendered by `next/og` ImageResponse (Satori).
  */
-export function BrandMarkIcon(props: BrandMarkIconProps): React.ReactElement {
-  const { size } = props;
-  const { paddingPx, squarePx, fontPx, gapPx } = _getBrandMarkLayout(size);
+export const BrandMarkIcon: React.FunctionComponent<BrandMarkIconProps> =
+  React.memo(function BrandMarkIcon(props: BrandMarkIconProps) {
+    const { size } = props;
+    const { paddingPx, squarePx, fontPx, gapPx } = _getBrandMarkLayout(size);
 
-  return (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: size,
-        height: size,
-        padding: paddingPx,
-        boxSizing: 'border-box',
-      }}
-    >
+    return (
       <div
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: gapPx,
+          width: size,
+          height: size,
+          padding: paddingPx,
+          boxSizing: 'border-box',
         }}
       >
         <div
@@ -78,32 +71,40 @@ export function BrandMarkIcon(props: BrandMarkIconProps): React.ReactElement {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            width: squarePx,
-            height: squarePx,
-            borderRadius: Math.round(squarePx * 0.2),
-            background: brandMarkBlue,
-            color: brandMarkOnBlue,
-            fontSize: fontPx,
-            fontWeight: 700,
-            fontFamily: 'Arial, Helvetica, sans-serif',
+            gap: gapPx,
           }}
         >
-          R
-        </div>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: brandMarkText,
-            fontSize: fontPx,
-            fontWeight: 700,
-            fontFamily: 'Arial, Helvetica, sans-serif',
-          }}
-        >
-          P
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              width: squarePx,
+              height: squarePx,
+              borderRadius: Math.round(squarePx * 0.2),
+              background: brandMarkBlue,
+              color: brandMarkOnBlue,
+              fontSize: fontPx,
+              fontWeight: 700,
+              fontFamily: 'Arial, Helvetica, sans-serif',
+            }}
+          >
+            R
+          </div>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: brandMarkText,
+              fontSize: fontPx,
+              fontWeight: 700,
+              fontFamily: 'Arial, Helvetica, sans-serif',
+            }}
+          >
+            P
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  });

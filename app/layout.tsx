@@ -51,6 +51,8 @@ export interface RootLayoutProps {
 }
 
 /** Root App Router layout: Mantine, Font Awesome, and site chrome globally. */
+// Next.js requires `export default function` for app/layout.tsx.
+// eslint-disable-next-line no-restricted-syntax
 export default async function RootLayout(
   props: RootLayoutProps
 ): Promise<React.ReactElement> {

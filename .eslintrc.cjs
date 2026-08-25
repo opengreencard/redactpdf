@@ -559,6 +559,23 @@ const commonNoRestrictedSyntaxRules = [
 const commonNoRestrictedSyntaxRulesForNonTests = [
   ...commonNoRestrictedSyntaxRules,
   {
+    // Bad: function SiteHeader() { ... }
+    // Bad: const SiteHeader = React.memo(function SiteHeader() { ... })
+    // Good: const SiteHeader: React.FunctionComponent<SiteHeaderProps> =
+    //         React.memo(function SiteHeader(props: SiteHeaderProps) { ... })
+    selector:
+      ':matches(FunctionDeclaration[id.name=/^[A-Z]/], FunctionExpression[id.name=/^[A-Z]/]:not(VariableDeclarator[id.typeAnnotation.typeAnnotation.typeName.left.name="React"][id.typeAnnotation.typeAnnotation.typeName.right.name="FunctionComponent"] > CallExpression[callee.object.name="React"][callee.property.name="memo"] > FunctionExpression))',
+    message:
+      'PascalCase functions should be `const Name: React.FunctionComponent<Props> = React.memo(function Name(...) { ... })`.',
+  },
+  {
+    // Bad: const blue = '#228be6'
+    // Good: resolveMantineThemeColor('blue.6') or <Box c="blue.6" />
+    selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
+    message:
+      'Avoid hardcoded hex colors. Use Mantine props (e.g. c="blue.6") in components, or resolveMantineThemeColor() / resolvePrimaryThemeColor() from lib/config/mantineTheme.ts for inline styles and ImageResponse.',
+  },
+  {
     // Bad: <Item onClick={(e) => ...} /> inline arrow in render
     // Good: <Item onClick={useMemoizedCallback(() => ...)}>
     // Good: <Item onClick={useCallbackWithPrefix(handleClick, [index])>
@@ -566,6 +583,37 @@ const commonNoRestrictedSyntaxRulesForNonTests = [
       'JSXAttribute[name.name=/^on/] JSXExpressionContainer ArrowFunctionExpression',
     message:
       'Inline arrow functions in JSX event handlers create new references each render. Use useMemoizedCallback for stable handlers, or useCallbackWithPrefix for item callbacks in lists. useSetState(setXXX, "blah") and useToggle(setChecked, checked) could also be helpful for minimal event handlers. In Storybook, likely use makeFakeHandler if it\'s a no-op (or the usual if we actually care about state)',
+  },
+];
+
+const baseRestrictedImportPaths = [
+  {
+    name: 'next/image',
+    importNames: ['Image'],
+    message:
+      "Instead of using next/image's Image, use our designSystem/Image.tsx component which combines both Mantine and Next.js image props",
+  },
+  {
+    name: '@mantine/core',
+    importNames: ['Image'],
+    message:
+      "Instead of using @mantine/core's Image, use our designSystem/Image.tsx component which combines both Mantine and Next.js image props",
+  },
+  {
+    name: '@tabler/icons-react',
+    message:
+      "Instead of using @tabler/icons-react's IconX, use our designSystem/FontAwesomeIcon with Font Awesome icons",
+  },
+  {
+    name: 'react-markdown',
+    message:
+      'Instead of using react-markdown directly, use our designSystem/Markdown component which applies Mantine defaults (e.g., Anchor links)',
+  },
+  {
+    name: '@mantine/core',
+    importNames: ['Button'],
+    message:
+      'Use the analytics-aware Button wrapper instead of importing Button directly from @mantine/core.',
   },
 ];
 
@@ -605,6 +653,31 @@ module.exports = {
     '@naverpay/eslint-plugin-use-client',
   ],
   overrides: [
+    {
+      files: ['**/*.{ts,tsx}'],
+      excludedFiles: ['lib/config/mantineTheme.ts'],
+      rules: {
+        'no-restricted-imports': [
+          'error',
+          ...baseRestrictedImportPaths,
+          {
+            name: '@mantine/core',
+            importNames: ['DEFAULT_THEME', 'DEFAULT_COLORS'],
+            message:
+              'Import theme colors via lib/config/mantineTheme.ts (resolveMantineThemeColor, resolvePrimaryThemeColor) instead of DEFAULT_THEME or DEFAULT_COLORS.',
+          },
+        ],
+      },
+    },
+    {
+      files: ['**/*.stories.*', '.storybook/**'],
+      rules: {
+        'no-restricted-syntax': [
+          'error',
+          ...commonNoRestrictedSyntaxRulesForNonTests,
+        ],
+      },
+    },
     {
       files: ['**/?(*.)+(spec|test).[jt]s?(x)'],
       extends: ['plugin:testing-library/react'],
@@ -727,37 +800,7 @@ module.exports = {
     // so that stacktraces and React Inspector is a bit easier to read
     'prefer-arrow-callback': 'off',
 
-    'no-restricted-imports': [
-      'error',
-      {
-        name: 'next/image',
-        importNames: ['Image'],
-        message:
-          "Instead of using next/image's Image, use our designSystem/Image.tsx component which combines both Mantine and Next.js image props",
-      },
-      {
-        name: '@mantine/core',
-        importNames: ['Image'],
-        message:
-          "Instead of using @mantine/core's Image, use our designSystem/Image.tsx component which combines both Mantine and Next.js image props",
-      },
-      {
-        name: '@tabler/icons-react',
-        message:
-          "Instead of using @tabler/icons-react's IconX, use our designSystem/FontAwesomeIcon with Font Awesome icons",
-      },
-      {
-        name: 'react-markdown',
-        message:
-          'Instead of using react-markdown directly, use our designSystem/Markdown component which applies Mantine defaults (e.g., Anchor links)',
-      },
-      {
-        name: '@mantine/core',
-        importNames: ['Button'],
-        message:
-          'Use the analytics-aware Button wrapper instead of importing Button directly from @mantine/core.',
-      },
-    ],
+    'no-restricted-imports': ['error', ...baseRestrictedImportPaths],
 
     // This prevents us from using `if (...) return X; else return Y;`, which
     // is often clearer than just defaulting to `return Y`

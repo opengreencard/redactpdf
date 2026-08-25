@@ -31,30 +31,36 @@ const SiteChrome: React.FunctionComponent<SiteChromeProps> = React.memo(
 
 export default SiteChrome;
 
-function SiteHeader(props: { isLoggedIn: boolean }): React.ReactElement {
-  const { isLoggedIn } = props;
-
-  return (
-    <Box
-      component="header"
-      bg="white"
-      py="sm"
-      pos="sticky"
-      top={0}
-      style={{ zIndex: 100 }}
-      bd="0 0 1px var(--mantine-color-gray-3)"
-    >
-      <Container size={siteContainerSize}>
-        <Group justify="space-between" wrap="wrap" align="center">
-          <SiteWordmark />
-          <LandingPageHeaderActions isLoggedIn={isLoggedIn} />
-        </Group>
-      </Container>
-    </Box>
-  );
+interface SiteHeaderProps {
+  isLoggedIn: boolean;
 }
 
-function SiteFooter(): React.ReactElement {
+const SiteHeader: React.FunctionComponent<SiteHeaderProps> = React.memo(
+  function SiteHeader(props: SiteHeaderProps) {
+    const { isLoggedIn } = props;
+
+    return (
+      <Box
+        component="header"
+        bg="white"
+        py="sm"
+        pos="sticky"
+        top={0}
+        style={{ zIndex: 100 }}
+        bd="0 0 1px var(--mantine-color-gray-3)"
+      >
+        <Container size={siteContainerSize}>
+          <Group justify="space-between" wrap="wrap" align="center">
+            <SiteWordmark />
+            <LandingPageHeaderActions isLoggedIn={isLoggedIn} />
+          </Group>
+        </Container>
+      </Box>
+    );
+  }
+);
+
+const SiteFooter: React.FunctionComponent = React.memo(function SiteFooter() {
   return (
     <Box component="footer" py="xl" bd="1px 0 0 var(--mantine-color-gray-3)">
       <Container size={siteContainerSize}>
@@ -68,19 +74,29 @@ function SiteFooter(): React.ReactElement {
       </Container>
     </Box>
   );
-}
+});
 
-function SiteWordmark(): React.ReactElement {
-  return (
-    <Anchor href="/" underline="never" c="inherit">
-      <Group gap="xs" wrap="nowrap">
-        <Box bg="blue.6" c="white" px="sm" py="xs" bdrs="sm" fw="bold" lh={1.4}>
-          redact
-        </Box>
-        <Text fw="bold" size="lg">
-          pdf.ai
-        </Text>
-      </Group>
-    </Anchor>
-  );
-}
+const SiteWordmark: React.FunctionComponent = React.memo(
+  function SiteWordmark() {
+    return (
+      <Anchor href="/" underline="never" c="inherit">
+        <Group gap="xs" wrap="nowrap">
+          <Box
+            bg="blue.6"
+            c="white"
+            px="sm"
+            py="xs"
+            bdrs="sm"
+            fw="bold"
+            lh={1.4}
+          >
+            redact
+          </Box>
+          <Text fw="bold" size="lg">
+            pdf.ai
+          </Text>
+        </Group>
+      </Anchor>
+    );
+  }
+);
