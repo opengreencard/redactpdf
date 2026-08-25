@@ -41,7 +41,7 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
             width="124"
             height="22"
             rx="11"
-            fill="var(--mantine-color-blue-6)"
+            fill="var(--mantine-primary-color-6)"
           />
           <text
             x="354"

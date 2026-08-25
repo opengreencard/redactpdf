@@ -5,11 +5,11 @@ import {
 } from './mantineTheme';
 
 // ImageResponse (Satori) uses inline `style` objects, so we need resolved hex
-// strings here — Mantine props like `bg="blue.6"` only work on Mantine
+// strings here — Mantine props like `bg="green.6"` only work on Mantine
 // components inside MantineProvider.
-const brandMarkBlue = resolvePrimaryThemeColor();
+const brandMarkFill = resolvePrimaryThemeColor();
 const brandMarkText = resolveMantineThemeColor('gray.9');
-const brandMarkOnBlue = resolveMantineThemeColor('white');
+const brandMarkOnFill = resolveMantineThemeColor('white');
 
 export interface BrandMarkIconProps {
   /**
@@ -27,14 +27,14 @@ interface BrandMarkLayout {
 }
 
 /**
- * Sizes the blue “R” tile, “P”, and inset from the canvas edge.
+ * Sizes the green “R” tile, “P”, and inset from the canvas edge.
  * Exported for tests.
  */
 export function _getBrandMarkLayout(size: number): BrandMarkLayout {
   // ~18% inset on each side so the mark does not touch the favicon / tile edge.
   const paddingPx = Math.round(size * 0.18);
   const contentWidth = size - paddingPx * 2;
-  // Blue square + gap + “P” ≈ 1.32× the square width at this font size.
+  // Green square + gap + “P” ≈ 1.32× the square width at this font size.
   const squarePx = Math.round(contentWidth / 1.32);
   const fontPx = Math.round(squarePx * 0.65);
   const gapPx = Math.max(1, Math.round(squarePx * 0.1));
@@ -43,7 +43,7 @@ export function _getBrandMarkLayout(size: number): BrandMarkLayout {
 }
 
 /**
- * Favicon / apple-touch graphic: a blue square with “R” and a “P” to the
+ * Favicon / apple-touch graphic: a green square with “R” and a “P” to the
  * right, a compact version of the redact / pdf.ai wordmark.
  *
  * Transparent PNG background — browsers and iOS supply their own tile/backdrop.
@@ -82,8 +82,8 @@ export const BrandMarkIcon: React.FunctionComponent<BrandMarkIconProps> =
               width: squarePx,
               height: squarePx,
               borderRadius: Math.round(squarePx * 0.2),
-              background: brandMarkBlue,
-              color: brandMarkOnBlue,
+              background: brandMarkFill,
+              color: brandMarkOnFill,
               fontSize: fontPx,
               fontWeight: 700,
               fontFamily: 'Arial, Helvetica, sans-serif',

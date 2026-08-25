@@ -1,7 +1,8 @@
 import React from 'react';
 import { Anchor, Box, Container, Group, Text } from '@mantine/core';
-import LandingPageHeaderActions from '../LandingPage/LandingPageHeaderActions';
 import { githubRepoUrl } from '../../lib/config/brand';
+import SiteHeaderActions from './SiteHeaderActions';
+import classes from './SiteChrome.module.css';
 
 /** Mantine container size shared by the site header, footer, and marketing sections. */
 export const siteContainerSize = 'lg';
@@ -40,19 +41,19 @@ const SiteHeader: React.FunctionComponent<SiteHeaderProps> = React.memo(
     const { isLoggedIn } = props;
 
     return (
+      // One-sided border and z-index: see SiteChrome.module.css.
       <Box
         component="header"
+        className={classes.header}
         bg="white"
         py="sm"
         pos="sticky"
         top={0}
-        style={{ zIndex: 100 }}
-        bd="0 0 1px var(--mantine-color-gray-3)"
       >
         <Container size={siteContainerSize}>
           <Group justify="space-between" wrap="wrap" align="center">
             <SiteWordmark />
-            <LandingPageHeaderActions isLoggedIn={isLoggedIn} />
+            <SiteHeaderActions isLoggedIn={isLoggedIn} />
           </Group>
         </Container>
       </Box>
@@ -62,7 +63,8 @@ const SiteHeader: React.FunctionComponent<SiteHeaderProps> = React.memo(
 
 const SiteFooter: React.FunctionComponent = React.memo(function SiteFooter() {
   return (
-    <Box component="footer" py="xl" bd="1px 0 0 var(--mantine-color-gray-3)">
+    // One-sided border: see SiteChrome.module.css.
+    <Box component="footer" className={classes.footer} py="xl">
       <Container size={siteContainerSize}>
         <Group justify="center" gap="md">
           <Anchor href="/terms-of-use">Terms of Use</Anchor>
@@ -82,7 +84,7 @@ const SiteWordmark: React.FunctionComponent = React.memo(
       <Anchor href="/" underline="never" c="inherit">
         <Group gap="xs" wrap="nowrap">
           <Box
-            bg="blue.6"
+            bg="green.8"
             c="white"
             px="sm"
             py="xs"

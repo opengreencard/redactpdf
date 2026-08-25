@@ -48,7 +48,7 @@ const UploadButtonAndDropzone: React.FunctionComponent = React.memo(
           <FontAwesomeIcon
             icon={faCloudArrowUp}
             size="2x"
-            color="var(--mantine-color-blue-6)"
+            color="var(--mantine-primary-color-6)"
           />
           <Button keyboardShortcut={null} onClick={handleOpenPicker}>
             Select a PDF

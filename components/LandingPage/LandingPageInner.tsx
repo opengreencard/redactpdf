@@ -73,17 +73,18 @@ const LandingPageHero: React.FunctionComponent = React.memo(
             <GridCol span={{ base: 12, md: 6 }}>
               <Stack gap="lg">
                 <Title order={1}>
-                  Redact PDFs{' '}
-                  <Text span inherit c="blue">
-                    automatically
+                  <Text span inherit c="green">
+                    Automatically
                   </Text>{' '}
-                  in seconds
+                  redact all sensitive info from PDFs{' '}
+                  <Text span inherit c="green">
+                    in seconds
+                  </Text>
                 </Title>
                 <Text size="lg" c="dimmed">
-                  The free way to redact a PDF. You do not have to hunt through
-                  the page and black out each name, address, or SSN by hand.
-                  Upload a PDF, review AI suggestions, and download a
-                  permanently redacted file.
+                  You don&apos;t have to hunt through the page and black out
+                  each name, address, or SSN by hand. Upload a PDF, review AI
+                  suggestions, and download a permanently redacted file.
                 </Text>
                 <Group>
                   <LandingPageUploadCTA fullWidth={false} />
@@ -275,12 +276,12 @@ const LandingPagePricing: React.FunctionComponent = React.memo(
                       Free
                     </Text>
                   </TableTh>
-                  <TableTh w="38%" ta="center" bg="blue.0" bdrs="md" py="sm">
+                  <TableTh w="38%" ta="center" bg="green.0" bdrs="md" py="sm">
                     <Stack gap={0} align="center">
-                      <Text fw="bold" size="sm" c="blue.8">
+                      <Text fw="bold" size="sm" c="green.8">
                         Registered
                       </Text>
-                      <Text size="xs" c="blue.6" fw="normal">
+                      <Text size="xs" c="green.6" fw="normal">
                         (still free!)
                       </Text>
                     </Stack>
@@ -296,7 +297,7 @@ const LandingPagePricing: React.FunctionComponent = React.memo(
                     <TableTd ta="center" bg="white">
                       <PricingCell value={row.free} />
                     </TableTd>
-                    <TableTd ta="center" bg="blue.0">
+                    <TableTd ta="center" bg="green.0">
                       <PricingCell value={row.registered} />
                     </TableTd>
                   </TableTr>
@@ -323,7 +324,10 @@ const PricingCell: React.FunctionComponent<PricingCellProps> = React.memo(
 
     if (value === 'check') {
       return (
-        <FontAwesomeIcon icon={faCheck} color="var(--mantine-color-blue-6)" />
+        <FontAwesomeIcon
+          icon={faCheck}
+          color="var(--mantine-primary-color-6)"
+        />
       );
     }
 

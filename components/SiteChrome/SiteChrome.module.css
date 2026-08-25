@@ -1,0 +1,13 @@
+/*
+ * Mantine `bd` is the CSS `border` shorthand (`1px solid gray.3`), not
+ * per-side widths. `bd="1px 0 0 gray.3"` is invalid and the browser ignores
+ * it. Box also has no z-index style prop.
+ */
+.header {
+  z-index: 100;
+  border-bottom: 1px solid var(--mantine-color-gray-2);
+}
+
+.footer {
+  border-top: 1px solid var(--mantine-color-gray-3);
+}

@@ -9,7 +9,7 @@ import Button from '../designSystem/Button/Button';
 import { githubRepoUrl } from '../../lib/config/brand';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 
-export interface LandingPageHeaderActionsProps {
+export interface SiteHeaderActionsProps {
   isLoggedIn: boolean;
 }
 
@@ -26,10 +26,8 @@ const flatHeaderButtonPadding = { px: 'xs' } as const;
  * Kept in one `Group` so fragment children do not become separate flex items
  * and spread across a wrapped mobile header row.
  */
-const LandingPageHeaderActions: React.FunctionComponent<LandingPageHeaderActionsProps> =
-  React.memo(function LandingPageHeaderActions(
-    props: LandingPageHeaderActionsProps
-  ) {
+const SiteHeaderActions: React.FunctionComponent<SiteHeaderActionsProps> =
+  React.memo(function SiteHeaderActions(props: SiteHeaderActionsProps) {
     const { isLoggedIn } = props;
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
     const [initialMode, setInitialMode] = useState<LoginFormMode>(
@@ -98,4 +96,4 @@ const LandingPageHeaderActions: React.FunctionComponent<LandingPageHeaderActions
     );
   });
 
-export default LandingPageHeaderActions;
+export default SiteHeaderActions;

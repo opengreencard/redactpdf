@@ -256,6 +256,17 @@ const commonNoRestrictedSyntaxRules = [
       "Avoid using style={{ gap }}. Use Mantine's 'gap' prop on Group or Stack components instead (e.g., gap=\"md\").",
   },
   {
+    // Bad: <Box bd="1px 0 0 var(--mantine-color-gray-3)" />
+    // Bad: <Box bd="0 0 1px gray.3" />
+    // Good: <Box bd="1px solid gray.3" />
+    // Good: a CSS module with border-top / border-bottom for one-sided borders
+    selector:
+      'JSXAttribute[name.name="bd"] Literal[value=/^\\s*\\d[\\w.]*\\s+\\d/]',
+    message:
+      'Mantine\'s bd prop is the CSS border shorthand (width style color), e.g. bd="1px solid gray.3". Values like bd="1px 0 0 gray.3" are invalid and the browser ignores them. Use a CSS module for one-sided borders.',
+  },
+
+  {
     // Bad: { ...ClientFakeData.makeFormField({ id: 'x' }), label: 'Name' }
     // Good: ClientFakeData.makeFormField({ id: 'x', label: 'Name' })
     selector:
