@@ -27,14 +27,14 @@ interface BrandMarkLayout {
 }
 
 /**
- * Sizes the blue “r” tile, lowercase “p”, and inset from the canvas edge.
+ * Sizes the blue “R” tile, “P”, and inset from the canvas edge.
  * Exported for tests.
  */
 export function _getBrandMarkLayout(size: number): BrandMarkLayout {
   // ~18% inset on each side so the mark does not touch the favicon / tile edge.
   const paddingPx = Math.round(size * 0.18);
   const contentWidth = size - paddingPx * 2;
-  // Blue square + gap + “p” ≈ 1.32× the square width at this font size.
+  // Blue square + gap + “P” ≈ 1.32× the square width at this font size.
   const squarePx = Math.round(contentWidth / 1.32);
   const fontPx = Math.round(squarePx * 0.65);
   const gapPx = Math.max(1, Math.round(squarePx * 0.1));
@@ -43,7 +43,7 @@ export function _getBrandMarkLayout(size: number): BrandMarkLayout {
 }
 
 /**
- * Favicon / apple-touch graphic: a blue square with “r” and a “p” to the
+ * Favicon / apple-touch graphic: a blue square with “R” and a “P” to the
  * right, a compact version of the redact / pdf.ai wordmark.
  *
  * Transparent PNG background — browsers and iOS supply their own tile/backdrop.
@@ -86,10 +86,9 @@ export function BrandMarkIcon(props: BrandMarkIconProps): React.ReactElement {
             fontSize: fontPx,
             fontWeight: 700,
             fontFamily: 'Arial, Helvetica, sans-serif',
-            textTransform: 'lowercase',
           }}
         >
-          r
+          R
         </div>
         <div
           style={{
@@ -100,10 +99,9 @@ export function BrandMarkIcon(props: BrandMarkIconProps): React.ReactElement {
             fontSize: fontPx,
             fontWeight: 700,
             fontFamily: 'Arial, Helvetica, sans-serif',
-            textTransform: 'lowercase',
           }}
         >
-          p
+          P
         </div>
       </div>
     </div>
