@@ -399,6 +399,17 @@ const commonNoRestrictedSyntaxRules = [
       'Avoid using z.any() or z.unknown() as they bypass type safety. Use a more specific Zod schema type instead.',
   },
   {
+    // Bad: Model.findOne({ where: { key } })
+    // Good: Model.findOne({ where: { key }, attributes: ['id'] })
+    //
+    // Explicit attributes keep read queries from loading columns that the
+    // caller does not need, including sensitive or large values.
+    selector:
+      'CallExpression[callee.type="MemberExpression"][callee.property.name=/^(findOne|findAll|findByPk)$/]:not(:has(ObjectExpression > :matches(Property[key.name="attributes"], Property[key.value="attributes"])))',
+    message:
+      'Always pass an attributes property to Sequelize .findOne(), .findAll(), and .findByPk() calls so they do not fetch every column.',
+  },
+  {
     // Bad:
     // db.define(..., { hooks: { afterDestroy: ... } })
     // Good:
