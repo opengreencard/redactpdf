@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
-import { BrandMarkIcon, BrandMarkIconProps } from './brandMarkIcon';
+import { BrandMarkIcon, BrandMarkIconProps } from './BrandMarkIcon';
 
 const metadata: Meta = {
   title: 'BrandMarkIcon',
@@ -9,6 +9,8 @@ const metadata: Meta = {
 export default metadata;
 
 const Template: StoryFn<BrandMarkIconProps> = (args) => (
+  // Checkerboard backdrop makes transparent canvas pixels visible in Storybook;
+  // production icons are transparent PNGs from ImageResponse.
   <div
     style={{
       display: 'inline-flex',

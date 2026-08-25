@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { BrandMarkIcon } from '../lib/config/brandMarkIcon';
+import { BrandMarkIcon } from '../lib/config/BrandMarkIcon';
 
 // Home-screen tile — Apple documents 180×180 for apple-touch-icon:
 // https://developer.apple.com/design/human-interface-guidelines/app-icons

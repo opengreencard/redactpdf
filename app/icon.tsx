@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { BrandMarkIcon } from '../lib/config/brandMarkIcon';
+import { BrandMarkIcon } from '../lib/config/BrandMarkIcon';
 
 // Tab favicon canvas — 32×32 is a common default for generated app icons:
 // https://nextjs.org/docs/app/api-reference/file-conventions/metadata/app-icons#icon
