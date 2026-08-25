@@ -11,6 +11,25 @@ For API changes, keep this shape:
 3. Test the server function (`*.test.ts`) for behavior + auth + errors.
 4. Do **not** add `route.test.ts` unless explicitly requested.
 
+## Testing
+
+- Test the server function (e.g. `getRedaction.ts`), not `route.ts`, for business
+  logic, auth, and error handling.
+- Add `route.test.ts` only when you need to assert HTTP-level wiring such as response
+  headers or status codes.
+
+## Polling GET endpoints
+
+When a GET returns JSON that clients poll while state is still changing (e.g.
+processing status or mutable fields), pass `additionalHeaders` on `makeGETAPIRoute`:
+
+```ts
+additionalHeaders: { 'Cache-Control': 'no-store' },
+```
+
+Add a comment on that option explaining why — intermediaries and browsers may otherwise
+cache a stale response while the client keeps polling.
+
 ## Example
 
 - Good:

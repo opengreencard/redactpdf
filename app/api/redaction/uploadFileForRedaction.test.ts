@@ -1,6 +1,10 @@
 import { PDFDocument } from '@cantoo/pdf-lib';
 import { putObject } from '../../../lib/storage/storageAPI';
-import Redaction, { redactionKeyLength } from '../../../lib/models/Redaction';
+import { PartialInstance } from '../../../lib/db/types';
+import Redaction, {
+  RedactionAttributes,
+  redactionKeyLength,
+} from '../../../lib/models/Redaction';
 import { RedactionStatus } from '../../../lib/models/redactionTypes';
 import { getRedactionFile } from '../../../lib/storage/storageFunctions/redactionFile';
 import { processRedaction } from './lib/processRedaction';
@@ -35,9 +39,13 @@ describe(uploadFileForRedaction, () => {
     expect(result.key).toHaveLength(redactionKeyLength);
     expect(result.pageCount).toBe(1);
 
-    const redaction = await Redaction.findOne({
+    const redaction = (await Redaction.findOne({
       where: { key: result.key },
-    });
+      attributes: ['status', 'redactionBoundingBoxes'],
+    })) as PartialInstance<
+      RedactionAttributes,
+      'status' | 'redactionBoundingBoxes'
+    > | null;
     expect(redaction).not.toBeNull();
     expect(redaction?.status).toBe(RedactionStatus.redacting);
     expect(redaction?.redactionBoundingBoxes).toEqual([]);

@@ -857,6 +857,7 @@ module.exports = {
         ],
       },
     ],
+    'redaction/require-find-by-pk-attributes': 'error',
     'redaction/require-sequelize-type-assertion': 'error',
     'redaction/enum-member-name-matches-value': 'error',
     'redaction/no-import-reexport': 'error',
