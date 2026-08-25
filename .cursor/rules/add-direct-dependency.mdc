@@ -1,0 +1,31 @@
+---
+description: Add a package as a direct dependency instead of inlining its types, enums, or string values.
+globs: '**/*.{ts,tsx},package.json'
+alwaysApply: false
+---
+
+# Add a direct dependency instead of inlining its API
+
+If you need a type, enum, or function from a package, import it and list that
+package in `package.json`. Do not copy its string values or types into our
+code to avoid an import.
+
+`import/no-extraneous-dependencies` means the package is missing from
+`package.json` (often it is only a transitive dependency). Fix that with
+`yarn add <package>`. Do not work around the lint by inlining the API.
+
+```ts
+// Bad — copied react-dropzone strings to avoid importing the package
+switch (error.code) {
+  case 'file-invalid-type':
+    return `${file.name} is not a PDF.`;
+}
+
+// Good — direct dependency + library enum
+import { ErrorCode } from 'react-dropzone';
+
+switch (error.code) {
+  case ErrorCode.FileInvalidType:
+    return `${file.name} is not a PDF.`;
+}
+```

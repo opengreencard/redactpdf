@@ -5,6 +5,9 @@ import { createRule } from '../util';
  * Flags `import { X } from '...'` followed by `export { X }` (or `export type { X }`)
  * in the same file. Canonical `export { X } from '...'` is covered separately by
  * `no-restricted-syntax`.
+ *
+ * `export default` is allowed: Next.js app-router pages commonly import a page
+ * component and re-export it as the route default.
  */
 export default createRule({
   name: 'no-import-reexport',
@@ -13,7 +16,7 @@ export default createRule({
     type: 'suggestion',
     docs: {
       description:
-        'Disallow re-exporting symbols that were imported in the same file.',
+        'Disallow named re-exports of symbols that were imported in the same file. Default re-exports are allowed.',
       requiresTypeChecking: false,
     },
     messages: {
@@ -30,16 +33,10 @@ export default createRule({
     }
 
     const importedLocalNames = new Set<string>();
-    let defaultImportLocalName: string | null = null;
 
     return {
       ImportDeclaration(node: TSESTree.ImportDeclaration) {
         for (const specifier of node.specifiers) {
-          if (specifier.type === AST_NODE_TYPES.ImportDefaultSpecifier) {
-            defaultImportLocalName = specifier.local.name;
-            continue;
-          }
-
           if (specifier.type === AST_NODE_TYPES.ImportSpecifier) {
             importedLocalNames.add(specifier.local.name);
           }
@@ -58,18 +55,6 @@ export default createRule({
               messageId: 'noImportReexport',
             });
           }
-        }
-      },
-
-      ExportDefaultDeclaration(node: TSESTree.ExportDefaultDeclaration) {
-        if (
-          node.declaration?.type === AST_NODE_TYPES.Identifier &&
-          defaultImportLocalName === node.declaration.name
-        ) {
-          context.report({
-            node: node.declaration,
-            messageId: 'noImportReexport',
-          });
         }
       },
     };

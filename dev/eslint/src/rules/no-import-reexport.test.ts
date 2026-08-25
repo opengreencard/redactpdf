@@ -38,6 +38,21 @@ ruleTester.run('no-import-reexport', rule, {
       `,
       filename: '/some/path/types.d.ts',
     },
+    // Next.js app-router pages import a component and re-export it as default.
+    {
+      code: `
+        import LandingPage from './LandingPage';
+        export default LandingPage;
+      `,
+      filename: '/some/path/app/page.tsx',
+    },
+    {
+      code: `
+        import { LandingPage } from './LandingPage';
+        export default LandingPage;
+      `,
+      filename: '/some/path/app/page.tsx',
+    },
   ],
   invalid: [
     {
@@ -75,14 +90,6 @@ ruleTester.run('no-import-reexport', rule, {
         { messageId: 'noImportReexport' },
         { messageId: 'noImportReexport' },
       ],
-    },
-    {
-      code: `
-        import Foo from './path';
-        export default Foo;
-      `,
-      filename: '/some/path/file.ts',
-      errors: [{ messageId: 'noImportReexport' }],
     },
   ],
 });
