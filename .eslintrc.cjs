@@ -256,6 +256,17 @@ const commonNoRestrictedSyntaxRules = [
       "Avoid using style={{ gap }}. Use Mantine's 'gap' prop on Group or Stack components instead (e.g., gap=\"md\").",
   },
   {
+    // Bad: <Box bd="1px 0 0 var(--mantine-color-gray-3)" />
+    // Bad: <Box bd="0 0 1px gray.3" />
+    // Good: <Box bd="1px solid gray.3" />
+    // Good: a CSS module with border-top / border-bottom for one-sided borders
+    selector:
+      'JSXAttribute[name.name="bd"] Literal[value=/^\\s*\\d[\\w.]*\\s+\\d/]',
+    message:
+      'Mantine\'s bd prop is the CSS border shorthand (width style color), e.g. bd="1px solid gray.3". Values like bd="1px 0 0 gray.3" are invalid and the browser ignores them. Use a CSS module for one-sided borders.',
+  },
+
+  {
     // Bad: { ...ClientFakeData.makeFormField({ id: 'x' }), label: 'Name' }
     // Good: ClientFakeData.makeFormField({ id: 'x', label: 'Name' })
     selector:
@@ -559,6 +570,23 @@ const commonNoRestrictedSyntaxRules = [
 const commonNoRestrictedSyntaxRulesForNonTests = [
   ...commonNoRestrictedSyntaxRules,
   {
+    // Bad: function SiteHeader() { ... }
+    // Bad: const SiteHeader = React.memo(function SiteHeader() { ... })
+    // Good: const SiteHeader: React.FunctionComponent<SiteHeaderProps> =
+    //         React.memo(function SiteHeader(props: SiteHeaderProps) { ... })
+    selector:
+      ':matches(FunctionDeclaration[id.name=/^[A-Z]/], FunctionExpression[id.name=/^[A-Z]/]:not(VariableDeclarator[id.typeAnnotation.typeAnnotation.typeName.left.name="React"][id.typeAnnotation.typeAnnotation.typeName.right.name="FunctionComponent"] > CallExpression[callee.object.name="React"][callee.property.name="memo"] > FunctionExpression))',
+    message:
+      'PascalCase functions should be `const Name: React.FunctionComponent<Props> = React.memo(function Name(...) { ... })`.',
+  },
+  {
+    // Bad: const blue = '#228be6'
+    // Good: resolveMantineThemeColor('blue.6') or <Box c="blue.6" />
+    selector: 'Literal[value=/^#[0-9a-fA-F]{3,8}$/]',
+    message:
+      'Avoid hardcoded hex colors. Use Mantine props (e.g. c="blue.6") in components, or resolveMantineThemeColor() / resolvePrimaryThemeColor() from lib/config/mantineTheme.ts for inline styles and ImageResponse.',
+  },
+  {
     // Bad: <Item onClick={(e) => ...} /> inline arrow in render
     // Good: <Item onClick={useMemoizedCallback(() => ...)}>
     // Good: <Item onClick={useCallbackWithPrefix(handleClick, [index])>
@@ -756,6 +784,12 @@ module.exports = {
         importNames: ['Button'],
         message:
           'Use the analytics-aware Button wrapper instead of importing Button directly from @mantine/core.',
+      },
+      {
+        name: '@mantine/core',
+        importNames: ['DEFAULT_THEME', 'DEFAULT_COLORS'],
+        message:
+          'Import theme colors via lib/config/mantineTheme.ts (resolveMantineThemeColor, resolvePrimaryThemeColor) instead of DEFAULT_THEME or DEFAULT_COLORS.',
       },
     ],
 

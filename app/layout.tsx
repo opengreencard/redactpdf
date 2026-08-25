@@ -5,35 +5,74 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 import React from 'react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import type { Metadata } from 'next';
-import { siteName } from '../lib/config/brand';
+import {
+  siteDescription,
+  siteName,
+  siteTitle,
+  siteUrl,
+} from '../lib/config/brand';
+import { outfit } from '../lib/config/fonts';
 import { theme } from '../theme';
+import { getAuthState } from '../lib/auth/nextAuth';
+import SiteChrome from '../components/SiteChrome/SiteChrome';
 
 config.autoAddCss = false;
 
-/** Metadata shared by pages until product-specific pages add their own. */
+/**
+ * Default metadata for `/` and a title template for inner pages.
+ * Title and description put “redact a PDF” / “free” in the first clause,
+ * which is what competitors (redactpdf.io, Smallpdf) do. Google ignores
+ * `<meta name="keywords">`, so we do not set it.
+ */
 export const metadata: Metadata = {
-  title: siteName,
-  description: 'Free, open-source AI-powered PDF redaction.',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteTitle,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  applicationName: siteName,
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    siteName,
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary',
+    title: siteTitle,
+    description: siteDescription,
+  },
 };
 
 export interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-/** Root App Router layout that provides Mantine and Font Awesome globally. */
-export default function RootLayout(props: RootLayoutProps): React.ReactElement {
+/** Root App Router layout: Mantine, Font Awesome, and site chrome globally. */
+// Next.js requires `export default function` for app/layout.tsx.
+// eslint-disable-next-line no-restricted-syntax
+export default async function RootLayout(
+  props: RootLayoutProps
+): Promise<React.ReactElement> {
   const { children } = props;
+  const authState = await getAuthState();
+  const isLoggedIn = Boolean(authState?.user);
 
   // Mantine's ColorSchemeScript sets data-mantine-color-scheme on <html> in
   // the browser based on the stored color-scheme preference. That client-side
   // attribute can differ from the server-rendered markup during hydration.
   return (
-    <html lang="en" suppressHydrationWarning>
+    // Keep any extra theme-related classes in sync with storybook/preview.tsx
+    <html lang="en" className={outfit.variable} suppressHydrationWarning>
       <head>
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          <SiteChrome isLoggedIn={isLoggedIn}>{children}</SiteChrome>
+        </MantineProvider>
       </body>
     </html>
   );

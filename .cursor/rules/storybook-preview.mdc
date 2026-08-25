@@ -31,15 +31,13 @@ export const SomethingElse: Story<YourComponentProps> = Template.bind({});
 SomethingElse.args = { someProp: 'abc' };
 ```
 
-Then, preview it using Storybook by visiting:
-`http://localhost:6006/iframe.html?path=/story/{title-lowercase}--{story-name-kebab}`
+Then load the `storybook-preview` skill to start Storybook if needed and open:
+
+`http://localhost:6006/iframe.html?id={title-lowercase}--{story-name-kebab}&viewMode=story`
 
 Where:
 
 - `{title-lowercase}` is the Storybook title in lowercase (e.g., `LandingPageInner` → `landingpageinner`)
 - `{story-name-kebab}` is the exported story name in kebab-case (e.g., `LoggedIn` → `logged-in`)
 
-Example: `http://localhost:6006/iframe.html?path=/story/landingpageinner--logged-in`
-
-After making a front-end change, load the `storybook-preview` skill to start
-Storybook if needed and verify the component renders as intended.
+Example: `http://localhost:6006/iframe.html?id=landingpageinner--logged-in&viewMode=story`

@@ -1,0 +1,5 @@
+.root {
+  border-width: 2px;
+  border-color: var(--mantine-primary-color-4);
+  background-color: var(--mantine-primary-color-0);
+}
