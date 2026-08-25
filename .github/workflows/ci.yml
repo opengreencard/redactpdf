@@ -5,8 +5,12 @@ name: CI
 # release adds a feature or fix we need — do not pin to old majors by default.
 
 on:
-  push:
   pull_request:
+  # Limit push to main so a commit on a PR branch does not trigger both
+  # pull_request and push. Feature-branch pushes without an open PR skip CI
+  # until a PR is opened; merges to main still run checks and build-image.
+  push:
+    branches: [main]
 
 jobs:
   # Static analysis (typecheck + lint) runs separately from tests and shellcheck
