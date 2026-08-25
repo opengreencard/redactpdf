@@ -59,6 +59,10 @@ while true; do
   if [ -z "$cursor" ]; then
     echo "Fetching page $page..."
     echo "Running: gh api graphql -f query=... -f owner=$OWNER -f repo=$REPO -F number=$PULL_REQUEST_NUMBER"
+
+    # Disable warning about using variables in the GraphQL query.
+    # GraphQL query is a literal; $owner/$repo/$number/$cursor are GraphQL variables.
+    # shellcheck disable=SC2016
     response=$(gh api graphql -f query='query($owner: String!, $repo: String!, $number: Int!, $cursor: String) {
       repository(owner: $owner, name: $repo) {
         pullRequest(number: $number) {
@@ -88,6 +92,8 @@ while true; do
   else
     echo "Fetching page $page..."
     echo "Running: gh api graphql -f query=... -f owner=$OWNER -f repo=$REPO -F number=$PULL_REQUEST_NUMBER -f cursor=$cursor"
+    # GraphQL query is a literal; $owner/$repo/$number/$cursor are GraphQL variables.
+    # shellcheck disable=SC2016
     response=$(gh api graphql -f query='query($owner: String!, $repo: String!, $number: Int!, $cursor: String) {
       repository(owner: $owner, name: $repo) {
         pullRequest(number: $number) {

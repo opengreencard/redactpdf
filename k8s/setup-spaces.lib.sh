@@ -76,8 +76,8 @@ buildScopedKeyGrants() {
 
 createScopedSpacesKey() {
   local keyName="$1"
-  local grants="$2"
-  doctl spaces keys create "$keyName" --grants "$grants" --output json
+  local grantsString="$2"
+  doctl spaces keys create "$keyName" --grants "$grantsString" --output json
 }
 
 createTemporaryFullaccessKeyJson() {
