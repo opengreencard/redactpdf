@@ -1,3 +1,5 @@
+// This file is the allowed DEFAULT_THEME merge; callers use resolveMantineThemeColor().
+// eslint-disable-next-line no-restricted-imports
 import { DEFAULT_THEME, mergeMantineTheme } from '@mantine/core';
 import { themeOverrides } from '../../themeOverrides';
 

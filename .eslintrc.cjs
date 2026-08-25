@@ -586,37 +586,6 @@ const commonNoRestrictedSyntaxRulesForNonTests = [
   },
 ];
 
-const baseRestrictedImportPaths = [
-  {
-    name: 'next/image',
-    importNames: ['Image'],
-    message:
-      "Instead of using next/image's Image, use our designSystem/Image.tsx component which combines both Mantine and Next.js image props",
-  },
-  {
-    name: '@mantine/core',
-    importNames: ['Image'],
-    message:
-      "Instead of using @mantine/core's Image, use our designSystem/Image.tsx component which combines both Mantine and Next.js image props",
-  },
-  {
-    name: '@tabler/icons-react',
-    message:
-      "Instead of using @tabler/icons-react's IconX, use our designSystem/FontAwesomeIcon with Font Awesome icons",
-  },
-  {
-    name: 'react-markdown',
-    message:
-      'Instead of using react-markdown directly, use our designSystem/Markdown component which applies Mantine defaults (e.g., Anchor links)',
-  },
-  {
-    name: '@mantine/core',
-    importNames: ['Button'],
-    message:
-      'Use the analytics-aware Button wrapper instead of importing Button directly from @mantine/core.',
-  },
-];
-
 const devDependencies = [
   '*eslintrc*',
   '**/*.test.*',
@@ -653,31 +622,6 @@ module.exports = {
     '@naverpay/eslint-plugin-use-client',
   ],
   overrides: [
-    {
-      files: ['**/*.{ts,tsx}'],
-      excludedFiles: ['lib/config/mantineTheme.ts'],
-      rules: {
-        'no-restricted-imports': [
-          'error',
-          ...baseRestrictedImportPaths,
-          {
-            name: '@mantine/core',
-            importNames: ['DEFAULT_THEME', 'DEFAULT_COLORS'],
-            message:
-              'Import theme colors via lib/config/mantineTheme.ts (resolveMantineThemeColor, resolvePrimaryThemeColor) instead of DEFAULT_THEME or DEFAULT_COLORS.',
-          },
-        ],
-      },
-    },
-    {
-      files: ['**/*.stories.*', '.storybook/**'],
-      rules: {
-        'no-restricted-syntax': [
-          'error',
-          ...commonNoRestrictedSyntaxRulesForNonTests,
-        ],
-      },
-    },
     {
       files: ['**/?(*.)+(spec|test).[jt]s?(x)'],
       extends: ['plugin:testing-library/react'],
@@ -800,7 +744,43 @@ module.exports = {
     // so that stacktraces and React Inspector is a bit easier to read
     'prefer-arrow-callback': 'off',
 
-    'no-restricted-imports': ['error', ...baseRestrictedImportPaths],
+    'no-restricted-imports': [
+      'error',
+      {
+        name: 'next/image',
+        importNames: ['Image'],
+        message:
+          "Instead of using next/image's Image, use our designSystem/Image.tsx component which combines both Mantine and Next.js image props",
+      },
+      {
+        name: '@mantine/core',
+        importNames: ['Image'],
+        message:
+          "Instead of using @mantine/core's Image, use our designSystem/Image.tsx component which combines both Mantine and Next.js image props",
+      },
+      {
+        name: '@tabler/icons-react',
+        message:
+          "Instead of using @tabler/icons-react's IconX, use our designSystem/FontAwesomeIcon with Font Awesome icons",
+      },
+      {
+        name: 'react-markdown',
+        message:
+          'Instead of using react-markdown directly, use our designSystem/Markdown component which applies Mantine defaults (e.g., Anchor links)',
+      },
+      {
+        name: '@mantine/core',
+        importNames: ['Button'],
+        message:
+          'Use the analytics-aware Button wrapper instead of importing Button directly from @mantine/core.',
+      },
+      {
+        name: '@mantine/core',
+        importNames: ['DEFAULT_THEME', 'DEFAULT_COLORS'],
+        message:
+          'Import theme colors via lib/config/mantineTheme.ts (resolveMantineThemeColor, resolvePrimaryThemeColor) instead of DEFAULT_THEME or DEFAULT_COLORS.',
+      },
+    ],
 
     // This prevents us from using `if (...) return X; else return Y;`, which
     // is often clearer than just defaulting to `return Y`
