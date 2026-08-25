@@ -150,11 +150,26 @@ fi
 doctl kubernetes cluster kubeconfig save "$CLUSTER_NAME"
 echo "kubectl context: $(kubectl config current-context)"
 
+# 1-click apps are installed asynchronously after cluster create returns
+# ("Successfully kicked off addon job"). `kubectl wait` fails immediately if
+# the namespace does not exist yet, so poll until cert-manager appears.
+echo 'Waiting for cert-manager 1-click app to be installed...'
+deadline=$((SECONDS + 600))
+until kubectl get deployment cert-manager -n cert-manager >/dev/null 2>&1; do
+  if [ "$SECONDS" -ge "$deadline" ]; then
+    echo 'Timed out waiting for cert-manager to be installed.'
+    exit 1
+  fi
+  echo -n '.'
+  sleep 5
+done
+echo
+
 # cert-manager's HTTP-01 self-check uses the pod's DNS resolver for domain
 # lookups. On DOKS, CoreDNS forwards to DO's internal resolver which can lag
 # behind external DNS propagation. Pinning cert-manager to public DNS (8.8.8.8)
 # avoids spurious "no such host" failures during certificate issuance.
-echo "Waiting for cert-manager to be ready..."
+echo 'Waiting for cert-manager to be ready...'
 kubectl wait --for=condition=available deployment/cert-manager -n cert-manager --timeout=300s
 kubectl patch deployment cert-manager -n cert-manager --type=strategic -p '
 {

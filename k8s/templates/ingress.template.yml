@@ -12,23 +12,22 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-issuer
     nginx.ingress.kubernetes.io/load-balance: ewma
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
-    nginx.ingress.kubernetes.io/server-snippet: |
-      # Keep redirect target in sync with NEXTAUTH_URL in
-      # k8s/templates/cluster.template.yml.
-      if ($host = 'www.%DOMAIN%') {
-        return 301 https://%DOMAIN%$request_uri;
-      }
+    # Keep the apex host in sync with NEXTAUTH_URL in
+    # k8s/templates/cluster.template.yml.
+    nginx.ingress.kubernetes.io/from-to-www-redirect: 'true'
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
+        # Both names must be on the certificate for HTTPS www→apex redirects.
         # Keep hosts in sync with k8s/variables.sh (DOMAIN).
         - '%DOMAIN%'
         - 'www.%DOMAIN%'
       secretName: redaction-tls
   rules:
+    # Only the apex host is listed. from-to-www-redirect adds the www server.
     - host: '%DOMAIN%'
-      http: &redaction-rules
+      http:
         paths:
           - pathType: Prefix
             path: /
@@ -37,5 +36,3 @@ spec:
                 name: redaction
                 port:
                   number: 3000
-    - host: 'www.%DOMAIN%'
-      http: *redaction-rules
