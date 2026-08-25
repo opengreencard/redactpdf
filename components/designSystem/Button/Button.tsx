@@ -22,6 +22,8 @@ export interface ButtonProps
     Pick<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
   component?: React.ElementType;
   href?: string;
+  target?: string;
+  rel?: string;
   leftSection?: ButtonSection;
   rightSection?: ButtonSection;
   keyboardShortcut: KeyboardShortcutValue | null;

@@ -38,10 +38,9 @@ import {
   siteName,
   wanderlogUrl,
 } from '../../lib/config/brand';
-import LandingPageAuthCTA from './LandingPageAuthCTA';
+import LandingPageHeaderActions from './LandingPageHeaderActions';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
 import LandingPageUploadCTA from './LandingPageUploadCTA';
-import LandingPageViewSourceButton from './LandingPageViewSourceButton';
 import UploadButtonAndDropzone from '../Upload/UploadButtonAndDropzone';
 
 export interface LandingPageInnerProps {
@@ -85,12 +84,9 @@ function LandingPageHeader(props: { isLoggedIn: boolean }): React.ReactElement {
       bd="0 0 1px var(--mantine-color-gray-3)"
     >
       <Container size={pageContainerSize}>
-        <Group justify="space-between">
+        <Group justify="space-between" wrap="wrap" align="center">
           <LandingPageWordmark />
-          <Group gap="xs">
-            <LandingPageViewSourceButton />
-            <LandingPageAuthCTA isLoggedIn={isLoggedIn} />
-          </Group>
+          <LandingPageHeaderActions isLoggedIn={isLoggedIn} />
         </Group>
       </Container>
     </Box>
