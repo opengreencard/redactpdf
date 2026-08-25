@@ -32,13 +32,19 @@ async function main() {
     extensions: ['.js', '.jsx', '.ts', '.tsx'],
   });
 
-  const filteredFiles = (
-    await Promise.all(
-      inputFiles.map(async (inputFile) =>
-        (await eslint.isPathIgnored(inputFile)) ? null : inputFile,
-      ),
-    )
-  ).filter((inputFile) => inputFile !== null);
+  const filteredFiles =
+    // Disable warning to use promiseAllThrottled: this mostly polls
+    // the local filesystem and is very fast
+    // Note that eslint-disable-next-line doesn't work here due to Prettier
+    /* eslint-disable no-restricted-syntax */
+    (
+      await Promise.all(
+        inputFiles.map(async (inputFile) =>
+          (await eslint.isPathIgnored(inputFile)) ? null : inputFile
+        )
+      )
+    ).filter((inputFile) => inputFile !== null);
+  /* eslint-enable no-restricted-syntax */
 
   // lefthook expands {push_files} into repo-relative paths, so returning the
   // filtered list as plain space-separated paths lets the hook splice them
@@ -47,6 +53,8 @@ async function main() {
 }
 
 main().catch((error) => {
+  // Hook tooling must surface failures to stderr without importing a logger.
+  // eslint-disable-next-line no-console
   console.error(error);
   process.exitCode = 1;
 });

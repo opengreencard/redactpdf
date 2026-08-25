@@ -575,6 +575,7 @@ const devDependencies = [
   '**/*.stories.*',
   '.storybook/**',
   'test-utils/**',
+  'dev/**',
 ];
 
 const useClientHookIgnorePaths = [
