@@ -1,5 +1,5 @@
-import rule from '../enum-member-name-matches-value';
-import ruleTester from '../ruleTester';
+import rule from './enum-member-name-matches-value';
+import ruleTester from './ruleTester';
 
 ruleTester.run('enum-member-name-matches-value', rule, {
   valid: [

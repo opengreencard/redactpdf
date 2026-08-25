@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import UploadModal from '../Upload/UploadModal';
+import React from 'react';
 import Button from '../designSystem/Button/Button';
-import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import { useLandingPageUploadModalState } from './LandingPageUploadModalProvider';
 
 export interface LandingPageUploadCTAProps {
   fullWidth: boolean;
@@ -13,26 +12,16 @@ export interface LandingPageUploadCTAProps {
 const LandingPageUploadCTA: React.FunctionComponent<LandingPageUploadCTAProps> =
   React.memo(function LandingPageUploadCTA(props: LandingPageUploadCTAProps) {
     const { fullWidth } = props;
-    const [isOpen, setIsOpen] = useState(false);
-
-    const handleOpen = useMemoizedCallback(() => {
-      setIsOpen(true);
-    }, []);
-    const handleClose = useMemoizedCallback(() => {
-      setIsOpen(false);
-    }, []);
+    const { openUploadModal } = useLandingPageUploadModalState();
 
     return (
-      <>
-        <Button
-          keyboardShortcut={null}
-          onClick={handleOpen}
-          fullWidth={fullWidth}
-        >
-          Upload your PDF
-        </Button>
-        <UploadModal isOpen={isOpen} onClose={handleClose} />
-      </>
+      <Button
+        keyboardShortcut={null}
+        onClick={openUploadModal}
+        fullWidth={fullWidth}
+      >
+        Upload your PDF
+      </Button>
     );
   });
 

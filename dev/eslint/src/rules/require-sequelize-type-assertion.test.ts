@@ -1,5 +1,5 @@
-import rule from '../require-sequelize-type-assertion';
-import ruleTester from '../ruleTester';
+import rule from './require-sequelize-type-assertion';
+import ruleTester from './ruleTester';
 
 ruleTester.run('require-sequelize-type-assertion', rule, {
   valid: [

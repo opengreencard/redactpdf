@@ -5,6 +5,8 @@ This folder contains custom ESLint rules for the repository, authored in TypeScr
 ## Current rules
 - `restricted-imports-needs-client-directive`
   - Requires `"use client"` at the top of files that use imports matched by configurable `paths` restrictions.
+- `no-import-reexport`
+  - Disallows named re-exports of a symbol that was imported in the same file (for example, `import type { X } from '...'` followed by `export type { X }`). `export default` is allowed so Next.js pages can re-export a page component.
 
 ## Working with this plugin
 - Build once with `yarn --cwd dev/eslint build` after rule changes.

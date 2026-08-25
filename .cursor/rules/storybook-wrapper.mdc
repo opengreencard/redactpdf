@@ -1,0 +1,75 @@
+---
+description: Use a StoryWrapper when a story must simulate interaction-driven loading or other local state.
+globs: '**/*.stories.tsx'
+alwaysApply: false
+---
+
+# Storybook wrappers for interactive state
+
+When a story needs to exercise loading, success, or error **after a user
+action** (file drop, submit, click), do not only pass a static
+`makeInProgressState()` into the presentational component. Wrap it in a
+`StoryWrapper` in the stories file that owns local state.
+
+Type the story as `StoryFn<StoryWrapperProps>`, not `StoryFn<InnerProps>`.
+`StoryWrapperProps` is a story control surface:
+
+- `Pick` (or pass through) Inner props the story should still tweak.
+- Replace callbacks and live state the wrapper owns (`onSubmit`, `status`)
+  with story-only seeds such as `initialStatus`.
+
+`Template` always mounts `StoryWrapper` so Default / Loading / Error share
+the same interaction path. Story `args` are wrapper props; the wrapper maps
+them onto Inner.
+
+```tsx
+interface StoryWrapperProps
+  extends Pick<SomeComponentInnerProps, 'enableFullScreenDrop'> {
+  initialStatus: APICallState<Result> | null;
+}
+
+const defaultProps: StoryWrapperProps = {
+  enableFullScreenDrop: true,
+  initialStatus: null,
+};
+
+const metadata: Meta = {
+  title: 'SomeComponentInner',
+  component: SomeComponentInner,
+  args: defaultProps,
+};
+export default metadata;
+
+const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
+  function StoryWrapper(props: StoryWrapperProps) {
+    const { enableFullScreenDrop, initialStatus } = props;
+    const [status, setStatus] = useState(initialStatus);
+
+    const handleSubmit = useMemoizedCallback(async () => {
+      setStatus(makeInProgressState());
+      await delay(5000);
+      setStatus(makeDoneState({ id: 'storybook-id' }));
+    }, []);
+
+    return (
+      <SomeComponentInner
+        enableFullScreenDrop={enableFullScreenDrop}
+        onSubmit={handleSubmit}
+        status={status}
+      />
+    );
+  }
+);
+
+const Template: StoryFn<StoryWrapperProps> = (args) => (
+  <StoryWrapper {...args} />
+);
+
+export const Default: StoryFn<StoryWrapperProps> = Template.bind({});
+
+export const Loading: StoryFn<StoryWrapperProps> = Template.bind({});
+Loading.args = { initialStatus: makeInProgressState() };
+```
+
+Keep the wrapper in the `.stories.tsx` file unless more than one story file
+needs it.

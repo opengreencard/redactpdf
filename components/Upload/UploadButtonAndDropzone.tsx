@@ -1,65 +1,44 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Stack, Text } from '@mantine/core';
-import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
-import { faCloudArrowUp } from '@fortawesome/free-solid-svg-icons';
-import Button from '../designSystem/Button/Button';
-import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
-import classes from './UploadButtonAndDropzone.module.css';
+import { useAPICall } from '../../lib/hookUtilities/useAPICall';
+import { uploadFileForRedactionClient } from '../clientLib/api/redaction';
+import UploadButtonAndDropzoneInner from './UploadButtonAndDropzoneInner';
+
+export interface UploadButtonAndDropzoneProps {
+  enableFullScreenDrop: boolean;
+}
 
 /**
- * Shim until task 2.2. Looks like the real dropzone but does not upload;
- * any accepted PDF navigates to `/redact/shim-key`.
+ * Uploads one PDF and navigates to `/redact/:key` when the API succeeds.
  */
-const shimRedactionKey = 'shim-key';
-
-const UploadButtonAndDropzone: React.FunctionComponent = React.memo(
-  function UploadButtonAndDropzone() {
+const UploadButtonAndDropzone: React.FunctionComponent<UploadButtonAndDropzoneProps> =
+  React.memo(function UploadButtonAndDropzone(
+    props: UploadButtonAndDropzoneProps
+  ) {
+    const { enableFullScreenDrop } = props;
     const router = useRouter();
-    const openRef = useRef<(() => void | undefined) | null>(null);
 
-    const handleDrop = useMemoizedCallback(
-      (files: File[]) => {
-        if (files.length !== 1) {
-          return;
-        }
-        router.push(`/redact/${shimRedactionKey}`);
-      },
-      [router]
+    const { call: handleFileSelected, state: uploadStatus } = useAPICall(
+      useMemoizedCallback(
+        async (file: File) => {
+          const result = await uploadFileForRedactionClient({ file });
+          router.push(`/redact/${result.key}`);
+          return result;
+        },
+        [router]
+      )
     );
-    const handleOpenPicker = useMemoizedCallback(() => {
-      openRef.current?.();
-    }, []);
 
     return (
-      <Dropzone
-        openRef={openRef}
-        onDrop={handleDrop}
-        accept={[MIME_TYPES.pdf]}
-        maxFiles={1}
-        multiple={false}
-        classNames={{ root: classes.root }}
-        p="xl"
-      >
-        <Stack align="center" gap="sm" py="md">
-          <FontAwesomeIcon
-            icon={faCloudArrowUp}
-            size="2x"
-            color="var(--mantine-primary-color-6)"
-          />
-          <Button keyboardShortcut={null} onClick={handleOpenPicker}>
-            Select a PDF
-          </Button>
-          <Text size="sm" c="dimmed">
-            or drop a file here · PDF only
-          </Text>
-        </Stack>
-      </Dropzone>
+      <UploadButtonAndDropzoneInner
+        onFileSelected={handleFileSelected}
+        uploadStatus={uploadStatus}
+        enableFullScreenDrop={enableFullScreenDrop}
+      />
     );
-  }
-);
+  });
 
 export default UploadButtonAndDropzone;

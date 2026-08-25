@@ -1,4 +1,4 @@
-import { UploadFileForRedactionResponse } from '../../../app/api/redaction/uploadFileForRedaction';
+import type { UploadFileForRedactionResponse } from '../../../app/api/redaction/uploadFileForRedaction';
 import { makeClientPOSTRoute, POSTRouteData } from './common';
 
 /** Client input for uploading one PDF for redaction. */
