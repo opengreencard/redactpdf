@@ -7,7 +7,7 @@ export interface LegalPageProps {
   children: React.ReactNode;
 }
 
-/** Provides the shared page shell for RedactPDF.ai legal documents. */
+/** Provides the shared content shell for RedactPDF.ai legal documents. */
 const LegalPage: React.FunctionComponent<LegalPageProps> = React.memo(
   function LegalPage(props: LegalPageProps) {
     const { title, lastUpdated, children } = props;

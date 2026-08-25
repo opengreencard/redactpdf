@@ -1,23 +1,33 @@
 import React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
-import LandingPageInner, { LandingPageInnerProps } from './LandingPageInner';
+import SiteChrome from '../SiteChrome/SiteChrome';
+import LandingPageInner from './LandingPageInner';
 
-const defaultProps: LandingPageInnerProps = {
+interface LandingPageInnerStoryProps {
+  isLoggedIn: boolean;
+}
+
+const defaultProps: LandingPageInnerStoryProps = {
   isLoggedIn: false,
 };
 
 const metadata: Meta = {
   title: 'LandingPageInner',
-  component: LandingPageInner,
   args: defaultProps,
 };
 export default metadata;
 
-const Template: StoryFn<LandingPageInnerProps> = (args) => (
-  <LandingPageInner {...args} />
-);
+const Template: StoryFn<LandingPageInnerStoryProps> = (args) => {
+  const { isLoggedIn } = args;
 
-export const Default: StoryFn<LandingPageInnerProps> = Template.bind({});
+  return (
+    <SiteChrome isLoggedIn={isLoggedIn}>
+      <LandingPageInner />
+    </SiteChrome>
+  );
+};
 
-export const LoggedIn: StoryFn<LandingPageInnerProps> = Template.bind({});
+export const Default: StoryFn<LandingPageInnerStoryProps> = Template.bind({});
+
+export const LoggedIn: StoryFn<LandingPageInnerStoryProps> = Template.bind({});
 LoggedIn.args = { isLoggedIn: true };

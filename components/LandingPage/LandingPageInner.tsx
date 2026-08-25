@@ -38,23 +38,18 @@ import {
   siteName,
   wanderlogUrl,
 } from '../../lib/config/brand';
-import LandingPageHeaderActions from './LandingPageHeaderActions';
+import { siteContainerSize } from '../SiteChrome/SiteChrome';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
 import LandingPageUploadCTA from './LandingPageUploadCTA';
 import UploadButtonAndDropzone from '../Upload/UploadButtonAndDropzone';
 
-export interface LandingPageInnerProps {
-  isLoggedIn: boolean;
-}
+export interface LandingPageInnerProps {}
 
 /** Marketing page visitors see at `/`. Upload is shimmed until task 2.2. */
 const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
-  React.memo(function LandingPageInner(props: LandingPageInnerProps) {
-    const { isLoggedIn } = props;
-
+  React.memo(function LandingPageInner() {
     return (
-      <Box>
-        <LandingPageHeader isLoggedIn={isLoggedIn} />
+      <>
         <LandingPageHero />
         <LandingPageBeforeAfter />
         <LandingPageHowItWorks />
@@ -63,39 +58,15 @@ const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
         <LandingPagePricing />
         <LandingPageWhyFree />
         <LandingPageFaq />
-        <LandingPageFooter />
-      </Box>
+      </>
     );
   });
 
 export default LandingPageInner;
 
-function LandingPageHeader(props: { isLoggedIn: boolean }): React.ReactElement {
-  const { isLoggedIn } = props;
-
-  return (
-    <Box
-      component="header"
-      bg="white"
-      py="sm"
-      pos="sticky"
-      top={0}
-      style={{ zIndex: 100 }}
-      bd="0 0 1px var(--mantine-color-gray-3)"
-    >
-      <Container size={pageContainerSize}>
-        <Group justify="space-between" wrap="wrap" align="center">
-          <LandingPageWordmark />
-          <LandingPageHeaderActions isLoggedIn={isLoggedIn} />
-        </Group>
-      </Container>
-    </Box>
-  );
-}
-
 function LandingPageHero(): React.ReactElement {
   return (
-    <Container size={pageContainerSize} py="xl">
+    <Container size={siteContainerSize} py="xl">
       <Stack gap="xl">
         <Grid gap="xl" align="center">
           <GridCol span={{ base: 12, md: 6 }}>
@@ -141,7 +112,7 @@ function LandingPageHero(): React.ReactElement {
 
 function LandingPageBeforeAfter(): React.ReactElement {
   return (
-    <Container size={pageContainerSize} py="xl">
+    <Container size={siteContainerSize} py="xl">
       <Stack gap="lg">
         <Title order={2} ta="center">
           Before / after
@@ -178,7 +149,7 @@ function BeforeAfterPlaceholder(props: { title: string }): React.ReactElement {
 function LandingPageHowItWorks(): React.ReactElement {
   return (
     <Box bg="gray.0" py="xl">
-      <Container size={pageContainerSize}>
+      <Container size={siteContainerSize}>
         <Stack gap="lg">
           <Stack gap="xs">
             <Title order={2} ta="center">
@@ -211,7 +182,7 @@ function LandingPageHowItWorks(): React.ReactElement {
 
 function LandingPageDetectList(): React.ReactElement {
   return (
-    <Container size={pageContainerSize} py="xl">
+    <Container size={siteContainerSize} py="xl">
       <Stack gap="lg">
         <Title order={2} ta="center">
           We automatically detect
@@ -234,7 +205,7 @@ function LandingPageDetectList(): React.ReactElement {
 function LandingPagePrivacy(): React.ReactElement {
   return (
     <Box bg="gray.0" py="xl">
-      <Container size={pageContainerSize}>
+      <Container size={siteContainerSize}>
         <Stack gap="lg">
           <Title order={2} ta="center">
             Privacy and open source
@@ -266,7 +237,7 @@ function LandingPagePrivacy(): React.ReactElement {
 
 function LandingPagePricing(): React.ReactElement {
   return (
-    <Container size={pageContainerSize} py="xl">
+    <Container size={siteContainerSize} py="xl">
       <Stack gap="lg">
         <Title order={2} ta="center">
           Pricing
@@ -347,7 +318,7 @@ function LandingPageWhyFree(): React.ReactElement {
       id={whyThisIsFreeSectionId}
       style={{ scrollMarginTop: 72 }}
     >
-      <Container size={pageContainerSize}>
+      <Container size={siteContainerSize}>
         <Stack gap="md">
           <Title order={2} ta="center">
             Why is this free?
@@ -385,7 +356,7 @@ function LandingPageWhyFree(): React.ReactElement {
 
 function LandingPageFaq(): React.ReactElement {
   return (
-    <Container size={pageContainerSize} py="xl">
+    <Container size={siteContainerSize} py="xl">
       <Stack gap="xl">
         <Title order={2} ta="center">
           FAQ
@@ -401,38 +372,6 @@ function LandingPageFaq(): React.ReactElement {
   );
 }
 
-function LandingPageFooter(): React.ReactElement {
-  return (
-    <Box component="footer" py="xl" bd="1px 0 0 var(--mantine-color-gray-3)">
-      <Container size={pageContainerSize}>
-        <Group justify="center" gap="md">
-          <Anchor href="/terms-of-use">Terms of Use</Anchor>
-          <Anchor href="/privacy-policy">Privacy Policy</Anchor>
-          <Anchor href={githubRepoUrl} target="_blank" rel="noreferrer">
-            GitHub
-          </Anchor>
-        </Group>
-      </Container>
-    </Box>
-  );
-}
-
-function LandingPageWordmark(): React.ReactElement {
-  return (
-    <Anchor href="/" underline="never" c="inherit">
-      <Group gap="xs" wrap="nowrap">
-        <Box bg="blue.6" c="white" px="sm" py="xs" bdrs="sm" fw="bold" lh={1.4}>
-          redact
-        </Box>
-        <Text fw="bold" size="lg">
-          pdf.ai
-        </Text>
-      </Group>
-    </Anchor>
-  );
-}
-
-const pageContainerSize = 'lg';
 const whyThisIsFreeSectionId = 'why-this-is-free';
 const unlimitedUploadsValue = 'unlimited';
 

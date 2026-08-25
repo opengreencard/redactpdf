@@ -13,6 +13,8 @@ import {
 } from '../lib/config/brand';
 import { outfit } from '../lib/config/fonts';
 import { theme } from '../theme';
+import { getAuthState } from '../lib/auth/nextAuth';
+import SiteChrome from '../components/SiteChrome/SiteChrome';
 
 config.autoAddCss = false;
 
@@ -48,9 +50,13 @@ export interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-/** Root App Router layout that provides Mantine and Font Awesome globally. */
-export default function RootLayout(props: RootLayoutProps): React.ReactElement {
+/** Root App Router layout: Mantine, Font Awesome, and site chrome globally. */
+export default async function RootLayout(
+  props: RootLayoutProps
+): Promise<React.ReactElement> {
   const { children } = props;
+  const authState = await getAuthState();
+  const isLoggedIn = Boolean(authState?.user);
 
   // Mantine's ColorSchemeScript sets data-mantine-color-scheme on <html> in
   // the browser based on the stored color-scheme preference. That client-side
@@ -62,7 +68,9 @@ export default function RootLayout(props: RootLayoutProps): React.ReactElement {
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={theme}>{children}</MantineProvider>
+        <MantineProvider theme={theme}>
+          <SiteChrome isLoggedIn={isLoggedIn}>{children}</SiteChrome>
+        </MantineProvider>
       </body>
     </html>
   );
