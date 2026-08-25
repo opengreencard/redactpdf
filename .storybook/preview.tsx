@@ -3,13 +3,18 @@ import '@mantine/dropzone/styles.css';
 import React from 'react';
 import { MantineProvider } from '@mantine/core';
 import type { Decorator, StoryFn } from '@storybook/react';
+import { outfit } from '../lib/config/fonts';
+
 import { theme } from '../theme';
 
 export const decorators: Decorator[] = [
   (Story: StoryFn) => (
-    <MantineProvider theme={theme}>
-      <Story />
-    </MantineProvider>
+    // Apply same font as in layout.tsx. Keep in sync
+    <div className={outfit.variable}>
+      <MantineProvider theme={theme}>
+        <Story />
+      </MantineProvider>
+    </div>
   ),
 ];
 

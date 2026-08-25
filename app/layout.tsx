@@ -5,15 +5,43 @@ import '@fortawesome/fontawesome-svg-core/styles.css';
 import React from 'react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import type { Metadata } from 'next';
-import { siteName } from '../lib/config/brand';
+import {
+  siteDescription,
+  siteName,
+  siteTitle,
+  siteUrl,
+} from '../lib/config/brand';
+import { outfit } from '../lib/config/fonts';
 import { theme } from '../theme';
 
 config.autoAddCss = false;
 
-/** Metadata shared by pages until product-specific pages add their own. */
+/**
+ * Default metadata for `/` and a title template for inner pages.
+ * Title and description put “redact a PDF” / “free” in the first clause,
+ * which is what competitors (redactpdf.io, Smallpdf) do. Google ignores
+ * `<meta name="keywords">`, so we do not set it.
+ */
 export const metadata: Metadata = {
-  title: siteName,
-  description: 'Free, open-source AI-powered PDF redaction.',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: siteTitle,
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  applicationName: siteName,
+  openGraph: {
+    title: siteTitle,
+    description: siteDescription,
+    siteName,
+    type: 'website',
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary',
+    title: siteTitle,
+    description: siteDescription,
+  },
 };
 
 export interface RootLayoutProps {
@@ -28,7 +56,8 @@ export default function RootLayout(props: RootLayoutProps): React.ReactElement {
   // the browser based on the stored color-scheme preference. That client-side
   // attribute can differ from the server-rendered markup during hydration.
   return (
-    <html lang="en" suppressHydrationWarning>
+    // Keep any extra theme-related classes in sync with storybook/preview.tsx
+    <html lang="en" className={outfit.variable} suppressHydrationWarning>
       <head>
         <ColorSchemeScript />
       </head>

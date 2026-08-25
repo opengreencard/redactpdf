@@ -1,6 +1,6 @@
 'use client';
 
-import React, { PropsWithChildren, useState } from 'react';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { Modal } from '@mantine/core';
 import LoginForm, { LoginFormMode, LoginFormProps } from './LoginForm';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
@@ -13,6 +13,8 @@ export interface LoginModalInnerProps extends Omit<
 > {
   isOpen: boolean;
   onClose: () => unknown;
+  /** Which form to show when the modal opens. */
+  initialMode: LoginFormMode;
   onLogin: (credentials: EmailAndPassword) => unknown;
   onSignUp: (credentials: EmailAndPassword) => unknown;
 }
@@ -22,10 +24,21 @@ const LoginModalInner: React.FunctionComponent<LoginModalInnerProps> =
   React.memo(function LoginModalInner(
     props: PropsWithChildren<LoginModalInnerProps>
   ) {
-    const { isOpen, onClose, onLogin, onSignUp, ...passThroughProps } = props;
-    const [formMode, setFormMode] = useState<LoginFormMode>(
-      LoginFormMode.signUp
-    );
+    const {
+      isOpen,
+      onClose,
+      initialMode,
+      onLogin,
+      onSignUp,
+      ...passThroughProps
+    } = props;
+    const [formMode, setFormMode] = useState<LoginFormMode>(initialMode);
+
+    useEffect(() => {
+      if (isOpen) {
+        setFormMode(initialMode);
+      }
+    }, [initialMode, isOpen]);
 
     const handleSubmit = useMemoizedCallback(
       (credentials: EmailAndPassword) => {

@@ -2357,6 +2357,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fortawesome/free-brands-svg-icons@npm:^7.3.1":
+  version: 7.3.1
+  resolution: "@fortawesome/free-brands-svg-icons@npm:7.3.1"
+  dependencies:
+    "@fortawesome/fontawesome-common-types": "npm:7.3.1"
+  checksum: 10c0/ae9049f450a64166f02e6a199b0c87786899a0d49e114994da85b8ccf906466543510d0e3e63fdb945eac00e0b81b0c2e274d54f06a605767a1e8503bdea344e
+  languageName: node
+  linkType: hard
+
 "@fortawesome/free-solid-svg-icons@npm:^7.3.1":
   version: 7.3.1
   resolution: "@fortawesome/free-solid-svg-icons@npm:7.3.1"
@@ -13453,6 +13462,7 @@ __metadata:
     "@aws-sdk/s3-request-presigner": "npm:^3.1111.0"
     "@cantoo/pdf-lib": "npm:^2.8.4"
     "@fortawesome/fontawesome-svg-core": "npm:^7.3.1"
+    "@fortawesome/free-brands-svg-icons": "npm:^7.3.1"
     "@fortawesome/free-solid-svg-icons": "npm:^7.3.1"
     "@fortawesome/react-fontawesome": "npm:^3.5.0"
     "@mantine/core": "npm:^9.5.1"

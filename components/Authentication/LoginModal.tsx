@@ -11,7 +11,7 @@ import { EmailAndPassword } from '../../lib/auth/types';
 
 export interface LoginModalProps extends Pick<
   LoginModalInnerProps,
-  'isOpen' | 'onClose'
+  'isOpen' | 'onClose' | 'initialMode'
 > {}
 
 /**
@@ -19,7 +19,7 @@ export interface LoginModalProps extends Pick<
  * login methods, and also handles starting OAuth, etc.
  */
 const LoginModal: React.FunctionComponent<LoginModalProps> = React.memo(
-  function LoginModal({ isOpen, onClose }: LoginModalProps) {
+  function LoginModal({ isOpen, onClose, initialMode }: LoginModalProps) {
     const router = useRouter();
 
     const { call: handleLogin, state: loginFormState } = useAPICall(
@@ -65,6 +65,7 @@ const LoginModal: React.FunctionComponent<LoginModalProps> = React.memo(
       <LoginModalInner
         isOpen={isOpen}
         onClose={onClose}
+        initialMode={initialMode}
         onLogin={handleLogin}
         onSignUp={handleSignUp}
         onGoogleClick={handleGoogleClick}
