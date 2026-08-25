@@ -1,5 +1,15 @@
-import { GetObjectCommandOutput, S3ServiceException } from '@aws-sdk/client-s3';
-import { putObject as origPutObject } from '../storageAPI';
+import { S3ServiceException } from '@aws-sdk/client-s3';
+import type {
+  DeleteObjectCommandOutput,
+  DeleteObjectsCommandOutput,
+  GetObjectCommandOutput,
+  PutObjectCommandOutput,
+} from '@aws-sdk/client-s3';
+import type {
+  deleteObject as origDeleteObject,
+  deleteObjects as origDeleteObjects,
+  putObject as origPutObject,
+} from '../storageAPI';
 
 interface Metadata {
   ContentLength: number;
@@ -19,13 +29,13 @@ const files: { [key: string]: FileData } = {};
  * Pretend to put an object into S3/Digital Ocean spaces, but
  * actually just save it in memory
  */
-export const putObject: typeof origPutObject = async ({
+async function putObjectImplementation({
   key,
   data,
   mimeType,
   length,
   contentEncoding,
-}) => {
+}: Parameters<typeof origPutObject>[0]): Promise<PutObjectCommandOutput> {
   files[key] = {
     data: Buffer.from(data),
     metadata: {
@@ -35,20 +45,32 @@ export const putObject: typeof origPutObject = async ({
     },
   };
   // We don't really use the response type here
-  return undefined as any;
-};
-
-/** Delete a single object */
-export async function deleteObject(key: string) {
-  delete files[key];
+  const response: PutObjectCommandOutput = { $metadata: {} };
+  return response;
 }
 
+export const putObject = jest.fn(
+  putObjectImplementation
+) as typeof origPutObject;
+
+/** Delete a single object */
+export const deleteObject: typeof origDeleteObject = async (key, _options) => {
+  delete files[key];
+  const response: DeleteObjectCommandOutput = { $metadata: {} };
+  return response;
+};
+
 /** Bulk delete multiple objects */
-export async function deleteObjects(keys: string[]) {
+export const deleteObjects: typeof origDeleteObjects = async (
+  keys,
+  _options
+) => {
   for (const key of keys) {
     delete files[key];
   }
-}
+  const response: DeleteObjectsCommandOutput = { $metadata: {} };
+  return response;
+};
 
 /**
  * This error is meant to mirror the actual error that the AWS S3 API

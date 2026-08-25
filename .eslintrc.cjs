@@ -539,6 +539,21 @@ const commonNoRestrictedSyntaxRules = [
     message:
       'Avoid re-exporting symbols. Import them from their canonical module, where they are declared, to keep the dependency path direct.',
   },
+  {
+    // Bad: import * as storageAPI from './storageAPI'
+    // Good: import { getObject } from './storageAPI'
+    selector: 'ImportDeclaration > ImportNamespaceSpecifier',
+    message:
+      'Prefer direct named or default imports over namespace imports so each dependency is explicit.',
+  },
+  {
+    // Bad: jest.mock('../storage/storageAPI')
+    // Good: use the in-memory mock registered in lib/testUtilities/setup.ts
+    selector:
+      'CallExpression[callee.object.name="jest"][callee.property.name="mock"] Literal[value=/storageAPI/]',
+    message:
+      'Do not mock storageAPI in an individual file; it is already mocked globally in lib/testUtilities/setup.ts with in-memory DigitalOcean Spaces reads and writes.',
+  },
 ];
 
 const commonNoRestrictedSyntaxRulesForNonTests = [
@@ -560,6 +575,7 @@ const devDependencies = [
   '**/*.stories.*',
   '.storybook/**',
   'test-utils/**',
+  'dev/**',
 ];
 
 const useClientHookIgnorePaths = [
