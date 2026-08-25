@@ -73,14 +73,12 @@ hasField() {
 
 dbPass=''
 dbRootPass=''
-nextauthSecret=''
 authSecret=''
 s3AccessKeyId=''
 s3SecretAccessKey=''
 googleClientId=''
 googleClientSecret=''
-smtpUser=''
-smtpPassword=''
+deepinfraApiKey=''
 
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'S3_ACCESS_KEY_ID'; then
   echo 'Enter external provider secrets:'
@@ -105,15 +103,10 @@ if [ "$OVERWRITE" = 'true' ] || ! hasField 'GOOGLE_CLIENT_SECRET'; then
   [ -n "$googleClientSecret" ] || { echo 'Error: Google OAuth client secret is required.'; exit 1; }
 fi
 
-if [ "$OVERWRITE" = 'true' ] || ! hasField 'SMTP_USER'; then
-  read -rep 'SMTP username (Gmail address): ' smtpUser
-  [ -n "$smtpUser" ] || { echo 'Error: SMTP username is required.'; exit 1; }
-fi
-
-if [ "$OVERWRITE" = 'true' ] || ! hasField 'SMTP_PASSWORD'; then
-  read -rsp 'SMTP password (Google App Password: https://myaccount.google.com/apppasswords): ' smtpPassword
+if [ "$OVERWRITE" = 'true' ] || ! hasField 'DEEPINFRA_API_KEY'; then
+  read -rsp 'Deep Infra API key (https://deepinfra.com/dash/api_keys): ' deepinfraApiKey
   echo
-  [ -n "$smtpPassword" ] || { echo 'Error: SMTP password is required.'; exit 1; }
+  [ -n "$deepinfraApiKey" ] || { echo 'Error: Deep Infra API key is required.'; exit 1; }
 fi
 
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'DB_PASS'; then
@@ -121,9 +114,6 @@ if [ "$OVERWRITE" = 'true' ] || ! hasField 'DB_PASS'; then
 fi
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'DB_ROOT_PASS'; then
   dbRootPass=$(openssl rand -base64 32)
-fi
-if [ "$OVERWRITE" = 'true' ] || ! hasField 'NEXTAUTH_SECRET'; then
-  nextauthSecret=$(openssl rand -base64 32)
 fi
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'AUTH_SECRET'; then
   authSecret=$(openssl rand -base64 32)
@@ -140,14 +130,12 @@ addField() {
 
 addField 'DB_PASS' "$dbPass"
 addField 'DB_ROOT_PASS' "$dbRootPass"
-addField 'NEXTAUTH_SECRET' "$nextauthSecret"
 addField 'AUTH_SECRET' "$authSecret"
 addField 'GOOGLE_CLIENT_ID' "$googleClientId"
 addField 'GOOGLE_CLIENT_SECRET' "$googleClientSecret"
 addField 'S3_ACCESS_KEY_ID' "$s3AccessKeyId"
 addField 'S3_SECRET_ACCESS_KEY' "$s3SecretAccessKey"
-addField 'SMTP_USER' "$smtpUser"
-addField 'SMTP_PASSWORD' "$smtpPassword"
+addField 'DEEPINFRA_API_KEY' "$deepinfraApiKey"
 
 if [ ${#fieldAssignments[@]} -eq 0 ]; then
   echo "No new or missing fields to add. All secrets are already set in $itemFQN."

@@ -49,7 +49,7 @@ items:
             - <<: &commonContainer
                 # Keep image in sync with GitHub Actions workflow (build-image job) and
                 # k8s/update-deployment.sh.
-                image: redaction/redaction:%REVISION%
+                image: opengreencard/redactpdf:%REVISION%
                 env:
                   - &commonNodeEnv
                     name: NODE_ENV
@@ -57,9 +57,8 @@ items:
                   - &commonAppMode
                     name: APP_MODE
                     value: production
-                # All sensitive values (DB_PASS, auth secrets, Google OAuth,
-                # S3 keys, and SMTP credentials) are injected from the redaction-env
-                # Secret.
+                # Sensitive values (DB_PASS, AUTH_SECRET, Google OAuth, S3 keys,
+                # and DEEPINFRA_API_KEY) are injected from the redaction-env Secret.
                 envFrom:
                   - secretRef:
                       name: redaction-env
@@ -78,9 +77,9 @@ items:
                 - *commonAppMode
 
                 # Non-sensitive production configuration (DB_HOST, DB_PORT,
-                # DB_USER, DB_DATABASE, and
-                # S3_BUCKET_PREFIX) is loaded from .env.production, which is
-                # intentionally included in the Docker image.
+                # DB_USER, DB_DATABASE, and S3_BUCKET_PREFIX) is loaded from
+                # .env.production.nonsecret, which is committed and copied
+                # into the Docker image.
                 #
                 # This remains an explicit deployment override because it
                 # must match the cluster's configured domain.

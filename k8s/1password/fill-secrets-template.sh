@@ -46,14 +46,12 @@ echo "Reading secrets from $itemFQN..."
 # op read writes the field value to stdout; stderr goes to inherited stderr.
 # stdin is redirected from /dev/null so op doesn't consume piped input.
 dbPass=$(op read "$itemFQN/DB_PASS" < /dev/null)
-nextauthSecret=$(op read "$itemFQN/NEXTAUTH_SECRET" < /dev/null)
 authSecret=$(op read "$itemFQN/AUTH_SECRET" < /dev/null)
 googleClientId=$(op read "$itemFQN/GOOGLE_CLIENT_ID" < /dev/null)
 googleClientSecret=$(op read "$itemFQN/GOOGLE_CLIENT_SECRET" < /dev/null)
 s3AccessKeyId=$(op read "$itemFQN/S3_ACCESS_KEY_ID" < /dev/null)
 s3SecretAccessKey=$(op read "$itemFQN/S3_SECRET_ACCESS_KEY" < /dev/null)
-smtpUser=$(op read "$itemFQN/SMTP_USER" < /dev/null)
-smtpPassword=$(op read "$itemFQN/SMTP_PASSWORD" < /dev/null)
+deepinfraApiKey=$(op read "$itemFQN/DEEPINFRA_API_KEY" < /dev/null)
 
 mkdir -p "$DIR/../config"
 
@@ -61,14 +59,12 @@ mkdir -p "$DIR/../config"
 # because base64-encoded secrets contain / characters.
 sed \
   -e "s|%DB_PASS%|$dbPass|g" \
-  -e "s|%NEXTAUTH_SECRET%|$nextauthSecret|g" \
   -e "s|%AUTH_SECRET%|$authSecret|g" \
   -e "s|%GOOGLE_CLIENT_ID%|$googleClientId|g" \
   -e "s|%GOOGLE_CLIENT_SECRET%|$googleClientSecret|g" \
   -e "s|%S3_ACCESS_KEY_ID%|$s3AccessKeyId|g" \
   -e "s|%S3_SECRET_ACCESS_KEY%|$s3SecretAccessKey|g" \
-  -e "s|%SMTP_USER%|$smtpUser|g" \
-  -e "s|%SMTP_PASSWORD%|$smtpPassword|g" \
+  -e "s|%DEEPINFRA_API_KEY%|$deepinfraApiKey|g" \
   "$DIR/../templates/secret.template.yml" > "$DIR/../config/secret.yml"
 
 # Ensure kubectl is connected before applying the secret to the cluster.

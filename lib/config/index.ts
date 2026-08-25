@@ -10,6 +10,9 @@ const environment: 'production' | 'development' | 'test' | 'ci' =
   // > https://nextjs.org/docs/messages/non-standard-node-env
   (process.env.APP_MODE as 'production' | 'development' | 'test' | 'ci') ||
   'development';
+// Load committed non-secret values first, then gitignored secrets. dotenv
+// does not override existing env, so Kubernetes envFrom still wins.
+loadConfig({ path: `.env.${environment}.nonsecret` });
 loadConfig({ path: `.env.${environment}` });
 
 interface Config {

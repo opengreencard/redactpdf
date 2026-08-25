@@ -15,7 +15,7 @@ export REPLICAS=2
 export ACME_EMAIL=letsencrypt@redactpdf.ai
 
 # Keep CLUSTER_NAME in sync with the default in k8s/setup-cluster.sh.
-export CLUSTER_NAME=ogc-production
+export CLUSTER_NAME=redaction-production
 
 # Keep DB_FIREWALL_NAME in sync with sysadmin/create-db-server.sh and
 # dev/add-db-firewall-ip.sh.

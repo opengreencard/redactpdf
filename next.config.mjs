@@ -1,4 +1,14 @@
+import { config as loadConfig } from 'dotenv';
+
+// Next inlines NEXT_PUBLIC_* at build time. Load committed non-secret env
+// so the files-bucket name is available without a gitignored .env file.
+const environment =
+  process.env.APP_MODE || process.env.NODE_ENV || 'development';
+loadConfig({ path: `.env.${environment}.nonsecret` });
+
 /** @type {import('next').NextConfig} */
+// .mjs cannot use TypeScript `const x: T` annotations; JSDoc above is the type.
+/* eslint-disable-next-line no-restricted-syntax -- typed via JSDoc NextConfig */
 const nextConfig = {
   reactStrictMode: true,
   // Keep Node-only packages out of the bundled server graph. sequelize loads
