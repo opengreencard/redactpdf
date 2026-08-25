@@ -5,7 +5,7 @@ import LandingPageInner from './LandingPageInner';
 export interface LandingPageProps {}
 
 /**
- * Server entry for `/`. Reads the session so the header can hide Sign in /
+ * Server entry for `/`. Reads the session so the header can hide Log in /
  * Sign up when the visitor is already logged in.
  */
 async function LandingPage(): Promise<React.ReactElement> {

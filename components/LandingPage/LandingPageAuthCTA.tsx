@@ -11,7 +11,7 @@ export interface LandingPageAuthCTAProps {
   isLoggedIn: boolean;
 }
 
-/** Header Sign in / Sign up controls. Hidden once a session already exists. */
+/** Header Log in / Sign up controls. Hidden once a session already exists. */
 const LandingPageAuthCTA: React.FunctionComponent<LandingPageAuthCTAProps> =
   React.memo(function LandingPageAuthCTA(props: LandingPageAuthCTAProps) {
     const { isLoggedIn } = props;
@@ -44,7 +44,7 @@ const LandingPageAuthCTA: React.FunctionComponent<LandingPageAuthCTAProps> =
             variant="subtle"
             onClick={handleOpenSignIn}
           >
-            Sign in
+            Log in
           </Button>
           <Button
             keyboardShortcut={null}

@@ -21,7 +21,6 @@ import {
   Title,
 } from '@mantine/core';
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
-import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import {
   faCheck,
   faClock,
@@ -42,6 +41,7 @@ import {
 import LandingPageAuthCTA from './LandingPageAuthCTA';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
 import LandingPageUploadCTA from './LandingPageUploadCTA';
+import LandingPageViewSourceButton from './LandingPageViewSourceButton';
 import UploadButtonAndDropzone from '../Upload/UploadButtonAndDropzone';
 
 export interface LandingPageInnerProps {
@@ -87,18 +87,8 @@ function LandingPageHeader(props: { isLoggedIn: boolean }): React.ReactElement {
       <Container size={pageContainerSize}>
         <Group justify="space-between">
           <LandingPageWordmark />
-          <Group gap="sm">
-            <Anchor
-              href={githubRepoUrl}
-              target="_blank"
-              rel="noreferrer"
-              underline="never"
-            >
-              <Group gap="xs" wrap="nowrap">
-                <FontAwesomeIcon icon={faGithub} />
-                <Box visibleFrom="sm">View the source</Box>
-              </Group>
-            </Anchor>
+          <Group gap="xs">
+            <LandingPageViewSourceButton />
             <LandingPageAuthCTA isLoggedIn={isLoggedIn} />
           </Group>
         </Group>
