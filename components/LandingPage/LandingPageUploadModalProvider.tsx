@@ -20,8 +20,13 @@ const LandingPageUploadModalContext =
   createContext<LandingPageUploadModalState | null>(null);
 
 /**
- * Shared upload-modal open state so the hero dropzone can turn off its
- * fullscreen listener while the modal (which has its own) is open.
+ * Owns the landing page's single upload modal and shares its state with the
+ * separate client components that trigger or coordinate it.
+ *
+ * Keeping this state here instead of in LandingPageInner preserves the
+ * server-compatible page composition. It also prevents each CTA from creating
+ * a separate modal and lets the hero dropzone disable its fullscreen listener
+ * while the modal's dropzone is active.
  */
 const LandingPageUploadModalProvider: React.FunctionComponent<PropsWithChildren> =
   React.memo(function LandingPageUploadModalProvider(props: PropsWithChildren) {

@@ -50,6 +50,10 @@ export interface LandingPageInnerProps {}
 const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
   React.memo(function LandingPageInner() {
     return (
+      // Keep client-only modal state out of this server-compatible page
+      // composition. The provider gives the hero dropzone and all CTAs one
+      // shared modal instance without turning this entire component into a
+      // client component.
       <LandingPageUploadModalProvider>
         <LandingPageHero />
         <LandingPageBeforeAfter />
