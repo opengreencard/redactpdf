@@ -859,6 +859,7 @@ module.exports = {
     ],
     'redaction/require-sequelize-type-assertion': 'error',
     'redaction/enum-member-name-matches-value': 'error',
+    'redaction/no-import-reexport': 'error',
     // We use _ to indicate methods exported for testing only
     'no-underscore-dangle': 'off',
 

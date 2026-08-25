@@ -4,8 +4,6 @@ import {
   FontAwesomeIconProps,
 } from '@fortawesome/react-fontawesome';
 
-export type { FontAwesomeIconProps };
-
 /**
  * A FontAwesome icon, rendered using React.memo so that it doesn't re-render
  * and cause complicated rendering of SVG.

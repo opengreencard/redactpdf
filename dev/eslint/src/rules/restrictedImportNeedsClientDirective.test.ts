@@ -1,8 +1,8 @@
 import path from 'path';
 import rule, {
   RestrictedImportNeedsClientDirectiveRuleOptions,
-} from '../restrictedImportNeedsClientDirective';
-import ruleTester from '../ruleTester';
+} from './restrictedImportNeedsClientDirective';
+import ruleTester from './ruleTester';
 
 const restrictedOptions: [RestrictedImportNeedsClientDirectiveRuleOptions] = [
   {
