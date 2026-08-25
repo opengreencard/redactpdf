@@ -16,7 +16,7 @@ const UploadModal: React.FunctionComponent<UploadModalProps> = React.memo(
 
     return (
       <Modal opened={isOpen} onClose={onClose} title="Upload your PDF">
-        <UploadButtonAndDropzone />
+        <UploadButtonAndDropzone enableFullScreenDrop={isOpen} />
       </Modal>
     );
   }

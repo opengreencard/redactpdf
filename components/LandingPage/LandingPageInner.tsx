@@ -40,16 +40,17 @@ import {
 } from '../../lib/config/brand';
 import { siteContainerSize } from '../SiteChrome/SiteChrome';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
+import LandingPageHeroDropzone from './LandingPageHeroDropzone';
 import LandingPageUploadCTA from './LandingPageUploadCTA';
-import UploadButtonAndDropzone from '../Upload/UploadButtonAndDropzone';
+import LandingPageUploadModalProvider from './LandingPageUploadModalProvider';
 
 export interface LandingPageInnerProps {}
 
-/** Marketing page visitors see at `/`. Upload is shimmed until task 2.2. */
+/** Marketing page visitors see at the site root. */
 const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
   React.memo(function LandingPageInner() {
     return (
-      <>
+      <LandingPageUploadModalProvider>
         <LandingPageHero />
         <LandingPageBeforeAfter />
         <LandingPageHowItWorks />
@@ -58,7 +59,7 @@ const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
         <LandingPagePricing />
         <LandingPageWhyFree />
         <LandingPageFaq />
-      </>
+      </LandingPageUploadModalProvider>
     );
   });
 
@@ -106,7 +107,7 @@ const LandingPageHero: React.FunctionComponent = React.memo(
               <LandingPageHeroIllustration />
             </GridCol>
           </Grid>
-          <UploadButtonAndDropzone />
+          <LandingPageHeroDropzone />
         </Stack>
       </Container>
     );

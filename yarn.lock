@@ -13263,7 +13263,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dropzone@npm:15.0.0":
+"react-dropzone@npm:15.0.0, react-dropzone@npm:^15.0.0":
   version: 15.0.0
   resolution: "react-dropzone@npm:15.0.0"
   dependencies:
@@ -13525,6 +13525,7 @@ __metadata:
     randomstring: "npm:^1.3.1"
     react: "npm:19.2.8"
     react-dom: "npm:19.2.8"
+    react-dropzone: "npm:^15.0.0"
     sequelize: "npm:^6.37.8"
     sharp: "npm:^0.35.3"
     storybook: "npm:^10.5.8"
