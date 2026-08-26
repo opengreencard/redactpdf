@@ -13506,6 +13506,7 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^4.6.2"
     eslint-plugin-redaction: "link:dev/eslint"
     eslint-plugin-testing-library: "npm:6.2.2"
+    fast-json-stable-stringify: "npm:^2.1.0"
     glob: "npm:^13.0.6"
     jest: "npm:^30.4.2"
     jest-environment-jsdom: "npm:^30.4.1"

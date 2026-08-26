@@ -1,9 +1,6 @@
-import '@mantine/core/styles.css';
-import '@mantine/dropzone/styles.css';
-import { config } from '@fortawesome/fontawesome-svg-core';
-import '@fortawesome/fontawesome-svg-core/styles.css';
+import '../components/TopLevelLayout/topLevelLayoutStyles';
 import React from 'react';
-import { ColorSchemeScript, MantineProvider } from '@mantine/core';
+import { ColorSchemeScript } from '@mantine/core';
 import type { Metadata } from 'next';
 import {
   siteDescription,
@@ -12,11 +9,9 @@ import {
   siteUrl,
 } from '../lib/config/brand';
 import { outfit } from '../lib/config/fonts';
-import { theme } from '../theme';
 import { getAuthState } from '../lib/auth/nextAuth';
 import SiteChrome from '../components/SiteChrome/SiteChrome';
-
-config.autoAddCss = false;
+import TopLevelLayoutComponents from '../components/TopLevelLayout/TopLevelLayoutComponents';
 
 /**
  * Default metadata for `/` and a title template for inner pages.
@@ -70,9 +65,9 @@ export default async function RootLayout(
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider theme={theme}>
+        <TopLevelLayoutComponents>
           <SiteChrome isLoggedIn={isLoggedIn}>{children}</SiteChrome>
-        </MantineProvider>
+        </TopLevelLayoutComponents>
       </body>
     </html>
   );
