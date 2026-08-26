@@ -13,6 +13,7 @@ import {
 } from '../../lib/models/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import SiteChrome from '../SiteChrome/SiteChrome';
 import RedactionPageInner from './RedactionPageInner';
 import {
   addBoundingBoxToResponse,
@@ -114,7 +115,9 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
 );
 
 const Template: StoryFn<StoryWrapperProps> = (args) => (
-  <StoryWrapper {...args} />
+  <SiteChrome isLoggedIn={false}>
+    <StoryWrapper {...args} />
+  </SiteChrome>
 );
 
 export const Loading: StoryFn<StoryWrapperProps> = Template.bind({});
