@@ -1,19 +1,16 @@
-import '@mantine/core/styles.css';
-import '@mantine/dropzone/styles.css';
+import '../components/TopLevelLayout/topLevelLayoutStyles';
 import React from 'react';
-import { MantineProvider } from '@mantine/core';
 import type { Decorator, StoryFn } from '@storybook/react';
 import { outfit } from '../lib/config/fonts';
-
-import { theme } from '../theme';
+import TopLevelLayoutComponents from '../components/TopLevelLayout/TopLevelLayoutComponents';
 
 export const decorators: Decorator[] = [
   (Story: StoryFn) => (
     // Apply same font as in layout.tsx. Keep in sync
     <div className={outfit.variable}>
-      <MantineProvider theme={theme}>
+      <TopLevelLayoutComponents>
         <Story />
-      </MantineProvider>
+      </TopLevelLayoutComponents>
     </div>
   ),
 ];

@@ -34,12 +34,6 @@ export interface UploadButtonAndDropzoneInnerProps {
   enableFullScreenDrop: boolean;
 }
 
-/** Test ID for the hidden file input. Exported for tests. */
-export const _uploadPDFInputTestId = 'upload-pdf-input';
-
-/** Test ID for drop-rejection or upload API error text. Exported for tests. */
-export const _uploadErrorMessageTestId = 'upload-error-message';
-
 /**
  * Presentational PDF dropzone. Mantine Dropzone still delivers `File[]`; this
  * component takes the first file and calls `onFileSelected` so callers only
@@ -113,6 +107,12 @@ const UploadButtonAndDropzoneInner: React.FunctionComponent<UploadButtonAndDropz
   });
 
 export default UploadButtonAndDropzoneInner;
+
+/** Test ID for the hidden file input. Exported for tests. */
+export const _uploadPDFInputTestId = 'upload-pdf-input';
+
+/** Test ID for drop-rejection or upload API error text. Exported for tests. */
+export const _uploadErrorMessageTestId = 'upload-error-message';
 
 const dropzoneFileConstraints: {
   accept: string[];
