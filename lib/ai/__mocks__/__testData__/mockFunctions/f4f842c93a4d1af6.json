@@ -1,0 +1,41 @@
+{
+  "object": "chat.completion",
+  "service_tier": "default",
+  "usage": {
+    "prompt_tokens": 1407,
+    "completion_tokens": 332,
+    "total_tokens": 1739,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "obfuscation": "vMK0QdvQaW",
+  "id": "chatcmpl-EHIBY4c28pfAZaGOqGqNDIdG3lSgB",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "{\"boxes\":[{\"dataType\":\"personPhoto\",\"text\":\"Passport card holder photograph\",\"minX\":5,\"minY\":229,\"maxX\":426,\"maxY\":855},{\"dataType\":\"idNumber\",\"text\":\"Passport card number 03005988\",\"minX\":719,\"minY\":245,\"maxX\":912,\"maxY\":306},{\"dataType\":\"personName\",\"text\":\"Surname TRAVELER\",\"minX\":379,\"minY\":342,\"maxX\":524,\"maxY\":425},{\"dataType\":\"personName\",\"text\":\"Given Names HAPPY\",\"minX\":476,\"minY\":449,\"maxX\":593,\"maxY\":528},{\"dataType\":\"dateOfBirth\",\"text\":\"1 JAN 1981\",\"minX\":579,\"minY\":596,\"maxX\":764,\"maxY\":660},{\"dataType\":\"address\",\"text\":\"Place of Birth NEW YORK, U.S.A.\",\"minX\":484,\"minY\":668,\"maxX\":727,\"maxY\":756},{\"dataType\":\"idNumber\",\"text\":\"Machine-readable document number M-6131821-07\",\"minX\":57,\"minY\":861,\"maxX\":267,\"maxY\":918},{\"dataType\":\"idNumber\",\"text\":\"Machine-readable document number 1-02781-0\",\"minX\":804,\"minY\":863,\"maxX\":921,\"maxY\":910},{\"dataType\":\"barcode\",\"text\":\"Machine-readable passport code area\",\"minX\":300,\"minY\":698,\"maxX\":970,\"maxY\":965}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1787790188,
+  "model": "gpt-5.6-luna",
+  "timing": {
+    "msToFirstToken": 1889,
+    "outputTokensPerSecond": 197.50148720999405,
+    "totalTimeMs": 3570
+  }
+}

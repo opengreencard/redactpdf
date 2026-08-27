@@ -32,7 +32,7 @@ export function makeMockedPassThroughFunction<
     ...args: Parameters<FunctionT>
   ): Promise<Awaited<ReturnType<FunctionT>>> => {
     const {
-      shouldUseCache = () => process.env.NODE_ENV === 'test',
+      shouldUseCache = shouldUseCacheForCurrentTestType,
       makeFilename = (...functionArgs: never[]) =>
         `${createHash('sha256')
           .update(JSON.stringify(functionArgs))
@@ -71,4 +71,9 @@ export function makeMockedPassThroughFunction<
     await fs.writeFile(cachePath, serializeFile(result));
     return result;
   };
+}
+
+function shouldUseCacheForCurrentTestType(): boolean {
+  const testTypes = new Set((process.env.TEST_TYPES ?? '').split(','));
+  return process.env.NODE_ENV === 'test' && !testTypes.has('manual');
 }

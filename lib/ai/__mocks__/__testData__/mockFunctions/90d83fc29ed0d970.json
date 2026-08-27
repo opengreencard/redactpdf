@@ -1,0 +1,36 @@
+{
+  "service_tier": "default",
+  "object": "chat.completion",
+  "usage": {
+    "prompt_tokens": 1308,
+    "total_tokens": 1702,
+    "completion_tokens": 394,
+    "estimated_cost": 0.0008319199998720001,
+    "prompt_tokens_details": {
+      "cached_tokens": 128,
+      "cache_write_tokens": null
+    }
+  },
+  "id": "chatcmpl-RnCtxsypbhq0rSUNsjDMQivd",
+  "choices": [
+    {
+      "message": {
+        "reasoning_content": null,
+        "role": "assistant",
+        "content": "{\"boxes\":[[\"personPhoto\",\"passport photo portrait\",35,197,346,742],[\"personName\",\"TRAVELER\",397,377,614,423],[\"personName\",\"HAPPY\",464,447,569,493],[\"idNumber\",\"C03005988\",725,215,910,267],[\"idNumber\",\"M-6131821-07\",53,785,249,825],[\"dateOfBirth\",\"1 JAN 1981\",568,509,752,554],[\"address\",\"NEW YORK. U.S.A.\",463,602,714,648],[\"idNumber\",\"1-02781-0\",803,794,905,822],[\"personPhoto\",\"secondary halftone portrait\",815,398,942,594],[\"other\",\"4309. W27S + (machine readable zone left edge)\",0,350,70,735],[\"other\",\"M-6131821-07 (machine readable number)\",20,770,265,830],[\"organizationName\",\"UNITED STATES DEPARTMENT OF STATE\",150,904,823,949]]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1787790229,
+  "model": "meta-models/Muse-Glimmer-30B",
+  "timing": {
+    "msToFirstToken": 4015,
+    "outputTokensPerSecond": 4.646171625334607,
+    "totalTimeMs": 88816
+  }
+}

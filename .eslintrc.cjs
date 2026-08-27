@@ -386,7 +386,7 @@ const commonNoRestrictedSyntaxRules = [
     // - We allow FontAwesome icon variables like faFilePdf since they follow
     //   the FontAwesome naming convention.
     selector:
-      'Identifier:not([name=/^fa[A-Z]/])[name=/[a-z](Pdf|Json|Jpeg|Png|Ast|Toc|Dpi|Html|Ses|Aws)(?=[A-Z]|\\b|$)/]',
+      'Identifier:not([name=/^fa[A-Z]/])[name=/[a-z](Pdf|Json|Jpeg|Png|Ast|Toc|Dpi|Html|Ses|Aws|Api)(?=[A-Z]|\\b|$)/]',
     message:
       'Acronyms should be fully capitalized mid-identifier (e.g., nameForPDF not nameForPdf, getJSONData not getJsonData). Lowercase is only allowed at the start (e.g., pdfName, jsonData).',
   },
@@ -880,6 +880,7 @@ module.exports = {
     'redaction/require-sequelize-type-assertion': 'error',
     'redaction/enum-member-name-matches-value': 'error',
     'redaction/no-import-reexport': 'error',
+    'redaction/no-unexported-underscore-functions': 'error',
     // We use _ to indicate methods exported for testing only
     'no-underscore-dangle': 'off',
 

@@ -2,6 +2,7 @@ import restrictedImportsNeedsClientDirective from './restrictedImportNeedsClient
 import enumMemberNameMatchesValue from './enum-member-name-matches-value';
 import jsxMultilineCommentStyle from './jsx-multiline-comment-style';
 import noImportReexport from './no-import-reexport';
+import noUnexportedUnderscoreFunctions from './no-unexported-underscore-functions';
 import requireFindByPkAttributes from './require-find-by-pk-attributes';
 import requireSequelizeTypeAssertion from './require-sequelize-type-assertion';
 
@@ -14,6 +15,7 @@ export const rules = {
   'enum-member-name-matches-value': enumMemberNameMatchesValue,
   'jsx-multiline-comment-style': jsxMultilineCommentStyle,
   'no-import-reexport': noImportReexport,
+  'no-unexported-underscore-functions': noUnexportedUnderscoreFunctions,
   'require-find-by-pk-attributes': requireFindByPkAttributes,
   'require-sequelize-type-assertion': requireSequelizeTypeAssertion,
 };

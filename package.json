@@ -13,6 +13,7 @@
     "lint": "yarn build:eslint-plugin && npm run lint:stylelint && eslint .",
     "lint:stylelint": "stylelint '**/*.css' --cache",
     "jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
+    "manual-jest": "TEST_TYPES=manual node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "storybook": "storybook dev -p 6006",
     "storybook:build": "storybook build",
     "swc-node": "node -r @swc-node/register",

@@ -5,6 +5,7 @@ import {
   ManualRedactionBoundingBox,
   RedactedDataType,
   RedactionStatus,
+  RedactedDataType,
 } from '../models/redactionTypes';
 
 /** Browser-safe fixture builders for redaction types used in tests and stories. */

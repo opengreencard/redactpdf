@@ -1,0 +1,41 @@
+{
+  "object": "chat.completion",
+  "service_tier": "default",
+  "usage": {
+    "prompt_tokens": 3097,
+    "completion_tokens": 402,
+    "total_tokens": 3499,
+    "prompt_tokens_details": {
+      "cached_tokens": 1792,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "obfuscation": "HTlLlIa",
+  "id": "chatcmpl-EHIFMEJ5GFT671j6FjlXFs3s7qaTJ",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean\",\"minX\":69,\"minY\":113,\"maxX\":119,\"maxY\":127},{\"dataType\":\"personName\",\"text\":\"John\",\"minX\":398,\"minY\":113,\"maxX\":452,\"maxY\":127},{\"dataType\":\"idNumber\",\"text\":\"400 00 1038\",\"minX\":779,\"minY\":113,\"maxX\":941,\"maxY\":127},{\"dataType\":\"personName\",\"text\":\"Joan\",\"minX\":69,\"minY\":142,\"maxX\":116,\"maxY\":156},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":398,\"minY\":142,\"maxX\":466,\"maxY\":156},{\"dataType\":\"idNumber\",\"text\":\"400 00 1071\",\"minX\":779,\"minY\":142,\"maxX\":941,\"maxY\":156},{\"dataType\":\"address\",\"text\":\"26 Dancing Daisy Drive\",\"minX\":71,\"minY\":174,\"maxX\":281,\"maxY\":189},{\"dataType\":\"address\",\"text\":\"Charleston, SC 29455\",\"minX\":71,\"minY\":207,\"maxX\":706,\"maxY\":223},{\"dataType\":\"organizationName\",\"text\":\"Presidential Election Campaign\",\"minX\":779,\"minY\":168,\"maxX\":942,\"maxY\":181},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":563,\"minY\":351,\"maxX\":757,\"maxY\":365},{\"dataType\":\"personName\",\"text\":\"Sam Jackson\",\"minX\":169,\"minY\":487,\"maxX\":353,\"maxY\":501},{\"dataType\":\"idNumber\",\"text\":\"400 00 1071\",\"minX\":436,\"minY\":487,\"maxX\":575,\"maxY\":501}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1787790424,
+  "model": "gpt-5.6-luna",
+  "timing": {
+    "msToFirstToken": 1623,
+    "outputTokensPerSecond": 222.09944751381215,
+    "totalTimeMs": 3433
+  }
+}
