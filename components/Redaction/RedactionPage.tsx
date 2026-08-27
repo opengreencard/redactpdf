@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { NotificationData } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import { useAPICall } from '../../lib/hookUtilities/useAPICall';
 import {
   addRedactionBoundingBoxClient,
@@ -19,9 +20,9 @@ import {
   RedactionStatus,
 } from '../../lib/models/redactionTypes';
 import {
-  addBoundingBoxToResponse,
-  removeBoundingBoxFromResponse,
-  toggleBoundingBoxInResponse,
+  addBoundingBoxesToResponse,
+  removeBoundingBoxesFromResponse,
+  toggleBoundingBoxesInResponse,
 } from './redactionBoundingBoxes';
 import RedactionPageInner from './RedactionPageInner';
 
@@ -96,47 +97,45 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       [redactionState, setStateResult]
     );
 
-    const handleAddBoundingBox = useMemoizedCallback(
-      async (box: ManualRedactionBoundingBox) => {
+    const handleAddBoundingBoxes = useMemoizedCallback(
+      async (boxes: ManualRedactionBoundingBox[]) => {
         await persistBoxMutation(
-          (current) => addBoundingBoxToResponse(current, box),
+          (current) => addBoundingBoxesToResponse(current, boxes),
           () =>
             addRedactionBoundingBoxClient({
               key: redactionKey,
-              page: box.page,
-              bbox: box.box,
+              boxes,
             })
         );
       },
       [persistBoxMutation, redactionKey]
     );
+    const handleAddBoundingBox = useConvertSingleArgumentToArray(
+      handleAddBoundingBoxes
+    );
 
-    const handleDeleteBoundingBox = useMemoizedCallback(
-      async (box: RedactionBoundingBox) => {
+    const handleDeleteBoundingBoxes = useMemoizedCallback(
+      async (boxes: RedactionBoundingBox[]) => {
         await persistBoxMutation(
-          (current) => removeBoundingBoxFromResponse(current, box),
+          (current) => removeBoundingBoxesFromResponse(current, boxes),
           () =>
             deleteRedactionBoundingBoxClient({
               key: redactionKey,
-              page: box.page,
-              box: box.box,
-              type: box.type,
+              boxes,
             })
         );
       },
       [persistBoxMutation, redactionKey]
     );
 
-    const handleToggleBoundingBox = useMemoizedCallback(
-      async (box: RedactionBoundingBox) => {
+    const handleToggleBoundingBoxes = useMemoizedCallback(
+      async (boxes: RedactionBoundingBox[]) => {
         await persistBoxMutation(
-          (current) => toggleBoundingBoxInResponse(current, box),
+          (current) => toggleBoundingBoxesInResponse(current, boxes),
           () =>
             toggleRedactionBoundingBoxClient({
               key: redactionKey,
-              page: box.page,
-              box: box.box,
-              type: box.type,
+              boxes,
             })
         );
       },
@@ -155,8 +154,8 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         redactionKey={redactionKey}
         redactionState={redactionState}
         onAddBoundingBox={handleAddBoundingBox}
-        onDeleteBoundingBox={handleDeleteBoundingBox}
-        onToggleBoundingBox={handleToggleBoundingBox}
+        onDeleteBoundingBoxes={handleDeleteBoundingBoxes}
+        onToggleBoundingBoxes={handleToggleBoundingBoxes}
         highlightedBox={highlightedBox}
         onRedactionClick={handleRedactionClick}
       />

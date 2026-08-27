@@ -1,5 +1,5 @@
 import React from 'react';
-import { Anchor, Box, Container, Group, Text } from '@mantine/core';
+import { Anchor, Box, Container, Group, Stack, Text } from '@mantine/core';
 import { githubRepoUrl } from '../../lib/config/brand';
 import SiteHeaderActions from './SiteHeaderActions';
 import classes from './SiteChrome.module.css';
@@ -20,12 +20,20 @@ const SiteChrome: React.FunctionComponent<SiteChromeProps> = React.memo(
   function SiteChrome(props: SiteChromeProps) {
     const { isLoggedIn, children } = props;
 
+    // Keep the footer at the bottom of short pages while allowing the main
+    // content to consume the remaining viewport height.
     return (
-      <Box>
+      <Stack mih="100vh" gap={0}>
         <SiteHeader isLoggedIn={isLoggedIn} />
-        {children}
+        {
+          // flex={1} fills the space between header and footer. mih={0} lets
+          // nested page regions shrink and manage their own scrolling.
+        }
+        <Stack component="main" flex={1} mih={0} gap={0}>
+          {children}
+        </Stack>
         <SiteFooter />
-      </Box>
+      </Stack>
     );
   }
 );

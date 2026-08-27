@@ -1,7 +1,7 @@
 import type { UploadFileForRedactionResponse } from '../../../app/api/redaction/uploadFileForRedaction';
 import type {
-  BoundingBox,
   GetRedactionResponse,
+  ManualRedactionBoundingBox,
   RedactionBoundingBox,
 } from '../../../lib/models/redactionTypes';
 import {
@@ -55,8 +55,7 @@ export async function generateRedactedPDFClient(
 /** Client input for drawing a manual redaction box. */
 export interface AddRedactionBoundingBoxClientRequest {
   key: string;
-  page: number;
-  bbox: BoundingBox;
+  boxes: ManualRedactionBoundingBox[];
 }
 
 /**
@@ -72,9 +71,7 @@ export async function addRedactionBoundingBoxClient(
 /** Client input for removing a redaction box. */
 export interface DeleteRedactionBoundingBoxClientRequest {
   key: string;
-  page: number;
-  box: BoundingBox;
-  type: RedactionBoundingBox['type'];
+  boxes: RedactionBoundingBox[];
 }
 
 /**
@@ -90,9 +87,7 @@ export async function deleteRedactionBoundingBoxClient(
 /** Client input for toggling a box's enabled flag. */
 export interface ToggleRedactionBoundingBoxClientRequest {
   key: string;
-  page: number;
-  box: BoundingBox;
-  type: RedactionBoundingBox['type'];
+  boxes: RedactionBoundingBox[];
 }
 
 /**

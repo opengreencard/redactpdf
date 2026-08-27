@@ -1,42 +1,44 @@
 'use client';
 
 import React from 'react';
-import { ActionIcon, Group, Stack, Text, UnstyledButton } from '@mantine/core';
+import { Alert, Anchor, Stack, Text, Title } from '@mantine/core';
 import type { NotificationData } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
-import { faEye, faEyeSlash, faXmark } from '@fortawesome/free-solid-svg-icons';
 import Button from '../designSystem/Button/Button';
-import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import { useAPICall } from '../../lib/hookUtilities/useAPICall';
-import { useCallbackWithPrefix } from '../../lib/hookUtilities/useCallbackWithPrefix';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { generateRedactedPDFClient } from '../clientLib/api/redaction';
-import type {
-  GetRedactionResponse,
-  RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
-import { getRedactionBoxLabel } from './redactionBoundingBoxes';
+import type { GetRedactionResponse } from '../../lib/models/redactionTypes';
+import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
+import RedactionBoundingBoxList, {
+  RedactionBoundingBoxListProps,
+} from './RedactionBoundingBoxList';
 
-export interface RedactionPanelProps {
+interface RedactionPanelOwnProps {
   redactionKey: string;
   redaction: GetRedactionResponse;
-  onRedactionClick: (box: RedactionBoundingBox) => unknown;
-  onDeleteBoundingBox: (box: RedactionBoundingBox) => unknown;
-  onToggleBoundingBox: (box: RedactionBoundingBox) => unknown;
 }
 
+interface RedactionPanelPassThroughProps extends Omit<
+  RedactionBoundingBoxListProps,
+  'redactionBoundingBoxes'
+> {}
+
+export interface RedactionPanelProps
+  extends RedactionPanelOwnProps, RedactionPanelPassThroughProps {}
+
 /**
- * Left-rail list of detections. Flat until task 2.11 groups by `dataType`.
+ * Left-rail list of detections and the repeatable PDF download action.
  */
 const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
   function RedactionPanel(props: RedactionPanelProps) {
-    const {
+    const { redactionKey, redaction, ...passThroughProps } = props;
+    // Keep owned props explicit so new wrapper fields cannot silently become
+    // pass-through props.
+    const _ownProps: RequiredWithUndefined<RedactionPanelOwnProps> = {
       redactionKey,
       redaction,
-      onRedactionClick,
-      onDeleteBoundingBox,
-      onToggleBoundingBox,
-    } = props;
+    };
     const { call: startDownload, state: downloadState } = useAPICall(
       generateRedactedPDFClient
     );
@@ -55,26 +57,9 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
       }
     }, [redactionKey, startDownload]);
 
-    const onRedactionClickWithPrefix =
-      useCallbackWithPrefix<[RedactionBoundingBox]>(onRedactionClick);
-    const onDeleteWithPrefix =
-      useCallbackWithPrefix<[RedactionBoundingBox]>(onDeleteBoundingBox);
-    const handleIsEnabledChange = useMemoizedCallback(
-      (box: RedactionBoundingBox, isEnabled: boolean) => {
-        if (box.enabled === isEnabled) {
-          return;
-        }
-        onToggleBoundingBox(box);
-      },
-      [onToggleBoundingBox]
-    );
-    const onIsEnabledChangeWithPrefix = useCallbackWithPrefix<
-      [RedactionBoundingBox],
-      [boolean]
-    >(handleIsEnabledChange);
-
     return (
       <Stack gap="md" data-testid={_redactionPanelTestId}>
+        <Title order={2}>Redacted information</Title>
         <Button
           keyboardShortcut={null}
           onClick={handleDownload}
@@ -83,19 +68,21 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
         >
           Download
         </Button>
+        {redaction.redactionBoundingBoxes.length === 0 ? (
+          <Alert color="blue" title="No automatic redactions found">
+            We could not find any automatic parts to redact. Please redact the
+            document manually. You can also email us at{' '}
+            <Anchor href="mailto:support@redactpdf.ai" inherit>
+              support@redactpdf.ai
+            </Anchor>{' '}
+            with the document, and we can try to improve the tool.
+          </Alert>
+        ) : null}
         <Text>Review suggestions and hide or remove any you do not need.</Text>
-        <Stack gap="xs">
-          {redaction.redactionBoundingBoxes.map((box, index) => (
-            <RedactionPanelRow
-              key={getRedactionBoxKey(box, index)}
-              box={box}
-              index={index}
-              onRedactionClick={onRedactionClickWithPrefix(box)}
-              onDelete={onDeleteWithPrefix(box)}
-              onIsEnabledChange={onIsEnabledChangeWithPrefix(box)}
-            />
-          ))}
-        </Stack>
+        <RedactionBoundingBoxList
+          {...passThroughProps}
+          redactionBoundingBoxes={redaction.redactionBoundingBoxes}
+        />
       </Stack>
     );
   }
@@ -112,75 +99,3 @@ export const _downloadErrorNotificationTestId =
 
 /** Test ID for the review suggestions rail. Exported for tests. */
 export const _redactionPanelTestId = 'redaction-panel';
-
-/** Test ID prefix for a suggestion row. Exported for tests. */
-export const _redactionPanelRowTestId = 'redaction-panel-row';
-
-/** Test ID prefix for a row's eye toggle. Exported for tests. */
-export const _redactionPanelToggleTestId = 'redaction-panel-toggle';
-
-/** Test ID prefix for a row's delete control. Exported for tests. */
-export const _redactionPanelDeleteTestId = 'redaction-panel-delete';
-
-interface RedactionPanelRowBoundProps {
-  box: RedactionBoundingBox;
-  index: number;
-  onRedactionClick: () => unknown;
-  onDelete: () => unknown;
-  onIsEnabledChange: (isEnabled: boolean) => unknown;
-}
-
-const RedactionPanelRow: React.FunctionComponent<RedactionPanelRowBoundProps> =
-  React.memo(function RedactionPanelRow(props: RedactionPanelRowBoundProps) {
-    const { box, index, onRedactionClick, onDelete, onIsEnabledChange } = props;
-    const label = getRedactionBoxLabel(box);
-    const onIsEnabledChangeWithPrefix =
-      useCallbackWithPrefix<[boolean]>(onIsEnabledChange);
-
-    return (
-      <Group
-        justify="space-between"
-        wrap="nowrap"
-        data-testid={`${_redactionPanelRowTestId}-${index}`}
-      >
-        <UnstyledButton onClick={onRedactionClick} ta="left">
-          <Text
-            td={box.enabled ? undefined : 'line-through'}
-            c={box.enabled ? undefined : 'dimmed'}
-          >
-            {label}
-          </Text>
-        </UnstyledButton>
-        <Group gap="xs" wrap="nowrap">
-          <ActionIcon
-            variant="subtle"
-            aria-label={box.enabled ? 'Hide redaction' : 'Show redaction'}
-            onClick={onIsEnabledChangeWithPrefix(!box.enabled)}
-            data-testid={`${_redactionPanelToggleTestId}-${index}`}
-          >
-            <FontAwesomeIcon icon={box.enabled ? faEye : faEyeSlash} />
-          </ActionIcon>
-          <ActionIcon
-            variant="subtle"
-            aria-label="Delete redaction"
-            onClick={onDelete}
-            data-testid={`${_redactionPanelDeleteTestId}-${index}`}
-          >
-            <FontAwesomeIcon icon={faXmark} />
-          </ActionIcon>
-        </Group>
-      </Group>
-    );
-  });
-
-function getRedactionBoxKey(box: RedactionBoundingBox, index: number): string {
-  return [
-    box.type,
-    box.page,
-    box.box.minX,
-    box.box.minY,
-    box.box.maxX,
-    box.box.maxY,
-    index,
-  ].join(':');
-}

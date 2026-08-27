@@ -1,0 +1,18 @@
+---
+description: Keep simple component styles local and reserve CSS modules for selectors
+globs: **/*.{tsx,css}
+alwaysApply: false
+---
+
+# Component Styling Locality
+
+- Prefer Mantine style props for supported layout and theme values, such as
+  `gap="xs"`, `flex={1}`, `mih={0}`, and `bdrs="sm"`.
+- For a simple element-specific property that Mantine does not expose, prefer
+  an inline `style` prop so the styling stays beside the element:
+  `<Group style={{ cursor: 'pointer' }}>`.
+- Use a CSS module when the style needs selectors or states that cannot be
+  expressed locally, such as `:hover`, `:focus-within`, pseudo-elements,
+  media queries, or keyframes.
+- Keep the CSS module focused on those exceptions rather than duplicating
+  styles already represented by component props.
