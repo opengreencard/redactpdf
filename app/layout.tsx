@@ -9,8 +9,6 @@ import {
   siteUrl,
 } from '../lib/config/brand';
 import { outfit } from '../lib/config/fonts';
-import { getAuthState } from '../lib/auth/nextAuth';
-import SiteChrome from '../components/SiteChrome/SiteChrome';
 import TopLevelLayoutComponents from '../components/TopLevelLayout/TopLevelLayoutComponents';
 
 /**
@@ -45,15 +43,13 @@ export interface RootLayoutProps {
   children: React.ReactNode;
 }
 
-/** Root App Router layout: Mantine, Font Awesome, and site chrome globally. */
+/** Root App Router layout: Mantine and Font Awesome providers globally. */
 // Next.js requires `export default function` for app/layout.tsx.
 // eslint-disable-next-line no-restricted-syntax
 export default async function RootLayout(
   props: RootLayoutProps
 ): Promise<React.ReactElement> {
   const { children } = props;
-  const authState = await getAuthState();
-  const isLoggedIn = Boolean(authState?.user);
 
   // Mantine's ColorSchemeScript sets data-mantine-color-scheme on <html> in
   // the browser based on the stored color-scheme preference. That client-side
@@ -65,9 +61,7 @@ export default async function RootLayout(
         <ColorSchemeScript />
       </head>
       <body>
-        <TopLevelLayoutComponents>
-          <SiteChrome isLoggedIn={isLoggedIn}>{children}</SiteChrome>
-        </TopLevelLayoutComponents>
+        <TopLevelLayoutComponents>{children}</TopLevelLayoutComponents>
       </body>
     </html>
   );

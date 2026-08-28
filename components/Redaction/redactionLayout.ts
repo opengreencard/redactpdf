@@ -4,3 +4,6 @@
  * paragraphs and progress text to remain easy to scan.
  */
 export const centeredAlertOrCardMaxWidth = '32rem';
+
+/** Mantine container size shared by the redaction page and its site chrome. */
+export const redactionPageContainerSize = 'xl';

@@ -22,6 +22,7 @@ import {
   removeBoundingBoxesFromResponse,
   toggleBoundingBoxesInResponse,
 } from './redactionBoundingBoxes';
+import { redactionPageContainerSize } from './redactionLayout';
 
 interface StoryWrapperProps {
   redactionKey: string;
@@ -124,7 +125,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
 );
 
 const Template: StoryFn<StoryWrapperProps> = (args) => (
-  <SiteChrome isLoggedIn={false}>
+  <SiteChrome isLoggedIn={false} containerSize={redactionPageContainerSize}>
     <StoryWrapper {...args} />
   </SiteChrome>
 );

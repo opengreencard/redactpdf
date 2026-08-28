@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import React from 'react';
-import RedactionPage from '../../../components/Redaction/RedactionPage';
+import RedactionPage from '../../../../components/Redaction/RedactionPage';
 
 export const metadata: Metadata = {
   title: 'Review redactions',
@@ -16,7 +16,7 @@ export interface RedactRoutePageProps {
 }
 
 /** App Router entry for `/redact/:key` after a successful upload. */
-// Next.js requires `export default function` for app/redact/[key]/page.tsx.
+// Next.js requires `export default function` for app route pages.
 // eslint-disable-next-line no-restricted-syntax
 export default async function RedactRoutePage(
   props: RedactRoutePageProps

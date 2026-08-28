@@ -24,6 +24,7 @@ import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import { useCallbackWithPrefix } from '../../lib/hookUtilities/useCallbackWithPrefix';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import { useStopPropagation } from '../../lib/hookUtilities/useStopPropagation';
 import { getRedactionBoxLabel } from './redactionBoundingBoxes';
 import classes from './RedactionBoundingBoxList.module.css';
 
@@ -129,27 +130,18 @@ const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
 
     return (
       <Stack gap={0}>
-        <Group
-          justify="space-between"
-          wrap="nowrap"
-          data-testid={_makeRedactionPanelRowTestId(
-            _makeTypeTestIdSuffix(group.dataType)
+        <RedactionRow
+          text={`${getDataTypeText(group.dataType)} (${boxes.length})`}
+          textStyle="bold"
+          indent={0}
+          isEnabled={!areAllDisabled}
+          testIdSuffix={_makeTypeTestIdSuffix(group.dataType)}
+          onRedactionClick={null}
+          onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix(boxes)}
+          onToggleBoundingBox={onToggleBoundingBoxesWithPrefix(
+            getBoxesToToggle(boxes)
           )}
-        >
-          <Text
-            fw="bold"
-            td={areAllDisabled ? 'line-through' : undefined}
-            c={areAllDisabled ? 'dimmed' : undefined}
-          >
-            {getDataTypeText(group.dataType)} ({boxes.length})
-          </Text>
-          <RedactionBoxActions
-            testIdSuffix={_makeTypeTestIdSuffix(group.dataType)}
-            isEnabled={boxes.every((box) => box.enabled)}
-            onDelete={onDeleteBoundingBoxesWithPrefix(boxes)}
-            onToggle={onToggleBoundingBoxesWithPrefix(getBoxesToToggle(boxes))}
-          />
-        </Group>
+        />
         {group.values.map((valueGroup) => (
           <RedactionValueGroup
             key={valueGroup.valueLabel}
@@ -193,35 +185,31 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
     >(onToggleBoundingBoxes);
 
     return (
-      <Stack gap={0} pl="md">
-        <Group
-          justify="space-between"
-          wrap="nowrap"
-          data-testid={_makeRedactionPanelRowTestId(
-            _makeGroupTestIdSuffix(groupDataType, valueGroup)
+      <Stack gap={0}>
+        <RedactionRow
+          text={`${valueGroup.valueLabel} (${valueGroup.occurrences.length})`}
+          indent={1}
+          isEnabled={!areAllDisabled}
+          testIdSuffix={_makeGroupTestIdSuffix(groupDataType, valueGroup)}
+          onRedactionClick={null}
+          onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix(
+            valueGroup.occurrences
           )}
-        >
-          <Text
-            fw="normal"
-            td={areAllDisabled ? 'line-through' : undefined}
-            c={areAllDisabled ? 'dimmed' : undefined}
-          >
-            {valueGroup.valueLabel} ({valueGroup.occurrences.length})
-          </Text>
-          <RedactionBoxActions
-            testIdSuffix={_makeGroupTestIdSuffix(groupDataType, valueGroup)}
-            isEnabled={valueGroup.occurrences.every((box) => box.enabled)}
-            onDelete={onDeleteBoundingBoxesWithPrefix(valueGroup.occurrences)}
-            onToggle={onToggleBoundingBoxesWithPrefix(
-              getBoxesToToggle(valueGroup.occurrences)
-            )}
-          />
-        </Group>
+          onToggleBoundingBox={onToggleBoundingBoxesWithPrefix(
+            getBoxesToToggle(valueGroup.occurrences)
+          )}
+        />
         {valueGroup.occurrences.map((box, index) => (
-          <RedactionOccurrenceRow
+          <RedactionRow
             key={getRedactionBoxKey(box)}
-            box={box}
-            indexToShow={valueGroup.occurrences.length > 1 ? index : null}
+            text={
+              valueGroup.occurrences.length > 1
+                ? `Page ${box.page} (${index + 1})`
+                : `Page ${box.page}`
+            }
+            indent={2}
+            isEnabled={box.enabled}
+            testIdSuffix={_makeOccurrenceTestIdSuffix(getRedactionBoxKey(box))}
             onRedactionClick={onRedactionClickWithPrefix(box)}
             onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix([box])}
             onToggleBoundingBox={onToggleBoundingBoxesWithPrefix([box])}
@@ -231,80 +219,101 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
     );
   });
 
-interface RedactionOccurrenceRowProps {
-  box: RedactionBoundingBox;
-  indexToShow: number | null;
-  onRedactionClick: () => unknown;
+interface RedactionRowProps {
+  text: string;
+  textStyle?: 'bold' | 'normal';
+  indent: RedactionRowIndent;
+  isEnabled: boolean;
+  testIdSuffix: string;
+  onRedactionClick: (() => unknown) | null;
   onDeleteBoundingBox: () => unknown;
   onToggleBoundingBox: () => unknown;
 }
 
-/** Renders one clickable page occurrence and its individual controls. */
-const RedactionOccurrenceRow: React.FunctionComponent<RedactionOccurrenceRowProps> =
-  React.memo(function RedactionOccurrenceRow(
-    props: RedactionOccurrenceRowProps
-  ) {
+type RedactionRowIndent = 0 | 1 | 2;
+
+/** Renders a grouped row and its view, toggle, and delete controls. */
+const RedactionRow: React.FunctionComponent<RedactionRowProps> = React.memo(
+  function RedactionRow(props: RedactionRowProps) {
     const {
-      box,
-      indexToShow,
+      text,
+      textStyle = 'normal',
+      indent,
+      isEnabled,
+      testIdSuffix,
       onRedactionClick,
       onDeleteBoundingBox,
       onToggleBoundingBox,
     } = props;
-    const occurrenceLabel =
-      indexToShow === null
-        ? `Page ${box.page}`
-        : `Page ${box.page} (${indexToShow + 1})`;
-    const boxKey = getRedactionBoxKey(box);
-
-    return (
+    const rowContent = (
       <Group
-        pl="xl"
+        pl={getRedactionRowPadding(indent)}
         gap="xs"
         justify="space-between"
         wrap="nowrap"
         bdrs="sm"
-        style={{ cursor: 'pointer' }}
-        className={classes.occurrenceRow}
-        data-testid={_makeRedactionPanelRowTestId(
-          _makeOccurrenceTestIdSuffix(boxKey)
-        )}
+        data-testid={_makeRedactionPanelRowTestId(testIdSuffix)}
       >
-        <UnstyledButton
-          onClick={onRedactionClick}
-          flex={1}
-          miw={0}
-          ta="left"
-          td={box.enabled ? undefined : 'line-through'}
-          c={box.enabled ? undefined : 'dimmed'}
-        >
-          <Text>{occurrenceLabel}</Text>
-        </UnstyledButton>
-        <Tooltip label="View redaction">
-          <ActionIcon
-            variant="subtle"
-            aria-label="View redaction"
-            onClick={onRedactionClick}
-            data-testid={_makeRedactionPanelViewTestId(
-              _makeOccurrenceTestIdSuffix(boxKey)
-            )}
+        {textStyle === 'bold' ? (
+          <Text
+            fw="bold"
+            td={isEnabled ? undefined : 'line-through'}
+            c={isEnabled ? undefined : 'dimmed'}
           >
-            <FontAwesomeIcon icon={faArrowRight} />
-          </ActionIcon>
-        </Tooltip>
+            {text}
+          </Text>
+        ) : (
+          <Text
+            fw="normal"
+            td={isEnabled ? undefined : 'line-through'}
+            c={isEnabled ? undefined : 'dimmed'}
+          >
+            {text}
+          </Text>
+        )}
         <RedactionBoxActions
-          testIdSuffix={_makeOccurrenceTestIdSuffix(boxKey)}
-          isEnabled={box.enabled}
+          testIdSuffix={testIdSuffix}
+          isEnabled={isEnabled}
+          onViewRedactionClick={onRedactionClick}
           onDelete={onDeleteBoundingBox}
           onToggle={onToggleBoundingBox}
         />
       </Group>
     );
-  });
+    const handleKeyDown = useMemoizedCallback(
+      (event: React.KeyboardEvent<HTMLDivElement>) => {
+        if (onRedactionClick && (event.key === 'Enter' || event.key === ' ')) {
+          event.preventDefault();
+          onRedactionClick();
+        }
+      },
+      [onRedactionClick]
+    );
+
+    if (onRedactionClick === null) {
+      return rowContent;
+    }
+
+    return (
+      <UnstyledButton
+        component="div"
+        role="button"
+        tabIndex={0}
+        onClick={onRedactionClick}
+        onKeyDown={handleKeyDown}
+        style={{ cursor: 'pointer' }}
+        className={classes.occurrenceRow}
+      >
+        {rowContent}
+      </UnstyledButton>
+    );
+  }
+);
 
 interface RedactionBoxActionsProps {
   testIdSuffix: string;
   isEnabled: boolean;
+  onViewRedactionClick: (() => unknown) | null;
   onDelete: () => unknown;
   onToggle: () => unknown;
 }
@@ -312,24 +321,31 @@ interface RedactionBoxActionsProps {
 /** Renders bulk-aware view, toggle, and delete controls. */
 const RedactionBoxActions: React.FunctionComponent<RedactionBoxActionsProps> =
   React.memo(function RedactionBoxActions(props: RedactionBoxActionsProps) {
-    const { testIdSuffix, isEnabled, onDelete, onToggle } = props;
-    const handleToggle = useMemoizedCallback(
-      (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.stopPropagation();
-        onToggle();
-      },
-      [onToggle]
-    );
-    const handleDelete = useMemoizedCallback(
-      (event: React.MouseEvent<HTMLButtonElement>) => {
-        event.stopPropagation();
-        onDelete();
-      },
-      [onDelete]
-    );
+    const {
+      testIdSuffix,
+      isEnabled,
+      onViewRedactionClick,
+      onDelete,
+      onToggle,
+    } = props;
+    const handleView = useStopPropagation(onViewRedactionClick);
+    const handleToggle = useStopPropagation(onToggle);
+    const handleDelete = useStopPropagation(onDelete);
 
     return (
       <Group gap="xs" wrap="nowrap">
+        {onViewRedactionClick ? (
+          <Tooltip label="View redaction">
+            <ActionIcon
+              variant="subtle"
+              aria-label="View redaction"
+              onClick={handleView}
+              data-testid={_makeRedactionPanelViewTestId(testIdSuffix)}
+            >
+              <FontAwesomeIcon icon={faArrowRight} />
+            </ActionIcon>
+          </Tooltip>
+        ) : null}
         <Tooltip label="Toggle on/off">
           <ActionIcon
             variant="subtle"
@@ -353,6 +369,21 @@ const RedactionBoxActions: React.FunctionComponent<RedactionBoxActionsProps> =
       </Group>
     );
   });
+
+function getRedactionRowPadding(
+  indent: RedactionRowIndent
+): 'md' | 'xl' | undefined {
+  switch (indent) {
+    case 0:
+      return undefined;
+    case 1:
+      return 'md';
+    case 2:
+      return 'xl';
+    default:
+      throw getUnreachableError(indent);
+  }
+}
 
 function getGroupBoxes(
   group: RedactionBoxOccurrenceGroup

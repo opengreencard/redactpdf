@@ -13,6 +13,7 @@ import RedactionError from './RedactionError';
 import RedactionPanel from './RedactionPanel';
 import RedactionPreview from './RedactionPreview';
 import RedactionProgress from './RedactionProgress';
+import { redactionPageContainerSize } from './redactionLayout';
 
 export interface RedactionPageInnerProps {
   redactionKey: string;
@@ -115,7 +116,13 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
       case RedactionPageView.loaded: {
         const redaction = getLoadedRedaction(redactionState);
         return (
-          <Container size="xl" px="md" flex={1} w="100%" display="flex">
+          <Container
+            size={redactionPageContainerSize}
+            px="md"
+            flex={1}
+            w="100%"
+            display="flex"
+          >
             <Grid flex={1}>
               <GridCol span={{ base: 12, md: 3 }} display="flex">
                 <Box flex={1} w="100%" style={{ overflowY: 'auto' }}>

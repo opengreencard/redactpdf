@@ -336,7 +336,7 @@ const commonNoRestrictedSyntaxRules = [
     // Good: const handleSearch = useDebounce((q) => doSearch(q), 250) // debounced callback wrapper
     // Bad: const onSubmit = someFactory() // not an allowed memoized callback wrapper
     selector:
-      'VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="ArrowFunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="FunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="CallExpression"][init.callee.type="Identifier"]:not([init.callee.name=/^(useMemoizedCallback|useCallbackWithPrefix|useSetState|useDebounce|useConvertSingleArgumentToArray)$/])',
+      'VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="ArrowFunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="FunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="CallExpression"][init.callee.type="Identifier"]:not([init.callee.name=/^(useMemoizedCallback|useCallbackWithPrefix|useSetState|useDebounce|useConvertSingleArgumentToArray|useStopPropagation)$/])',
     message:
       'Event handlers in React components should use useMemoizedCallback so they remain stable when passed as props and avoid triggering re-renders.',
   },

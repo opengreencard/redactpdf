@@ -77,12 +77,17 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
             </Anchor>{' '}
             with the document, and we can try to improve the tool.
           </Alert>
-        ) : null}
-        <Text>Review suggestions and hide or remove any you do not need.</Text>
-        <RedactionBoundingBoxList
-          {...passThroughProps}
-          redactionBoundingBoxes={redaction.redactionBoundingBoxes}
-        />
+        ) : (
+          <>
+            <Text>
+              Review suggestions and hide or remove any you do not need.
+            </Text>
+            <RedactionBoundingBoxList
+              {...passThroughProps}
+              redactionBoundingBoxes={redaction.redactionBoundingBoxes}
+            />
+          </>
+        )}
       </Stack>
     );
   }
