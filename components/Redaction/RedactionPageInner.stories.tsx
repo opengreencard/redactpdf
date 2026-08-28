@@ -10,16 +10,19 @@ import {
   ManualRedactionBoundingBox,
   RedactionBoundingBox,
   RedactionStatus,
+  RedactedDataType,
 } from '../../lib/models/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import SiteChrome from '../SiteChrome/SiteChrome';
 import RedactionPageInner from './RedactionPageInner';
 import {
-  addBoundingBoxToResponse,
-  removeBoundingBoxFromResponse,
-  toggleBoundingBoxInResponse,
+  addBoundingBoxesToResponse,
+  removeBoundingBoxesFromResponse,
+  toggleBoundingBoxesInResponse,
 } from './redactionBoundingBoxes';
+import { redactionPageContainerSize } from './redactionLayout';
 
 interface StoryWrapperProps {
   redactionKey: string;
@@ -73,23 +76,30 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       []
     );
 
-    const handleAddBoundingBox = useMemoizedCallback(
-      (box: ManualRedactionBoundingBox) => {
-        updateRedaction((current) => addBoundingBoxToResponse(current, box));
-      },
-      [updateRedaction]
-    );
-    const handleDeleteBoundingBox = useMemoizedCallback(
-      (box: RedactionBoundingBox) => {
+    const handleAddBoundingBoxes = useMemoizedCallback(
+      (boxes: ManualRedactionBoundingBox[]) => {
         updateRedaction((current) =>
-          removeBoundingBoxFromResponse(current, box)
+          addBoundingBoxesToResponse(current, boxes)
         );
       },
       [updateRedaction]
     );
-    const handleToggleBoundingBox = useMemoizedCallback(
-      (box: RedactionBoundingBox) => {
-        updateRedaction((current) => toggleBoundingBoxInResponse(current, box));
+    const handleAddBoundingBox = useConvertSingleArgumentToArray(
+      handleAddBoundingBoxes
+    );
+    const handleDeleteBoundingBoxes = useMemoizedCallback(
+      (boxes: RedactionBoundingBox[]) => {
+        updateRedaction((current) =>
+          removeBoundingBoxesFromResponse(current, boxes)
+        );
+      },
+      [updateRedaction]
+    );
+    const handleToggleBoundingBoxes = useMemoizedCallback(
+      (boxes: RedactionBoundingBox[]) => {
+        updateRedaction((current) =>
+          toggleBoundingBoxesInResponse(current, boxes)
+        );
       },
       [updateRedaction]
     );
@@ -105,8 +115,8 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
         redactionKey={redactionKey}
         redactionState={redactionState}
         onAddBoundingBox={handleAddBoundingBox}
-        onDeleteBoundingBox={handleDeleteBoundingBox}
-        onToggleBoundingBox={handleToggleBoundingBox}
+        onDeleteBoundingBoxes={handleDeleteBoundingBoxes}
+        onToggleBoundingBoxes={handleToggleBoundingBoxes}
         highlightedBox={highlightedBox}
         onRedactionClick={handleRedactionClick}
       />
@@ -115,7 +125,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
 );
 
 const Template: StoryFn<StoryWrapperProps> = (args) => (
-  <SiteChrome isLoggedIn={false}>
+  <SiteChrome isLoggedIn={false} containerSize={redactionPageContainerSize}>
     <StoryWrapper {...args} />
   </SiteChrome>
 );
@@ -136,7 +146,7 @@ Loaded.args = {
       pageCount: 2,
       redactionBoundingBoxes: [
         ClientFakeData.makeAutoRedactionBoundingBox({
-          dataType: 'address',
+          dataType: RedactedDataType.address,
           text: '123 Main St',
         }),
         ClientFakeData.makeManualRedactionBoundingBox({ page: 2 }),

@@ -1,25 +1,26 @@
 import React from 'react';
-import { Container, Grid, GridCol } from '@mantine/core';
+import { Box, Container, Grid, GridCol, Stack } from '@mantine/core';
 import { APICallState } from '../../lib/typescript/apiCallState';
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
+import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import {
   GetRedactionResponse,
   ManualRedactionBoundingBox,
   RedactionBoundingBox,
   RedactionStatus,
 } from '../../lib/models/redactionTypes';
-import { siteContainerSize } from '../SiteChrome/SiteChrome';
 import RedactionError from './RedactionError';
 import RedactionPanel from './RedactionPanel';
 import RedactionPreview from './RedactionPreview';
 import RedactionProgress from './RedactionProgress';
+import { redactionPageContainerSize } from './redactionLayout';
 
 export interface RedactionPageInnerProps {
   redactionKey: string;
   redactionState: APICallState<GetRedactionResponse> | null;
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
-  onDeleteBoundingBox: (box: RedactionBoundingBox) => unknown;
-  onToggleBoundingBox: (box: RedactionBoundingBox) => unknown;
+  onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
+  onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
   highlightedBox: RedactionBoundingBox | null;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
 }
@@ -34,17 +35,19 @@ const RedactionPageInner: React.FunctionComponent<RedactionPageInnerProps> =
       redactionKey,
       redactionState,
       onAddBoundingBox,
-      onDeleteBoundingBox,
-      onToggleBoundingBox,
+      onDeleteBoundingBoxes,
+      onToggleBoundingBoxes,
       highlightedBox,
       onRedactionClick,
     } = props;
     const view = getRedactionPageView(redactionState);
 
     return (
-      <Container
-        size={siteContainerSize}
+      <Stack
+        gap={0}
+        flex={1}
         py="xl"
+        w="100%"
         aria-label={`Redaction ${redactionKey}`}
       >
         <RedactionPageViewBody
@@ -52,12 +55,12 @@ const RedactionPageInner: React.FunctionComponent<RedactionPageInnerProps> =
           redactionKey={redactionKey}
           redactionState={redactionState}
           onAddBoundingBox={onAddBoundingBox}
-          onDeleteBoundingBox={onDeleteBoundingBox}
-          onToggleBoundingBox={onToggleBoundingBox}
+          onDeleteBoundingBoxes={onDeleteBoundingBoxes}
+          onToggleBoundingBoxes={onToggleBoundingBoxes}
           highlightedBox={highlightedBox}
           onRedactionClick={onRedactionClick}
         />
-      </Container>
+      </Stack>
     );
   });
 
@@ -69,13 +72,17 @@ enum RedactionPageView {
   loaded = 'loaded',
 }
 
+/**
+ * Props shared by the three render states: loading, error, and loaded.
+ * Only the loaded state uses the box-edit callbacks and preview.
+ */
 interface RedactionPageViewBodyProps {
   view: RedactionPageView;
   redactionKey: string;
   redactionState: APICallState<GetRedactionResponse> | null;
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
-  onDeleteBoundingBox: (box: RedactionBoundingBox) => unknown;
-  onToggleBoundingBox: (box: RedactionBoundingBox) => unknown;
+  onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
+  onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
   highlightedBox: RedactionBoundingBox | null;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
 }
@@ -87,49 +94,60 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
       redactionKey,
       redactionState,
       onAddBoundingBox,
-      onDeleteBoundingBox,
-      onToggleBoundingBox,
+      onDeleteBoundingBoxes,
+      onToggleBoundingBoxes,
       highlightedBox,
       onRedactionClick,
     } = props;
+    const handleDeleteBoundingBox = useConvertSingleArgumentToArray(
+      onDeleteBoundingBoxes
+    );
+    const handleToggleBoundingBox = useConvertSingleArgumentToArray(
+      onToggleBoundingBoxes
+    );
 
     switch (view) {
       case RedactionPageView.loading: {
         const progress = getProgressProps(redactionState);
-        return (
-          <RedactionProgress
-            pageCount={progress.pageCount}
-            createdAt={progress.createdAt}
-          />
-        );
+        return <RedactionProgress redaction={progress} />;
       }
       case RedactionPageView.error:
         return <RedactionError message={getErrorMessage(redactionState)} />;
       case RedactionPageView.loaded: {
         const redaction = getLoadedRedaction(redactionState);
         return (
-          <Grid>
-            <GridCol span={{ base: 12, md: 3 }}>
-              <RedactionPanel
-                redactionKey={redactionKey}
-                redaction={redaction}
-                onRedactionClick={onRedactionClick}
-                onDeleteBoundingBox={onDeleteBoundingBox}
-                onToggleBoundingBox={onToggleBoundingBox}
-              />
-            </GridCol>
-            <GridCol span={{ base: 12, md: 9 }}>
-              <RedactionPreview
-                redactionKey={redactionKey}
-                pageCount={redaction.pageCount}
-                redactionBoundingBoxes={redaction.redactionBoundingBoxes}
-                onAddBoundingBox={onAddBoundingBox}
-                onDeleteBoundingBox={onDeleteBoundingBox}
-                onToggleBoundingBox={onToggleBoundingBox}
-                scrollToBox={highlightedBox}
-              />
-            </GridCol>
-          </Grid>
+          <Container
+            size={redactionPageContainerSize}
+            px="md"
+            flex={1}
+            w="100%"
+            display="flex"
+          >
+            <Grid flex={1}>
+              <GridCol span={{ base: 12, md: 3 }} display="flex">
+                <Box flex={1} w="100%" style={{ overflowY: 'auto' }}>
+                  <RedactionPanel
+                    redactionKey={redactionKey}
+                    redaction={redaction}
+                    onRedactionClick={onRedactionClick}
+                    onDeleteBoundingBoxes={onDeleteBoundingBoxes}
+                    onToggleBoundingBoxes={onToggleBoundingBoxes}
+                  />
+                </Box>
+              </GridCol>
+              <GridCol span={{ base: 12, md: 9 }}>
+                <RedactionPreview
+                  redactionKey={redactionKey}
+                  pageCount={redaction.pageCount}
+                  redactionBoundingBoxes={redaction.redactionBoundingBoxes}
+                  onAddBoundingBox={onAddBoundingBox}
+                  onDeleteBoundingBox={handleDeleteBoundingBox}
+                  onToggleBoundingBox={handleToggleBoundingBox}
+                  scrollToBox={highlightedBox}
+                />
+              </GridCol>
+            </Grid>
+          </Container>
         );
       }
       default:

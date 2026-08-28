@@ -6,44 +6,72 @@ import type {
   RedactionBoundingBox,
 } from '../../lib/models/redactionTypes';
 
-/** Append a newly drawn box to the current GET payload. */
-export function addBoundingBoxToResponse(
+/** Append newly drawn boxes to the current GET payload. */
+export function addBoundingBoxesToResponse(
   current: GetRedactionResponse,
-  box: ManualRedactionBoundingBox
+  boxes: ManualRedactionBoundingBox[]
 ): GetRedactionResponse {
   const next: GetRedactionResponse = {
     ...current,
-    redactionBoundingBoxes: [...current.redactionBoundingBoxes, box],
+    redactionBoundingBoxes: [...current.redactionBoundingBoxes, ...boxes],
   };
   return next;
 }
 
-/** Drop the matching box from the current GET payload. */
-export function removeBoundingBoxFromResponse(
+/**
+ * Drop matching boxes from an array.
+ * For example, removing `[boxB]` from `[boxA, boxB]` returns `[boxA]`.
+ */
+export function removeBoundingBoxesFromArray(
+  current: RedactionBoundingBox[],
+  boxes: RedactionBoundingBox[]
+): RedactionBoundingBox[] {
+  return current.filter(
+    (existing) =>
+      !boxes.some((box) => isSameRedactionBoundingBox(existing, box))
+  );
+}
+
+/**
+ * Flip `enabled` on matching boxes in an array.
+ * For example, toggling `[boxB]` in `[boxA, boxB]` changes only `boxB`.
+ */
+export function toggleBoundingBoxesInArray(
+  current: RedactionBoundingBox[],
+  boxes: RedactionBoundingBox[]
+): RedactionBoundingBox[] {
+  return current.map((existing): RedactionBoundingBox =>
+    boxes.some((box) => isSameRedactionBoundingBox(existing, box))
+      ? { ...existing, enabled: !existing.enabled }
+      : existing
+  );
+}
+
+/** Drop matching boxes from the current GET payload. */
+export function removeBoundingBoxesFromResponse(
   current: GetRedactionResponse,
-  box: RedactionBoundingBox
+  boxes: RedactionBoundingBox[]
 ): GetRedactionResponse {
   const next: GetRedactionResponse = {
     ...current,
-    redactionBoundingBoxes: current.redactionBoundingBoxes.filter(
-      (existing) => !isSameRedactionBoundingBox(existing, box)
+    redactionBoundingBoxes: removeBoundingBoxesFromArray(
+      current.redactionBoundingBoxes,
+      boxes
     ),
   };
   return next;
 }
 
-/** Flip `enabled` on the matching box in the current GET payload. */
-export function toggleBoundingBoxInResponse(
+/** Flip `enabled` on matching boxes in the current GET payload. */
+export function toggleBoundingBoxesInResponse(
   current: GetRedactionResponse,
-  box: RedactionBoundingBox
+  boxes: RedactionBoundingBox[]
 ): GetRedactionResponse {
   const next: GetRedactionResponse = {
     ...current,
-    redactionBoundingBoxes: current.redactionBoundingBoxes.map(
-      (existing): RedactionBoundingBox =>
-        isSameRedactionBoundingBox(existing, box)
-          ? { ...existing, enabled: !existing.enabled }
-          : existing
+    redactionBoundingBoxes: toggleBoundingBoxesInArray(
+      current.redactionBoundingBoxes,
+      boxes
     ),
   };
   return next;

@@ -1,0 +1,8 @@
+.occurrenceRow {
+  transition: background-color 150ms ease;
+}
+
+.occurrenceRow:hover,
+.occurrenceRow:focus-within {
+  background-color: var(--mantine-color-gray-0);
+}

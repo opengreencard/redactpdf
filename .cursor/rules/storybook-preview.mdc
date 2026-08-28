@@ -31,6 +31,20 @@ export const SomethingElse: Story<YourComponentProps> = Template.bind({});
 SomethingElse.args = { someProp: 'abc' };
 ```
 
+If a story handler only needs to log and does not own local state, use
+`makeFakeHandler` from `lib/storybook.ts` instead of a no-op or
+`console.log` stub:
+
+```tsx
+import { makeFakeHandler } from '../../lib/storybook';
+
+const defaultProps: YourComponentProps = {
+  onRedactionClick: makeFakeHandler('onRedactionClick'),
+};
+```
+
+Keep a `StoryWrapper` only when the story must mutate state after an action.
+
 Then load the `storybook-preview` skill to start Storybook if needed and open:
 
 `http://localhost:6006/iframe.html?id={title-lowercase}--{story-name-kebab}&viewMode=story`

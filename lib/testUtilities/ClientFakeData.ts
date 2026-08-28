@@ -3,6 +3,7 @@ import {
   BoundingBox,
   GetRedactionResponse,
   ManualRedactionBoundingBox,
+  RedactedDataType,
   RedactionStatus,
 } from '../models/redactionTypes';
 
@@ -20,12 +21,21 @@ const ClientFakeData = {
 export default ClientFakeData;
 
 function makeBoundingBox(options: Partial<BoundingBox> = {}): BoundingBox {
+  // Random defaults so independently built boxes tend to be distinct.
+  const x = randomNormalizedRange();
+  const y = randomNormalizedRange();
   return {
-    minX: options.minX ?? 0.1,
-    minY: options.minY ?? 0.2,
-    maxX: options.maxX ?? 0.4,
-    maxY: options.maxY ?? 0.3,
+    minX: options.minX ?? x.min,
+    minY: options.minY ?? y.min,
+    maxX: options.maxX ?? x.max,
+    maxY: options.maxY ?? y.max,
   };
+}
+
+function randomNormalizedRange(): { min: number; max: number } {
+  const a = Math.random();
+  const b = Math.random();
+  return a < b ? { min: a, max: b } : { min: b, max: a };
 }
 
 function makeAutoRedactionBoundingBox(
@@ -33,7 +43,7 @@ function makeAutoRedactionBoundingBox(
 ): AutoRedactionBoundingBox {
   return {
     type: 'automatic',
-    dataType: options.dataType ?? 'person',
+    dataType: options.dataType ?? RedactedDataType.personName,
     text: options.text ?? 'Jane Doe',
     box: options.box ?? makeBoundingBox(),
     page: options.page ?? 1,

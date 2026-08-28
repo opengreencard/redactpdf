@@ -12,6 +12,9 @@ This folder contains custom ESLint rules for the repository, authored in TypeScr
   - Requires an `attributes` option on Sequelize `.findOne()`, `.findAll()`, and `.findByPk()` calls.
 - `require-sequelize-type-assertion`
   - Requires a `PartialInstance` assertion when queries select a subset of columns.
+- `jsx-multiline-comment-style`
+  - Requires line comments inside multiline JSX comment containers instead of
+    multiline block comments.
 
 ## Working with this plugin
 

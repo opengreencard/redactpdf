@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert, Anchor, Stack, Text } from '@mantine/core';
+import { centeredAlertOrCardMaxWidth } from './redactionLayout';
 
 export interface RedactionErrorProps {
   message: string | null;
@@ -7,7 +8,6 @@ export interface RedactionErrorProps {
 
 /**
  * Safe error card for a failed GET or a `status: error` redaction.
- * Task 2.9 replaces this shim with the finished Alert treatment.
  */
 const RedactionError: React.FunctionComponent<RedactionErrorProps> = React.memo(
   function RedactionError(props: RedactionErrorProps) {
@@ -15,6 +15,8 @@ const RedactionError: React.FunctionComponent<RedactionErrorProps> = React.memo(
 
     return (
       <Alert
+        maw={centeredAlertOrCardMaxWidth}
+        mx="auto"
         color="red"
         title="Redaction failed"
         data-testid={_redactionErrorTestId}

@@ -96,6 +96,7 @@
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "lefthook": "^2.1.10",
+    "mockdate": "^3.0.5",
     "only-allow": "^1.2.2",
     "postcss": "^8.5.26",
     "postcss-preset-mantine": "^1.18.0",

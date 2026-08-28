@@ -336,7 +336,7 @@ const commonNoRestrictedSyntaxRules = [
     // Good: const handleSearch = useDebounce((q) => doSearch(q), 250) // debounced callback wrapper
     // Bad: const onSubmit = someFactory() // not an allowed memoized callback wrapper
     selector:
-      'VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="ArrowFunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="FunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="CallExpression"][init.callee.type="Identifier"]:not([init.callee.name=/^(useMemoizedCallback|useCallbackWithPrefix|useSetState|useDebounce)$/])',
+      'VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="ArrowFunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="FunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="CallExpression"][init.callee.type="Identifier"]:not([init.callee.name=/^(useMemoizedCallback|useCallbackWithPrefix|useSetState|useDebounce|useConvertSingleArgumentToArray|useStopPropagation)$/])',
     message:
       'Event handlers in React components should use useMemoizedCallback so they remain stable when passed as props and avoid triggering re-renders.',
   },
@@ -709,6 +709,7 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'import/extensions': 'off',
     'no-console': ['error', { allow: ['info'] }],
+    'redaction/jsx-multiline-comment-style': 'error',
     // We use describe(function) so that the test name doesn't get out of sync
     // with the function's name, which this rule forbids.
     'jest/valid-title': 'off',
@@ -784,6 +785,24 @@ module.exports = {
         importNames: ['Button'],
         message:
           'Use the analytics-aware Button wrapper instead of importing Button directly from @mantine/core.',
+      },
+      {
+        name: '@mantine/core',
+        importNames: ['Card'],
+        message:
+          'Use components/designSystem/Card.tsx instead of importing Card directly from @mantine/core so cards stay flat and visually consistent.',
+      },
+      {
+        name: '@mantine/core',
+        importNames: ['ActionIcon'],
+        message:
+          'Use components/designSystem/ActionIcon.tsx instead of importing ActionIcon directly from @mantine/core so tooltips and accessible names stay synchronized.',
+      },
+      {
+        name: '@mantine/core',
+        importNames: ['UnstyledButton'],
+        message:
+          'Use components/designSystem/ButtonDiv.tsx instead of importing UnstyledButton directly from @mantine/core for clickable div rows.',
       },
       {
         name: '@mantine/core',

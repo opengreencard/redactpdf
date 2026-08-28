@@ -1,0 +1,50 @@
+---
+description: Keep React wrapper-owned props separate from child pass-through props
+globs: **/*.tsx
+alwaysApply: false
+---
+
+# OwnProps and PassThroughProps
+
+When a React wrapper forwards most of a child component's props, separate the
+wrapper-owned inputs from the forwarded child surface:
+
+```tsx
+interface OwnProps {
+  redaction: GetRedactionResponse;
+}
+
+interface PassThroughProps extends Omit<
+  RedactionBoundingBoxListProps,
+  'redactionBoundingBoxes'
+> {}
+
+export interface RedactionPanelProps extends OwnProps, PassThroughProps {}
+```
+
+Destructure the owned props and forward the remainder. Put wrapper-generated
+values after the spread so they override pass-through values:
+
+```tsx
+const { redaction, ...passThroughProps } = props;
+
+// Ensures that we don't pass through more props than needed
+const _ownProps: RequiredWithUndefined<OwnProps> = { redaction };
+
+return (
+  <RedactionBoundingBoxList
+    {...passThroughProps}
+    redactionBoundingBoxes={redaction.redactionBoundingBoxes}
+  />
+);
+```
+
+- Always add `const _ownProps: RequiredWithUndefined<OwnProps>` after
+  destructuring. TypeScript then fails if a new owned field is forgotten and
+  would otherwise leak into `passThroughProps`.
+- Use `Omit` when nearly all child props pass through; use `Pick` for a small,
+  deliberate child surface.
+- Keep `OwnProps` and `PassThroughProps` private unless another module needs
+  them.
+- Keep the child prop type as the source of truth so adding a child prop does
+  not require repeating it in the wrapper interface.

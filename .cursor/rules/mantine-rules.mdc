@@ -1,9 +1,11 @@
 ---
-description: Guidelines for using Mantine components in React components. Applies to *.tsx
+description: Guidelines for using Mantine components and when to use style vs CSS modules. Applies to *.tsx and *.css
 alwaysApply: true
 ---
 
-Prefer using Mantine components (Grid, Box, Stack, Group, Container, etc.) and their native props over using the `style` prop or inline styles.
+Prefer using Mantine components (Grid, Box, Stack, Group, Container, etc.)
+and their native props over using the `style` prop, inline styles, or a CSS
+module.
 
 Be prescriptive about color and size on our visual components. Prefer a
 short list of named options (`size: 'sm' | 'lg'`, `color: 'blue' | 'gray'`)
@@ -29,8 +31,18 @@ When styling components:
 - Use `Group` for horizontal layouts with spacing
 - Use `Grid` for grid-based layouts
 - Use `Container` for page-level containers with max-width constraints
-- Prefer Mantine component props like `p`, `m`, `px`, `py`, `mt`, `mb`, `gap`, `spacing`, etc. over inline styles
-- Use `sx` prop for more complex styling when needed, but prefer component props when possible
+- Prefer Mantine component props like `p`, `m`, `px`, `py`, `mt`, `mb`, `gap`,
+  `spacing`, `flex`, `mih`, and `bdrs` over inline styles
+- For a simple element-specific property that Mantine does not expose, prefer
+  an inline `style` prop so the styling stays beside the element:
+  `<Group style={{ cursor: 'pointer' }}>`
+- Use a CSS module only when the style needs selectors or states that cannot
+  be expressed locally, such as `:hover`, `:focus-within`, pseudo-elements,
+  media queries, or keyframes
+- Keep the CSS module focused on those exceptions rather than duplicating
+  styles already represented by component props
+- Use `sx` prop for more complex styling when needed, but prefer component
+  props when possible
 
 Examples:
 
@@ -72,4 +84,18 @@ Examples:
 <Container size={1200} px="md">
   {content}
 </Container>
+```
+
+```tsx
+// Avoid a CSS module for a static property Mantine does not expose
+.occurrenceRow { cursor: pointer; }
+
+// Prefer keeping that property beside the element
+<Group style={{ cursor: 'pointer' }} className={classes.occurrenceRow}>
+
+// A CSS module is still appropriate for hover and focus
+.occurrenceRow:hover,
+.occurrenceRow:focus-within {
+  background-color: var(--mantine-color-gray-0);
+}
 ```
