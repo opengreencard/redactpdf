@@ -3,6 +3,11 @@ node_modules/
 .next/
 out/
 dist/
+# Compiled custom ESLint rules must stay committed so `eslint .` works
+# without a prior plugin build. Yarn 4 also treats this folder as a workspace.
+!dev/eslint/
+!dev/eslint/dist/
+!dev/eslint/dist/**
 coverage/
 .eslintcache
 .stylelintcache
