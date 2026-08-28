@@ -2,14 +2,7 @@
 
 import React from 'react';
 import _ from 'lodash';
-import {
-  ActionIcon,
-  Group,
-  Stack,
-  Text,
-  Tooltip,
-  UnstyledButton,
-} from '@mantine/core';
+import { Group, Stack, Text } from '@mantine/core';
 import {
   faArrowRight,
   faEye,
@@ -21,10 +14,11 @@ import {
   type RedactionBoundingBox,
 } from '../../lib/models/redactionTypes';
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
-import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import { useCallbackWithPrefix } from '../../lib/hookUtilities/useCallbackWithPrefix';
-import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { useStopPropagation } from '../../lib/hookUtilities/useStopPropagation';
+import ActionIcon from '../designSystem/ActionIcon';
+import ButtonDiv from '../designSystem/ButtonDiv';
+import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import { getRedactionBoxLabel } from './redactionBoundingBoxes';
 import classes from './RedactionBoundingBoxList.module.css';
 
@@ -280,32 +274,14 @@ const RedactionRow: React.FunctionComponent<RedactionRowProps> = React.memo(
         />
       </Group>
     );
-    const handleKeyDown = useMemoizedCallback(
-      (event: React.KeyboardEvent<HTMLDivElement>) => {
-        if (onRedactionClick && (event.key === 'Enter' || event.key === ' ')) {
-          event.preventDefault();
-          onRedactionClick();
-        }
-      },
-      [onRedactionClick]
-    );
-
     if (onRedactionClick === null) {
       return rowContent;
     }
 
     return (
-      <UnstyledButton
-        component="div"
-        role="button"
-        tabIndex={0}
-        onClick={onRedactionClick}
-        onKeyDown={handleKeyDown}
-        style={{ cursor: 'pointer' }}
-        className={classes.occurrenceRow}
-      >
+      <ButtonDiv onClick={onRedactionClick} className={classes.occurrenceRow}>
         {rowContent}
-      </UnstyledButton>
+      </ButtonDiv>
     );
   }
 );
@@ -335,37 +311,31 @@ const RedactionBoxActions: React.FunctionComponent<RedactionBoxActionsProps> =
     return (
       <Group gap="xs" wrap="nowrap">
         {onViewRedactionClick ? (
-          <Tooltip label="View redaction">
-            <ActionIcon
-              variant="subtle"
-              aria-label="View redaction"
-              onClick={handleView}
-              data-testid={_makeRedactionPanelViewTestId(testIdSuffix)}
-            >
-              <FontAwesomeIcon icon={faArrowRight} />
-            </ActionIcon>
-          </Tooltip>
+          <ActionIcon
+            tooltip="View redaction"
+            variant="subtle"
+            onClick={handleView}
+            data-testid={_makeRedactionPanelViewTestId(testIdSuffix)}
+          >
+            <FontAwesomeIcon icon={faArrowRight} />
+          </ActionIcon>
         ) : null}
-        <Tooltip label="Toggle on/off">
-          <ActionIcon
-            variant="subtle"
-            aria-label="Toggle on/off"
-            onClick={handleToggle}
-            data-testid={_makeRedactionPanelToggleTestId(testIdSuffix)}
-          >
-            <FontAwesomeIcon icon={isEnabled ? faEye : faEyeSlash} />
-          </ActionIcon>
-        </Tooltip>
-        <Tooltip label="Delete">
-          <ActionIcon
-            variant="subtle"
-            aria-label="Delete"
-            onClick={handleDelete}
-            data-testid={_makeRedactionPanelDeleteTestId(testIdSuffix)}
-          >
-            <FontAwesomeIcon icon={faXmark} />
-          </ActionIcon>
-        </Tooltip>
+        <ActionIcon
+          tooltip="Toggle on/off"
+          variant="subtle"
+          onClick={handleToggle}
+          data-testid={_makeRedactionPanelToggleTestId(testIdSuffix)}
+        >
+          <FontAwesomeIcon icon={isEnabled ? faEye : faEyeSlash} />
+        </ActionIcon>
+        <ActionIcon
+          tooltip="Delete"
+          variant="subtle"
+          onClick={handleDelete}
+          data-testid={_makeRedactionPanelDeleteTestId(testIdSuffix)}
+        >
+          <FontAwesomeIcon icon={faXmark} />
+        </ActionIcon>
       </Group>
     );
   });

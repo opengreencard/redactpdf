@@ -3,6 +3,7 @@ import {
   BoundingBox,
   GetRedactionResponse,
   ManualRedactionBoundingBox,
+  RedactedDataType,
   RedactionStatus,
 } from '../models/redactionTypes';
 
@@ -42,7 +43,7 @@ function makeAutoRedactionBoundingBox(
 ): AutoRedactionBoundingBox {
   return {
     type: 'automatic',
-    dataType: options.dataType ?? 'person',
+    dataType: options.dataType ?? RedactedDataType.personName,
     text: options.text ?? 'Jane Doe',
     box: options.box ?? makeBoundingBox(),
     page: options.page ?? 1,

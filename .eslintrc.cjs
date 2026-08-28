@@ -794,6 +794,18 @@ module.exports = {
       },
       {
         name: '@mantine/core',
+        importNames: ['ActionIcon'],
+        message:
+          'Use components/designSystem/ActionIcon.tsx instead of importing ActionIcon directly from @mantine/core so tooltips and accessible names stay synchronized.',
+      },
+      {
+        name: '@mantine/core',
+        importNames: ['UnstyledButton'],
+        message:
+          'Use components/designSystem/ButtonDiv.tsx instead of importing UnstyledButton directly from @mantine/core for clickable div rows.',
+      },
+      {
+        name: '@mantine/core',
         importNames: ['DEFAULT_THEME', 'DEFAULT_COLORS'],
         message:
           'Import theme colors via lib/config/mantineTheme.ts (resolveMantineThemeColor, resolvePrimaryThemeColor) instead of DEFAULT_THEME or DEFAULT_COLORS.',
