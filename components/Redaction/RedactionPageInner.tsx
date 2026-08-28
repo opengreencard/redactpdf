@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Grid, GridCol, Stack } from '@mantine/core';
+import { Box, Container, Grid, GridCol, Stack } from '@mantine/core';
 import { APICallState } from '../../lib/typescript/apiCallState';
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
@@ -45,7 +45,6 @@ const RedactionPageInner: React.FunctionComponent<RedactionPageInnerProps> =
       <Stack
         gap={0}
         flex={1}
-        mih={0}
         py="xl"
         w="100%"
         aria-label={`Redaction ${redactionKey}`}
@@ -116,30 +115,32 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
       case RedactionPageView.loaded: {
         const redaction = getLoadedRedaction(redactionState);
         return (
-          <Grid flex={1} mih={0}>
-            <GridCol span={{ base: 12, md: 3 }} mih={0} display="flex">
-              <Box flex={1} w="100%" mih={0} style={{ overflowY: 'auto' }}>
-                <RedactionPanel
+          <Container size="xl" px="md" flex={1} w="100%" display="flex">
+            <Grid flex={1}>
+              <GridCol span={{ base: 12, md: 3 }} display="flex">
+                <Box flex={1} w="100%" style={{ overflowY: 'auto' }}>
+                  <RedactionPanel
+                    redactionKey={redactionKey}
+                    redaction={redaction}
+                    onRedactionClick={onRedactionClick}
+                    onDeleteBoundingBoxes={onDeleteBoundingBoxes}
+                    onToggleBoundingBoxes={onToggleBoundingBoxes}
+                  />
+                </Box>
+              </GridCol>
+              <GridCol span={{ base: 12, md: 9 }}>
+                <RedactionPreview
                   redactionKey={redactionKey}
-                  redaction={redaction}
-                  onRedactionClick={onRedactionClick}
-                  onDeleteBoundingBoxes={onDeleteBoundingBoxes}
-                  onToggleBoundingBoxes={onToggleBoundingBoxes}
+                  pageCount={redaction.pageCount}
+                  redactionBoundingBoxes={redaction.redactionBoundingBoxes}
+                  onAddBoundingBox={onAddBoundingBox}
+                  onDeleteBoundingBox={handleDeleteBoundingBox}
+                  onToggleBoundingBox={handleToggleBoundingBox}
+                  scrollToBox={highlightedBox}
                 />
-              </Box>
-            </GridCol>
-            <GridCol span={{ base: 12, md: 9 }}>
-              <RedactionPreview
-                redactionKey={redactionKey}
-                pageCount={redaction.pageCount}
-                redactionBoundingBoxes={redaction.redactionBoundingBoxes}
-                onAddBoundingBox={onAddBoundingBox}
-                onDeleteBoundingBox={handleDeleteBoundingBox}
-                onToggleBoundingBox={handleToggleBoundingBox}
-                scrollToBox={highlightedBox}
-              />
-            </GridCol>
-          </Grid>
+              </GridCol>
+            </Grid>
+          </Container>
         );
       }
       default:
