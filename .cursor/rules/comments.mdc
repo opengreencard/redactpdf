@@ -28,15 +28,15 @@ alwaysApply: true
 }
 ```
 
-- In React JSX, use the syntax-required block comment form for multi-line
-  comments, with the opening and closing delimiters on their own lines and a
-  leading `*` on each content line:
+- In React JSX, put multiline comments in an empty expression using
+  consecutive `//` lines. `redaction/jsx-multiline-comment-style` enforces
+  this:
 
 ```tsx
-{/*
- * Explain why this JSX is structured this way.
- * Include relevant context or a source link when useful.
- */}
+{
+  // Explain why this JSX is structured this way.
+  // Include relevant context or a source link when useful.
+}
 ```
 
 - Keep a one-line JSX comment inline as `{/* Explain the JSX here */}`.

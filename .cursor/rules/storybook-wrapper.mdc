@@ -73,3 +73,6 @@ Loading.args = { initialStatus: makeInProgressState() };
 
 Keep the wrapper in the `.stories.tsx` file unless more than one story file
 needs it.
+
+If a callback does not mutate wrapper state, pass `makeFakeHandler` from
+`lib/storybook.ts` instead of a local no-op.

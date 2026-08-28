@@ -16,7 +16,9 @@ When enforcing a new convention, add a rule in this order:
    `eslint-plugin-unicorn` and `@typescript-eslint/*`.
 2. **Custom plugin rules** — only when the first tier cannot express the check.
    Implement in `dev/eslint/src/rules/`, export from `src/rules/index.ts`, add tests, run
-   `yarn --cwd dev/eslint build`, and keep `dev/eslint/dist` checked in.
+   `yarn build:eslint-plugin` (or `npm --prefix dev/eslint run build`), and keep
+   `dev/eslint/dist` checked in. Do not use `yarn --cwd`: Yarn 4 does not
+   resolve this workspace package that way.
 
 After adding the rule, suppress existing violations (see below) so new code is enforced
 immediately while legacy code is cleaned up incrementally.
@@ -172,8 +174,11 @@ const row = await Model.findOne({ where: { id } });
 
 - Source: `dev/eslint/src/rules/<rule-name>.ts`
 - Tests: `dev/eslint/src/rules/<rule-name>.test.ts` (adjacent to the rule)
-- Build: `yarn build:eslint-plugin` or `yarn --cwd dev/eslint build`
-- Check in compiled `dev/eslint/dist/` so `eslint .` works without a prior build
+- Build: `yarn build:eslint-plugin` or `npm --prefix dev/eslint run build`.
+  Do not use `yarn --cwd`; Yarn 4 cannot resolve this workspace that way.
+- Check in compiled `dev/eslint/dist/` so `eslint .` works without a prior
+  build. The root `.gitignore` ignores `dist/` globally and then un-ignores
+  `dev/eslint/dist/` for this reason.
 
 Before writing a custom rule, check **immigration** and **itineraries** for an existing
 equivalent in their `dev/eslint/` plugins.

@@ -1,5 +1,7 @@
 import React from 'react';
 import {
+  // This design-system wrapper is the allowed Mantine Card boundary.
+  // eslint-disable-next-line no-restricted-imports
   Card as MantineCard,
   type CardProps as MantineCardProps,
 } from '@mantine/core';

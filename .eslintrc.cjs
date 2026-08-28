@@ -788,6 +788,12 @@ module.exports = {
       },
       {
         name: '@mantine/core',
+        importNames: ['Card'],
+        message:
+          'Use components/designSystem/Card.tsx instead of importing Card directly from @mantine/core so cards stay flat and visually consistent.',
+      },
+      {
+        name: '@mantine/core',
         importNames: ['DEFAULT_THEME', 'DEFAULT_COLORS'],
         message:
           'Import theme colors via lib/config/mantineTheme.ts (resolveMantineThemeColor, resolvePrimaryThemeColor) instead of DEFAULT_THEME or DEFAULT_COLORS.',

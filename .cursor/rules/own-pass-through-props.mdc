@@ -39,6 +39,9 @@ return (
 );
 ```
 
+- Always add `const _ownProps: RequiredWithUndefined<OwnProps>` after
+  destructuring. TypeScript then fails if a new owned field is forgotten and
+  would otherwise leak into `passThroughProps`.
 - Use `Omit` when nearly all child props pass through; use `Pick` for a small,
   deliberate child surface.
 - Keep `OwnProps` and `PassThroughProps` private unless another module needs
