@@ -12,10 +12,10 @@ afterAll(async () => {
 });
 
 describe('createOpenAICompatibleCompletion', () => {
-  it('returns a simple completion from Gemini 3.5 Flash Lite', async () => {
+  it('returns a simple completion from Gemini 3.7 Flash', async () => {
     const response = await createOpenAICompatibleCompletion({
       provider: OpenAICompatibleProvider.gemini,
-      model: 'gemini-3.5-flash-lite',
+      model: 'gemini-3.7-flash',
       messages: [{ role: 'user', content: 'What is 1 + 1' }],
       max_tokens: 1_024,
     });

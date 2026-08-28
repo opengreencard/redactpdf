@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 15,
+    "prompt_tokens": 2663,
+    "total_tokens": 3481
+  },
+  "id": "7CSRapVK29OMxw-csu3pCA",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "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"
+          }
+        },
+        "content": "{\"corrections\":[{\"originalBoxId\":4,\"correctedBox\":null}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1787897073,
+  "model": "gemini-3.7-flash",
+  "timing": {
+    "msToFirstToken": 5875,
+    "outputTokensPerSecond": 3000,
+    "totalTimeMs": 5880
+  }
+}

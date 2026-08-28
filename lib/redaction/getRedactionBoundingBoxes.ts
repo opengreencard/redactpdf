@@ -92,6 +92,10 @@ export interface GetRedactionBoundingBoxesResult {
  * drawn on the image and can correct, add, or remove them before the result is
  * returned. Coordinates are integers from 0 through 1000 in the model
  * response, then converted to the normalized coordinates used by the app.
+ *
+ * Gemini 3.7 Flash is intentionally used here because local comparisons show
+ * it is more exhaustive at finding sensitive content, including repeated or
+ * faint values, than the previous Flash Lite model.
  */
 export async function getRedactionBoundingBoxes(
   image: Uint8Array
@@ -200,7 +204,7 @@ function requestRedactionVision(
 ): ReturnType<typeof createOpenAICompatibleCompletion> {
   return createOpenAICompatibleCompletion({
     provider: OpenAICompatibleProvider.gemini,
-    model: 'gemini-3.5-flash-lite',
+    model: 'gemini-3.7-flash',
     reasoning_effort: 'medium',
     messages: [
       {
