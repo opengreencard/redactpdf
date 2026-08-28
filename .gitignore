@@ -34,6 +34,9 @@ k8s/config/
 # Local project specs (copied from planning docs, not versioned)
 spec/
 
+# Debug dumps written next to mock-function cache files
+**/__testData__/**/*.input.json
+
 # Local files
 .DS_Store
 *.log

@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 7,
+    "prompt_tokens": 8,
+    "total_tokens": 15
+  },
+  "id": "l7-Pao7ZKuu8sOIPj5SL0AQ",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "El4KXAERTTIP42CbeCSrK5kmsOVNwX3Tk7GU+NeHbiqAbQio2yilx+uNlRwrnsy7rEh2sgDi4pyJNxdg+Se2tXkgK8JYES2yMS9KQ8kn0EBA1N9oKhrCXcjqS+NQorIq"
+          }
+        },
+        "content": "1 + 1 = 2",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1787805592,
+  "model": "gemini-3.5-flash-lite",
+  "timing": {
+    "msToFirstToken": 675,
+    "outputTokensPerSecond": 3500,
+    "totalTimeMs": 677
+  }
+}

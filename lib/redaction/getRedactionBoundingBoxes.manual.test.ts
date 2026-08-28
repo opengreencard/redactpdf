@@ -1,7 +1,10 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { describeManualTest } from '../testUtilities/testTypes';
-import { annotateJPEGWithRedactionBoxes } from './annotateJPEGWithRedactionBoxes';
+import {
+  annotateJPEGWithRedactionBoxes,
+  type RedactionBoxToAnnotate,
+} from './annotateJPEGWithRedactionBoxes';
 import { getRedactionBoundingBoxes } from './getRedactionBoundingBoxes';
 
 describeManualTest(() => {
@@ -14,7 +17,7 @@ describeManualTest(() => {
   it('annotates a manually selected JPEG with live redaction boxes', async () => {
     if (!hasConfiguredVisionProviderAPIKey()) {
       console.info(
-        'Skipping live vision request because no vision provider API key is configured.'
+        'Skipping live vision request because no vision provider API key is configured. Add it to .env.test'
       );
       return;
     }
@@ -31,7 +34,10 @@ describeManualTest(() => {
     const result = await getRedactionBoundingBoxes(image);
     const annotatedJPEG = await annotateJPEGWithRedactionBoxes(
       image,
-      result.boxes
+      result.boxes.map((box, index): RedactionBoxToAnnotate => ({
+        ...box,
+        id: index + 1,
+      }))
     );
     await fs.writeFile(outputPath, annotatedJPEG);
 
@@ -54,16 +60,10 @@ describeManualTest(() => {
 });
 
 function hasConfiguredVisionProviderAPIKey(): boolean {
-  const testOnlyDeepInfraAPIKey = 'test-only-deepinfra-key';
   const testOnlyGeminiAPIKey = 'test-only-gemini-key';
-  const testOnlyOpenAIAPIKey = 'test-only-openai-key';
-  return (
-    (Boolean(process.env.GEMINI_API_KEY) &&
-      process.env.GEMINI_API_KEY !== testOnlyGeminiAPIKey) ||
-    (Boolean(process.env.OPENAI_API_KEY) &&
-      process.env.OPENAI_API_KEY !== testOnlyOpenAIAPIKey) ||
-    (Boolean(process.env.DEEPINFRA_API_KEY) &&
-      process.env.DEEPINFRA_API_KEY !== testOnlyDeepInfraAPIKey)
+  return Boolean(
+    process.env.GEMINI_API_KEY &&
+    process.env.GEMINI_API_KEY !== testOnlyGeminiAPIKey
   );
 }
 

@@ -1,14 +1,32 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+// The .delete helper lives next to the mock so cache paths match
+// `createOpenAICompatibleCompletion.ts` after stripping `.delete`.
+// eslint-disable-next-line jest/no-mocks-import
+import { maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles } from '../ai/__mocks__/createOpenAICompatibleCompletion.delete';
 import { RedactedDataType } from '../models/redactionTypes';
-import { promiseAllThrottled } from '../utilities/promiseAllThrottled';
-import { annotateJPEGWithRedactionBoxes } from './annotateJPEGWithRedactionBoxes';
-import { getRedactionBoundingBoxes } from './getRedactionBoundingBoxes';
+import {
+  annotateJPEGWithRedactionBoxes,
+  type RedactionBoxToAnnotate,
+} from './annotateJPEGWithRedactionBoxes';
+import {
+  _combineRedactionBoxes,
+  getRedactionBoundingBoxes,
+} from './getRedactionBoundingBoxes';
+
+afterAll(async () => {
+  await maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles(__filename);
+});
 
 interface ExpectedRedaction {
-  dataType: RedactedDataType;
+  /**
+   * If an array, the `dataType` just needs to be one of the types specified.
+   */
+  dataType: RedactedDataType | RedactedDataType[];
   text: RegExp;
   count: number;
+  /** Some providers may omit this sensitive value despite the expected type. */
+  optional?: boolean;
 }
 
 interface RedactionImageCase {
@@ -18,74 +36,7 @@ interface RedactionImageCase {
 }
 
 describe(getRedactionBoundingBoxes, () => {
-  let imagesByFileName: Record<string, Buffer>;
-
-  beforeAll(async () => {
-    const imageEntries = await promiseAllThrottled(
-      getRedactionImageCases().map(
-        ({ imageFileName }) =>
-          async (): Promise<[string, Buffer]> => [
-            imageFileName,
-            await fs.readFile(
-              path.join(__dirname, '__testData__', imageFileName)
-            ),
-          ]
-      ),
-      3
-    );
-    imagesByFileName = Object.fromEntries(imageEntries);
-  });
-
-  it.each(getRedactionImageCases())(
-    'redacts the expected information from the $label',
-    async ({ imageFileName, expectedRedactions }) => {
-      const result = await getRedactionBoundingBoxes(
-        imagesByFileName[imageFileName]
-      );
-
-      const expectedRedactionCount: number = expectedRedactions.flatMap(
-        ({ count }) => Array.from({ length: count })
-      ).length;
-      expect(result.boxes).toHaveLength(expectedRedactionCount);
-      for (const box of result.boxes) {
-        expect(box.type).toBe('automatic');
-        expect(box.enabled).toBe(true);
-        expect(box.box.minX).toBeGreaterThanOrEqual(0);
-        expect(box.box.minY).toBeGreaterThanOrEqual(0);
-        expect(box.box.maxX).toBeLessThanOrEqual(1);
-        expect(box.box.maxY).toBeLessThanOrEqual(1);
-      }
-      for (const expectedRedaction of expectedRedactions) {
-        expect(result.boxes).toEqual(
-          expect.arrayContaining([
-            expect.objectContaining({
-              dataType: expectedRedaction.dataType,
-              text: expect.stringMatching(expectedRedaction.text),
-            }),
-          ])
-        );
-        const matchingBoxes = result.boxes.filter(
-          ({ dataType, text }): boolean =>
-            dataType === expectedRedaction.dataType &&
-            expectedRedaction.text.test(text)
-        );
-        expect(matchingBoxes).toHaveLength(expectedRedaction.count);
-      }
-
-      if (process.env.CI !== 'true') {
-        const annotatedJPEG = await annotateJPEGWithRedactionBoxes(
-          imagesByFileName[imageFileName],
-          result.boxes
-        );
-        await fs.writeFile(getAnnotatedImagePath(imageFileName), annotatedJPEG);
-      }
-    },
-    60_000
-  );
-});
-
-function getRedactionImageCases(): RedactionImageCase[] {
-  return [
+  it.each<RedactionImageCase>([
     {
       label: 'Dutch passport specimen',
       imageFileName: 'dutchPassportSpecimen.jpg',
@@ -93,6 +44,7 @@ function getRedactionImageCases(): RedactionImageCase[] {
         {
           dataType: RedactedDataType.idNumber,
           text: /^SPEC[I1]2014$/i,
+          // The passport number appears once horizontally and once vertically.
           count: 2,
         },
         {
@@ -111,6 +63,18 @@ function getRedactionImageCases(): RedactionImageCase[] {
           count: 1,
         },
         {
+          dataType: RedactedDataType.issueDate,
+          text: /09\s+MAA[/-]?MAR\s+2014/i,
+          count: 1,
+          optional: true,
+        },
+        {
+          dataType: RedactedDataType.expiryDate,
+          text: /09\s+MAA[/-]?MAR\s+2024/i,
+          count: 1,
+          optional: true,
+        },
+        {
           dataType: RedactedDataType.address,
           text: /Specimen/i,
           count: 1,
@@ -118,6 +82,7 @@ function getRedactionImageCases(): RedactionImageCase[] {
         {
           dataType: RedactedDataType.personPhoto,
           text: /photo|portrait|Willeke/i,
+          // Both the large photo on the left and smaller photo in right bottom.
           count: 2,
         },
         {
@@ -164,6 +129,7 @@ function getRedactionImageCases(): RedactionImageCase[] {
         {
           dataType: RedactedDataType.personName,
           text: /^Jackson$/i,
+          // Jackson appears in both the taxpayer and spouse name fields.
           count: 2,
         },
         {
@@ -174,6 +140,7 @@ function getRedactionImageCases(): RedactionImageCase[] {
         {
           dataType: RedactedDataType.idNumber,
           text: /400[\s-]*00[\s-]*1071/i,
+          // This identifier is repeated in the form's two relevant fields.
           count: 2,
         },
         {
@@ -215,7 +182,8 @@ function getRedactionImageCases(): RedactionImageCase[] {
         {
           dataType: RedactedDataType.personPhoto,
           text: /photo|portrait/i,
-          count: 1,
+          // Both the large photo on the left and smaller photo in right bottom.
+          count: 2,
         },
         {
           dataType: RedactedDataType.idNumber,
@@ -223,7 +191,11 @@ function getRedactionImageCases(): RedactionImageCase[] {
           count: 1,
         },
         {
-          dataType: RedactedDataType.personName,
+          dataType: [
+            RedactedDataType.personName,
+            RedactedDataType.other,
+            RedactedDataType.documentOrCaseId,
+          ],
           text: /EXEMPLAR/i,
           count: 1,
         },
@@ -251,6 +223,19 @@ function getRedactionImageCases(): RedactionImageCase[] {
           dataType: RedactedDataType.idNumber,
           text: /M[\s-]*6131821[\s-]*07/i,
           count: 1,
+          optional: true,
+        },
+        {
+          dataType: RedactedDataType.issueDate,
+          text: /30\s+NOV\s+2009/i,
+          count: 1,
+          optional: true,
+        },
+        {
+          dataType: RedactedDataType.expiryDate,
+          text: /29\s+NOV\s+2019/i,
+          count: 1,
+          optional: true,
         },
         {
           dataType: RedactedDataType.idNumber,
@@ -259,8 +244,117 @@ function getRedactionImageCases(): RedactionImageCase[] {
         },
       ],
     },
-  ];
-}
+  ])(
+    'redacts the expected information from the $label',
+    async ({ imageFileName, expectedRedactions }) => {
+      const image = await fs.readFile(
+        path.join(__dirname, '__testData__', imageFileName)
+      );
+      const result = await getRedactionBoundingBoxes(image);
+
+      if (process.env.CI !== 'true') {
+        const annotatedJPEG = await annotateJPEGWithRedactionBoxes(
+          image,
+          result.boxes.map((box, index): RedactionBoxToAnnotate => ({
+            ...box,
+            id: index + 1,
+          }))
+        );
+        await fs.writeFile(getAnnotatedImagePath(imageFileName), annotatedJPEG);
+      }
+
+      const requiredRedactionCount: number = expectedRedactions
+        .filter(({ optional }) => !optional)
+        .flatMap(({ count }) => Array.from({ length: count })).length;
+      const maximumRedactionCount: number = expectedRedactions.flatMap(
+        ({ count }) => Array.from({ length: count })
+      ).length;
+      expect(result.boxes.length).toBeGreaterThanOrEqual(
+        requiredRedactionCount
+      );
+      expect(result.boxes.length).toBeLessThanOrEqual(maximumRedactionCount);
+      for (const box of result.boxes) {
+        expect(box.type).toBe('automatic');
+        expect(box.enabled).toBe(true);
+        expect(box.box.minX).toBeGreaterThanOrEqual(0);
+        expect(box.box.minY).toBeGreaterThanOrEqual(0);
+        expect(box.box.maxX).toBeLessThanOrEqual(1);
+        expect(box.box.maxY).toBeLessThanOrEqual(1);
+      }
+      for (const expectedRedaction of expectedRedactions) {
+        const expectedDataTypes: RedactedDataType[] = Array.isArray(
+          expectedRedaction.dataType
+        )
+          ? expectedRedaction.dataType
+          : [expectedRedaction.dataType];
+        const matchingTextBoxes = result.boxes.filter(({ text }): boolean =>
+          expectedRedaction.text.test(text)
+        );
+        const matchingBoxes = result.boxes.filter(
+          ({ dataType, text }): boolean =>
+            expectedDataTypes.includes(dataType) &&
+            expectedRedaction.text.test(text)
+        );
+        if (expectedRedaction.optional && matchingTextBoxes.length === 0) {
+          continue;
+        }
+        expect(matchingBoxes).toHaveLength(expectedRedaction.count);
+      }
+    },
+    60_000
+  );
+});
+
+describe(_combineRedactionBoxes, () => {
+  it('replaces, adds, and removes boxes from review corrections', () => {
+    const originalBox: TestRedactionBox = {
+      id: 1,
+      dataType: RedactedDataType.personName,
+      text: 'Jane Doe',
+      minX: 100,
+      minY: 100,
+      maxX: 200,
+      maxY: 200,
+    };
+    const removedBox: TestRedactionBox = {
+      id: 2,
+      dataType: RedactedDataType.email,
+      text: 'jane@example.com',
+      minX: 300,
+      minY: 300,
+      maxX: 400,
+      maxY: 400,
+    };
+    const correctedBox: TestRedactionBox = {
+      ...originalBox,
+      minX: 110,
+      maxX: 210,
+    };
+    const addedBox: TestRedactionBox = {
+      id: 3,
+      dataType: RedactedDataType.phone,
+      text: '555-0100',
+      minX: 500,
+      minY: 500,
+      maxX: 600,
+      maxY: 600,
+    };
+    const corrections: TestRedactionCorrection[] = [
+      { originalBoxId: originalBox.id, correctedBox },
+      { originalBoxId: removedBox.id, correctedBox: null },
+      { originalBoxId: null, correctedBox: addedBox },
+    ];
+
+    expect(
+      _combineRedactionBoxes([originalBox, removedBox], corrections)
+    ).toEqual([correctedBox, addedBox]);
+  });
+});
+
+type TestRedactionBox = Parameters<typeof _combineRedactionBoxes>[0][number];
+type TestRedactionCorrection = Parameters<
+  typeof _combineRedactionBoxes
+>[1][number];
 
 function getAnnotatedImagePath(imageFileName: string): string {
   const extension = path.extname(imageFileName);

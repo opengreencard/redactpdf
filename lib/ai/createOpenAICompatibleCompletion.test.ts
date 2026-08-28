@@ -1,7 +1,15 @@
+// The .delete helper lives next to the mock so cache paths match
+// `createOpenAICompatibleCompletion.ts` after stripping `.delete`.
+// eslint-disable-next-line jest/no-mocks-import
+import { maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles } from './__mocks__/createOpenAICompatibleCompletion.delete';
 import {
   createOpenAICompatibleCompletion,
   OpenAICompatibleProvider,
 } from './createOpenAICompatibleCompletion';
+
+afterAll(async () => {
+  await maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles(__filename);
+});
 
 describe('createOpenAICompatibleCompletion', () => {
   it('returns a simple completion from Gemini 3.5 Flash Lite', async () => {

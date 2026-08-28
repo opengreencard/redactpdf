@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 10,
+    "prompt_tokens": 2484,
+    "total_tokens": 2887
+  },
+  "id": "Y4yQarfAHabJ-8YPx8PI4Q0",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "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"
+          }
+        },
+        "content": "{\n  \"corrections\": []\n}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1787858021,
+  "model": "gemini-3.5-flash-lite",
+  "timing": {
+    "msToFirstToken": 3172,
+    "outputTokensPerSecond": 3333.3333333333335,
+    "totalTimeMs": 3175
+  }
+}

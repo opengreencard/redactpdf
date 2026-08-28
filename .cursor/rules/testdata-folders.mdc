@@ -11,7 +11,7 @@ alwaysApply: true
 - Use `FakeData` and `ClientFakeData` for in-memory application objects, and
   `blahTestCommon.ts` for shared module-specific fixture builders.
 - Store pass-through recordings next to their mock module under
-  `__testData__/mockFunctions/`.
+  `__testData__/<mock-file-basename>/<function-name>/`.
 - Every downloaded or third-party binary must have a sidecar
   `file.ext.README.md` or `file.ext.README.txt` containing the search terms,
   exact source URL, license or attribution, and retrieval date.

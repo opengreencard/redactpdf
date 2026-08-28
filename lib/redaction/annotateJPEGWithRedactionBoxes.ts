@@ -1,6 +1,14 @@
 import sharp from 'sharp';
 import type { AutoRedactionBoundingBox } from '../models/redactionTypes';
 
+/** Automatic box plus the numeric ID shown in inspection annotations. */
+export interface RedactionBoxToAnnotate extends Omit<
+  AutoRedactionBoundingBox,
+  'page'
+> {
+  id: number;
+}
+
 /**
  * Draw red outlines around normalized automatic redaction boxes.
  *
@@ -11,7 +19,7 @@ import type { AutoRedactionBoundingBox } from '../models/redactionTypes';
  */
 export async function annotateJPEGWithRedactionBoxes(
   image: Uint8Array,
-  boxes: Omit<AutoRedactionBoundingBox, 'page'>[]
+  boxes: RedactionBoxToAnnotate[]
 ): Promise<Uint8Array> {
   const imageProcessor = sharp(image);
   const metadata = await imageProcessor.metadata();
@@ -22,12 +30,14 @@ export async function annotateJPEGWithRedactionBoxes(
   const { width, height } = metadata;
   const strokeWidth = Math.max(3, Math.round(Math.min(width, height) / 250));
   const rectangles = boxes
-    .map(({ box }): string => {
+    .map(({ box, id }): string => {
       const x = box.minX * width;
       const y = box.minY * height;
       const boxWidth = (box.maxX - box.minX) * width;
       const boxHeight = (box.maxY - box.minY) * height;
-      return `<rect x="${x}" y="${y}" width="${boxWidth}" height="${boxHeight}" fill="none" stroke="#ff0000" stroke-width="${strokeWidth}"/>`;
+      const fontSize = Math.min(36, Math.max(12, boxHeight * 0.75));
+      const textStrokeWidth = Math.max(2, Math.round(fontSize / 8));
+      return `<rect x="${x}" y="${y}" width="${boxWidth}" height="${boxHeight}" fill="none" stroke="#ff0000" stroke-width="${strokeWidth}"/><text x="${x + 2}" y="${y + fontSize}" fill="#ffff00" stroke="#000000" stroke-width="${textStrokeWidth}" paint-order="stroke" font-family="sans-serif" font-size="${fontSize}" font-weight="bold">${id}</text>`;
     })
     .join('');
   const overlay: Buffer = Buffer.from(

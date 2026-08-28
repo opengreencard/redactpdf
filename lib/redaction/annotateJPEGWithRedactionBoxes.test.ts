@@ -1,9 +1,9 @@
 import sharp from 'sharp';
+import { RedactedDataType } from '../models/redactionTypes';
 import {
-  RedactedDataType,
-  type AutoRedactionBoundingBox,
-} from '../models/redactionTypes';
-import { annotateJPEGWithRedactionBoxes } from './annotateJPEGWithRedactionBoxes';
+  annotateJPEGWithRedactionBoxes,
+  type RedactionBoxToAnnotate,
+} from './annotateJPEGWithRedactionBoxes';
 
 describe(annotateJPEGWithRedactionBoxes, () => {
   it('returns a JPEG with the original dimensions', async () => {
@@ -17,8 +17,9 @@ describe(annotateJPEGWithRedactionBoxes, () => {
     })
       .jpeg()
       .toBuffer();
-    const boxes: Omit<AutoRedactionBoundingBox, 'page'>[] = [
+    const boxes: RedactionBoxToAnnotate[] = [
       {
+        id: 1,
         type: 'automatic',
         dataType: RedactedDataType.email,
         text: 'person@example.com',

@@ -3,6 +3,11 @@ export enum TestType {
   manual = 'manual',
 }
 
+/** `describe()` titles for each test type. Keep in sync with `describeManualTest`. */
+export const testNames: Record<TestType, string> = {
+  [TestType.manual]: 'manual test',
+};
+
 /** Return whether a test type was explicitly enabled by TEST_TYPES. */
 export function shouldRunTestType(testType: TestType): boolean {
   return new Set((process.env.TEST_TYPES ?? '').split(',')).has(testType);
@@ -14,7 +19,7 @@ export function shouldRunTestType(testType: TestType): boolean {
  * Run these with `TEST_TYPES=manual yarn jest <test-file>`.
  */
 export function describeManualTest(testBody: jest.EmptyFunction): void {
-  const testName = 'manual test';
+  const testName = testNames[TestType.manual];
   if (shouldRunTestType(TestType.manual)) {
     describe(testName, testBody);
   } else {
