@@ -9,7 +9,6 @@ import {
   GetRedactionResponse,
   ManualRedactionBoundingBox,
   RedactionBoundingBox,
-  RedactedDataType,
   RedactionStatus,
   RedactedDataType,
 } from '../../lib/models/redactionTypes';
