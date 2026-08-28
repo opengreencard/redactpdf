@@ -19,6 +19,8 @@ export enum RedactedDataType {
   email = 'email',
   phone = 'phone',
   dateOfBirth = 'dateOfBirth',
+  issueDate = 'issueDate',
+  expiryDate = 'expiryDate',
   idNumber = 'idNumber',
   accountNumber = 'accountNumber',
   documentOrCaseId = 'documentOrCaseId',
@@ -55,6 +57,10 @@ export const redactedDataTypeToDescription: Record<RedactedDataType, string> = {
   [RedactedDataType.email]: 'An email address.',
   [RedactedDataType.phone]: 'A phone or fax number.',
   [RedactedDataType.dateOfBirth]: 'A date of birth.',
+  [RedactedDataType.issueDate]:
+    'The date a document or identification was issued.',
+  [RedactedDataType.expiryDate]:
+    'The date a document or identification expires.',
   [RedactedDataType.idNumber]:
     'A unique identifier such as an SSN, ITIN, passport number, driver license, A-number, vehicle VIN, or license plate.',
   [RedactedDataType.accountNumber]:
@@ -77,6 +83,7 @@ export const redactedDataTypeToDescription: Record<RedactedDataType, string> = {
   [RedactedDataType.other]:
     'Other content that could identify or embarrass someone and does not fit a more specific type.',
 };
+
 /** Normalized coordinates for a box on an upright page image. */
 export interface BoundingBox {
   // Coordinates are normalized to 0–1, with the origin at the top-left.
