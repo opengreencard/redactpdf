@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 658,
+    "prompt_tokens": 1736,
+    "total_tokens": 3382
+  },
+  "id": "nyySaunnAvmcjMcP_tr3iA4",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "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"
+          }
+        },
+        "content": "{\n  \"boxes\": [\n    {\"dataType\":\"idNumber\",\"text\":\"SPECI2014\",\"minX\":872,\"minY\":93,\"maxX\":949,\"maxY\":429},\n    {\"dataType\":\"idNumber\",\"text\":\"SPECI2014\",\"minX\":721,\"minY\":569,\"maxX\":840,\"maxY\":588},\n    {\"dataType\":\"personName\",\"text\":\"De Bruijn\",\"minX\":331,\"minY\":597,\"maxX\":442,\"maxY\":615},\n    {\"dataType\":\"personName\",\"text\":\"e/v Molenaar\",\"minX\":330,\"minY\":617,\"maxX\":479,\"maxY\":635},\n    {\"dataType\":\"personName\",\"text\":\"Willeke Liselotte\",\"minX\":330,\"minY\":644,\"maxX\":512,\"maxY\":659},\n    {\"dataType\":\"dateOfBirth\",\"text\":\"10 MAA/MAR 1965\",\"minX\":329,\"minY\":669,\"maxX\":554,\"maxY\":686},\n    {\"dataType\":\"address\",\"text\":\"Specimen\",\"minX\":329,\"minY\":698,\"maxX\":434,\"maxY\":715},\n    {\"dataType\":\"sensitiveQuantity\",\"text\":\"1,75 m\",\"minX\":746,\"minY\":724,\"maxX\":828,\"maxY\":741},\n    {\"dataType\":\"issueDate\",\"text\":\"09 MAA/MAR 2014\",\"minX\":331,\"minY\":752,\"maxX\":538,\"maxY\":769},\n    {\"dataType\":\"expiryDate\",\"text\":\"09 MAA/MAR 2024\",\"minX\":749,\"minY\":753,\"maxX\":955,\"maxY\":770},\n    {\"dataType\":\"organizationName\",\"text\":\"Burg. van Stad en Dorp\",\"minX\":625,\"minY\":778,\"maxX\":860,\"maxY\":797},\n    {\"dataType\":\"personPhoto\",\"text\":\"person photo\",\"minX\":52,\"minY\":567,\"maxX\":304,\"maxY\":808},\n    {\"dataType\":\"personPhoto\",\"text\":\"ghost photo\",\"minX\":620,\"minY\":663,\"maxX\":742,\"maxY\":768},\n    {\"dataType\":\"signature\",\"text\":\"W.L. de Bruijn\",\"minX\":334,\"minY\":798,\"maxX\":590,\"maxY\":836},\n    {\"dataType\":\"personName\",\"text\":\"P<NLDDE<BRUIJN<<WILLEKE<LISELOTTE<<<<<<<<<<\",\"minX\":66,\"minY\":878,\"maxX\":931,\"maxY\":902},\n    {\"dataType\":\"idNumber\",\"text\":\"SPECI20142NLD6503101F2403096999999990<<<<<<84\",\"minX\":68,\"minY\":914,\"maxX\":931,\"maxY\":936}\n  ]\n}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1787964579,
+  "model": "gemini-3.7-flash",
+  "timing": {
+    "msToFirstToken": 4248,
+    "outputTokensPerSecond": 813.3498145859085,
+    "totalTimeMs": 5057
+  }
+}

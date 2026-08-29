@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 666,
+    "prompt_tokens": 1758,
+    "total_tokens": 3045
+  },
+  "id": "pCySauP9B97k-sAPtJLBiQ8",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "EssMCsgMARFNMg+UHBPvHAAHWe4VYR2fSeFMgal7mE8IBjxp7SvzVASbuwaZXMZe22kNdrPEGDQheZTnG+fgqDCZQQr4Dz9EJHsKpxUd1Q1diKLFXAX/RZRvTVu76WJNPzqwoe3RyB8uov5S2HmZg8pRlohJowFWnNtRr7AbbNbPitP4J30+cHsdTUtpl2dBirOMKvvsbwmYEznPIwEX5NstE0C9hGc2RfPcWh/ZIWTzmyh5aWjKjsCTg/snm+25AqKinRuIX3PeN2x0I5F/CXt8mbcHR8a4FKQXxw/4Rr8s0CK9wSfkzp22DQG6zu2d2pDhUfGSSl2iaFOXvMPKxrIvc01O1tRXaLT8jHYFStPOdfgHRMDEJ/EVvmiHccDT/5d/28MqYm5VbphfXSb5zZsJB+ZUvTD7HXjkcWXZVcGntZJtpJmof5albWPLIL7Dm9eps32WXT7PT0zW3MA4eeymXxMHN/rGth1kFGQiKEkbRDl+mkHRUKrBKfipcdGheQQzsy/kfIwMs8iZYH+14QIEXGSpafKWF2QPH+Vts0lzBZ7LeClBlrVocn2u7XUCiwQ2MA3W8gfVhahEguuLvJ8Xph7xF6sLmT5mGUr7nls4Ch3LXzLF83Chq1Y+mIQXCct82vEfFXm5tKG6oNosCR3znHkNJ138yKMXQFQ6Pt2lHqVmacpfmdPhpLfziczcYbJoN4oqcnpiFmZZURGRotXUM8MLC52etzmVma4JAv/JL3vDBL0WqcHFygO1q9m7Jd7+RPOnCi487xkPY7XQqg3BuF5+jSHLHDNDj+7fVf9QuSVgU1IVr190DA7DV91RxM8td3GhAJCXTnxxf0YqNQuBa9rh6WKSlGvXlvTCf+iZ4nAqIgumcQ2DatdoS1lVyIRtEo3DIv/5X9jXyXSEN90sFA121SxqsWuXtMQGz9r5PnZaXfOwVIQwUw1y1EQ4Y5shd9RxQNLRUixCit+ib2a35F/5WWiCSThY+lqlTSsHQ3AELEThLTk7BEhmpDZBamXI7qNih2GSbpo7lM/mDTPtawxFFWtuBrKKFLb0xv8VmPm32u2JLv0P30LNH3iI0kGufSMaWSzkNvDWRSXzVp1PgZ5DgtOZ5snQVnvOXfw9O+mql45PKbZKhYv0R7kfu4rR39yuILQvHJtRmpTrx+KchMT7qAYOJ0n8sRALgUm4tkjDTlb5QLTR5TvdQ97r4/fOnQHURh/9I4BddXTB7GA6M/k6zZOzf4GdTeXoCeJtefsLOXfGwrY9vvfPZZddQHnBE9xj7+AHpQ7gR5m7+ilLXsASdWCfcfsJ/k2552iHODXaeKaHjqqP1s1Tiob741UFoRZFb38lM8UBKiG67/rBmW3nNOTfzrJ1rCQDHquv7cONQZCYO0wiA8nlxWfvPClLfo8ZUoacjYilv0gknRgYG/bbilJjiUCsLMw1N7znZeOwYDnvVEO93KW9X0SgTIauOhf4RDWMVxFb2DZi4IcqFgSNcfLKscuyNibhYeWpBKeI/MZFxTniuhMKW67OtXq54RsE8IfzcIrzEeW7Cg2Z45stqHqi/iungJiOIn7Re27Yfhk+LnK3rMZz9bmyFa2dBzhzvDw5cnkRUh/fpE2RC5pN18uDeNGsVE2jzd15WYiq+j6y94jGX6PdhIDAwg0GJAIcf3MiGCYbcrIcdbffyMIEFL1WdP1Cs+lS3KND1yKGtnONQ/TMY4lgl88GZlVbwga8b9WgIZQ5MnvV8O98aCgO3V/9AWv6g5nrZQsadeZ/Co9PV95LzkrwctgeCIjAfMh0ljzzRb1pgQgMIMVDM9rleDA2L827o+w+oPx18ePY8XhEfAZRyj4jaDpqyc0+Mlzp9fsdM9JCOP2+DfW53wdn8bZ5BJ4horcJ3Of4X2s6preGkKhJVEQDBImjiBH0dYoFMbAjhrZGwY6mCFDtZftN+ttOmgbPhpdeOS1I8ETEoQBP/WjuOVwiILrjKVqqbgY6hZII1br07c7fBIC1qwEHCVRBwBCh0KBxtG4ghuzPE3CwOousfwv8fSwqAdmqJ7biSj40sSWLthwDGLrIrQ+x7hTNOTJ3uMNtmbZj1dFBpHvnpjh/L+sFmooR/0P1xxJNPrVJui4UFSf9ZBn+jzmFTgbsEu7G8KbT"
+          }
+        },
+        "content": "{\n  \"boxes\": [\n    {\"dataType\": \"personName\", \"text\": \"Sean\", \"minX\": 73, \"minY\": 114, \"maxX\": 114, \"maxY\": 126},\n    {\"dataType\": \"personName\", \"text\": \"John\", \"minX\": 403, \"minY\": 113, \"maxX\": 437, \"maxY\": 126},\n    {\"dataType\": \"idNumber\", \"text\": \"400 00 1038\", \"minX\": 781, \"minY\": 113, \"maxX\": 899, \"maxY\": 127},\n    {\"dataType\": \"personName\", \"text\": \"Joan\", \"minX\": 72, \"minY\": 144, \"maxX\": 106, \"maxY\": 156},\n    {\"dataType\": \"personName\", \"text\": \"Jackson\", \"minX\": 402, \"minY\": 144, \"maxX\": 464, \"maxY\": 156},\n    {\"dataType\": \"idNumber\", \"text\": \"400 00 1071\", \"minX\": 780, \"minY\": 144, \"maxX\": 900, \"maxY\": 157},\n    {\"dataType\": \"address\", \"text\": \"26 Dancing Daisy Drive\", \"minX\": 73, \"minY\": 174, \"maxX\": 263, \"maxY\": 188},\n    {\"dataType\": \"address\", \"text\": \"Charleston\", \"minX\": 72, \"minY\": 203, \"maxX\": 158, \"maxY\": 216},\n    {\"dataType\": \"address\", \"text\": \"SC\", \"minX\": 572, \"minY\": 201, \"maxX\": 590, \"maxY\": 213},\n    {\"dataType\": \"address\", \"text\": \"29455\", \"minX\": 669, \"minY\": 205, \"maxX\": 712, \"maxY\": 217},\n    {\"dataType\": \"personName\", \"text\": \"Joan Jackson\", \"minX\": 568, \"minY\": 341, \"maxX\": 670, \"maxY\": 353},\n    {\"dataType\": \"personName\", \"text\": \"Sam\", \"minX\": 161, \"minY\": 479, \"maxX\": 198, \"maxY\": 492},\n    {\"dataType\": \"personName\", \"text\": \"Jackson\", \"minX\": 295, \"minY\": 480, \"maxX\": 355, \"maxY\": 493},\n    {\"dataType\": \"idNumber\", \"text\": \"400 00 1071\", \"minX\": 444, \"minY\": 478, \"maxX\": 554, \"maxY\": 491}\n  ]\n}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1787964582,
+  "model": "gemini-3.7-flash",
+  "timing": {
+    "msToFirstToken": 2618,
+    "outputTokensPerSecond": 1168.421052631579,
+    "totalTimeMs": 3188
+  }
+}

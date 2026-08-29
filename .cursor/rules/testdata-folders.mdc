@@ -1,0 +1,18 @@
+---
+description: Keep binary and recorded test fixtures documented and adjacent to tests.
+globs: '**/*.{test,spec}.{ts,tsx},**/__testData__/**'
+alwaysApply: true
+---
+
+# Test data folders
+
+- Put module-specific committed fixtures in an adjacent `__testData__/` folder.
+  Do not create parallel `fixtures/`, `testData/`, or `samples/` directories.
+- Use `FakeData` and `ClientFakeData` for in-memory application objects, and
+  `blahTestCommon.ts` for shared module-specific fixture builders.
+- Store pass-through recordings next to their mock module under
+  `__testData__/<mock-file-basename>/<function-name>/`.
+- Every downloaded or third-party binary must have a sidecar
+  `file.ext.README.md` or `file.ext.README.txt` containing the search terms,
+  exact source URL, license or attribution, and retrieval date.
+- Never commit real user documents or extracted personal information.

@@ -18,6 +18,11 @@ jest.mock('../auth/nextAuth', () => ({
 // eslint-disable-next-line no-restricted-syntax
 jest.mock('../storage/storageAPI');
 
+// Billed OpenAI-compatible vision calls use a global record/replay mock.
+// Individual tests must reuse this mock rather than adding another mock.
+// eslint-disable-next-line no-restricted-syntax
+jest.mock('../ai/createOpenAICompatibleCompletion');
+
 afterAll(async () => {
   await db.close();
 });
