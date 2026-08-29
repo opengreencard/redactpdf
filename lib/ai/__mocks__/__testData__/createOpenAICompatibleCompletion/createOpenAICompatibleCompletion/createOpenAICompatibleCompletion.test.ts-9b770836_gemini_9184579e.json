@@ -3,16 +3,16 @@
   "usage": {
     "completion_tokens": 7,
     "prompt_tokens": 8,
-    "total_tokens": 99
+    "total_tokens": 94
   },
-  "id": "oCaRav67O6nQjMcP7bbF2Qg",
+  "id": "FimSaomrGaWqjrEP9sqfyQs",
   "choices": [
     {
       "message": {
         "role": "assistant",
         "extra_content": {
           "google": {
-            "thought_signature": "ErADCq0DARFNMg8EP89gxpdd49p14TDrHUAGQ1onwVfknsFWEPCWx6KOzYXEJ5jZcd+N1RQbWWZFDokUv7EDM1RRuRIuOWtSDXbNtWh8GTkE9mRoAndmontrtGzN/SmRAtyY/OZxhwNPs9GIXXVSeEkG39VEgccXrpIi2QUL1Va8xSyASCcxv1IwL8h83I7xMfWGVzyukgKeNTixZCDC3Um5Tz8QIJZpnHjGlO/Zpg6XAJLN4gRce4C0D/oN11J5sN0PFJVEfMiLOGn17PDOvyQ4uqfV5c4jtR3g092OKliOH5Abvpow+VAYsjiCWC+QwNCx1To4r8O8kUkkvCHN0ZemgrkvPpWhL6v7h8NpPsKkRhZI65gPtZIz+Qnca8rHfop3tgTCSLtFs1XXdEeIJlv4oyq1Olxp/1bW+xp/O7z7VWIjp8bFn/oidEAuTGiUCG1G3lXyFcIa5/wkhM9XQmGFH3aV54st0lAQXfL7azO39g2TYCc0REbWfluH2Ew/y2cNRg6YCz3wPPV6d2iL1eb1wPoLaal+VFmAy1GPTMQhaSJM2NKOE89ducYEHJCEwNr6"
+            "thought_signature": "ErsDCrgDARFNMg+QyOTca7knHcdnO2w0Cu9GlgR2oy0mUOIyxQ/izDrVbVnqK6dfNx9BeGAti83m6Lci4azbuig62XKYxxWn6FwwRt/JFrqg307QHOVXgw6B1XCK0DFn6n+DMyh0PQMhs3+pLUem3SoZWZGVyWc+0LsdtDXxrfb2CxL7/eylmC3/G5DeRX8HpzctMaWhg3c3R7/QhWyC/vxutvdfvDoyTa5Mc72IixgzPZbvNs25n0IiVbadzQ648UyrzZFtXaXg7mPVELDLMYXusKVMeCyNxmEpgNRs/n4pacFSI5vz/NFvW5oC0dElUEpqXioQwRNxbt2o8WEBiPuvj0wbegHM/zGsw2gJ2i+YZRWoEOUwdxjR4d9SdhKdu/L+4o7lUfKaflLfoWzWqsnvuWwm7srsFaRPFu/KJmX2AB2f94R59PU2z8jjOXMLA4YgGqyujQl6CZkpThpXlBXpKUigiajM2OzBGjm7UrEUt4zC9LdJvjuz7MmqTFFtjw45V3W4WqNqgEg7R1dM2uYFTiqXfId7Uz2IcDAliPy2OlP6l/A79TRHcNgWXwVwaYdIGiynw/9uD5FXHms="
           }
         },
         "content": "1 + 1 = 2",
@@ -24,11 +24,11 @@
       "logprobs": null
     }
   ],
-  "created": 1787897505,
+  "created": 1787963671,
   "model": "gemini-3.7-flash",
   "timing": {
-    "msToFirstToken": 1162,
-    "outputTokensPerSecond": 2333.3333333333335,
-    "totalTimeMs": 1165
+    "msToFirstToken": 983,
+    "outputTokensPerSecond": 7000,
+    "totalTimeMs": 984
   }
 }

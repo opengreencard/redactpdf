@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 500,
+    "prompt_tokens": 1758,
+    "total_tokens": 3441
+  },
+  "id": "BCmSarSqIMzQ_uMPmOHyqQ4",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "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"
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean\",\"minX\":68,\"minY\":113,\"maxX\":116,\"maxY\":128},{\"dataType\":\"personName\",\"text\":\"John\",\"minX\":401,\"minY\":113,\"maxX\":444,\"maxY\":128},{\"dataType\":\"idNumber\",\"text\":\"400 00 1038\",\"minX\":772,\"minY\":112,\"maxX\":899,\"maxY\":128},{\"dataType\":\"personName\",\"text\":\"Joan\",\"minX\":71,\"minY\":143,\"maxX\":110,\"maxY\":157},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":402,\"minY\":143,\"maxX\":466,\"maxY\":157},{\"dataType\":\"idNumber\",\"text\":\"400 00 1071\",\"minX\":771,\"minY\":143,\"maxX\":899,\"maxY\":158},{\"dataType\":\"address\",\"text\":\"26 Dancing Daisy Drive\",\"minX\":70,\"minY\":173,\"maxX\":265,\"maxY\":189},{\"dataType\":\"address\",\"text\":\"Charleston\",\"minX\":70,\"minY\":202,\"maxX\":162,\"maxY\":218},{\"dataType\":\"address\",\"text\":\"SC\",\"minX\":567,\"minY\":201,\"maxX\":593,\"maxY\":217},{\"dataType\":\"address\",\"text\":\"29455\",\"minX\":665,\"minY\":202,\"maxX\":717,\"maxY\":218},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":562,\"minY\":341,\"maxX\":676,\"maxY\":356},{\"dataType\":\"personName\",\"text\":\"Sam\",\"minX\":160,\"minY\":476,\"maxX\":200,\"maxY\":491},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":287,\"minY\":475,\"maxX\":358,\"maxY\":491},{\"dataType\":\"idNumber\",\"text\":\"400 00 1071\",\"minX\":441,\"minY\":475,\"maxX\":556,\"maxY\":492}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1787963656,
+  "model": "gemini-3.7-flash",
+  "timing": {
+    "msToFirstToken": 4030,
+    "outputTokensPerSecond": 775.1937984496125,
+    "totalTimeMs": 4675
+  }
+}

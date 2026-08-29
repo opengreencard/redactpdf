@@ -49,8 +49,8 @@ describeManualTest(() => {
           inputPath,
           outputPath,
           redactionBoxCount: result.boxes.length,
-          usage: result.usage,
-          timing: result.timing,
+          usage: result.response.usage,
+          timing: result.response.timing,
         },
         null,
         2
