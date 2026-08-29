@@ -1,4 +1,4 @@
-import { config as loadConfig } from 'dotenv';
+import { existsSync } from 'node:fs';
 
 const environment: 'production' | 'development' | 'test' | 'ci' =
   // APP_MODE is our own variable, not typed by Next.js like NODE_ENV is.
@@ -10,10 +10,16 @@ const environment: 'production' | 'development' | 'test' | 'ci' =
   // > https://nextjs.org/docs/messages/non-standard-node-env
   (process.env.APP_MODE as 'production' | 'development' | 'test' | 'ci') ||
   'development';
-// Load committed non-secret values first, then gitignored secrets. dotenv
-// does not override existing env, so Kubernetes envFrom still wins.
-loadConfig({ path: `.env.${environment}.nonsecret` });
-loadConfig({ path: `.env.${environment}` });
+// Load committed non-secret values first, then gitignored secrets. Node's
+// loader does not override existing env, so Kubernetes envFrom still wins.
+const nonsecretEnvPath = `.env.${environment}.nonsecret`;
+if (existsSync(nonsecretEnvPath)) {
+  process.loadEnvFile(nonsecretEnvPath);
+}
+const secretEnvPath = `.env.${environment}`;
+if (existsSync(secretEnvPath)) {
+  process.loadEnvFile(secretEnvPath);
+}
 
 interface Config {
   /** True when running in a test environment (test or ci). */

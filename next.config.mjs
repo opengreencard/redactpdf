@@ -1,10 +1,13 @@
-import { config as loadConfig } from 'dotenv';
+import { existsSync } from 'node:fs';
 
 // Next inlines NEXT_PUBLIC_* at build time. Load committed non-secret env
 // so the files-bucket name is available without a gitignored .env file.
 const environment =
   process.env.APP_MODE || process.env.NODE_ENV || 'development';
-loadConfig({ path: `.env.${environment}.nonsecret` });
+const nonsecretEnvPath = `.env.${environment}.nonsecret`;
+if (existsSync(nonsecretEnvPath)) {
+  process.loadEnvFile(nonsecretEnvPath);
+}
 
 /** @type {import('next').NextConfig} */
 // .mjs cannot use TypeScript `const x: T` annotations; JSDoc above is the type.
