@@ -13,7 +13,6 @@ import {
   RedactionBoundingBox,
   RedactionStatus,
 } from '../../../../lib/models/redactionTypes';
-import { getUrlForRedactionImage } from '../../../../lib/storage/redactionImageUrl';
 import { getRedactionImage } from '../../../../lib/storage/storageFunctions/redactionImage';
 import { putRedactionFile } from '../../../../lib/storage/storageFunctions/redactionFile';
 import { promiseAllThrottled } from '../../../../lib/utilities/promiseAllThrottled';
@@ -102,12 +101,4 @@ describe(processRedaction, () => {
       )
     ).toBe(true);
   }, 30000);
-});
-
-describe(getUrlForRedactionImage, () => {
-  it('returns the public virtual-hosted URL for a page image', () => {
-    expect(getUrlForRedactionImage({ key: 'abc', page: 2 })).toBe(
-      'https://redaction-test-files.sfo3.digitaloceanspaces.com/redactions/abc-2.jpg'
-    );
-  });
 });

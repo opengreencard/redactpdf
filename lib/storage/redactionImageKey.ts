@@ -12,7 +12,7 @@ export function makeRedactionImageKey({
   return `${key}-${page}`;
 }
 
-/** Build the complete public Spaces object key for one page image. */
+/** Build the complete private Spaces object key for one page image. */
 export function makeRedactionImageStorageKey(
   options: RedactionImageKeyOptions
 ): string {
