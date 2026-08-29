@@ -1,0 +1,25 @@
+---
+description: Do not extract a one-use helper when inlining is shorter and clearer.
+globs: '**/*.ts,**/*.tsx'
+alwaysApply: true
+---
+
+Do not extract a helper that is called once if the body is clearer
+inline and the extract adds more lines than it saves. This is especially
+true of functions that only format or `console.info` a local object.
+
+Keep an extracted function when it is reused, hides non-obvious logic, or
+makes the caller substantially easier to read.
+
+```typescript
+// Avoid — called once and only wraps console.info
+function printProcessingResults(result: ProcessResult): void {
+  console.info(JSON.stringify(result, null, 2));
+}
+printProcessingResults({ elapsedMs, outputPath, processing });
+
+// Prefer — inline when the helper is used once and adds no meaning
+console.info(
+  JSON.stringify({ elapsedMs, outputPath, processing }, null, 2)
+);
+```

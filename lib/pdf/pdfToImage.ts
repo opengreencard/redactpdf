@@ -1,61 +1,64 @@
+import { PDFDocument } from '@cantoo/pdf-lib';
 import { fromBuffer } from 'pdf2pic';
 import sharp from 'sharp';
+import { PageSize } from '../models/redactionTypes';
 import { promiseAllThrottled } from '../utilities/promiseAllThrottled';
 
-/** Convert a PDF into a series of images, one for each page in the PDF */
-export async function pdfToJPEGs(pdf: Uint8Array): Promise<Uint8Array[]> {
+/** One rasterized PDF page and its image pixel size. */
+interface PDFPagePNG {
+  png: Uint8Array;
+  pageSize: PageSize;
+}
+
+/** Convert a PDF into one uncompressed PNG per page. */
+export async function pdfToPNGs(pdf: Uint8Array): Promise<PDFPagePNG[]> {
+  const document = await PDFDocument.load(pdf, { ignoreEncryption: true });
+  const pages = document.getPages();
+  if (pages.length === 0) {
+    return [];
+  }
+
+  // pdf2pic needs an explicit canvas size; pages can differ, so rasterize onto
+  // a shared 2048×2048 canvas and resize each page to its own 72 DPI size.
   const results = await fromBuffer(Buffer.from(pdf), {
     preserveAspectRatio: true,
-    // Despite specifying targetDPI, without specifying width/height the output
-    // image has dimensions of 768x1086 by default
-    width: 4096,
-    height: 4096,
-    format: 'png', // Start with PNG uncompressed so we don't double-compress
+    width: rasterSize,
+    height: rasterSize,
+    format: 'png',
     density: targetDPI,
   }).bulk(-1, { responseType: 'buffer' });
 
-  // Compress each image to reduce file size
-  const compressedBuffers = await promiseAllThrottled(
-    results.map((r) => async () => compressJPEG(r.buffer!)),
+  return promiseAllThrottled(
+    results.map((result, pageIndex) => async (): Promise<PDFPagePNG> => {
+      const { width, height } = pages[pageIndex].getSize();
+      const pageSize: PageSize = {
+        width: Math.round((width * targetDPI) / 72),
+        height: Math.round((height * targetDPI) / 72),
+      };
+      const png = await sharp(result.buffer)
+        .resize(pageSize.width, pageSize.height, { fit: 'fill' })
+        .png()
+        .toBuffer();
+      return { png, pageSize };
+    }),
     4
   );
-
-  return compressedBuffers;
 }
 
-/** Target DPI for PDF to image conversion (reduces file size vs higher DPI) */
-const targetDPI = 300;
+/** Compress a rasterized page PNG into a JPEG for storage and vision. */
+export async function compressImage(
+  pngBuffer: Uint8Array
+): Promise<Uint8Array> {
+  return sharp(pngBuffer)
+    .jpeg({ quality: jpegQuality, progressive: false })
+    .toBuffer();
+}
 
-/** Maximum width for output images in pixels (8.5 inches at target DPI) */
-const maxWidth = 8.5 * targetDPI;
+/** Shared pdf2pic canvas so mixed page sizes still rasterize. */
+const rasterSize = 2048;
 
-/** Maximum height for output images in pixels (11 inches at target DPI) */
-const maxHeight = 11 * targetDPI;
+/** Target DPI for PDF to image conversion. 72 DPI is 1 PDF point per pixel. */
+const targetDPI = 72;
 
 /** JPEG quality setting (0-100, lower = smaller file size) */
 const jpegQuality = 85;
-
-/**
- * Compress a JPEG buffer using sharp to reduce file size.
- * Resizes if dimensions exceed max and applies quality compression.
- */
-async function compressJPEG(jpegBuffer: Uint8Array): Promise<Uint8Array> {
-  const image = sharp(jpegBuffer);
-  const metadata = await image.metadata();
-
-  // Check if resizing is needed
-  const width = metadata.width ?? 0;
-  const height = metadata.height ?? 0;
-  const needsResize = width > maxWidth || height > maxHeight;
-
-  let ret = image;
-  if (needsResize) {
-    // Resize to fit within maxWidth/maxHeight while maintaining aspect ratio
-    ret = ret.resize(maxWidth, maxHeight, {
-      fit: 'inside',
-      withoutEnlargement: true,
-    });
-  }
-
-  return ret.jpeg({ quality: jpegQuality, progressive: false }).toBuffer();
-}

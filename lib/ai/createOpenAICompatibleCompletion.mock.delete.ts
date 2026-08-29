@@ -1,6 +1,6 @@
-import { maybeDeleteUnusedCacheFiles } from '../../testUtilities/maybeDeleteUnusedCacheFiles';
+import { maybeDeleteUnusedCacheFiles } from '../testUtilities/maybeDeleteUnusedCacheFiles';
 
-const actualModule = jest.requireActual('../createOpenAICompatibleCompletion');
+const actualModule = jest.requireActual('./createOpenAICompatibleCompletion');
 
 export async function maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles(
   testFilename: string

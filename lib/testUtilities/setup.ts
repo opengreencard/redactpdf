@@ -19,7 +19,8 @@ jest.mock('../auth/nextAuth', () => ({
 jest.mock('../storage/storageAPI');
 
 // Billed OpenAI-compatible vision calls use a global record/replay mock.
-// Individual tests must reuse this mock rather than adding another mock.
+// Individual tests must reuse this mock rather than adding another mock. Manual
+// integration tests use jest.unmock() to call the provider directly.
 // eslint-disable-next-line no-restricted-syntax
 jest.mock('../ai/createOpenAICompatibleCompletion');
 

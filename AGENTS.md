@@ -6,6 +6,12 @@
 - Tests run with Jest; the local MariaDB service is provided by Docker Compose.
 - Keep this public repository independent from OpenGreenCard. Do not copy
   immigration forms, user data, credentials, or product-specific domain code.
+- Before mocking an API in a test, check whether a global mock already
+  exists in an adjacent `__mocks__` folder or in `lib/testUtilities/setup.ts`.
+  If it does, do not add another `jest.mock` or `jest.mocked` — that
+  infrastructure already records, replays, or fakes the service. Put rare
+  outage simulations in a dedicated `*.mocked.test.ts` file and suppress
+  the mock restriction there.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

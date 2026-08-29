@@ -6,6 +6,7 @@ import {
   RedactedDataType,
   RedactionStatus,
 } from '../models/redactionTypes';
+import type { OpenAICompatibleCompletionResult } from '../ai/createOpenAICompatibleCompletion';
 
 /** Browser-safe fixture builders for redaction types used in tests and stories. */
 // Keep the builder collection inferred so its public keys stay synchronized
@@ -16,6 +17,7 @@ const ClientFakeData = {
   makeAutoRedactionBoundingBox,
   makeManualRedactionBoundingBox,
   makeGetRedactionResponse,
+  makeOpenAICompatibleCompletionResult,
 };
 
 export default ClientFakeData;
@@ -72,6 +74,47 @@ function makeGetRedactionResponse(
       makeAutoRedactionBoundingBox(),
     ],
     createdAt: options.createdAt ?? '2026-01-01T00:00:00.000Z',
+  };
+  return response;
+}
+
+/** Create a minimal valid provider response for mocked vision error tests. */
+function makeOpenAICompatibleCompletionResult(
+  options: Partial<OpenAICompatibleCompletionResult> = {}
+): OpenAICompatibleCompletionResult {
+  const response: OpenAICompatibleCompletionResult = {
+    object: options.object ?? 'chat.completion',
+    id: options.id ?? 'process-redaction-test',
+    created: options.created ?? 0,
+    model: options.model ?? 'test-model',
+    choices: options.choices ?? [
+      {
+        message: {
+          role: 'assistant',
+          content: JSON.stringify({
+            boxes: [
+              {
+                dataType: RedactedDataType.personName,
+                text: 'Jane Doe',
+                minX: 100,
+                minY: 200,
+                maxX: 300,
+                maxY: 400,
+              },
+            ],
+          }),
+          refusal: null,
+        },
+        finish_reason: 'stop',
+        index: 0,
+        logprobs: null,
+      },
+    ],
+    timing: options.timing ?? {
+      msToFirstToken: 1,
+      outputTokensPerSecond: 1,
+      totalTimeMs: 1,
+    },
   };
   return response;
 }

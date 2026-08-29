@@ -23,8 +23,10 @@ async function makeDBRedaction(
       id: options.id,
       key: options.key ?? generateRedactionKey(),
       pageCount: options.pageCount ?? 1,
+      pageSizes: options.pageSizes ?? null,
       redactionBoundingBoxes: options.redactionBoundingBoxes ?? [],
       status: options.status ?? RedactionStatus.redacting,
+      errorMessage: options.errorMessage ?? null,
     };
 
   return Redaction.create(creationAttributes);

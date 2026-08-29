@@ -16,7 +16,7 @@ import { getLegacyTestFilePrefix, getTestFilePrefix } from './testState';
  * @param logPrefix Label for the console summary
  * @param module Pass in the `jest.requireActual` for the un-mocked module
  * @param testFilename Pass in `__filename` from within the .test.ts file
- * @param deleteFilename Pass in `__filename` from within the .delete.ts file
+ * @param deleteFilename Pass in `__filename` from the `.mock.delete.ts` helper
  */
 export async function maybeDeleteUnusedCacheFiles(
   logPrefix: string,
@@ -91,7 +91,7 @@ async function getCacheFilesMatchingCurrentTest(
 ): Promise<string[]> {
   try {
     const cacheDir = getMockFunctionCacheDir({
-      scriptFileName: deleteFilename.replaceAll('.delete', ''),
+      scriptFileName: getMockScriptFileNameFromDeleteFile(deleteFilename),
       origFunctionName: functionName,
       overrideCacheDir: null,
     });
@@ -105,4 +105,14 @@ async function getCacheFilesMatchingCurrentTest(
     }
     throw error;
   }
+}
+
+/**
+ * `foo.mock.delete.ts` next to the real module points at `__mocks__/foo.ts`,
+ * whose adjacent `__testData__` folder holds the recordings.
+ */
+function getMockScriptFileNameFromDeleteFile(deleteFilename: string): string {
+  const realModulePath = deleteFilename.replace(/\.mock\.delete\.ts$/, '.ts');
+  const parsed = path.parse(realModulePath);
+  return path.join(parsed.dir, '__mocks__', parsed.base);
 }

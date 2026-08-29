@@ -97,18 +97,8 @@ describe(makeMockedPassThroughFunction, () => {
       { shouldErrorInCI: () => false }
     );
 
-    const firstError = await mockedFunction('provider-error').then(
-      () => {
-        throw new Error('expected throw');
-      },
-      (error: unknown) => error
-    );
-    const secondError = await mockedFunction('provider-error').then(
-      () => {
-        throw new Error('expected throw');
-      },
-      (error: unknown) => error
-    );
+    const firstError = await getRejection(mockedFunction('provider-error'));
+    const secondError = await getRejection(mockedFunction('provider-error'));
 
     expect(firstError).toBeInstanceOf(ApplicationError);
     expect((firstError as ApplicationError).message).toBe(
@@ -128,7 +118,11 @@ describe(makeMockedPassThroughFunction, () => {
     async function echoValue(value: string): Promise<string> {
       return value;
     }
-    const scriptFileName = path.join(temporaryDirectory, 'cleanup.ts');
+    const scriptFileName = path.join(
+      temporaryDirectory,
+      '__mocks__',
+      'cleanup.ts'
+    );
     const mockedFunction = makeMockedPassThroughFunction(
       echoValue,
       scriptFileName,
@@ -142,6 +136,7 @@ describe(makeMockedPassThroughFunction, () => {
 
     const cacheDirectory = path.join(
       temporaryDirectory,
+      '__mocks__',
       '__testData__',
       'cleanup',
       'echoValue'
@@ -159,7 +154,7 @@ describe(makeMockedPassThroughFunction, () => {
         'maybeDeleteUnusedCacheFiles',
         { echoValue },
         __filename,
-        path.join(temporaryDirectory, 'cleanup.delete.ts')
+        path.join(temporaryDirectory, 'cleanup.mock.delete.ts')
       );
     } finally {
       if (previousDeleteUnused === undefined) {
@@ -179,3 +174,15 @@ describe(makeMockedPassThroughFunction, () => {
     ).resolves.toBeDefined();
   });
 });
+
+async function getRejection(promise: Promise<unknown>): Promise<unknown> {
+  try {
+    await promise;
+    throw new Error('expected throw');
+  } catch (error) {
+    if (error instanceof Error && error.message === 'expected throw') {
+      throw error;
+    }
+    return error;
+  }
+}

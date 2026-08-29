@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 587,
+    "prompt_tokens": 1758,
+    "total_tokens": 3254
+  },
+  "id": "1hOTavjcI7PGjMcP_tO34QU",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "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"
+          }
+        },
+        "content": "{\n  \"boxes\": [\n    {\n      \"dataType\": \"personName\",\n      \"text\": \"Sean John and Joan Jackson\",\n      \"minX\": 420,\n      \"minY\": 113,\n      \"maxX\": 704,\n      \"maxY\": 128\n    },\n    {\n      \"dataType\": \"idNumber\",\n      \"text\": \"400-00-1038\",\n      \"minX\": 487,\n      \"minY\": 131,\n      \"maxX\": 604,\n      \"maxY\": 145\n    },\n    {\n      \"dataType\": \"dateOfBirth\",\n      \"text\": \"August 2, 1966\",\n      \"minX\": 478,\n      \"minY\": 520,\n      \"maxX\": 593,\n      \"maxY\": 535\n    },\n    {\n      \"dataType\": \"dateOfBirth\",\n      \"text\": \"March 19, 1965\",\n      \"minX\": 485,\n      \"minY\": 539,\n      \"maxX\": 620,\n      \"maxY\": 554\n    },\n    {\n      \"dataType\": \"dateOfBirth\",\n      \"text\": \"July 20, 2006\",\n      \"minX\": 431,\n      \"minY\": 558,\n      \"maxX\": 524,\n      \"maxY\": 573\n    },\n    {\n      \"dataType\": \"idNumber\",\n      \"text\": \"876543\",\n      \"minX\": 448,\n      \"minY\": 577,\n      \"maxX\": 516,\n      \"maxY\": 591\n    },\n    {\n      \"dataType\": \"dollarAmount\",\n      \"text\": \"$425.00\",\n      \"minX\": 538,\n      \"minY\": 632,\n      \"maxX\": 608,\n      \"maxY\": 647\n    },\n    {\n      \"dataType\": \"dollarAmount\",\n      \"text\": \"$200\",\n      \"minX\": 159,\n      \"minY\": 686,\n      \"maxX\": 204,\n      \"maxY\": 701\n    },\n    {\n      \"dataType\": \"dollarAmount\",\n      \"text\": \"$250\",\n      \"minX\": 484,\n      \"minY\": 686,\n      \"maxX\": 530,\n      \"maxY\": 701\n    }\n  ]\n}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1788023770,
+  "model": "gemini-3.7-flash",
+  "timing": {
+    "msToFirstToken": 3429,
+    "outputTokensPerSecond": 774.4063324538258,
+    "totalTimeMs": 4187
+  }
+}

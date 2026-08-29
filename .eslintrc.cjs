@@ -124,6 +124,44 @@ const untypedObjectMessage =
 const untypedObjectExcludeEventPropertiesSelector =
   ':not(VariableDeclarator[id.name=/EventProperties/i]):not(VariableDeclarator[id.name=/EventProperties/i] *)';
 
+// APIs that already have a global Jest mock (in setup.ts or an adjacent
+// `__mocks__` folder) should not be re-mocked in ordinary tests. Add an
+// entry here when introducing that kind of infrastructure mock:
+//
+// - symbol: the imported name, or the identifier passed to
+//   `jest.mocked(symbol)`
+// - filePattern: a substring of the .ts filename / module path that
+//   exports that symbol, used to match `jest.mock('...filePattern...')`
+// - message: why a local mock is forbidden (usually: the global mock
+//   already records, replays, or fakes the real service)
+const forbiddenMockTargets = [
+  {
+    symbol: 'storageAPI',
+    filePattern: 'storageAPI',
+    message:
+      'It is already mocked globally in lib/testUtilities/setup.ts with in-memory DigitalOcean Spaces reads and writes.',
+  },
+  {
+    symbol: 'createOpenAICompatibleCompletion',
+    filePattern: 'createOpenAICompatibleCompletion',
+    message:
+      'Integration tests should exercise the configured API; use a dedicated mocked test only for provider failures.',
+  },
+];
+
+const forbiddenMockRules = forbiddenMockTargets.flatMap(
+  ({ symbol, filePattern, message }) => [
+    {
+      selector: `CallExpression[callee.object.name="jest"][callee.property.name="mock"] > Literal[value=/${filePattern}/]`,
+      message: `Do not mock ${symbol}. ${message}`,
+    },
+    {
+      selector: `CallExpression[callee.object.name="jest"][callee.property.name="mocked"] > Identifier[name="${symbol}"]`,
+      message: `Do not use jest.mocked(${symbol}). ${message}`,
+    },
+  ]
+);
+
 const commonNoRestrictedSyntaxRules = [
   ...noRestrictedSyntaxRules
     .slice(1)
@@ -507,6 +545,16 @@ const commonNoRestrictedSyntaxRules = [
       'Prefer promiseAllThrottled over Promise.all(arr.map(...)) for I/O-bound parallel work. promiseAllThrottled limits concurrency, preventing resource exhaustion. Convert .map(fn) to .map(item => async () => fn(item)), then pass generators to promiseAllThrottled(generators, concurrency). For database updates, consider using bulkCreate with updateOnDuplicate instead of individual queries.',
   },
   {
+    // Bad: promise.then((value) => ...).catch((error) => ...)
+    // Good: const value = await promise;
+    // Good: try { await promise; } catch (error) { ... }
+    // Good: await Promise.all([(async () => { try { ... } catch { ... } })()]);
+    selector:
+      'CallExpression[callee.type="MemberExpression"][callee.property.name=/^(then|catch)$/]',
+    message:
+      'Use async/await instead of .then()/.catch(). For concurrent work with isolated errors, use an async IIFE inside Promise.all or promiseAllThrottled.',
+  },
+  {
     // Bad: PDFDocument.load(buffer) — no or incomplete options
     // Good: PDFDocument.load(buffer, { ignoreEncryption: true })
     selector:
@@ -557,14 +605,7 @@ const commonNoRestrictedSyntaxRules = [
     message:
       'Prefer direct named or default imports over namespace imports so each dependency is explicit.',
   },
-  {
-    // Bad: jest.mock('../storage/storageAPI')
-    // Good: use the in-memory mock registered in lib/testUtilities/setup.ts
-    selector:
-      'CallExpression[callee.object.name="jest"][callee.property.name="mock"] Literal[value=/storageAPI/]',
-    message:
-      'Do not mock storageAPI in an individual file; it is already mocked globally in lib/testUtilities/setup.ts with in-memory DigitalOcean Spaces reads and writes.',
-  },
+  ...forbiddenMockRules,
 ];
 
 const commonNoRestrictedSyntaxRulesForNonTests = [
