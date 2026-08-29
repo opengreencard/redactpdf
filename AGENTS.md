@@ -4,6 +4,10 @@
 - The app is a Next.js App Router codebase using TypeScript, React, and
   Mantine.
 - Tests run with Jest; the local MariaDB service is provided by Docker Compose.
+- `db.sync()` creates missing tables but does not change existing production
+  tables. Apply production schema changes manually in phpMyAdmin before or
+  alongside deployment, and include the required SQL in the PR description or
+  commit message for the operator.
 - Keep this public repository independent from OpenGreenCard. Do not copy
   immigration forms, user data, credentials, or product-specific domain code.
 - Before mocking an API in a test, check whether a global mock already
