@@ -2,6 +2,7 @@
   "name": "eslint-plugin-redaction",
   "private": true,
   "version": "1.0.0",
+  "license": "AGPL-3.0-only",
   "main": "dist/rules/index.js",
   "scripts": {
     "build": "tsc -p tsconfig.json"
