@@ -11,39 +11,6 @@ import {
   redactedDataTypeToDescription,
 } from '../models/redactionTypes';
 
-const redactionCoordinateSchema = z.number().finite().int().min(0).max(1000);
-
-interface RedactionBoxContent {
-  dataType: RedactedDataType;
-  text: string;
-  minX: number;
-  minY: number;
-  maxX: number;
-  maxY: number;
-}
-
-const redactionBoxSchema: z.ZodType<RedactionBoxContent> = z
-  .object({
-    dataType: redactedDataTypeSchema,
-    text: z.string(),
-    minX: redactionCoordinateSchema,
-    minY: redactionCoordinateSchema,
-    maxX: redactionCoordinateSchema,
-    maxY: redactionCoordinateSchema,
-  })
-  .refine(
-    ({ minX, minY, maxX, maxY }) => minX < maxX && minY < maxY,
-    'Redaction box coordinates must have positive width and height.'
-  );
-
-interface RedactionResponse {
-  boxes: RedactionBoxContent[];
-}
-
-const redactionResponseSchema: z.ZodType<RedactionResponse> = z.object({
-  boxes: redactionBoxSchema.array(),
-});
-
 /** Redaction boxes and token usage returned for one page. */
 export interface GetRedactionBoundingBoxesResult {
   boxes: Omit<AutoRedactionBoundingBox, 'page'>[];
@@ -77,6 +44,39 @@ export async function getRedactionBoundingBoxes(
     response,
   };
 }
+
+interface RedactionBoxContent {
+  dataType: RedactedDataType;
+  text: string;
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+}
+
+interface RedactionResponse {
+  boxes: RedactionBoxContent[];
+}
+
+const redactionCoordinateSchema = z.number().finite().int().min(0).max(1000);
+
+const redactionBoxSchema: z.ZodType<RedactionBoxContent> = z
+  .object({
+    dataType: redactedDataTypeSchema,
+    text: z.string(),
+    minX: redactionCoordinateSchema,
+    minY: redactionCoordinateSchema,
+    maxX: redactionCoordinateSchema,
+    maxY: redactionCoordinateSchema,
+  })
+  .refine(
+    ({ minX, minY, maxX, maxY }) => minX < maxX && minY < maxY,
+    'Redaction box coordinates must have positive width and height.'
+  );
+
+const redactionResponseSchema: z.ZodType<RedactionResponse> = z.object({
+  boxes: redactionBoxSchema.array(),
+});
 
 function requestRedactionVision(
   imageDataURL: string,
