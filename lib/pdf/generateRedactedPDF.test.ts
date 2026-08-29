@@ -1,4 +1,5 @@
 import { PDFDocument } from '@cantoo/pdf-lib';
+import { verify } from 'scrubzero';
 import ClientFakeData from '../testUtilities/ClientFakeData';
 import { generateRedactedPDF } from './generateRedactedPDF';
 
@@ -27,5 +28,26 @@ describe(generateRedactedPDF, () => {
     const output = await PDFDocument.load(result, { ignoreEncryption: true });
     expect(output.getPageCount()).toBe(2);
     expect(result.length).toBeGreaterThan(0);
+  });
+
+  it('removes text covered by an enabled redaction box', async () => {
+    const source = await PDFDocument.create();
+    const page = source.addPage([612, 792]);
+    page.drawText('Sensitive text', { x: 100, y: 700, size: 24 });
+    const pdf = Buffer.from(await source.save());
+
+    const result = await generateRedactedPDF({
+      pdf,
+      redactionBoundingBoxes: [
+        ClientFakeData.makeAutoRedactionBoundingBox({
+          page: 1,
+          box: { minX: 0.1, minY: 0.1, maxX: 0.4, maxY: 0.2 },
+        }),
+      ],
+    });
+
+    const verification = await verify(Uint8Array.from(result).buffer);
+    expect(verification.clean).toBe(true);
+    expect(verification.violations).toHaveLength(0);
   });
 });
