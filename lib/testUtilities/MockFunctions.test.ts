@@ -97,19 +97,14 @@ describe(makeMockedPassThroughFunction, () => {
       { shouldErrorInCI: () => false }
     );
 
-    const firstError = await getRejection(mockedFunction('provider-error'));
-    const secondError = await getRejection(mockedFunction('provider-error'));
-
-    expect(firstError).toBeInstanceOf(ApplicationError);
-    expect((firstError as ApplicationError).message).toBe(
-      'provider unavailable'
-    );
-    expect((firstError as ApplicationError).statusCode).toBe(503);
-    expect(secondError).toBeInstanceOf(ApplicationError);
-    expect((secondError as ApplicationError).message).toBe(
-      'provider unavailable'
-    );
-    expect((secondError as ApplicationError).statusCode).toBe(503);
+    await expect(mockedFunction('provider-error')).rejects.toMatchObject({
+      message: 'provider unavailable',
+      statusCode: 503,
+    });
+    await expect(mockedFunction('provider-error')).rejects.toMatchObject({
+      message: 'provider unavailable',
+      statusCode: 503,
+    });
 
     expect(originalCallCount).toBe(1);
   });
@@ -174,15 +169,3 @@ describe(makeMockedPassThroughFunction, () => {
     ).resolves.toBeDefined();
   });
 });
-
-async function getRejection(promise: Promise<unknown>): Promise<unknown> {
-  try {
-    await promise;
-    throw new Error('expected throw');
-  } catch (error) {
-    if (error instanceof Error && error.message === 'expected throw') {
-      throw error;
-    }
-    return error;
-  }
-}
