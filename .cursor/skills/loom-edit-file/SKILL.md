@@ -1,3 +1,11 @@
+---
+name: loom-edit-file
+description: Edit a specified file based on instructions from a Loom video or transcript.
+disable-model-invocation: true
+triggers:
+  - user
+---
+
 # Edit a file from a Loom video or transcript
 
 Can you edit this file based on instructions from a Loom video or transcript?
@@ -7,7 +15,7 @@ Can you edit this file based on instructions from a Loom video or transcript?
 - Be comprehensive and make all edits suggested, even if uncertain
 - Do not hard-wrap lines for max length; copied output keeps those breaks
 
-When this command is invoked, ask for the below if not already provided:
+When this skill is invoked, ask for the below if not already provided:
 
 1. File to edit
 2. Loom video link

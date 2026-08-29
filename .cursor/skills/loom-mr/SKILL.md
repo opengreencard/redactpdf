@@ -1,3 +1,11 @@
+---
+name: loom-mr
+description: Convert a Loom transcript and branch diff into a pull request description.
+disable-model-invocation: true
+triggers:
+  - user
+---
+
 # Convert Loom transcript to pull request description
 
 Converts a Loom transcript into a pull request description by:
@@ -5,7 +13,7 @@ Converts a Loom transcript into a pull request description by:
 1. Formatting the transcript into a motivation section
 2. Generating the full pull request description from the diff and commits
 
-When this command is invoked, fetch the transcript and generate the PR without asking for any inputs (assume defaults):
+When this skill is invoked, fetch the transcript and generate the PR without asking for any inputs (assume defaults):
 
 1. Link to the Loom video
 2. Use `origin/main` as the base branch (assume it is rebased)
@@ -46,8 +54,7 @@ Then:
    - Use simpler, concise, conversational language
    - Avoid using long words like "comprehensive"
    - Mention specific functions and broad areas rather than enumerating every file.
-   - Avoid naming every changed file path; keep references to module-level areas unless
-     a path is essential.
+   - Avoid naming every changed file path; keep references to module-level areas unless a path is essential.
    - Only mention added tests and Storybook stories in the "Testing" section
    - In the "Testing" section, try to include specific shell commands to run or
      - Use `yarn jest testFileName` to run tests

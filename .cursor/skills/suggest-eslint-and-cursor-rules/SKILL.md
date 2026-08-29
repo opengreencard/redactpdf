@@ -1,9 +1,17 @@
+---
+name: suggest-eslint-and-cursor-rules
+description: Suggest ESLint rules, skills, Cursor rules, and AGENTS.md updates from review feedback.
+disable-model-invocation: true
+triggers:
+  - user
+---
+
 # Suggest ESLint rules, skills, cursor rules, and AGENTS.md updates based on feedback
 
 Run this at the end of a long conversation where someone reviewed code and
-suggested follow-ups. The "feedback" here is user feedback from that
-conversation — read the conversation context before this command, especially
-user messages and review comments.
+suggested follow-ups. This feedback comes from that conversation — read the
+conversation context before this skill, especially user messages and review
+comments.
 
 Suggest improvements from that feedback in priority order:
 

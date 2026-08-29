@@ -1,3 +1,11 @@
+---
+name: address-review-comments
+description: Download and address unresolved pull request review comments one by one.
+disable-model-invocation: true
+triggers:
+  - user
+---
+
 # Address pull request review comments
 
 Can you help address review comments for a pull request?
@@ -109,7 +117,7 @@ The pull request whose comments to address is:
 
 ID or URL: $1
 
-If you didn't get an ID or URL above, immediately after this command is invoked,
+If you didn't get an ID or URL above, immediately after this skill is invoked,
 respond with:
 
 ```
@@ -122,7 +130,7 @@ Then, I'll read the pull request, add the TODOs, and execute on them.
 ```
 
 It's OK to create a long TODO list. This is expected for larger pull requests.
-Prefer being exhaustive over keeping a short list of TODOs.
+Prefer being exhaustive over keeping a short list.
 
 Your initial TODO list should be:
 
