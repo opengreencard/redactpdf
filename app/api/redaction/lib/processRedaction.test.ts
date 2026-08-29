@@ -32,7 +32,12 @@ describe(processRedaction, () => {
   let redactionPageSizes: PageSize[] | null = null;
 
   beforeAll(async () => {
-    const twoPagePDF = await readTwoPageIRS1040();
+    const twoPagePDF = await fs.readFile(
+      path.join(
+        process.cwd(),
+        'lib/redaction/__testData__/irs1040Scenario2First2Pages.pdf'
+      )
+    );
     redactionKey = generateRedactionKey();
     const [redaction] = await Promise.all([
       FakeData.makeDBRedaction({
@@ -106,12 +111,3 @@ describe(getUrlForRedactionImage, () => {
     );
   });
 });
-
-async function readTwoPageIRS1040(): Promise<Buffer> {
-  return fs.readFile(
-    path.join(
-      process.cwd(),
-      'lib/redaction/__testData__/irs1040Scenario2First2Pages.pdf'
-    )
-  );
-}
