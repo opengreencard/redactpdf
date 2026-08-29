@@ -28,3 +28,8 @@ yarn jest
 The application is intentionally separate from OpenGreenCard. It copies
 general-purpose infrastructure patterns without importing immigration forms or
 domain data.
+
+## License
+
+RedactPDF.ai is licensed under the GNU Affero General Public License, version 3
+only. See [LICENSE](./LICENSE) for the complete license text.
