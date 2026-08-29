@@ -52,9 +52,15 @@ async function main() {
   process.stdout.write(filteredFiles.join(' '));
 }
 
-main().catch((error) => {
-  // Hook tooling must surface failures to stderr without importing a logger.
-  // eslint-disable-next-line no-console
-  console.error(error);
-  process.exitCode = 1;
-});
+async function run() {
+  try {
+    await main();
+  } catch (error) {
+    // Hook tooling must surface failures to stderr without importing a logger.
+    // eslint-disable-next-line no-console
+    console.error(error);
+    process.exitCode = 1;
+  }
+}
+
+run();

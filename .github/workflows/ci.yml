@@ -75,6 +75,8 @@ jobs:
         with:
           node-version: 26
           cache: yarn
+      # pdf2pic requires GraphicsMagick and Ghostscript to rasterize PDFs.
+      - run: sudo apt-get update && sudo apt-get install -y graphicsmagick ghostscript
       - run: corepack enable
       - run: yarn install --immutable
       - run: yarn jest
