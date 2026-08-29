@@ -1,11 +1,14 @@
 import type { RedactionInstance } from '../../../../lib/models/Redaction';
 import {
+  PageSize,
   RedactionBoundingBox,
   RedactionStatus,
 } from '../../../../lib/models/redactionTypes';
-import { compressImage, pdfToPNGs } from '../../../../lib/pdf/pdfToImage';
+import {
+  compressImage,
+  processPDFPagesInBatches,
+} from '../../../../lib/pdf/pdfToImage';
 import { getRedactionBoundingBoxes } from '../../../../lib/redaction/getRedactionBoundingBoxes';
-import { promiseAllThrottled } from '../../../../lib/utilities/promiseAllThrottled';
 import { putRedactionImage } from '../../../../lib/storage/storageFunctions/redactionImage';
 
 /** Timing and success information for one page's vision request. */
@@ -22,9 +25,6 @@ export interface ProcessRedactionResult {
   pageTimings: ProcessRedactionPageTiming[];
 }
 
-/** Maximum number of pages compressed, uploaded, and analyzed at once. */
-const processImageConcurrency = 8;
-
 /**
  * Rasterize a PDF, publish its page images, and persist automatic redactions.
  *
@@ -39,26 +39,23 @@ export async function processRedaction(
 ): Promise<ProcessRedactionResult> {
   try {
     const rasterizationStartedAt = Date.now();
-    const images = await pdfToPNGs(buffer);
+    const pageSizes: PageSize[] = [];
+    const pages: ProcessImageResult[] = [];
+    await processPDFPagesInBatches(buffer, async ({ page, png, pageSize }) => {
+      pageSizes[page - 1] = pageSize;
+      pages[page - 1] = await processImage({
+        png,
+        page,
+        key: redaction.key,
+      });
+    });
     const rasterizationTimeMs = Date.now() - rasterizationStartedAt;
-
-    const pages = await promiseAllThrottled(
-      images.map(
-        (image, imageIndex) => async (): Promise<ProcessImageResult> =>
-          processImage({
-            png: image.png,
-            page: imageIndex + 1,
-            key: redaction.key,
-          })
-      ),
-      processImageConcurrency
-    );
 
     const boundingBoxes = pages.flatMap((page) => page.boundingBoxes);
     const pageTimings = pages.map((page) => page.timing);
     const succeeded = pageTimings.some((pageTiming) => pageTiming.succeeded);
     await redaction.update({
-      pageSizes: images.map((image) => image.pageSize),
+      pageSizes,
       redactionBoundingBoxes: [
         ...redaction.redactionBoundingBoxes,
         ...boundingBoxes,
@@ -73,7 +70,7 @@ export async function processRedaction(
     });
 
     const averageRasterizationTimeMs =
-      images.length === 0 ? 0 : rasterizationTimeMs / images.length;
+      pageSizes.length === 0 ? 0 : rasterizationTimeMs / pageSizes.length;
     const result: ProcessRedactionResult = {
       rasterizationTimeMs,
       averageRasterizationTimeMs,
