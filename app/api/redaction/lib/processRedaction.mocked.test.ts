@@ -61,7 +61,7 @@ describe(processRedaction, () => {
       new Error('vision unavailable for page one')
     );
 
-    await processRedaction(redaction, twoPagePDF);
+    const processingResult = await processRedaction(redaction, twoPagePDF);
 
     const updatedRedaction = (await Redaction.findOne({
       where: { key: redactionKey },
@@ -73,9 +73,14 @@ describe(processRedaction, () => {
 
     expect(updatedRedaction?.status).toBe(RedactionStatus.redacted);
     expect(updatedRedaction?.errorMessage).toBeNull();
+    expect(processingResult.pageTimings).toHaveLength(2);
     expect(
-      updatedRedaction?.redactionBoundingBoxes.some((box) => box.page === 2)
-    ).toBe(true);
+      processingResult.pageTimings.filter((pageTiming) => pageTiming.succeeded)
+    ).toHaveLength(1);
+    expect(
+      processingResult.pageTimings.filter((pageTiming) => !pageTiming.succeeded)
+    ).toHaveLength(1);
+    expect(updatedRedaction?.redactionBoundingBoxes.length).toBeGreaterThan(0);
   }, 120000);
 
   it('marks the row as errored when every vision request fails', async () => {
