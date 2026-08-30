@@ -1,7 +1,7 @@
 import { PDFDocument } from '@cantoo/pdf-lib';
 import { redact, verify, type RedactionRegion } from 'scrubzero';
 import { ApplicationError } from '../errors/applicationError';
-import { RedactionBoundingBox } from '../models/redactionTypes';
+import { PageSize, RedactionBoundingBox } from '../models/redactionTypes';
 import { isNotNullOrUndefined } from '../typescript/isNotNullOrUndefined';
 
 export interface GenerateRedactedPDFOptions {
@@ -18,19 +18,22 @@ export async function generateRedactedPDF({
   try {
     pdfDocument = await PDFDocument.load(pdf, { ignoreEncryption: true });
     const pages = pdfDocument.getPages();
+    const pageSizes = pages.map((sourcePage): PageSize => {
+      const { width, height } = sourcePage.getSize();
+      return { width, height };
+    });
     const regions = redactionBoundingBoxes
       .filter(({ enabled }) => enabled)
       .map(({ box, page }): RedactionRegion | null => {
-        const sourcePage = pages[page - 1];
-        if (!sourcePage) return null;
+        const pageSize = pageSizes[page - 1];
+        if (!pageSize) return null;
 
-        const { width, height } = sourcePage.getSize();
         const region: RedactionRegion = {
           page,
-          x: box.minX * width,
-          y: (1 - box.maxY) * height,
-          width: (box.maxX - box.minX) * width,
-          height: (box.maxY - box.minY) * height,
+          x: box.minX * pageSize.width,
+          y: (1 - box.maxY) * pageSize.height,
+          width: (box.maxX - box.minX) * pageSize.width,
+          height: (box.maxY - box.minY) * pageSize.height,
           color: [0, 0, 0],
         };
         return region;
