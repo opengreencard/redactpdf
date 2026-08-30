@@ -44,7 +44,7 @@ export async function generateRedactedPDF({
     const verification = await verify(toArrayBuffer(result.pdf));
     if (!verification.clean) {
       const violations = verification.violations
-        .map(({ page, recoveredText }) => `page ${page}: ${recoveredText}`)
+        .map(({ page }) => `page ${page}`)
         .join('; ');
       throw new ApplicationError(
         `Could not verify PDF redaction (${violations}).`
