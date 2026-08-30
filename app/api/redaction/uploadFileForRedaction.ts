@@ -1,9 +1,6 @@
 import { PDFDocument } from '@cantoo/pdf-lib';
 import { ApplicationError } from '../../../lib/errors/applicationError';
-import Redaction, {
-  generateRedactionKey,
-  RedactionCreationAttributes,
-} from '../../../lib/models/Redaction';
+import Redaction, { generateRedactionKey } from '../../../lib/models/Redaction';
 import { RedactionStatus } from '../../../lib/models/redactionTypes';
 import {
   deleteRedactionFile,
@@ -48,14 +45,15 @@ export async function uploadFileForRedaction({
   const key = generateRedactionKey();
   const pageCount = await getPDFPageCount(buffer);
 
-  const creationAttributes: RedactionCreationAttributes = {
+  const putFilePromise = putRedactionFile(buffer, 'application/pdf', key);
+  const createRedactionPromise = Redaction.create({
     key,
     pageCount,
+    pageSizes: null,
     redactionBoundingBoxes: [],
     status: RedactionStatus.redacting,
-  };
-  const putFilePromise = putRedactionFile(buffer, 'application/pdf', key);
-  const createRedactionPromise = Redaction.create(creationAttributes);
+    errorMessage: null,
+  });
 
   try {
     const [, redaction] = await Promise.all([

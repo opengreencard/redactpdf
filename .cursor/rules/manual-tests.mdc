@@ -1,0 +1,20 @@
+---
+description: Manual tests warn and return when required env is missing.
+globs: '**/*.manual.test.ts,**/*.manual.test.tsx'
+alwaysApply: false
+---
+
+If a manual test needs an environment variable or other caller-supplied
+parameter and it is missing, `console.warn` the usage string and `return`.
+Do not throw — throwing fails CI or a `TEST_TYPES=manual` run that includes
+the file without those parameters.
+
+```typescript
+const inputPath = process.env.REDACTION_INPUT_PATH;
+if (!inputPath) {
+  console.warn(
+    'Skipping test. To run, run: REDACTION_INPUT_PATH=file.pdf yarn manual-jest path/to/file.manual.test.ts'
+  );
+  return;
+}
+```

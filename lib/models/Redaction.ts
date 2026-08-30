@@ -3,7 +3,11 @@ import { DataTypes, Model } from 'sequelize';
 import db from '../db';
 import { WithOptionalId } from '../db/types';
 import { makeJSONGetter, makeJSONSetter } from './jsonDatabaseUtilities';
-import { RedactionBoundingBox, RedactionStatus } from './redactionTypes';
+import {
+  PageSize,
+  RedactionBoundingBox,
+  RedactionStatus,
+} from './redactionTypes';
 
 /** The fixed length used for unguessable redaction lookup keys. */
 export const redactionKeyLength = 32;
@@ -16,10 +20,24 @@ export function generateRedactionKey(): string {
 /** Database attributes for one uploaded redaction document. */
 export interface RedactionAttributes {
   id: number;
+  /** Unguessable public lookup key used in URLs. */
   key: string;
+  /** Number of pages in the uploaded PDF. Known at upload time. */
   pageCount: number;
+  /**
+   * Pixel size of each rasterized page image, in page order.
+   * Null until `processRedaction` finishes rasterizing.
+   */
+  pageSizes: PageSize[] | null;
+  /**
+   * Automatic and manual boxes to redact. Empty at upload; filled as
+   * `processRedaction` and later review edits run.
+   */
   redactionBoundingBoxes: RedactionBoundingBox[];
+  /** `redacting` while the background job runs, then `redacted` or `error`. */
   status: RedactionStatus;
+  /** If the redaction errors, the error message that we got */
+  errorMessage: string | null;
   createdAt: Date;
 }
 
@@ -56,6 +74,13 @@ const Redaction = db.define<
       type: DataTypes.INTEGER.UNSIGNED,
       allowNull: false,
     },
+    pageSizes: {
+      type: DataTypes.TEXT(),
+      allowNull: true,
+      defaultValue: null,
+      get: makeJSONGetter('pageSizes'),
+      set: makeJSONSetter('pageSizes'),
+    },
     redactionBoundingBoxes: {
       type: DataTypes.TEXT('medium'),
       allowNull: false,
@@ -65,6 +90,11 @@ const Redaction = db.define<
     status: {
       type: DataTypes.ENUM(...Object.values(RedactionStatus)),
       allowNull: false,
+    },
+    errorMessage: {
+      type: DataTypes.TEXT(),
+      allowNull: true,
+      defaultValue: null,
     },
   },
   {

@@ -15,14 +15,25 @@ describeManualTest(() => {
    * lib/redaction/getRedactionBoundingBoxes.manual.test.ts`
    */
   it('annotates a manually selected JPEG with live redaction boxes', async () => {
-    if (!hasConfiguredVisionProviderAPIKey()) {
-      console.info(
-        'Skipping live vision request because no vision provider API key is configured. Add it to .env.test'
+    const testOnlyGeminiAPIKey = 'test-only-gemini-key';
+    if (
+      !process.env.GEMINI_API_KEY ||
+      process.env.GEMINI_API_KEY === testOnlyGeminiAPIKey
+    ) {
+      console.warn(
+        'Skipping test. Add a real GEMINI_API_KEY to .env.test, then run: REDACTION_INPUT_PATH=page.jpg yarn manual-jest lib/redaction/getRedactionBoundingBoxes.manual.test.ts'
       );
       return;
     }
 
-    const inputPath = getRequiredEnvironmentPath('REDACTION_INPUT_PATH');
+    const inputPathValue = process.env.REDACTION_INPUT_PATH;
+    if (!inputPathValue) {
+      console.warn(
+        'Skipping test. To run, run: REDACTION_INPUT_PATH=page.jpg yarn manual-jest lib/redaction/getRedactionBoundingBoxes.manual.test.ts'
+      );
+      return;
+    }
+    const inputPath = path.resolve(inputPathValue);
     const outputPath = path.resolve(
       process.env.REDACTION_OUTPUT_PATH ??
         `${path.join(
@@ -58,21 +69,3 @@ describeManualTest(() => {
     );
   }, 240_000);
 });
-
-function hasConfiguredVisionProviderAPIKey(): boolean {
-  const testOnlyGeminiAPIKey = 'test-only-gemini-key';
-  return Boolean(
-    process.env.GEMINI_API_KEY &&
-    process.env.GEMINI_API_KEY !== testOnlyGeminiAPIKey
-  );
-}
-
-function getRequiredEnvironmentPath(name: string): string {
-  const value = process.env[name];
-  if (!value) {
-    throw new Error(
-      `Set ${name} to a JPEG path before running this manual test.`
-    );
-  }
-  return path.resolve(value);
-}

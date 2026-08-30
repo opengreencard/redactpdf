@@ -1,7 +1,4 @@
-// The .delete helper lives next to the mock so cache paths match
-// `createOpenAICompatibleCompletion.ts` after stripping `.delete`.
-// eslint-disable-next-line jest/no-mocks-import
-import { maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles } from './__mocks__/createOpenAICompatibleCompletion.delete';
+import { maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles } from './createOpenAICompatibleCompletion.mock.delete';
 import {
   createOpenAICompatibleCompletion,
   OpenAICompatibleProvider,

@@ -1,9 +1,6 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
-// The .delete helper lives next to the mock so cache paths match
-// `createOpenAICompatibleCompletion.ts` after stripping `.delete`.
-// eslint-disable-next-line jest/no-mocks-import
-import { maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles } from '../ai/__mocks__/createOpenAICompatibleCompletion.delete';
+import { maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles } from '../ai/createOpenAICompatibleCompletion.mock.delete';
 import { RedactedDataType } from '../models/redactionTypes';
 import {
   annotateJPEGWithRedactionBoxes,

@@ -84,6 +84,14 @@ export const redactedDataTypeToDescription: Record<RedactedDataType, string> = {
     'Other content that could identify or embarrass someone and does not fit a more specific type.',
 };
 
+/** Pixel size of one rasterized redaction page image. */
+export interface PageSize {
+  /** Image width in pixels. */
+  width: number;
+  /** Image height in pixels. */
+  height: number;
+}
+
 /** Normalized coordinates for a box on an upright page image. */
 export interface BoundingBox {
   // Coordinates are normalized to 0–1, with the origin at the top-left.

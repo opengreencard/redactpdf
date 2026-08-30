@@ -12,11 +12,12 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { getS3Bucket, S3Bucket } from './buckets';
+import { digitalOceanSpacesRegion } from './digitalOceanSpacesRegion';
 import config from '../config';
 
 const s3 = new S3Client({
-  endpoint: 'https://sfo3.digitaloceanspaces.com',
-  region: 'sfo3',
+  endpoint: `https://${digitalOceanSpacesRegion}.digitaloceanspaces.com`,
+  region: digitalOceanSpacesRegion,
   credentials: {
     accessKeyId: config.s3.accessKeyId,
     secretAccessKey: config.s3.secretAccessKey,

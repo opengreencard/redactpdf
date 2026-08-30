@@ -97,29 +97,14 @@ describe(makeMockedPassThroughFunction, () => {
       { shouldErrorInCI: () => false }
     );
 
-    const firstError = await mockedFunction('provider-error').then(
-      () => {
-        throw new Error('expected throw');
-      },
-      (error: unknown) => error
-    );
-    const secondError = await mockedFunction('provider-error').then(
-      () => {
-        throw new Error('expected throw');
-      },
-      (error: unknown) => error
-    );
-
-    expect(firstError).toBeInstanceOf(ApplicationError);
-    expect((firstError as ApplicationError).message).toBe(
-      'provider unavailable'
-    );
-    expect((firstError as ApplicationError).statusCode).toBe(503);
-    expect(secondError).toBeInstanceOf(ApplicationError);
-    expect((secondError as ApplicationError).message).toBe(
-      'provider unavailable'
-    );
-    expect((secondError as ApplicationError).statusCode).toBe(503);
+    await expect(mockedFunction('provider-error')).rejects.toMatchObject({
+      message: 'provider unavailable',
+      statusCode: 503,
+    });
+    await expect(mockedFunction('provider-error')).rejects.toMatchObject({
+      message: 'provider unavailable',
+      statusCode: 503,
+    });
 
     expect(originalCallCount).toBe(1);
   });
@@ -128,7 +113,11 @@ describe(makeMockedPassThroughFunction, () => {
     async function echoValue(value: string): Promise<string> {
       return value;
     }
-    const scriptFileName = path.join(temporaryDirectory, 'cleanup.ts');
+    const scriptFileName = path.join(
+      temporaryDirectory,
+      '__mocks__',
+      'cleanup.ts'
+    );
     const mockedFunction = makeMockedPassThroughFunction(
       echoValue,
       scriptFileName,
@@ -142,6 +131,7 @@ describe(makeMockedPassThroughFunction, () => {
 
     const cacheDirectory = path.join(
       temporaryDirectory,
+      '__mocks__',
       '__testData__',
       'cleanup',
       'echoValue'
@@ -159,7 +149,7 @@ describe(makeMockedPassThroughFunction, () => {
         'maybeDeleteUnusedCacheFiles',
         { echoValue },
         __filename,
-        path.join(temporaryDirectory, 'cleanup.delete.ts')
+        path.join(temporaryDirectory, 'cleanup.mock.delete.ts')
       );
     } finally {
       if (previousDeleteUnused === undefined) {
