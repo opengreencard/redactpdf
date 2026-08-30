@@ -41,11 +41,11 @@ Can you help address review comments for a pull request?
 
    - Address X comment and run linter and tests
    - Commit X comment's fix to Git
-   - Reply to X comment with a link to the commit
+   - Push X comment's commit, then reply with a link to it
 
    IMPORTANT: you'll have lots of TODOs, but that's fine.
 
-4. Then, execute the TODOs to address/commit/reply:
+4. Then, execute the TODOs to address/commit/push/reply:
 
    - Address X comment
 
@@ -80,11 +80,15 @@ Can you help address review comments for a pull request?
         have the same behavior of only changing on mount (or when src changes).
         ```
 
-   - Reply to X comment with a link to the commit
+   - Push X comment's commit, then reply with a link to it
 
      5. Figure out the full Git commit hash by running
         `git rev-parse HEAD`
-     6. Add a reply to the review thread using `gh api graphql`:
+     6. Run `git push` to push the commit to the remote **before** adding any
+        reply. CodeRabbit cannot see unpushed commits, so a reply that
+        mentions a local-only hash will get a "I can't see these changes"
+        response.
+     7. Add a reply to the review thread using `gh api graphql`:
 
         ```sh
         gh api graphql -f query='
@@ -100,9 +104,6 @@ Can you help address review comments for a pull request?
 
         IMPORTANT: use the full commit hash, not just the first few characters.
         Include a brief description of what was changed after the colon.
-
-     7. Run `git push` to push all commits to the remote. This allows CodeRabbit
-        to see the changes and provide feedback.
 
 The pull request whose comments to address is:
 
