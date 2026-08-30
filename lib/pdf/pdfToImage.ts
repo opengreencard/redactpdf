@@ -19,10 +19,10 @@ export interface PDFPageImage extends PDFPagePNG {
  * Rasterize and process PDF pages in bounded batches.
  *
  * `pdf2pic.bulk(-1)` retains every page buffer until the complete conversion
- * finishes. This callback-based pipeline instead renders four pages, waits
- * for their processing to finish, and only then renders the next four. For a
- * 100-page document, at most four resized PNGs are handed to the caller at a
- * time rather than retaining all 100 pages.
+ * finishes. This callback-based pipeline instead renders 24 pages, processes
+ * them with four concurrent workers, waits for the batch to finish, and only
+ * then renders the next 24. For a 100-page document, at most 24 resized PNGs
+ * are retained rather than all 100 pages.
  */
 export async function processPDFPagesInBatches(
   pdf: Uint8Array,
@@ -47,10 +47,12 @@ export async function processPDFPagesInBatches(
   for (
     let batchStart = 0;
     batchStart < pages.length;
-    batchStart += pdfPageBatchSize
+    batchStart += pdfPageProcessingBatchSize
   ) {
     const pageNumbers = Array.from(
-      { length: Math.min(pdfPageBatchSize, pages.length - batchStart) },
+      {
+        length: Math.min(pdfPageProcessingBatchSize, pages.length - batchStart),
+      },
       (_, batchIndex) => batchStart + batchIndex + 1
     );
     // pdf2pic returns results in the same order as the requested page numbers.
@@ -110,3 +112,6 @@ const jpegQuality = 85;
 
 /** Keep rasterized buffers bounded before downstream processing releases them. */
 const pdfPageBatchSize = 4;
+
+/** Keep enough pages queued for the workers without retaining the whole PDF. */
+const pdfPageProcessingBatchSize = 3 * pdfPageBatchSize;
