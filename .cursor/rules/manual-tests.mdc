@@ -5,23 +5,16 @@ alwaysApply: false
 ---
 
 If a manual test needs an environment variable or other caller-supplied
-parameter and it is missing, `console.warn` the usage string and `return` from
-the test callback. Prefer this early return over wrapping the rest of the test
-in an `if/else` branch, so the test body stays shallow. Do not throw —
-throwing fails CI or a `TEST_TYPES=manual` run that includes the file without
-those parameters. A module-scope `return` is invalid TypeScript, so keep the
-guard inside the test callback.
+parameter and it is missing, `console.warn` the usage string and `return`.
+Do not throw — throwing fails CI or a `TEST_TYPES=manual` run that includes
+the file without those parameters.
 
 ```typescript
-it('processes the supplied PDF', async () => {
-  const inputPath = process.env.REDACTION_INPUT_PATH;
-  if (!inputPath) {
-    console.warn(
-      'Skipping test. To run, run: REDACTION_INPUT_PATH=file.pdf yarn manual-jest path/to/file.manual.test.ts'
-    );
-    return;
-  }
-
-  // Process the supplied PDF here.
-});
+const inputPath = process.env.REDACTION_INPUT_PATH;
+if (!inputPath) {
+  console.warn(
+    'Skipping test. To run, run: REDACTION_INPUT_PATH=file.pdf yarn manual-jest path/to/file.manual.test.ts'
+  );
+  return;
+}
 ```
