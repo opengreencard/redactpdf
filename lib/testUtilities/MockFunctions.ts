@@ -307,6 +307,7 @@ export function allowCacheForCurrentTestType(): boolean {
 
   const shouldCacheTestType: Record<TestType, boolean> = {
     [TestType.manual]: false,
+    [TestType.testDataGeneratorTest]: false,
   };
 
   const shouldNotCacheTestNames = Object.values(TestType)

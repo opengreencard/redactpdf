@@ -1,66 +1,96 @@
-import React from 'react';
-import { Box, Container, Grid, GridCol, Stack } from '@mantine/core';
+'use client';
+
+import React, { useRef, useState } from 'react';
+import {
+  Box,
+  Grid,
+  GridCol,
+  SegmentedControl,
+  Stack,
+  type SegmentedControlItem,
+} from '@mantine/core';
 import { APICallState } from '../../lib/typescript/apiCallState';
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
+import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import { delay } from '../../lib/utilities/delay';
 import {
   GetRedactionResponse,
+  RedactedGetRedactionResponse,
   ManualRedactionBoundingBox,
   RedactionBoundingBox,
   RedactionStatus,
 } from '../../lib/models/redactionTypes';
 import RedactionError from './RedactionError';
 import RedactionPanel from './RedactionPanel';
-import RedactionPreview from './RedactionPreview';
+import { getUrlForRedactionImage } from '../../lib/storage/redactionImageUrl';
+import RedactionPreview, {
+  RedactionPreviewPagesPassThroughProps,
+} from './RedactionPreview';
+import { RedactionPreviewPagesRef } from './RedactionPreviewPages';
 import RedactionProgress from './RedactionProgress';
-import { redactionPageContainerSize } from './redactionLayout';
+import SiteChrome from '../SiteChrome/SiteChrome';
+import { redactionPaneBorder } from './redactionLayout';
 
-export interface RedactionPageInnerProps {
+enum MobileRedactionView {
+  review = 'review',
+  document = 'document',
+}
+
+export interface RedactionPageInnerProps extends RedactionPreviewPagesPassThroughProps {
   redactionKey: string;
   redactionState: APICallState<GetRedactionResponse> | null;
+  isLoggedIn: boolean;
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
   onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  highlightedBox: RedactionBoundingBox | null;
-  onRedactionClick: (box: RedactionBoundingBox) => unknown;
 }
 
 /**
  * Presentational `/redact/:key` review UI. The outer page owns polling and
- * mutations; this component only switches loading / error / loaded.
+ * mutations; this component switches loading / error / loaded while the
+ * loaded view coordinates list clicks with the preview.
  */
 const RedactionPageInner: React.FunctionComponent<RedactionPageInnerProps> =
   React.memo(function RedactionPageInner(props: RedactionPageInnerProps) {
     const {
       redactionKey,
       redactionState,
+      isLoggedIn,
       onAddBoundingBox,
       onDeleteBoundingBoxes,
       onToggleBoundingBoxes,
-      highlightedBox,
-      onRedactionClick,
+      getUrlForRedactionImageForTesting,
     } = props;
     const view = getRedactionPageView(redactionState);
 
     return (
-      <Stack
-        gap={0}
-        flex={1}
-        py="xl"
-        w="100%"
-        aria-label={`Redaction ${redactionKey}`}
+      <SiteChrome
+        isLoggedIn={isLoggedIn}
+        containerSize="none"
+        fullHeight
+        showFooter={false}
       >
-        <RedactionPageViewBody
-          view={view}
-          redactionKey={redactionKey}
-          redactionState={redactionState}
-          onAddBoundingBox={onAddBoundingBox}
-          onDeleteBoundingBoxes={onDeleteBoundingBoxes}
-          onToggleBoundingBoxes={onToggleBoundingBoxes}
-          highlightedBox={highlightedBox}
-          onRedactionClick={onRedactionClick}
-        />
-      </Stack>
+        <Stack
+          gap={0}
+          flex={1}
+          mih={0}
+          w="100%"
+          aria-label={`Redaction ${redactionKey}`}
+        >
+          <RedactionPageViewBody
+            view={view}
+            redactionKey={redactionKey}
+            redactionState={redactionState}
+            onAddBoundingBox={onAddBoundingBox}
+            onDeleteBoundingBoxes={onDeleteBoundingBoxes}
+            onToggleBoundingBoxes={onToggleBoundingBoxes}
+            getUrlForRedactionImageForTesting={
+              getUrlForRedactionImageForTesting
+            }
+          />
+        </Stack>
+      </SiteChrome>
     );
   });
 
@@ -71,6 +101,12 @@ enum RedactionPageView {
   error = 'error',
   loaded = 'loaded',
 }
+
+const mobileRedactionViewOptions: SegmentedControlItem<MobileRedactionView>[] =
+  [
+    { value: MobileRedactionView.review, label: 'Review' },
+    { value: MobileRedactionView.document, label: 'Document' },
+  ];
 
 /**
  * Props shared by the three render states: loading, error, and loaded.
@@ -83,8 +119,7 @@ interface RedactionPageViewBodyProps {
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
   onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  highlightedBox: RedactionBoundingBox | null;
-  onRedactionClick: (box: RedactionBoundingBox) => unknown;
+  getUrlForRedactionImageForTesting: typeof getUrlForRedactionImage | undefined;
 }
 
 const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps> =
@@ -96,13 +131,31 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
       onAddBoundingBox,
       onDeleteBoundingBoxes,
       onToggleBoundingBoxes,
-      highlightedBox,
-      onRedactionClick,
+      getUrlForRedactionImageForTesting,
     } = props;
-    const handleDeleteBoundingBox = useConvertSingleArgumentToArray(
+    const redactionPreviewPagesRef = useRef<RedactionPreviewPagesRef>(null);
+    const [mobileView, setMobileView] = useState<MobileRedactionView>(
+      MobileRedactionView.review
+    );
+
+    /**
+     * Handle a click on a redaction on the left side. Scroll to the box in
+     * the document pane.
+     */
+    const handleRedactionClick = useMemoizedCallback(
+      async (box: RedactionBoundingBox): Promise<void> => {
+        setMobileView(MobileRedactionView.document);
+        // Let the Document pane become display: flex before measuring and
+        // scrolling the overlay. This is a no-op on desktop.
+        await delay(0);
+        redactionPreviewPagesRef.current?.scrollToAndSelectBox(box);
+      },
+      []
+    );
+    const onDeleteBoundingBox = useConvertSingleArgumentToArray(
       onDeleteBoundingBoxes
     );
-    const handleToggleBoundingBox = useConvertSingleArgumentToArray(
+    const onToggleBoundingBox = useConvertSingleArgumentToArray(
       onToggleBoundingBoxes
     );
 
@@ -116,38 +169,83 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
       case RedactionPageView.loaded: {
         const redaction = getLoadedRedaction(redactionState);
         return (
-          <Container
-            size={redactionPageContainerSize}
-            px="md"
-            flex={1}
-            w="100%"
-            display="flex"
-          >
-            <Grid flex={1}>
-              <GridCol span={{ base: 12, md: 3 }} display="flex">
-                <Box flex={1} w="100%" style={{ overflowY: 'auto' }}>
+          <Stack gap="md" flex={1} mih={0} w="100%">
+            <Box px="md" hiddenFrom="md">
+              <SegmentedControl
+                fullWidth
+                data={mobileRedactionViewOptions}
+                value={mobileView}
+                onChange={setMobileView}
+              />
+            </Box>
+            <Grid
+              flex={1}
+              mih={0}
+              h="100%"
+              w="100%"
+              // Mantine's columns live in an inner flex element; give that
+              // element the row height so each pane can shrink and scroll.
+              styles={{ inner: { height: '100%' } }}
+            >
+              {
+                // The responsive display prop provides a Mantine equivalent
+                // of a mobile-only display utility while keeping both panes
+                // mounted, so switching tabs preserves their scroll state.
+              }
+              <GridCol
+                span={{ base: 12, md: 3 }}
+                mih={0}
+                h="100%"
+                p={0}
+                display={{
+                  base:
+                    mobileView === MobileRedactionView.review ? 'flex' : 'none',
+                  md: 'flex',
+                }}
+              >
+                <Box
+                  flex={1}
+                  mih={0}
+                  h="100%"
+                  style={{ borderRight: redactionPaneBorder }}
+                >
                   <RedactionPanel
                     redactionKey={redactionKey}
                     redaction={redaction}
-                    onRedactionClick={onRedactionClick}
+                    onRedactionClick={handleRedactionClick}
                     onDeleteBoundingBoxes={onDeleteBoundingBoxes}
                     onToggleBoundingBoxes={onToggleBoundingBoxes}
                   />
                 </Box>
               </GridCol>
-              <GridCol span={{ base: 12, md: 9 }}>
+              <GridCol
+                span={{ base: 12, md: 9 }}
+                mih={0}
+                miw={0}
+                h="100%"
+                p={0}
+                display={{
+                  base:
+                    mobileView === MobileRedactionView.document
+                      ? 'flex'
+                      : 'none',
+                  md: 'flex',
+                }}
+              >
                 <RedactionPreview
                   redactionKey={redactionKey}
-                  pageCount={redaction.pageCount}
-                  redactionBoundingBoxes={redaction.redactionBoundingBoxes}
+                  redactionResponse={redaction}
                   onAddBoundingBox={onAddBoundingBox}
-                  onDeleteBoundingBox={handleDeleteBoundingBox}
-                  onToggleBoundingBox={handleToggleBoundingBox}
-                  scrollToBox={highlightedBox}
+                  onDeleteBoundingBox={onDeleteBoundingBox}
+                  onToggleBoundingBox={onToggleBoundingBox}
+                  redactionPreviewPagesRef={redactionPreviewPagesRef}
+                  getUrlForRedactionImageForTesting={
+                    getUrlForRedactionImageForTesting
+                  }
                 />
               </GridCol>
             </Grid>
-          </Container>
+          </Stack>
         );
       }
       default:
@@ -179,7 +277,7 @@ function getRedactionPageView(
         case RedactionStatus.redacted:
           return RedactionPageView.loaded;
         default:
-          throw getUnreachableError(result.status);
+          throw getUnreachableError(result);
       }
     }
     default:
@@ -225,11 +323,9 @@ function getErrorMessage(
 
 function getLoadedRedaction(
   redactionState: APICallState<GetRedactionResponse> | null
-): GetRedactionResponse {
+): RedactedGetRedactionResponse {
   if (
-    redactionState &&
-    redactionState.status !== 'error' &&
-    redactionState.result &&
+    redactionState?.status === 'done' &&
     redactionState.result.status === RedactionStatus.redacted
   ) {
     return redactionState.result;

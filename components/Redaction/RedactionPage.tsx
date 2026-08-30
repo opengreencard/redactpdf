@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import type { NotificationData } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
@@ -16,6 +16,7 @@ import { APICallState } from '../../lib/typescript/apiCallState';
 import {
   GetRedactionResponse,
   ManualRedactionBoundingBox,
+  RedactedGetRedactionResponse,
   RedactionBoundingBox,
   RedactionStatus,
 } from '../../lib/models/redactionTypes';
@@ -28,6 +29,7 @@ import RedactionPageInner from './RedactionPageInner';
 
 export interface RedactionPageProps {
   redactionKey: string;
+  isLoggedIn: boolean;
 }
 
 /**
@@ -36,9 +38,7 @@ export interface RedactionPageProps {
  */
 const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
   function RedactionPage(props: RedactionPageProps) {
-    const { redactionKey } = props;
-    const [highlightedBox, setHighlightedBox] =
-      useState<RedactionBoundingBox | null>(null);
+    const { redactionKey, isLoggedIn } = props;
     const startedKeyRef = useRef<string | null>(null);
 
     const {
@@ -69,8 +69,8 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
     const persistBoxMutation = useMemoizedCallback(
       async (
         applyOptimistic: (
-          current: GetRedactionResponse
-        ) => GetRedactionResponse,
+          current: RedactedGetRedactionResponse
+        ) => RedactedGetRedactionResponse,
         persist: () => Promise<void>
       ) => {
         const previous = getRedactedResult(redactionState);
@@ -78,7 +78,8 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
           return;
         }
 
-        const optimistic: GetRedactionResponse = applyOptimistic(previous);
+        const optimistic: RedactedGetRedactionResponse =
+          applyOptimistic(previous);
         setStateResult(optimistic);
 
         try {
@@ -110,6 +111,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       },
       [persistBoxMutation, redactionKey]
     );
+
     const handleAddBoundingBox = useConvertSingleArgumentToArray(
       handleAddBoundingBoxes
     );
@@ -142,22 +144,14 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       [persistBoxMutation, redactionKey]
     );
 
-    const handleRedactionClick = useMemoizedCallback(
-      (box: RedactionBoundingBox) => {
-        setHighlightedBox(box);
-      },
-      []
-    );
-
     return (
       <RedactionPageInner
         redactionKey={redactionKey}
         redactionState={redactionState}
+        isLoggedIn={isLoggedIn}
         onAddBoundingBox={handleAddBoundingBox}
         onDeleteBoundingBoxes={handleDeleteBoundingBoxes}
         onToggleBoundingBoxes={handleToggleBoundingBoxes}
-        highlightedBox={highlightedBox}
-        onRedactionClick={handleRedactionClick}
       />
     );
   }
@@ -171,10 +165,14 @@ export const _mutationErrorNotificationTestId =
 
 function getRedactedResult(
   redactionState: APICallState<GetRedactionResponse> | null
-): GetRedactionResponse | null {
-  return redactionState?.status === 'done'
-    ? (redactionState.result ?? null)
-    : null;
+): RedactedGetRedactionResponse | null {
+  if (
+    redactionState?.status === 'done' &&
+    redactionState.result.status === RedactionStatus.redacted
+  ) {
+    return redactionState.result;
+  }
+  return null;
 }
 
 function getErrorMessage(err: unknown): string {

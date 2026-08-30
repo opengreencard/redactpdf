@@ -1,0 +1,16 @@
+---
+description: Shape child props for what the child needs; the parent adapts.
+globs: '**/*.tsx'
+alwaysApply: false
+---
+
+# Shape child props for the child
+
+Keep a component reusable: its props should describe what _it_ needs, not who
+called it. The parent adapts.
+
+Avoid parent-specific names (`isHomePageHeading`). Prefer a general knob
+(`level: 'h1' | 'h2'`).
+
+Prefer the arity the child actually uses. If the preview always deletes one
+box, take `onDeleteBoundingBox: (box) => unknown`.

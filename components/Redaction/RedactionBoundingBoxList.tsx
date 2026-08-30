@@ -2,7 +2,7 @@
 
 import React from 'react';
 import _ from 'lodash';
-import { Group, Stack, Text } from '@mantine/core';
+import { Badge, Group, Stack, Text } from '@mantine/core';
 import {
   faArrowRight,
   faEye,
@@ -126,6 +126,7 @@ const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
       <Stack gap={0}>
         <RedactionRow
           text={`${getDataTypeText(group.dataType)} (${boxes.length})`}
+          badge={null}
           textStyle="bold"
           indent={0}
           isEnabled={!areAllDisabled}
@@ -169,6 +170,10 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
       onToggleBoundingBoxes,
     } = props;
     const areAllDisabled = areAllBoxesDisabled(valueGroup.occurrences);
+    const occurrencesByPage = _.groupBy(
+      valueGroup.occurrences,
+      (occurrence) => occurrence.page
+    );
     const onRedactionClickWithPrefix =
       useCallbackWithPrefix<[RedactionBoundingBox]>(onRedactionClick);
     const onDeleteBoundingBoxesWithPrefix = useCallbackWithPrefix<
@@ -182,6 +187,7 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
       <Stack gap={0}>
         <RedactionRow
           text={`${valueGroup.valueLabel} (${valueGroup.occurrences.length})`}
+          badge={null}
           indent={1}
           isEnabled={!areAllDisabled}
           testIdSuffix={_makeGroupTestIdSuffix(groupDataType, valueGroup)}
@@ -193,28 +199,30 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
             getBoxesToToggle(valueGroup.occurrences)
           )}
         />
-        {valueGroup.occurrences.map((box, index) => (
-          <RedactionRow
-            key={getRedactionBoxKey(box)}
-            text={
-              valueGroup.occurrences.length > 1
-                ? `Page ${box.page} (${index + 1})`
-                : `Page ${box.page}`
-            }
-            indent={2}
-            isEnabled={box.enabled}
-            testIdSuffix={_makeOccurrenceTestIdSuffix(getRedactionBoxKey(box))}
-            onRedactionClick={onRedactionClickWithPrefix(box)}
-            onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix([box])}
-            onToggleBoundingBox={onToggleBoundingBoxesWithPrefix([box])}
-          />
-        ))}
+        {Object.values(occurrencesByPage).flatMap((pageOccurrences) =>
+          pageOccurrences.map((box, index) => (
+            <RedactionRow
+              key={getRedactionBoxKey(box)}
+              text={`Page ${box.page}`}
+              badge={pageOccurrences.length > 1 ? index + 1 : null}
+              indent={2}
+              isEnabled={box.enabled}
+              testIdSuffix={_makeOccurrenceTestIdSuffix(
+                getRedactionBoxKey(box)
+              )}
+              onRedactionClick={onRedactionClickWithPrefix(box)}
+              onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix([box])}
+              onToggleBoundingBox={onToggleBoundingBoxesWithPrefix([box])}
+            />
+          ))
+        )}
       </Stack>
     );
   });
 
 interface RedactionRowProps {
   text: string;
+  badge: number | null;
   textStyle?: 'bold' | 'normal';
   indent: RedactionRowIndent;
   isEnabled: boolean;
@@ -231,6 +239,7 @@ const RedactionRow: React.FunctionComponent<RedactionRowProps> = React.memo(
   function RedactionRow(props: RedactionRowProps) {
     const {
       text,
+      badge,
       textStyle = 'normal',
       indent,
       isEnabled,
@@ -248,23 +257,30 @@ const RedactionRow: React.FunctionComponent<RedactionRowProps> = React.memo(
         bdrs="sm"
         data-testid={_makeRedactionPanelRowTestId(testIdSuffix)}
       >
-        {textStyle === 'bold' ? (
-          <Text
-            fw="bold"
-            td={isEnabled ? undefined : 'line-through'}
-            c={isEnabled ? undefined : 'dimmed'}
-          >
-            {text}
-          </Text>
-        ) : (
-          <Text
-            fw="normal"
-            td={isEnabled ? undefined : 'line-through'}
-            c={isEnabled ? undefined : 'dimmed'}
-          >
-            {text}
-          </Text>
-        )}
+        <Group gap="xs" wrap="nowrap">
+          {textStyle === 'bold' ? (
+            <Text
+              fw="bold"
+              td={isEnabled ? undefined : 'line-through'}
+              c={isEnabled ? undefined : 'dimmed'}
+            >
+              {text}
+            </Text>
+          ) : (
+            <Text
+              fw="normal"
+              td={isEnabled ? undefined : 'line-through'}
+              c={isEnabled ? undefined : 'dimmed'}
+            >
+              {text}
+            </Text>
+          )}
+          {badge !== null ? (
+            <Badge size="sm" variant="light" style={{ flexShrink: 0 }}>
+              {badge}
+            </Badge>
+          ) : null}
+        </Group>
         <RedactionBoxActions
           testIdSuffix={testIdSuffix}
           isEnabled={isEnabled}

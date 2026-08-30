@@ -1,6 +1,6 @@
 import {
   RedactedDataType,
-  type GetRedactionResponse,
+  type RedactedGetRedactionResponse,
   type RedactionBoundingBox,
 } from '../../lib/models/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
@@ -62,10 +62,8 @@ describe(toggleBoundingBoxesInResponse, () => {
 
 function makeResponse(
   redactionBoundingBoxes: RedactionBoundingBox[]
-): GetRedactionResponse {
-  const response: GetRedactionResponse =
-    ClientFakeData.makeGetRedactionResponse({
-      redactionBoundingBoxes,
-    });
-  return response;
+): RedactedGetRedactionResponse {
+  return ClientFakeData.makeRedactedGetRedactionResponse({
+    redactionBoundingBoxes,
+  });
 }

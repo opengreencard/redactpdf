@@ -1,5 +1,12 @@
 import { useCallback } from 'react';
 
+/** Stop an event from bubbling to an ancestor handler. */
+export function stopPropagation(event: {
+  stopPropagation: () => unknown;
+}): void {
+  event.stopPropagation();
+}
+
 /**
  * Wrap a onXXX handler with stopPropagation so that clicks, etc. get
  * stopped from bubbling up. Useful if we have a button that's contained
@@ -13,12 +20,10 @@ import { useCallback } from 'react';
  * ```
  */
 export function useStopPropagation<
-  // TODO: Rename generic to end in T (e.g., BlahT)
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  Event extends { stopPropagation: () => unknown },
+  EventT extends { stopPropagation: () => unknown },
 >(handler: (() => unknown) | null) {
   return useCallback(
-    (event?: Event | null | undefined) => {
+    (event?: EventT | null | undefined) => {
       // Be extra super-duper safe and permissive in our typings
       if (event) event.stopPropagation();
       if (handler) handler();

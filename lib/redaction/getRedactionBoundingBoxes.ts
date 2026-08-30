@@ -5,7 +5,7 @@ import {
   OpenAICompatibleProvider,
 } from '../ai/createOpenAICompatibleCompletion';
 import {
-  type AutoRedactionBoundingBox,
+  type SinglePageRedactionBoundingBox,
   RedactedDataType,
   redactedDataTypeSchema,
   redactedDataTypeToDescription,
@@ -13,7 +13,7 @@ import {
 
 /** Redaction boxes and token usage returned for one page. */
 export interface GetRedactionBoundingBoxesResult {
-  boxes: Omit<AutoRedactionBoundingBox, 'page'>[];
+  boxes: SinglePageRedactionBoundingBox[];
   response: OpenAICompatibleCompletionResult;
 }
 
@@ -162,8 +162,8 @@ const redactionPrompt = makeRedactionPrompt();
 
 function mapRedactionBoxToBoundingBox(
   rawBox: RedactionBoxContent
-): Omit<AutoRedactionBoundingBox, 'page'> {
-  const boundingBox: Omit<AutoRedactionBoundingBox, 'page'> = {
+): SinglePageRedactionBoundingBox {
+  const boundingBox: SinglePageRedactionBoundingBox = {
     type: 'automatic',
     dataType: rawBox.dataType,
     text: rawBox.text,

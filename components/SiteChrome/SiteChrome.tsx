@@ -5,15 +5,18 @@ import SiteHeaderActions from './SiteHeaderActions';
 import classes from './SiteChrome.module.css';
 
 /** Mantine container size shared by the site header, footer, and marketing sections. */
-// Keep the two supported Mantine size tokens as a reusable prop union.
 // eslint-disable-next-line no-restricted-syntax
-export type ContainerSize = 'lg' | 'xl';
+export type ContainerSize = 'lg' | 'none';
 
 export const siteContainerSize: ContainerSize = 'lg';
 
 export interface SiteChromeProps {
   isLoggedIn: boolean;
   containerSize?: ContainerSize;
+  /** Fill the viewport so nested panes can own their scrolling. */
+  fullHeight?: boolean;
+  /** Hide the footer for full-screen workflows that need all available height. */
+  showFooter?: boolean;
   children: React.ReactNode;
 }
 
@@ -23,12 +26,18 @@ export interface SiteChromeProps {
  */
 const SiteChrome: React.FunctionComponent<SiteChromeProps> = React.memo(
   function SiteChrome(props: SiteChromeProps) {
-    const { isLoggedIn, containerSize = siteContainerSize, children } = props;
+    const {
+      isLoggedIn,
+      containerSize = siteContainerSize,
+      fullHeight = false,
+      showFooter = true,
+      children,
+    } = props;
 
     // Keep the footer at the bottom of short pages while allowing the main
     // content to consume the remaining viewport height.
     return (
-      <Stack mih="100vh" gap={0}>
+      <Stack h={fullHeight ? '100vh' : undefined} mih="100vh" gap={0}>
         <SiteHeader isLoggedIn={isLoggedIn} containerSize={containerSize} />
         {
           // flex={1} fills the space between header and footer. mih={0} lets
@@ -37,7 +46,7 @@ const SiteChrome: React.FunctionComponent<SiteChromeProps> = React.memo(
         <Stack component="main" flex={1} mih={0} gap={0}>
           {children}
         </Stack>
-        <SiteFooter containerSize={containerSize} />
+        {showFooter ? <SiteFooter containerSize={containerSize} /> : null}
       </Stack>
     );
   }
@@ -64,12 +73,21 @@ const SiteHeader: React.FunctionComponent<SiteHeaderProps> = React.memo(
         pos="sticky"
         top={0}
       >
-        <Container size={containerSize}>
-          <Group justify="space-between" wrap="wrap" align="center">
-            <SiteWordmark />
-            <SiteHeaderActions isLoggedIn={isLoggedIn} />
-          </Group>
-        </Container>
+        {containerSize === 'none' ? (
+          <Box px="md">
+            <Group justify="space-between" wrap="wrap" align="center">
+              <SiteWordmark />
+              <SiteHeaderActions isLoggedIn={isLoggedIn} />
+            </Group>
+          </Box>
+        ) : (
+          <Container size={containerSize}>
+            <Group justify="space-between" wrap="wrap" align="center">
+              <SiteWordmark />
+              <SiteHeaderActions isLoggedIn={isLoggedIn} />
+            </Group>
+          </Container>
+        )}
       </Box>
     );
   }
@@ -86,15 +104,27 @@ const SiteFooter: React.FunctionComponent<SiteFooterProps> = React.memo(
     return (
       // One-sided border: see SiteChrome.module.css.
       <Box component="footer" className={classes.footer} py="xl">
-        <Container size={containerSize}>
-          <Group justify="center" gap="md">
-            <Anchor href="/terms-of-use">Terms of Use</Anchor>
-            <Anchor href="/privacy-policy">Privacy Policy</Anchor>
-            <Anchor href={githubRepoUrl} target="_blank" rel="noreferrer">
-              GitHub
-            </Anchor>
-          </Group>
-        </Container>
+        {containerSize === 'none' ? (
+          <Box px="md">
+            <Group justify="center" gap="md">
+              <Anchor href="/terms-of-use">Terms of Use</Anchor>
+              <Anchor href="/privacy-policy">Privacy Policy</Anchor>
+              <Anchor href={githubRepoUrl} target="_blank" rel="noreferrer">
+                GitHub
+              </Anchor>
+            </Group>
+          </Box>
+        ) : (
+          <Container size={containerSize}>
+            <Group justify="center" gap="md">
+              <Anchor href="/terms-of-use">Terms of Use</Anchor>
+              <Anchor href="/privacy-policy">Privacy Policy</Anchor>
+              <Anchor href={githubRepoUrl} target="_blank" rel="noreferrer">
+                GitHub
+              </Anchor>
+            </Group>
+          </Container>
+        )}
       </Box>
     );
   }

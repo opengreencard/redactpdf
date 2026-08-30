@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import _ from 'lodash';
 import type { Meta, StoryFn } from '@storybook/react';
 import { Stack } from '@mantine/core';
 import {
@@ -23,15 +24,13 @@ interface StoryWrapperProps {
 
 const defaultProps: StoryWrapperProps = {
   initialBoxes: [
-    ClientFakeData.makeAutoRedactionBoundingBox({
-      dataType: RedactedDataType.email,
-      text: 'peter@example.com',
-    }),
-    ClientFakeData.makeAutoRedactionBoundingBox({
-      dataType: RedactedDataType.personName,
-      text: 'Jane Doe',
-      page: 2,
-    }),
+    // Make two of the same so that we preview the repeated value badge
+    ..._.times(2, () =>
+      ClientFakeData.makeAutoRedactionBoundingBox({
+        dataType: RedactedDataType.email,
+        text: 'peter@example.com',
+      })
+    ),
     ClientFakeData.makeManualRedactionBoundingBox({ page: 3 }),
   ],
   onRedactionClick: makeFakeHandler('onRedactionClick'),

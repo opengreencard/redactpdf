@@ -1,17 +1,17 @@
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import type {
   BoundingBox,
-  GetRedactionResponse,
   ManualRedactionBoundingBox,
+  RedactedGetRedactionResponse,
   RedactionBoundingBox,
 } from '../../lib/models/redactionTypes';
 
 /** Append newly drawn boxes to the current GET payload. */
 export function addBoundingBoxesToResponse(
-  current: GetRedactionResponse,
+  current: RedactedGetRedactionResponse,
   boxes: ManualRedactionBoundingBox[]
-): GetRedactionResponse {
-  const next: GetRedactionResponse = {
+): RedactedGetRedactionResponse {
+  const next: RedactedGetRedactionResponse = {
     ...current,
     redactionBoundingBoxes: [...current.redactionBoundingBoxes, ...boxes],
   };
@@ -49,10 +49,10 @@ export function toggleBoundingBoxesInArray(
 
 /** Drop matching boxes from the current GET payload. */
 export function removeBoundingBoxesFromResponse(
-  current: GetRedactionResponse,
+  current: RedactedGetRedactionResponse,
   boxes: RedactionBoundingBox[]
-): GetRedactionResponse {
-  const next: GetRedactionResponse = {
+): RedactedGetRedactionResponse {
+  const next: RedactedGetRedactionResponse = {
     ...current,
     redactionBoundingBoxes: removeBoundingBoxesFromArray(
       current.redactionBoundingBoxes,
@@ -64,10 +64,10 @@ export function removeBoundingBoxesFromResponse(
 
 /** Flip `enabled` on matching boxes in the current GET payload. */
 export function toggleBoundingBoxesInResponse(
-  current: GetRedactionResponse,
+  current: RedactedGetRedactionResponse,
   boxes: RedactionBoundingBox[]
-): GetRedactionResponse {
-  const next: GetRedactionResponse = {
+): RedactedGetRedactionResponse {
+  const next: RedactedGetRedactionResponse = {
     ...current,
     redactionBoundingBoxes: toggleBoundingBoxesInArray(
       current.redactionBoundingBoxes,

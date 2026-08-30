@@ -1,0 +1,21 @@
+---
+description: Test-data generator tests write committed JSON fixtures.
+globs: '**/__testData__/**/index.test.ts'
+alwaysApply: false
+---
+
+# Test-data generator tests
+
+Wrap generated fixture tests with `makeTestDataGeneratorTest` from
+`lib/testUtilities/testDataGenerator.ts`. Ordinary `yarn jest` skips these
+tests.
+
+Run against the development environment by default:
+
+```sh
+yarn devdb-testdata-jest path/to/__testData__/<Name>/index.test.ts
+```
+
+Use `yarn proddb-testdata-jest` only when production data is required. Existing
+JSON files are not overwritten; use `UPDATE=1` to refresh all generated files
+or `UPDATE_PATTERN=FileName` to refresh one matching file.

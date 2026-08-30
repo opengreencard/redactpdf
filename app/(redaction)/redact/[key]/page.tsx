@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import React from 'react';
+import { getAuthState } from '../../../../lib/auth/nextAuth';
 import RedactionPage from '../../../../components/Redaction/RedactionPage';
 
 export const metadata: Metadata = {
@@ -24,5 +25,9 @@ export default async function RedactRoutePage(
   const { params } = props;
   const { key } = await params;
 
-  return <RedactionPage redactionKey={key} />;
+  const authState = await getAuthState();
+
+  return (
+    <RedactionPage redactionKey={key} isLoggedIn={Boolean(authState?.user)} />
+  );
 }

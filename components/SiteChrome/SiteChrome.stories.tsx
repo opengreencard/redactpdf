@@ -24,5 +24,5 @@ const Template: StoryFn<SiteChromeProps> = (args) => <SiteChrome {...args} />;
 
 export const Default: StoryFn<SiteChromeProps> = Template.bind({});
 
-export const Wide: StoryFn<SiteChromeProps> = Template.bind({});
-Wide.args = { containerSize: 'xl' };
+export const Uncontained: StoryFn<SiteChromeProps> = Template.bind({});
+Uncontained.args = { containerSize: 'none' };

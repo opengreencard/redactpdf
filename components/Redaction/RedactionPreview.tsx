@@ -1,94 +1,190 @@
 'use client';
 
-import React from 'react';
-import { Stack, Text } from '@mantine/core';
-import Button from '../designSystem/Button/Button';
+import React, { RefObject, useMemo, useRef, useState } from 'react';
+import _ from 'lodash';
+import { Box, Stack } from '@mantine/core';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
-import type {
-  ManualRedactionBoundingBox,
-  RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
-import { getRedactionBoxLabel } from './redactionBoundingBoxes';
+import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
+import type { ManualRedactionBoundingBox } from '../../lib/models/redactionTypes';
+import RedactionPreviewPages, {
+  RedactionPreviewPagesProps,
+  RedactionPreviewPagesRef,
+} from './RedactionPreviewPages';
+import RedactionPreviewToolbar, {
+  RedactionPreviewToolbarProps,
+  RedactionPreviewZoom,
+} from './RedactionPreviewToolbar';
+import { redactionPaneBorder } from './redactionLayout';
 
-export interface RedactionPreviewProps {
-  redactionKey: string;
-  pageCount: number;
-  redactionBoundingBoxes: RedactionBoundingBox[];
+interface RedactionPreviewOwnProps {
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
-  onDeleteBoundingBox: (box: RedactionBoundingBox) => unknown;
-  onToggleBoundingBox: (box: RedactionBoundingBox) => unknown;
-  scrollToBox: RedactionBoundingBox | null;
+  /**
+   * Pass a ref to scroll to a particular page from outside this component.
+   */
+  redactionPreviewPagesRef?: RefObject<RedactionPreviewPagesRef | null>;
+  /** Storybook / tests only — start with draw mode on. */
+  initialIsRedactingForTesting?: boolean;
 }
 
 /**
- * Placeholder document pane until task 2.12 lands the real preview.
- * Exposes an add control so 2.6 can test optimistic box mutations.
+ * Caller-supplied extras forwarded to the toolbar. Preview owns page, zoom,
+ * and draw-mode state, so those fields are omitted.
  */
+export type RedactionPreviewToolbarPassThroughProps = Omit<
+  RedactionPreviewToolbarProps,
+  | 'pageCount'
+  | 'page'
+  | 'onPageChange'
+  | 'zoomPercent'
+  | 'onZoomChange'
+  | 'isRedacting'
+  | 'onIsRedactingChange'
+>;
+
+/**
+ * Testing-only image URL override forwarded to the page canvas.
+ */
+export type RedactionPreviewPagesPassThroughProps = Pick<
+  RedactionPreviewPagesProps,
+  'getUrlForRedactionImageForTesting'
+>;
+
+export interface RedactionPreviewProps
+  extends
+    RedactionPreviewOwnProps,
+    Pick<
+      RedactionPreviewPagesProps,
+      | 'redactionKey'
+      | 'redactionResponse'
+      | 'onDeleteBoundingBox'
+      | 'onToggleBoundingBox'
+    >,
+    RedactionPreviewToolbarPassThroughProps,
+    RedactionPreviewPagesPassThroughProps {}
+
+/** Composes the preview toolbar and scrollable, editable page canvas. */
 const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
   React.memo(function RedactionPreview(props: RedactionPreviewProps) {
     const {
       redactionKey,
-      pageCount,
-      redactionBoundingBoxes,
+      redactionResponse,
       onAddBoundingBox,
-      // Delete/toggle land with the real preview; required now so Inner's
-      // contract does not change when that task ships.
-      onDeleteBoundingBox: _onDeleteBoundingBox,
-      onToggleBoundingBox: _onToggleBoundingBox,
-      scrollToBox,
+      onDeleteBoundingBox,
+      onToggleBoundingBox,
+      redactionPreviewPagesRef,
+      initialIsRedactingForTesting = false,
+      ...passThroughProps
     } = props;
-    const highlightedLabel = getHighlightedBoxLabel(scrollToBox);
+    const _ownProps: RequiredWithUndefined<RedactionPreviewOwnProps> = {
+      onAddBoundingBox,
+      redactionPreviewPagesRef,
+      initialIsRedactingForTesting,
+    };
 
-    const handleAddBoundingBox = useMemoizedCallback(() => {
-      const box: ManualRedactionBoundingBox = {
-        type: 'manual',
-        page: 1,
-        enabled: true,
-        box: {
-          minX: 0.15,
-          minY: 0.15,
-          maxX: 0.35,
-          maxY: 0.25,
-        },
-      };
-      onAddBoundingBox(box);
-    }, [onAddBoundingBox]);
+    const { getUrlForRedactionImageForTesting, ...toolbarPassThroughProps } =
+      passThroughProps;
+
+    const internalPagesRef = useRef<RedactionPreviewPagesRef | null>(null);
+    const pagesRef = redactionPreviewPagesRef ?? internalPagesRef;
+
+    const [internalPage, setPage] = useState(1);
+    const [zoomPercent, setZoomPercent] = useState(100);
+    const [isRedacting, setIsRedacting] = useState(
+      initialIsRedactingForTesting
+    );
+
+    const pageCount = redactionResponse.pageSizes.length;
+    const page = useMemo(
+      () => _.clamp(internalPage, 1, pageCount || 1),
+      [internalPage, pageCount]
+    );
+
+    const handleContainerReady = useMemoizedCallback((): void => {
+      const fitZoomPercent = pagesRef.current?.getFitZoomPercent('fitToWidth');
+      if (fitZoomPercent !== null && fitZoomPercent !== undefined) {
+        setZoomPercent(fitZoomPercent);
+      }
+    }, [pagesRef]);
+
+    const handlePageChange = useMemoizedCallback(
+      (nextPage: number): void => {
+        const clampedPage = _.clamp(nextPage, 1, pageCount || 1);
+        setPage(clampedPage);
+        pagesRef.current?.scrollToPage(clampedPage);
+      },
+      [pageCount, pagesRef]
+    );
+
+    const handleScrolledPageChange = useMemoizedCallback(
+      (nextPage: number) => {
+        setPage(_.clamp(nextPage, 1, pageCount || 1));
+      },
+      [pageCount]
+    );
+
+    // Pages owns the content-box measurement and shared fit calculation.
+    const handleZoomChange = useMemoizedCallback(
+      (zoom: RedactionPreviewZoom): void => {
+        if (zoom.type === 'percent') {
+          setZoomPercent(_.clamp(zoom.percent, 1, 2000));
+          return;
+        }
+
+        const fitZoomPercent = pagesRef.current?.getFitZoomPercent(zoom.type);
+        if (fitZoomPercent !== null && fitZoomPercent !== undefined) {
+          setZoomPercent(fitZoomPercent);
+        }
+      },
+      [pagesRef]
+    );
 
     return (
       <Stack
-        gap="md"
-        data-testid={_redactionPreviewTestId}
+        gap="sm"
+        // Fill the grid column so the page canvas, not the toolbar, scrolls.
+        // mih={0} lets this flex child shrink below its intrinsic height.
+        // h="100%" keeps the stack as tall as the surrounding column.
+        flex={1}
+        mih={0}
+        // Allow wide, zoomed pages to scroll inside the canvas instead of
+        // expanding the grid column and the surrounding page.
+        miw={0}
+        h="100%"
+        bg="gray.2"
         aria-label={`Preview for ${redactionKey}`}
       >
-        <Text>
-          {pageCount} {pageCount === 1 ? 'page' : 'pages'} ·{' '}
-          {redactionBoundingBoxes.length} redactions
-        </Text>
-        {highlightedLabel ? <Text>Highlighted: {highlightedLabel}</Text> : null}
-        <Button
-          keyboardShortcut={null}
-          onClick={handleAddBoundingBox}
-          data-testid={_addManualBoxTestId}
+        <Box
+          bg="white"
+          w="100%"
+          py="xs"
+          px={{ base: 'xs', md: 0 }}
+          style={{ borderBottom: redactionPaneBorder }}
         >
-          Add drawn region
-        </Button>
+          <RedactionPreviewToolbar
+            {...toolbarPassThroughProps}
+            pageCount={redactionResponse.pageCount}
+            page={page}
+            onPageChange={handlePageChange}
+            zoomPercent={zoomPercent}
+            onZoomChange={handleZoomChange}
+            isRedacting={isRedacting}
+            onIsRedactingChange={setIsRedacting}
+          />
+        </Box>
+        <RedactionPreviewPages
+          ref={pagesRef}
+          redactionKey={redactionKey}
+          redactionResponse={redactionResponse}
+          onScrolledPageChange={handleScrolledPageChange}
+          onContainerReady={handleContainerReady}
+          zoomPercent={zoomPercent}
+          onRedact={isRedacting ? onAddBoundingBox : null}
+          onDeleteBoundingBox={onDeleteBoundingBox}
+          onToggleBoundingBox={onToggleBoundingBox}
+          getUrlForRedactionImageForTesting={getUrlForRedactionImageForTesting}
+        />
       </Stack>
     );
   });
 
 export default RedactionPreview;
-
-/** Test ID for the preview pane. Exported for tests. */
-export const _redactionPreviewTestId = 'redaction-preview';
-
-/** Test ID for the shim control that draws a manual box. Exported for tests. */
-export const _addManualBoxTestId = 'redaction-preview-add-box';
-
-function getHighlightedBoxLabel(
-  scrollToBox: RedactionBoundingBox | null
-): string | null {
-  if (!scrollToBox) {
-    return null;
-  }
-  return getRedactionBoxLabel(scrollToBox);
-}

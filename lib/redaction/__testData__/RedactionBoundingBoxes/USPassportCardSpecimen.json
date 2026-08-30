@@ -1,0 +1,146 @@
+[
+  {
+    "type": "automatic",
+    "dataType": "personPhoto",
+    "text": "Passport photo",
+    "box": {
+      "minX": 0.023,
+      "minY": 0.228,
+      "maxX": 0.337,
+      "maxY": 0.846
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "C03005988",
+    "box": {
+      "minX": 0.717,
+      "minY": 0.247,
+      "maxX": 0.913,
+      "maxY": 0.3
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "TRAVELER",
+    "box": {
+      "minX": 0.403,
+      "minY": 0.386,
+      "maxX": 0.569,
+      "maxY": 0.429
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "43309-W27S",
+    "box": {
+      "minX": 0.005,
+      "minY": 0.433,
+      "maxX": 0.026,
+      "maxY": 0.875
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personPhoto",
+    "text": "Ghost portrait image",
+    "box": {
+      "minX": 0.835,
+      "minY": 0.447,
+      "maxX": 0.975,
+      "maxY": 0.712
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "HAPPY",
+    "box": {
+      "minX": 0.479,
+      "minY": 0.497,
+      "maxX": 0.582,
+      "maxY": 0.539
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "dateOfBirth",
+    "text": "1 JAN 1981",
+    "box": {
+      "minX": 0.58,
+      "minY": 0.605,
+      "maxX": 0.742,
+      "maxY": 0.649
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "address",
+    "text": "NEW YORK, U.S.A.",
+    "box": {
+      "minX": 0.478,
+      "minY": 0.72,
+      "maxX": 0.742,
+      "maxY": 0.768
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "issueDate",
+    "text": "30 NOV 2009",
+    "box": {
+      "minX": 0.486,
+      "minY": 0.82,
+      "maxX": 0.666,
+      "maxY": 0.864
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "expiryDate",
+    "text": "29 NOV 2019",
+    "box": {
+      "minX": 0.698,
+      "minY": 0.82,
+      "maxX": 0.881,
+      "maxY": 0.864
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "M-6131821-07",
+    "box": {
+      "minX": 0.062,
+      "minY": 0.865,
+      "maxX": 0.26,
+      "maxY": 0.908
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "1-02781-0",
+    "box": {
+      "minX": 0.808,
+      "minY": 0.871,
+      "maxX": 0.932,
+      "maxY": 0.913
+    },
+    "enabled": true
+  }
+]

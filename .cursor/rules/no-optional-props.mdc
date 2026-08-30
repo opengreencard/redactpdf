@@ -27,5 +27,5 @@ Options and config objects may use optional properties when the option is genuin
 ## Exceptions
 
 - **Framework signatures**: If optional is required by a framework (e.g., React's `onClick`), keep it and add a brief comment explaining why.
-- **Testing-only props**: Props used exclusively for testing convenience (e.g., `onActiveItemIdChange` in a table of contents that is normally a link in production) may be optional.
+- **Testing-only props**: Name them `*ForTesting` (e.g. `initialIsRedactingForTesting`). They may be optional. Comment **when to pass** the prop, not why it is optional.
 - **Styling props with defaults**: Props like `width`, `gap`, `p`, `m`, `style`, etc. that have sensible defaults for the vast majority of cases and are unlikely to be "forgotten" may be optional.

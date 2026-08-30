@@ -5,21 +5,15 @@ import { Box, Group } from '@mantine/core';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import LoginModal from '../Authentication/LoginModal';
 import { LoginFormMode } from '../Authentication/LoginForm';
-import Button from '../designSystem/Button/Button';
+import Button, { ButtonProps } from '../designSystem/Button/Button';
+import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import { githubRepoUrl } from '../../lib/config/brand';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import { useSetState } from '../../lib/hookUtilities/useSetState';
 
 export interface SiteHeaderActionsProps {
   isLoggedIn: boolean;
 }
-
-/**
- * Tighter horizontal inset on borderless header buttons;
- * height stays default for larger tap targets.
- *
- * Useful so all buttons fit on an iPhone SE screen.
- */
-const flatHeaderButtonPadding = { px: 'xs' } as const;
 
 /**
  * Header actions: GitHub link plus Log in / Sign up when logged out.
@@ -34,9 +28,7 @@ const SiteHeaderActions: React.FunctionComponent<SiteHeaderActionsProps> =
       LoginFormMode.signUp
     );
 
-    const handleCloseLoginModal = useMemoizedCallback(() => {
-      setIsLoginModalOpen(false);
-    }, []);
+    const handleCloseLoginModal = useSetState(setIsLoginModalOpen, false);
     const handleOpenLogIn = useMemoizedCallback(() => {
       setInitialMode(LoginFormMode.logIn);
       setIsLoginModalOpen(true);
@@ -51,35 +43,51 @@ const SiteHeaderActions: React.FunctionComponent<SiteHeaderActionsProps> =
         <Box ml="auto">
           <Group gap={4} wrap="nowrap">
             <Button
-              component="a"
-              href={githubRepoUrl}
-              target="_blank"
-              rel="noreferrer"
-              variant="subtle"
-              keyboardShortcut={null}
-              onClick={null}
+              {...viewSourceButtonProps}
+              visibleFrom="sm"
               leftSection={{ type: 'icon', icon: faGithub }}
-              aria-label="View the source on GitHub"
               {...flatHeaderButtonPadding}
             >
-              <Box visibleFrom="sm">View the source</Box>
+              View the source
+            </Button>
+            {
+              // The icon-only mobile control does not need the horizontal
+              // padding reserved for a text label.
+            }
+            <Button {...viewSourceButtonProps} hiddenFrom="sm" p={0}>
+              <FontAwesomeIcon icon={faGithub} />
             </Button>
             {!isLoggedIn ? (
               <>
+                <Group visibleFrom="sm" gap={4} wrap="nowrap">
+                  <Button
+                    {...commonButtonProps}
+                    variant="subtle"
+                    onClick={handleOpenLogIn}
+                    {...flatHeaderButtonPadding}
+                  >
+                    Log in
+                  </Button>
+                  <Button
+                    {...commonButtonProps}
+                    variant="default"
+                    onClick={handleOpenSignUp}
+                  >
+                    Sign up
+                  </Button>
+                </Group>
+                {
+                  // A single action keeps the authentication controls from
+                  // forcing the mobile header onto a second row.
+                }
                 <Button
-                  keyboardShortcut={null}
-                  variant="subtle"
-                  onClick={handleOpenLogIn}
-                  {...flatHeaderButtonPadding}
-                >
-                  Log in
-                </Button>
-                <Button
-                  keyboardShortcut={null}
+                  {...commonButtonProps}
+                  hiddenFrom="sm"
                   variant="default"
                   onClick={handleOpenSignUp}
+                  px="xs"
                 >
-                  Sign up
+                  Log in or sign up
                 </Button>
               </>
             ) : null}
@@ -97,3 +105,39 @@ const SiteHeaderActions: React.FunctionComponent<SiteHeaderActionsProps> =
   });
 
 export default SiteHeaderActions;
+
+/** Tighter horizontal inset for borderless header buttons. */
+const flatHeaderButtonPadding = { px: 'xs' } as const;
+
+/**
+ * The design-system Button requires these values to distinguish ordinary
+ * buttons from tracked actions and keyboard-shortcut buttons.
+ */
+const commonButtonProps: Pick<ButtonProps, 'keyboardShortcut'> = {
+  keyboardShortcut: null,
+};
+
+/**
+ * Shared link props for the desktop text button and the compact mobile icon
+ * button. They are separate controls because hiding the label alone leaves
+ * the desktop button's text spacing around the mobile icon.
+ */
+const viewSourceButtonProps: Pick<
+  ButtonProps,
+  | 'component'
+  | 'href'
+  | 'target'
+  | 'rel'
+  | 'variant'
+  | 'onClick'
+  | 'keyboardShortcut'
+> & { 'aria-label': string } = {
+  ...commonButtonProps,
+  component: 'a',
+  href: githubRepoUrl,
+  target: '_blank',
+  rel: 'noreferrer',
+  variant: 'subtle',
+  onClick: null,
+  'aria-label': 'View the source on GitHub',
+};
