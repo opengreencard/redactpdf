@@ -27,11 +27,11 @@ export interface PDFPageImage extends PDFPagePNG {
 export async function processPDFPagesInBatches(
   pdf: Uint8Array,
   onPage: (image: PDFPageImage) => Promise<void>
-): Promise<void> {
+): Promise<{ rasterizationTimeMs: number }> {
   const document = await PDFDocument.load(pdf, { ignoreEncryption: true });
   const pages = document.getPages();
   if (pages.length === 0) {
-    return;
+    return { rasterizationTimeMs: 0 };
   }
 
   // pdf2pic needs an explicit canvas size; pages can differ, so rasterize onto
@@ -43,6 +43,7 @@ export async function processPDFPagesInBatches(
     format: 'png',
     density: targetDPI,
   });
+  let rasterizationTimeMs = 0;
 
   for (
     let batchStart = 0;
@@ -58,10 +59,12 @@ export async function processPDFPagesInBatches(
     // pdf2pic returns results in the same order as the requested page numbers.
     // The batch is small so all rasterized buffers can be released together
     // before the next bulk conversion starts.
-    // eslint-disable-next-line no-await-in-loop
+    const rasterizationStartedAt = Date.now();
+    // eslint-disable-next-line no-await-in-loop -- batches must rasterize sequentially to bound memory
     const results = await converter.bulk(pageNumbers, {
       responseType: 'buffer',
     });
+    rasterizationTimeMs += Date.now() - rasterizationStartedAt;
     // Await the batch before rasterizing another one to bound retained buffers.
     // eslint-disable-next-line no-await-in-loop -- sequential batches provide the memory bound
     await promiseAllThrottled(
@@ -81,6 +84,8 @@ export async function processPDFPagesInBatches(
       pdfPageBatchSize
     );
   }
+
+  return { rasterizationTimeMs };
 }
 
 /** Convert a PDF into one uncompressed PNG per page. */

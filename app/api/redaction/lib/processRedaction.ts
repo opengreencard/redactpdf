@@ -38,18 +38,19 @@ export async function processRedaction(
   buffer: Buffer
 ): Promise<ProcessRedactionResult> {
   try {
-    const rasterizationStartedAt = Date.now();
     const pageSizes: PageSize[] = [];
     const pages: ProcessImageResult[] = [];
-    await processPDFPagesInBatches(buffer, async ({ page, png, pageSize }) => {
-      pageSizes[page - 1] = pageSize;
-      pages[page - 1] = await processImage({
-        png,
-        page,
-        key: redaction.key,
-      });
-    });
-    const rasterizationTimeMs = Date.now() - rasterizationStartedAt;
+    const { rasterizationTimeMs } = await processPDFPagesInBatches(
+      buffer,
+      async ({ page, png, pageSize }) => {
+        pageSizes[page - 1] = pageSize;
+        pages[page - 1] = await processImage({
+          png,
+          page,
+          key: redaction.key,
+        });
+      }
+    );
 
     const boundingBoxes = pages.flatMap((page) => page.boundingBoxes);
     const pageTimings = pages.map((page) => page.timing);
