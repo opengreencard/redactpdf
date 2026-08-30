@@ -33,8 +33,17 @@ describe(generateRedactedPDF, () => {
   it('removes text covered by an enabled redaction box', async () => {
     const source = await PDFDocument.create();
     const page = source.addPage([612, 792]);
-    page.drawText('Sensitive text', { x: 100, y: 700, size: 24 });
-    const pdf = Buffer.from(await source.save());
+    const sensitiveText = 'Sensitive text';
+    page.drawText(sensitiveText, { x: 100, y: 700, size: 24 });
+    const sourcePDF = Buffer.from(await source.save());
+    // pdf-lib encodes drawn text as compressed/hex data, so append a PDF
+    // comment marker for the byte-level assertion; verify() checks the text
+    // layer itself.
+    const pdf = Buffer.concat([
+      sourcePDF,
+      Buffer.from(`\n% ${sensitiveText}\n`),
+    ]);
+    expect(pdf.includes(sensitiveText)).toBe(true);
 
     const result = await generateRedactedPDF({
       pdf,
@@ -46,6 +55,7 @@ describe(generateRedactedPDF, () => {
       ],
     });
 
+    expect(result.includes(sensitiveText)).toBe(false);
     const verification = await verify(Uint8Array.from(result).buffer);
     expect(verification.clean).toBe(true);
     expect(verification.violations).toHaveLength(0);
