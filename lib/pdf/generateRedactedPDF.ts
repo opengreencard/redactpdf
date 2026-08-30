@@ -42,7 +42,7 @@ export async function generateRedactedPDF({
 
     const result = await redact(toArrayBuffer(pdf), regions);
     const verification = await verify(toArrayBuffer(result.pdf));
-    if (!verification.clean) {
+    if (!verification.clean || verification.warnings.length > 0) {
       const violations = verification.violations
         .map(({ page }) => `page ${page}`)
         .join('; ');
