@@ -185,7 +185,7 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
           <ActionIcon
             {...toolbarActionIconCommonProps}
             tooltip="Zoom out"
-            visibleFrom="md"
+            visibleFrom="xs"
             disabled={zoomPercent <= zoomPresets[0]}
             onClick={handleZoomOut}
           >
@@ -233,7 +233,7 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
           <ActionIcon
             {...toolbarActionIconCommonProps}
             tooltip="Zoom in"
-            visibleFrom="md"
+            visibleFrom="xs"
             disabled={zoomPercent >= zoomPresets[zoomPresets.length - 1]}
             onClick={handleZoomIn}
           >
@@ -241,14 +241,14 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
           </ActionIcon>
         </Group>
         <Switch
-          visibleFrom="md"
+          visibleFrom="xs"
           label="Draw redaction"
           checked={isRedacting}
           onChange={handleDrawRedactionChange}
         />
         <ActionIcon
           {...toolbarActionIconCommonProps}
-          hiddenFrom="md"
+          hiddenFrom="xs"
           tooltip="Toggle draw redaction"
           variant={isRedacting ? 'light' : 'transparent'}
           aria-pressed={isRedacting}

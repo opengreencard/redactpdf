@@ -233,7 +233,7 @@ const RedactionPreviewPages = forwardRef<
         const verticalPadding =
           parseFloat(computedStyle.paddingTop) +
           parseFloat(computedStyle.paddingBottom);
-        return getFitZoomPercent({
+        return _getFitZoomPercent({
           type,
           available: {
             width: container.clientWidth - horizontalPadding,
@@ -767,11 +767,11 @@ interface FitZoomOptions {
 }
 
 /**
- * Converts the available content box into a fit zoom without enlarging
- * documents beyond their native size. This keeps initial and menu-driven
- * fitting on the same calculation.
+ * Converts the available content box into a fit zoom. Menu-driven fitting
+ * may exceed 100%; the initial load caps that separately.
+ * Exported for tests.
  */
-function getFitZoomPercent({
+export function _getFitZoomPercent({
   type,
   available,
   pageSize,
@@ -784,5 +784,5 @@ function getFitZoomPercent({
       : Math.min(widthPercent, heightPercent);
   // Floor the fit so the rendered page never exceeds the available space due
   // to rounding up, which would introduce an unnecessary scrollbar.
-  return _.clamp(Math.floor(fitPercent), 1, 100);
+  return _.clamp(Math.floor(fitPercent), 1, 2000);
 }

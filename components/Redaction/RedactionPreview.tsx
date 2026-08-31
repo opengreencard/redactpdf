@@ -102,7 +102,9 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
     const handleContainerReady = useMemoizedCallback((): void => {
       const fitZoomPercent = pagesRef.current?.getFitZoomPercent('fitToWidth');
       if (fitZoomPercent !== null && fitZoomPercent !== undefined) {
-        setZoomPercent(fitZoomPercent);
+        // First paint should fill the pane without enlarging past native
+        // size. Menu "Fit to width" may exceed 100%.
+        setZoomPercent(Math.min(fitZoomPercent, 100));
       }
     }, [pagesRef]);
 
@@ -157,7 +159,7 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
           bg="white"
           w="100%"
           py="xs"
-          px={{ base: 'xs', md: 0 }}
+          px={{ base: 'xs', xs: 0 }}
           style={{ borderBottom: redactionPaneBorder }}
         >
           <RedactionPreviewToolbar

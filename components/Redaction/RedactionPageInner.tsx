@@ -170,7 +170,7 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
         const redaction = getLoadedRedaction(redactionState);
         return (
           <Stack gap="md" flex={1} mih={0} w="100%">
-            <Box px="md" hiddenFrom="md">
+            <Box px="md" hiddenFrom="sm">
               <SegmentedControl
                 fullWidth
                 data={mobileRedactionViewOptions}
@@ -193,14 +193,14 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                 // mounted, so switching tabs preserves their scroll state.
               }
               <GridCol
-                span={{ base: 12, md: 3 }}
+                span={{ base: 12, sm: 3 }}
                 mih={0}
                 h="100%"
                 p={0}
                 display={{
                   base:
                     mobileView === MobileRedactionView.review ? 'flex' : 'none',
-                  md: 'flex',
+                  sm: 'flex',
                 }}
               >
                 <Box
@@ -219,7 +219,7 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                 </Box>
               </GridCol>
               <GridCol
-                span={{ base: 12, md: 9 }}
+                span={{ base: 12, sm: 9 }}
                 mih={0}
                 miw={0}
                 h="100%"
@@ -229,7 +229,7 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                     mobileView === MobileRedactionView.document
                       ? 'flex'
                       : 'none',
-                  md: 'flex',
+                  sm: 'flex',
                 }}
               >
                 <RedactionPreview
