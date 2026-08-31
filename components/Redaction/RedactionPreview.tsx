@@ -164,7 +164,7 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
         >
           <RedactionPreviewToolbar
             {...toolbarPassThroughProps}
-            pageCount={redactionResponse.pageCount}
+            pageCount={pageCount}
             page={page}
             onPageChange={handlePageChange}
             zoomPercent={zoomPercent}
