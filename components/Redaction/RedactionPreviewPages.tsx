@@ -26,7 +26,7 @@ import {
   stopPropagation,
   useStopPropagation,
 } from '../../lib/hookUtilities/useStopPropagation';
-import { getUrlForRedactionImage } from '../../lib/storage/redactionImageUrl';
+import { getRedactionImageUrl } from '../../lib/storage/getRedactionImageUrl';
 import ActionIcon from '../designSystem/ActionIcon';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import classes from './RedactionPreviewPages.module.css';
@@ -51,8 +51,8 @@ export interface RedactionPreviewPagesProps {
   onRedact: ((box: ManualRedactionBoundingBox) => unknown) | null;
   onDeleteBoundingBox: (box: RedactionBoundingBox) => unknown;
   onToggleBoundingBox: (box: RedactionBoundingBox) => unknown;
-  /** Storybook / tests only — same shape as `getUrlForRedactionImage`. */
-  getUrlForRedactionImageForTesting?: typeof getUrlForRedactionImage;
+  /** Storybook / tests only — same shape as `getRedactionImageUrl`. */
+  getUrlForRedactionImageForTesting?: typeof getRedactionImageUrl;
 }
 
 export interface RedactionPreviewPagesRef {
@@ -476,7 +476,7 @@ const RedactionPreviewPages = forwardRef<
             const width = pageSize.width * (zoomPercent / 100);
             const height = pageSize.height * (zoomPercent / 100);
             const imageUrl = (
-              getUrlForRedactionImageForTesting ?? getUrlForRedactionImage
+              getUrlForRedactionImageForTesting ?? getRedactionImageUrl
             )({ key: redactionKey, page });
             const draftBox =
               drawingState?.page === page

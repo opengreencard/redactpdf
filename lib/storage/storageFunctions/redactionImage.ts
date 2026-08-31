@@ -12,7 +12,7 @@ export const {
 } = makeStorageFunctions<RedactionImageKeyOptions>(
   makeRedactionImageStorageKey,
   {
-    public: false,
+    public: true,
     bucket: S3Bucket.files,
   }
 );

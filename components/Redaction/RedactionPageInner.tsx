@@ -23,7 +23,7 @@ import {
 } from '../../lib/models/redactionTypes';
 import RedactionError from './RedactionError';
 import RedactionPanel from './RedactionPanel';
-import { getUrlForRedactionImage } from '../../lib/storage/redactionImageUrl';
+import { getRedactionImageUrl } from '../../lib/storage/getRedactionImageUrl';
 import RedactionPreview, {
   RedactionPreviewPagesPassThroughProps,
 } from './RedactionPreview';
@@ -119,7 +119,7 @@ interface RedactionPageViewBodyProps {
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
   onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  getUrlForRedactionImageForTesting: typeof getUrlForRedactionImage | undefined;
+  getUrlForRedactionImageForTesting: typeof getRedactionImageUrl | undefined;
 }
 
 const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps> =
