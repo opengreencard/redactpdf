@@ -13,7 +13,10 @@ Converts a Loom transcript into a pull request description by:
 1. Formatting the transcript into a motivation section
 2. Generating the full pull request description from the diff and commits
 
-When this skill is invoked, fetch the transcript and generate the PR without asking for any inputs (assume defaults):
+When this skill is invoked, require a Loom link before fetching the transcript or
+generating the PR. If no Loom link is provided, ask the user for one. Only
+proceed automatically when a valid Loom link is supplied; use these defaults
+for the remaining inputs:
 
 1. Link to the Loom video
 2. Use `origin/main` as the base branch (assume it is rebased)
