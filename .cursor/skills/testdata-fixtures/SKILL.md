@@ -50,10 +50,14 @@ types; use a type assertion when JSON module inference widens enum-valued
 fields:
 
 ```ts
-import ExampleJSON from './Example.json';
+import SomeInstanceJSON from './SomeInstance.json';
 import type { Example } from '../../../models/example';
 
-export const TestExample: Example = ExampleJSON as Example;
+export const TestExample = {
+  someInstance: SomeInstanceJSON satisfies Example,
+  // Or if it has enums or tuples:
+  // someInstance: SomeInstanceJSON as Example,
+};
 ```
 
 Do not manually duplicate generated values in `index.ts`. For vision or API
