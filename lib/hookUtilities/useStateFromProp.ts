@@ -10,7 +10,7 @@ export function useStateFromProp<T>(
 ): [T, Dispatch<SetStateAction<T>>] {
   const [state, setState] = useState<T>(initialValue);
   useEffect(() => {
-    // In case `T` is an object-type, do a deep comparison before setting state
+    // Skip the update when the prop is referentially equal to current state.
     setState((prevState) =>
       initialValue !== prevState ? initialValue : prevState
     );
