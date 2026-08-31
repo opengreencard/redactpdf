@@ -3,7 +3,13 @@ import Redaction, {
   RedactionAttributes,
 } from '../../../../lib/models/Redaction';
 import { PartialInstance } from '../../../../lib/db/types';
-import { GetRedactionResponse } from '../../../../lib/models/redactionTypes';
+import {
+  GenericGetRedactionResponse,
+  GetRedactionResponse,
+  RedactedGetRedactionResponse,
+  RedactionStatus,
+} from '../../../../lib/models/redactionTypes';
+import { getUnreachableError } from '../../../../lib/typescript/getUnreachableError';
 
 /** Parameters used to look up one redaction document. */
 export interface GetRedactionRequest {
@@ -21,21 +27,55 @@ export async function getRedaction({
 }: GetRedactionRequest): Promise<GetRedactionResponse> {
   const redaction = (await Redaction.findOne({
     where: { key },
-    attributes: ['status', 'pageCount', 'redactionBoundingBoxes', 'createdAt'],
+    attributes: [
+      'status',
+      'pageCount',
+      'pageSizes',
+      'redactionBoundingBoxes',
+      'createdAt',
+    ],
   })) as PartialInstance<
     RedactionAttributes,
-    'status' | 'pageCount' | 'redactionBoundingBoxes' | 'createdAt'
+    | 'status'
+    | 'pageCount'
+    | 'pageSizes'
+    | 'redactionBoundingBoxes'
+    | 'createdAt'
   > | null;
 
   if (!redaction) {
     throw new ApplicationError('We could not find this redaction.', 404);
   }
 
-  const response: GetRedactionResponse = {
-    status: redaction.status,
+  const commonResponse: Omit<GenericGetRedactionResponse, 'status'> = {
     pageCount: redaction.pageCount,
-    redactionBoundingBoxes: redaction.redactionBoundingBoxes,
     createdAt: redaction.createdAt.toISOString(),
   };
-  return response;
+
+  switch (redaction.status) {
+    case RedactionStatus.redacting:
+    case RedactionStatus.error: {
+      const response: GenericGetRedactionResponse = {
+        ...commonResponse,
+        status: redaction.status,
+      };
+      return response;
+    }
+    case RedactionStatus.redacted: {
+      if (redaction.pageSizes === null) {
+        throw new ApplicationError(
+          'The redaction is complete but page sizes are unavailable.'
+        );
+      }
+      const response: RedactedGetRedactionResponse = {
+        ...commonResponse,
+        status: RedactionStatus.redacted,
+        pageSizes: redaction.pageSizes,
+        redactionBoundingBoxes: redaction.redactionBoundingBoxes,
+      };
+      return response;
+    }
+    default:
+      throw getUnreachableError(redaction.status);
+  }
 }

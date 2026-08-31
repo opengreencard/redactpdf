@@ -5,5 +5,8 @@
  */
 export const centeredAlertOrCardMaxWidth = '32rem';
 
-/** Mantine container size shared by the redaction page and its site chrome. */
-export const redactionPageContainerSize = 'xl';
+/** Shared Mantine spacing token for the preview canvas padding. */
+export const redactionPreviewPagesPadding = 'sm';
+
+/** Divider used between the review panel and document preview. */
+export const redactionPaneBorder = '1px solid var(--mantine-color-gray-3)';

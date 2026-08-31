@@ -8,21 +8,23 @@ import {
 import {
   GetRedactionResponse,
   ManualRedactionBoundingBox,
+  RedactedGetRedactionResponse,
   RedactionBoundingBox,
   RedactionStatus,
-  RedactedDataType,
 } from '../../lib/models/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
-import SiteChrome from '../SiteChrome/SiteChrome';
 import RedactionPageInner from './RedactionPageInner';
 import {
   addBoundingBoxesToResponse,
   removeBoundingBoxesFromResponse,
   toggleBoundingBoxesInResponse,
 } from './redactionBoundingBoxes';
-import { redactionPageContainerSize } from './redactionLayout';
+import {
+  getStorybookRedactionImageUrl,
+  makeStorybookRedactedResponse,
+} from './redactionPreviewStorybookCommon';
 
 interface StoryWrapperProps {
   redactionKey: string;
@@ -32,9 +34,8 @@ interface StoryWrapperProps {
 const defaultProps: StoryWrapperProps = {
   redactionKey: 'storybook-key',
   initialRedactionState: makeDoneState(
-    ClientFakeData.makeGetRedactionResponse({
+    ClientFakeData.makeGenericGetRedactionResponse({
       status: RedactionStatus.redacting,
-      redactionBoundingBoxes: [],
     })
   ),
 };
@@ -57,13 +58,19 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       useState<APICallState<GetRedactionResponse> | null>(
         initialRedactionState
       );
-    const [highlightedBox, setHighlightedBox] =
-      useState<RedactionBoundingBox | null>(null);
 
     const updateRedaction = useMemoizedCallback(
-      (apply: (current: GetRedactionResponse) => GetRedactionResponse) => {
+      (
+        apply: (
+          current: RedactedGetRedactionResponse
+        ) => RedactedGetRedactionResponse
+      ) => {
         setRedactionState((current) => {
-          if (!current || current.status !== 'done' || !current.result) {
+          if (
+            !current ||
+            current.status !== 'done' ||
+            current.result.status !== RedactionStatus.redacted
+          ) {
             return current;
           }
           const nextState: APICallState<GetRedactionResponse> = {
@@ -103,31 +110,22 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       },
       [updateRedaction]
     );
-    const handleRedactionClick = useMemoizedCallback(
-      (box: RedactionBoundingBox) => {
-        setHighlightedBox(box);
-      },
-      []
-    );
-
     return (
       <RedactionPageInner
         redactionKey={redactionKey}
         redactionState={redactionState}
+        isLoggedIn={false}
         onAddBoundingBox={handleAddBoundingBox}
         onDeleteBoundingBoxes={handleDeleteBoundingBoxes}
         onToggleBoundingBoxes={handleToggleBoundingBoxes}
-        highlightedBox={highlightedBox}
-        onRedactionClick={handleRedactionClick}
+        getUrlForRedactionImageForTesting={getStorybookRedactionImageUrl}
       />
     );
   }
 );
 
 const Template: StoryFn<StoryWrapperProps> = (args) => (
-  <SiteChrome isLoggedIn={false} containerSize={redactionPageContainerSize}>
-    <StoryWrapper {...args} />
-  </SiteChrome>
+  <StoryWrapper {...args} />
 );
 
 export const Loading: StoryFn<StoryWrapperProps> = Template.bind({});
@@ -141,16 +139,5 @@ Error.args = {
 
 export const Loaded: StoryFn<StoryWrapperProps> = Template.bind({});
 Loaded.args = {
-  initialRedactionState: makeDoneState(
-    ClientFakeData.makeGetRedactionResponse({
-      pageCount: 2,
-      redactionBoundingBoxes: [
-        ClientFakeData.makeAutoRedactionBoundingBox({
-          dataType: RedactedDataType.address,
-          text: '123 Main St',
-        }),
-        ClientFakeData.makeManualRedactionBoundingBox({ page: 2 }),
-      ],
-    })
-  ),
+  initialRedactionState: makeDoneState(makeStorybookRedactedResponse()),
 };

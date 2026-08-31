@@ -8,6 +8,13 @@
   tables. Apply production schema changes manually in phpMyAdmin before or
   alongside deployment, and include the required SQL in the PR description or
   commit message for the operator.
+
+## Checks
+
+- Typecheck: `yarn typecheck`
+- Lint: `yarn lint`
+- Tests: `yarn jest`
+
 - Keep this public repository independent from OpenGreenCard. Do not copy
   immigration forms, user data, credentials, or product-specific domain code.
 - Before mocking an API in a test, check whether a global mock already

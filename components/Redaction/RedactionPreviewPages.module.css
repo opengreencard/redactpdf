@@ -1,0 +1,27 @@
+.overlay {
+  /* Sit above the page image so hover and click hit the box, not the img. */
+  z-index: 1;
+  pointer-events: auto;
+  cursor: pointer;
+  box-sizing: border-box;
+  background-color: transparent;
+}
+
+/* Light red wash on hover; keep the border color unchanged. */
+.overlay:hover,
+.overlay:focus-within {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-red-2) 55%,
+    transparent
+  );
+}
+
+/* Same red as the enabled border, washed out so the text stays readable. */
+.overlay[data-active='true'] {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-red-6) 40%,
+    transparent
+  );
+}

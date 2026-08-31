@@ -3,7 +3,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { Stack } from '@mantine/core';
 import {
   RedactedDataType,
-  type GetRedactionResponse,
+  type RedactedGetRedactionResponse,
   type RedactionBoundingBox,
 } from '../../lib/models/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
@@ -17,13 +17,13 @@ import RedactionPanel, { RedactionPanelProps } from './RedactionPanel';
 
 interface StoryWrapperProps {
   redactionKey: string;
-  initialRedaction: GetRedactionResponse;
+  initialRedaction: RedactedGetRedactionResponse;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
 }
 
 const defaultProps: StoryWrapperProps = {
   redactionKey: 'storybook-key',
-  initialRedaction: ClientFakeData.makeGetRedactionResponse({
+  initialRedaction: ClientFakeData.makeRedactedGetRedactionResponse({
     pageCount: 3,
     redactionBoundingBoxes: [
       ClientFakeData.makeAutoRedactionBoundingBox({
@@ -82,7 +82,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
   function StoryWrapper(props: StoryWrapperProps) {
     const { redactionKey, initialRedaction, onRedactionClick } = props;
     const [redaction, setRedaction] =
-      useState<GetRedactionResponse>(initialRedaction);
+      useState<RedactedGetRedactionResponse>(initialRedaction);
 
     const handleDelete = useMemoizedCallback(
       (boxes: RedactionBoundingBox[]) => {
@@ -125,7 +125,7 @@ export const Default: StoryFn<StoryWrapperProps> = Template.bind({});
 
 export const Empty: StoryFn<StoryWrapperProps> = Template.bind({});
 Empty.args = {
-  initialRedaction: ClientFakeData.makeGetRedactionResponse({
+  initialRedaction: ClientFakeData.makeRedactedGetRedactionResponse({
     redactionBoundingBoxes: [],
   }),
 };

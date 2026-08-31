@@ -1,0 +1,170 @@
+[
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "Sean",
+    "box": {
+      "minX": 0.073,
+      "minY": 0.114,
+      "maxX": 0.114,
+      "maxY": 0.126
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "John",
+    "box": {
+      "minX": 0.403,
+      "minY": 0.113,
+      "maxX": 0.437,
+      "maxY": 0.126
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "400 00 1038",
+    "box": {
+      "minX": 0.781,
+      "minY": 0.113,
+      "maxX": 0.899,
+      "maxY": 0.127
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "Joan",
+    "box": {
+      "minX": 0.072,
+      "minY": 0.144,
+      "maxX": 0.106,
+      "maxY": 0.156
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "Jackson",
+    "box": {
+      "minX": 0.402,
+      "minY": 0.144,
+      "maxX": 0.464,
+      "maxY": 0.156
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "400 00 1071",
+    "box": {
+      "minX": 0.78,
+      "minY": 0.144,
+      "maxX": 0.9,
+      "maxY": 0.157
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "address",
+    "text": "26 Dancing Daisy Drive",
+    "box": {
+      "minX": 0.073,
+      "minY": 0.174,
+      "maxX": 0.263,
+      "maxY": 0.188
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "address",
+    "text": "Charleston",
+    "box": {
+      "minX": 0.072,
+      "minY": 0.203,
+      "maxX": 0.158,
+      "maxY": 0.216
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "address",
+    "text": "SC",
+    "box": {
+      "minX": 0.572,
+      "minY": 0.201,
+      "maxX": 0.59,
+      "maxY": 0.213
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "address",
+    "text": "29455",
+    "box": {
+      "minX": 0.669,
+      "minY": 0.205,
+      "maxX": 0.712,
+      "maxY": 0.217
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "Joan Jackson",
+    "box": {
+      "minX": 0.568,
+      "minY": 0.341,
+      "maxX": 0.67,
+      "maxY": 0.353
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "Sam",
+    "box": {
+      "minX": 0.161,
+      "minY": 0.479,
+      "maxX": 0.198,
+      "maxY": 0.492
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "Jackson",
+    "box": {
+      "minX": 0.295,
+      "minY": 0.48,
+      "maxX": 0.355,
+      "maxY": 0.493
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "400 00 1071",
+    "box": {
+      "minX": 0.444,
+      "minY": 0.478,
+      "maxX": 0.554,
+      "maxY": 0.491
+    },
+    "enabled": true
+  }
+]

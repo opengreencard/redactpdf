@@ -1,8 +1,16 @@
+---
+name: execute-task
+description: Execute a named task from a project specification in TASKS-VIEW.md.
+disable-model-invocation: true
+triggers:
+  - user
+---
+
 # Execute a Specific Task
 
 ## Usage
 
-This command requires two parameters:
+This skill requires two parameters:
 
 1. **Directory**: The subfolder containing the project specifications (e.g.,
    `spec/2026-08/redactPDF/`)
@@ -11,10 +19,10 @@ This command requires two parameters:
 ## Example Usage
 
 ```
-@execute-task.md spec/2026-08/redactPDF/ "Build landing page upload dropzone"
+/execute-task spec/2026-08/redactPDF/ "Build landing page upload dropzone"
 ```
 
-## What This Command Does
+## What This Skill Does
 
 1. **Reads project context** from the specified directory:
 
@@ -54,21 +62,6 @@ bullet in the spec already)
 
 - `$1`: Directory path (required) - e.g., `spec/2026-08/redactPDF/`
 - `$2`: Task name (required) - task title from TASKS-VIEW.md
-
-## Response Format
-
-If parameters are missing, I'll respond with:
-
-```
-I'm ready to execute a specific task. Please provide:
-
-1. Directory: The subfolder with the project specifications (e.g.,
-   spec/2026-08/redactPDF/)
-2. Task Name: The exact task title from TASKS-VIEW.md (e.g.,
-   "Build landing page upload dropzone")
-
-Usage: @execute-task.md <directory> "<task-name>"
-```
 
 ## Implementation Approach
 

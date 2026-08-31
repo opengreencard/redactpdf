@@ -1,9 +1,11 @@
 import {
   AutoRedactionBoundingBox,
   BoundingBox,
-  GetRedactionResponse,
+  GenericGetRedactionResponse,
   ManualRedactionBoundingBox,
+  PageSize,
   RedactedDataType,
+  RedactedGetRedactionResponse,
   RedactionStatus,
 } from '../models/redactionTypes';
 import type { OpenAICompatibleCompletionResult } from '../ai/createOpenAICompatibleCompletion';
@@ -14,9 +16,11 @@ import type { OpenAICompatibleCompletionResult } from '../ai/createOpenAICompati
 // eslint-disable-next-line no-restricted-syntax
 const ClientFakeData = {
   makeBoundingBox,
+  makePageSize,
   makeAutoRedactionBoundingBox,
   makeManualRedactionBoundingBox,
-  makeGetRedactionResponse,
+  makeGenericGetRedactionResponse,
+  makeRedactedGetRedactionResponse,
   makeOpenAICompatibleCompletionResult,
 };
 
@@ -38,6 +42,13 @@ function randomNormalizedRange(): { min: number; max: number } {
   const a = Math.random();
   const b = Math.random();
   return a < b ? { min: a, max: b } : { min: b, max: a };
+}
+
+function makePageSize(options: Partial<PageSize> = {}): PageSize {
+  return {
+    width: options.width ?? 1275,
+    height: options.height ?? 1650,
+  };
 }
 
 function makeAutoRedactionBoundingBox(
@@ -64,12 +75,27 @@ function makeManualRedactionBoundingBox(
   };
 }
 
-function makeGetRedactionResponse(
-  options: Partial<GetRedactionResponse> = {}
-): GetRedactionResponse {
-  const response: GetRedactionResponse = {
-    status: options.status ?? RedactionStatus.redacted,
+function makeGenericGetRedactionResponse(
+  options: Partial<GenericGetRedactionResponse> = {}
+): GenericGetRedactionResponse {
+  const response: GenericGetRedactionResponse = {
+    status: options.status ?? RedactionStatus.redacting,
     pageCount: options.pageCount ?? 1,
+    createdAt: options.createdAt ?? '2026-01-01T00:00:00.000Z',
+  };
+  return response;
+}
+
+function makeRedactedGetRedactionResponse(
+  options: Partial<Omit<RedactedGetRedactionResponse, 'status'>> = {}
+): RedactedGetRedactionResponse {
+  const pageCount = options.pageCount ?? options.pageSizes?.length ?? 1;
+  const response: RedactedGetRedactionResponse = {
+    status: RedactionStatus.redacted,
+    pageCount,
+    pageSizes:
+      options.pageSizes ??
+      Array.from({ length: pageCount }, () => makePageSize()),
     redactionBoundingBoxes: options.redactionBoundingBoxes ?? [
       makeAutoRedactionBoundingBox(),
     ],

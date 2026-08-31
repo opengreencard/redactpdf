@@ -7,7 +7,7 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import { useSetState } from '../../lib/hookUtilities/useSetState';
 import UploadModal from '../Upload/UploadModal';
 
 interface LandingPageUploadModalState {
@@ -33,12 +33,8 @@ const LandingPageUploadModalProvider: React.FunctionComponent<PropsWithChildren>
     const { children } = props;
     const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
 
-    const openUploadModal = useMemoizedCallback(() => {
-      setIsUploadModalOpen(true);
-    }, []);
-    const closeUploadModal = useMemoizedCallback(() => {
-      setIsUploadModalOpen(false);
-    }, []);
+    const openUploadModal = useSetState(setIsUploadModalOpen, true);
+    const closeUploadModal = useSetState(setIsUploadModalOpen, false);
 
     const value: LandingPageUploadModalState = useMemo(
       (): LandingPageUploadModalState => ({

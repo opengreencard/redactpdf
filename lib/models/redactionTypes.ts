@@ -108,11 +108,18 @@ export interface RedactionBoundingBoxCommon {
   enabled: boolean;
 }
 
-/** A redaction suggestion produced by the vision model. */
-export interface AutoRedactionBoundingBox extends RedactionBoundingBoxCommon {
+/** An automatic redaction box before it is assigned to a page. */
+export interface SinglePageRedactionBoundingBox {
   type: 'automatic';
   dataType: RedactedDataType;
   text: string;
+  box: BoundingBox;
+  enabled: boolean;
+}
+
+/** A redaction suggestion produced by the vision model on a specific page. */
+export interface AutoRedactionBoundingBox extends SinglePageRedactionBoundingBox {
+  page: number;
 }
 
 /** A redaction box drawn by the user. */
@@ -124,10 +131,31 @@ export interface ManualRedactionBoundingBox extends RedactionBoundingBoxCommon {
 export type RedactionBoundingBox =
   AutoRedactionBoundingBox | ManualRedactionBoundingBox;
 
-/** Browser-safe response returned while a redaction is being processed. */
-export interface GetRedactionResponse {
-  status: RedactionStatus;
-  pageCount: number;
+/**
+ * Browser-safe polling payload. Incomplete and failed jobs share
+ * {@link GenericGetRedactionResponse}; only a finished job includes page
+ * image sizes.
+ */
+export type GetRedactionResponse =
+  GenericGetRedactionResponse | RedactedGetRedactionResponse;
+
+/**
+ * Response while processing is still running or after it failed.
+ * Boxes are omitted so the review UI cannot render a half-built list.
+ */
+export interface GenericGetRedactionResponse extends GetRedactionResponseCommon {
+  status: RedactionStatus.redacting | RedactionStatus.error;
+}
+
+/** Response after page images and redaction suggestions are available. */
+export interface RedactedGetRedactionResponse extends GetRedactionResponseCommon {
+  status: RedactionStatus.redacted;
+  pageSizes: PageSize[];
   redactionBoundingBoxes: RedactionBoundingBox[];
+}
+
+/** Fields shared by every browser-safe redaction response. */
+interface GetRedactionResponseCommon {
+  pageCount: number;
   createdAt: string;
 }

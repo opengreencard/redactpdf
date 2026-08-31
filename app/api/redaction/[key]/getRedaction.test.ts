@@ -54,4 +54,27 @@ describe(getRedaction, () => {
       statusCode: 404,
     });
   });
+
+  it('omits boxes and page sizes while a redaction is still processing', async () => {
+    const redaction = await FakeData.makeDBRedaction({
+      status: RedactionStatus.redacting,
+    });
+
+    const result = await getRedaction({ key: redaction.key });
+
+    expect(result.status).toBe(RedactionStatus.redacting);
+    expect(result).not.toHaveProperty('pageSizes');
+    expect(result).not.toHaveProperty('redactionBoundingBoxes');
+  });
+
+  it('throws when a redacted row has no page sizes', async () => {
+    const redaction = await FakeData.makeDBRedaction({
+      status: RedactionStatus.redacted,
+      pageSizes: null,
+    });
+
+    await expect(getRedaction({ key: redaction.key })).rejects.toThrow(
+      'page sizes are unavailable'
+    );
+  });
 });

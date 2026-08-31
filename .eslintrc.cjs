@@ -124,6 +124,8 @@ const untypedObjectMessage =
 const untypedObjectExcludeEventPropertiesSelector =
   ':not(VariableDeclarator[id.name=/EventProperties/i]):not(VariableDeclarator[id.name=/EventProperties/i] *)';
 
+const untypedObjectLiteralVariableSelector = `VariableDeclarator[init.type=ObjectExpression]:not(VariableDeclarator[id.typeAnnotation])${untypedObjectExcludeEventPropertiesSelector}`;
+
 // APIs that already have a global Jest mock (in setup.ts or an adjacent
 // `__mocks__` folder) should not be re-mocked in ordinary tests. Add an
 // entry here when introducing that kind of infrastructure mock:
@@ -330,7 +332,7 @@ const commonNoRestrictedSyntaxRules = [
   {
     // Bad: const myVariable = { a: 1, b: 2 }
     // Good: const myVariable: MyType = { a: 1, b: 2 }
-    selector: `VariableDeclarator[init.type=ObjectExpression]:not(VariableDeclarator[id.typeAnnotation])${untypedObjectExcludeEventPropertiesSelector}`,
+    selector: untypedObjectLiteralVariableSelector,
     message: `${untypedObjectMessage}: \`const myVariable: MyType = { ... }\``,
   },
   {
@@ -369,7 +371,7 @@ const commonNoRestrictedSyntaxRules = [
     // Bad: const handleClick = () => {}
     // Bad: const onSubmit = useCallback(() => {})
     // Good: const onSubmit = useMemoizedCallback(() => {})
-    // Good: const handleSubmit = useCallbackWithPrefix((payload) => save(payload), 'Form') // existing stable callback wrapper
+    // Good: const handleSubmit = useCallbackWithPrefix(savePayload)
     // Good: const handleSubmit = useSetState(setSubmitting, true) // stable state-setting wrapper
     // Good: const handleSearch = useDebounce((q) => doSearch(q), 250) // debounced callback wrapper
     // Bad: const onSubmit = someFactory() // not an allowed memoized callback wrapper
@@ -377,6 +379,46 @@ const commonNoRestrictedSyntaxRules = [
       'VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="ArrowFunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="FunctionExpression"], VariableDeclarator[id.name=/^(handle|on)[A-Z]/][init.type="CallExpression"][init.callee.type="Identifier"]:not([init.callee.name=/^(useMemoizedCallback|useCallbackWithPrefix|useSetState|useDebounce|useConvertSingleArgumentToArray|useStopPropagation)$/])',
     message:
       'Event handlers in React components should use useMemoizedCallback so they remain stable when passed as props and avoid triggering re-renders.',
+  },
+  {
+    // Forbid useCallbackWithPrefix being called directly with a function. Since
+    // useCallbackWithPrefix stores the function in a ref, it can leak memory
+    // since the function created on every render will be different, and old
+    // versions of the function may remain forever.
+    //
+    // Bad: `useCallbackWithPrefix(() => {})`
+    // Bad: `useCallbackWithPrefix(useCallback(() => {}, []))`
+    // Good: `useCallbackWithPrefix(useMemoizedCallback(() => {}, []))`
+    selector:
+      'CallExpression[callee.name=/^(useCallbackWithPrefix|useNullableCallbackWithPrefix)$/] > ArrowFunctionExpression, CallExpression[callee.name=/^(useCallbackWithPrefix|useNullableCallbackWithPrefix)$/] > FunctionExpression, CallExpression[callee.name=/^(useCallbackWithPrefix|useNullableCallbackWithPrefix)$/] > CallExpression[callee.name=useCallback]',
+    message:
+      'Instead of useCallbackWithPrefix(() => {}) or useCallbackWithPrefix(useCallback(...)), use useCallbackWithPrefix(useMemoizedCallback(...)) to prevent memory leaks. Directly passing in an unmemoized function can cause many different versions of the function to be cached, which uses a lot of memory.',
+  },
+  {
+    // Bad:
+    //   useMemoizedCallback(() => { setValue(4); }, []);
+    //   useMemoizedCallback(() => setSelected(null), []);
+    //   useMemoizedCallback(() => setTab(props.tab), [props.tab]);
+    // Good:
+    //   useSetState(setValue, 4);
+    //   useSetState(setSelected, null);
+    //   useSetState(setTab, props.tab);
+    //
+    // For boolean toggles, prefer useToggle or useBooleanState instead.
+    selector:
+      'CallExpression[callee.name=/^(useMemoizedCallback|useCallback)$/] > ArrowFunctionExpression[params.length=0] > BlockStatement[body.length=1] > ExpressionStatement > CallExpression[callee.name=/^set(?!Timeout|Interval|Immediate)(?=[A-Z])/][arguments.length=1][arguments.0.type=/^(Identifier|Literal|MemberExpression)$/], ' +
+      'CallExpression[callee.name=/^(useMemoizedCallback|useCallback)$/] > ArrowFunctionExpression[params.length=0][body.type=CallExpression][body.callee.name=/^set(?!Timeout|Interval|Immediate)(?=[A-Z])/][body.arguments.length=1][body.arguments.0.type=/^(Identifier|Literal|MemberExpression)$/]',
+    message:
+      'Prefer `useSetState(setX, value)` from `lib/hookUtilities/useSetState` when a callback only calls a state setter.',
+  },
+  {
+    // Bad: useMemoizedCallback((value) => { setValue(value); }, []);
+    // Good: pass setValue directly when the callback only forwards its input.
+    selector:
+      'CallExpression[callee.name=/^(useMemoizedCallback|useCallback)$/] > ArrowFunctionExpression[params.length=1] > BlockStatement[body.length=1] > ExpressionStatement > CallExpression[callee.name=/^set(?!Timeout|Interval|Immediate)(?=[A-Z])/][arguments.length=1][arguments.0.type="Identifier"], ' +
+      'CallExpression[callee.name=/^(useMemoizedCallback|useCallback)$/] > ArrowFunctionExpression[params.length=1][body.type=CallExpression][body.callee.name=/^set(?!Timeout|Interval|Immediate)(?=[A-Z])/][body.arguments.length=1][body.arguments.0.type="Identifier"]',
+    message:
+      'Avoid useCallback/useMemoizedCallback wrappers that only pass one callback argument to a state setter. Pass the state setter directly when possible.',
   },
   {
     // Bad: screen.getByRole('button', { name: /save/i })
@@ -424,7 +466,7 @@ const commonNoRestrictedSyntaxRules = [
     // - We allow FontAwesome icon variables like faFilePdf since they follow
     //   the FontAwesome naming convention.
     selector:
-      'Identifier:not([name=/^fa[A-Z]/])[name=/[a-z](Pdf|Json|Jpeg|Png|Ast|Toc|Dpi|Html|Ses|Aws|Api)(?=[A-Z]|\\b|$)/]',
+      'Identifier:not([name=/^fa[A-Z]/])[name=/[a-z](Pdf|Json|Jpeg|Png|Ast|Toc|Dpi|Html|Ses|Aws|Api|Irs|Us)(?=[A-Z]|\\b|$)/]',
     message:
       'Acronyms should be fully capitalized mid-identifier (e.g., nameForPDF not nameForPdf, getJSONData not getJsonData). Lowercase is only allowed at the start (e.g., pdfName, jsonData).',
   },
@@ -739,6 +781,21 @@ module.exports = {
             message:
               'Raw arrays are not allowed in valuesSchema. Wrap array elements in an object: { value: string }[] instead of string[]',
           },
+        ],
+      },
+    },
+    {
+      // Fixture indexes export an inferred TestXxx collection; skip only the
+      // explicit-object-literal typing rule so other syntax restrictions stay.
+      files: ['**/__testData__/**/index.ts'],
+      rules: {
+        'no-restricted-syntax': [
+          'error',
+          ...commonNoRestrictedSyntaxRulesForNonTests.filter(
+            (rule) =>
+              typeof rule === 'object' &&
+              rule.selector !== untypedObjectLiteralVariableSelector
+          ),
         ],
       },
     },

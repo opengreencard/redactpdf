@@ -10,6 +10,19 @@ alwaysApply: true
   Do not create parallel `fixtures/`, `testData/`, or `samples/` directories.
 - Use `FakeData` and `ClientFakeData` for in-memory application objects, and
   `blahTestCommon.ts` for shared module-specific fixture builders.
+- For reusable typed fixtures, use the `__testData__/<Name>/` pair:
+  - `index.test.ts` should call `makeTestDataGeneratorTest` once per generated
+    JSON file. Keep any shared generator helper above those calls.
+  - `index.ts` should import the generated JSON files directly and export a
+    `TestXxx` object (for example, `TestRedactionBoundingBoxes`). Do not add an
+    explicit `Record` or object type annotation to the fixture collection.
+- Generator tests are skipped by ordinary `yarn jest`. Run them with
+  `yarn devdb-testdata-jest path/to/index.test.ts` for development data or
+  `yarn proddb-testdata-jest path/to/index.test.ts` when production data is
+  required.
+- Generated files are skipped when they already exist. Use
+  `UPDATE=1` to regenerate all files in the selected test, or
+  `UPDATE_PATTERN=FileName` to regenerate one matching file.
 - Store pass-through recordings next to their mock module under
   `__testData__/<mock-file-basename>/<function-name>/`.
 - Every downloaded or third-party binary must have a sidecar
