@@ -325,8 +325,9 @@ function getLoadedRedaction(
   redactionState: APICallState<GetRedactionResponse> | null
 ): RedactedGetRedactionResponse {
   if (
-    redactionState?.status === 'done' &&
-    redactionState.result.status === RedactionStatus.redacted
+    redactionState &&
+    redactionState.status !== 'error' &&
+    redactionState.result?.status === RedactionStatus.redacted
   ) {
     return redactionState.result;
   }
