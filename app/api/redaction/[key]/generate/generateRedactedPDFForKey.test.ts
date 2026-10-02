@@ -56,8 +56,7 @@ describe(generateRedactedPDFForKey, () => {
       generateRedactedPDFForKey({ key: redaction.key })
     ).rejects.toMatchObject({
       statusCode: 409,
-      message:
-        'This redaction encountered an error and is not ready for download.',
+      message: 'This redaction encountered an error and is not ready.',
     });
 
     expect(generateRedactedPDF).not.toHaveBeenCalled();

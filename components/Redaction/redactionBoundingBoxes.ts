@@ -1,10 +1,10 @@
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import type {
-  BoundingBox,
   ManualRedactionBoundingBox,
   RedactedGetRedactionResponse,
   RedactionBoundingBox,
 } from '../../lib/models/redactionTypes';
+import { isSameRedactionBoundingBox } from '../../lib/models/redactionBoundingBoxIdentity';
 
 /** Append newly drawn boxes to the current GET payload. */
 export function addBoundingBoxesToResponse(
@@ -87,24 +87,4 @@ export function getRedactionBoxLabel(box: RedactionBoundingBox): string {
     default:
       throw getUnreachableError(box);
   }
-}
-
-function isSameRedactionBoundingBox(
-  left: RedactionBoundingBox,
-  right: RedactionBoundingBox
-): boolean {
-  return (
-    left.type === right.type &&
-    left.page === right.page &&
-    areBoundingBoxesEqual(left.box, right.box)
-  );
-}
-
-function areBoundingBoxesEqual(left: BoundingBox, right: BoundingBox): boolean {
-  return (
-    left.minX === right.minX &&
-    left.minY === right.minY &&
-    left.maxX === right.maxX &&
-    left.maxY === right.maxY
-  );
 }

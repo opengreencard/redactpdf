@@ -6,7 +6,7 @@ import { getAuthState } from '../auth/nextAuth';
 import { getUnreachableError } from '../typescript/getUnreachableError';
 import { UserAttributes } from '../models/User';
 
-/** Minimal route-handler types used by both GET and POST route factories. */
+/** Minimal route-handler types used by the with-body and without-body factories. */
 export interface AppRouteHandlerFnContext {
   params: Promise<Record<string, string | string[] | undefined>>;
 }
@@ -203,7 +203,8 @@ async function runFunctionAndHandleErrorsBase<ResponseT>(
  *   return userName;
  * }
  *
- * export const GET = makeGETAPIRoute({
+ * export const GET = makeAPIRouteWithoutBody({
+ *   method: 'GET',
  *   apiFunc: echoUserName,
  *   injectAuth: async (session) => ({
  *     userName: session?.user.name,
@@ -245,8 +246,7 @@ export interface MakeRequestParamsFromRequestOptions<
 
 /**
  * Take the request and context from Next.js and turn them into a set of
- * parameters that can be passed into an API function. Used primarily by
- * makeGETAPIRoute and makePOSTAPIRoute
+ * parameters that can be passed into an API function.
  */
 export async function makeRequestParamsFromRequest<
   TransformedQueryAndPathParamsT,

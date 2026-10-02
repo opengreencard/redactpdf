@@ -1,8 +1,8 @@
 import { SignUpRequestBody, SignUpResponse, signUpServer } from './signUp';
-import { makePOSTAPIRoute } from '../../../../lib/api/makePOSTAPIRoute';
+import { makeAPIRouteWithBody } from '../../../../lib/api/makeAPIRouteWithBody';
 
-export const POST = makePOSTAPIRoute<
+export const POST = makeAPIRouteWithBody<
   SignUpRequestBody, // RequestBodyT
   {}, // TransformedQueryAndPathParamsT
   SignUpResponse // ResponseT
->({ apiFunc: signUpServer });
+>({ method: 'POST', apiFunc: signUpServer });

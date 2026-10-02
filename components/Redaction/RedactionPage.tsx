@@ -71,7 +71,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         applyOptimistic: (
           current: RedactedGetRedactionResponse
         ) => RedactedGetRedactionResponse,
-        persist: () => Promise<void>
+        persist: () => Promise<GetRedactionResponse | null>
       ) => {
         const previous = getRedactedResult(redactionState);
         if (!previous) {
@@ -83,9 +83,18 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         setStateResult(optimistic);
 
         try {
-          await persist();
+          const persisted = await persist();
+          if (persisted) {
+            setStateResult(persisted);
+          }
         } catch (err) {
-          setStateResult(previous);
+          // A bulk loop may have saved some boxes already, so reload instead
+          // of rolling back to `previous`.
+          try {
+            setStateResult(await getRedactionClient({ key: redactionKey }));
+          } catch {
+            setStateResult(previous);
+          }
           const notification: NotificationData = {
             color: 'red',
             title: 'Could not update redactions',
@@ -95,7 +104,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
           notifications.show(notification);
         }
       },
-      [redactionState, setStateResult]
+      [redactionKey, redactionState, setStateResult]
     );
 
     const handleAddBoundingBoxes = useMemoizedCallback(
@@ -103,10 +112,13 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         await persistBoxMutation(
           (current) => addBoundingBoxesToResponse(current, boxes),
           () =>
-            addRedactionBoundingBoxClient({
-              key: redactionKey,
-              boxes,
-            })
+            persistBoxesSequentially(boxes, (box) =>
+              addRedactionBoundingBoxClient({
+                key: redactionKey,
+                page: box.page,
+                box: box.box,
+              })
+            )
         );
       },
       [persistBoxMutation, redactionKey]
@@ -121,10 +133,14 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         await persistBoxMutation(
           (current) => removeBoundingBoxesFromResponse(current, boxes),
           () =>
-            deleteRedactionBoundingBoxClient({
-              key: redactionKey,
-              boxes,
-            })
+            persistBoxesSequentially(boxes, (box) =>
+              deleteRedactionBoundingBoxClient({
+                key: redactionKey,
+                page: box.page,
+                box: box.box,
+                type: box.type,
+              })
+            )
         );
       },
       [persistBoxMutation, redactionKey]
@@ -135,10 +151,14 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         await persistBoxMutation(
           (current) => toggleBoundingBoxesInResponse(current, boxes),
           () =>
-            toggleRedactionBoundingBoxClient({
-              key: redactionKey,
-              boxes,
-            })
+            persistBoxesSequentially(boxes, (box) =>
+              toggleRedactionBoundingBoxClient({
+                key: redactionKey,
+                page: box.page,
+                box: box.box,
+                type: box.type,
+              })
+            )
         );
       },
       [persistBoxMutation, redactionKey]
@@ -180,4 +200,21 @@ function getErrorMessage(err: unknown): string {
     return err.message;
   }
   return 'Something went wrong. Please try again.';
+}
+
+/**
+ * One HTTP request per box, in order, so two saves do not overwrite each
+ * other on the JSON column.
+ */
+async function persistBoxesSequentially<BoxT>(
+  boxes: BoxT[],
+  persistOne: (box: BoxT) => Promise<GetRedactionResponse>
+): Promise<GetRedactionResponse | null> {
+  let last: GetRedactionResponse | null = null;
+  for (const box of boxes) {
+    // Sequential so two JSON saves cannot overwrite each other.
+    // eslint-disable-next-line no-await-in-loop
+    last = await persistOne(box);
+  }
+  return last;
 }

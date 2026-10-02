@@ -1,20 +1,26 @@
 import { NextRequest } from 'next/server';
 import {
+  APIRouteResponseFormat,
   AppRouteHandlerFn,
   AppRouteHandlerFnContext,
-  APIRouteResponseFormat,
   makeRequestParamsFromRequest,
   MakeRequestParamsFromRequestOptions,
   RawResponse,
   RedirectResponse,
   runFunctionAndHandleErrors,
-} from './apiRouteCommon';
+} from './makeAPIRoute';
 
-type MakeGETAPIRouteAuthQueryPathOptions<
+type MakeAPIRouteWithoutBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT extends {} = {},
-> = Partial<
+> = {
+  /**
+   * Next.js still routes from the export name (`GET`). We take `method` so the
+   * call site documents the verb next to that export.
+   */
+  method: 'GET';
+} & Partial<
   Pick<
     MakeRequestParamsFromRequestOptions<
       TransformedQueryAndPathParamsT,
@@ -26,37 +32,20 @@ type MakeGETAPIRouteAuthQueryPathOptions<
 >;
 
 /**
- * Wrap an API function so that it takes GET requests from Next.js and
- * responds according to the chosen response format.
+ * Wrap an API function that has no request body (query and path params only).
  *
- * We use function overloads because TypeScript cannot express "when
- * responseFormat is raw, ResponseT must extend RawResponse" and "when
- * responseFormat is redirect, ResponseT must extend RedirectResponse" in a
- * single generic signature. Each overload below represents one valid response
- * format, and the implementation signature that follows accepts the union of
- * all of them and delegates to the runtime handler.
+ * Overloads exist because TypeScript cannot express "when responseFormat is
+ * raw, ResponseT must extend RawResponse" and "when responseFormat is
+ * redirect, ResponseT must extend RedirectResponse" in a single generic
+ * signature.
  *
  * @example
  * ```ts
- * interface GetBlahQueryParams {
- *   id: number;
- * }
- *
- * interface GetBlahAuthParams {
- *   userId: number | null;
- * }
- *
- * async function getBlah({ id, userId }: GetBlahQueryParams & GetBlahAuthParams) {
- *   return await Blah.findOne({ where: { id, userId }, raw: true });
- * }
- *
- * export const GET = makeGETAPIRoute({
+ * export const GET = makeAPIRouteWithoutBody({
+ *   method: 'GET',
  *   apiFunc: getBlah,
  *   makeQueryAndPathParams: ({ pathParams }) => ({
  *     id: parseInt(pathParams.id, 10),
- *   }),
- *   makeAuthParams: ({ session }) => ({
- *     userId: session?.user?.id ?? null,
  *   }),
  * });
  * ```
@@ -64,7 +53,7 @@ type MakeGETAPIRouteAuthQueryPathOptions<
 
 // Start overloads
 
-export function makeGETAPIRoute<
+export function makeAPIRouteWithoutBody<
   TransformedQueryAndPathParamsT,
   ResponseT,
   AuthParamsT = {},
@@ -81,13 +70,13 @@ export function makeGETAPIRoute<
   apiFunc: (
     request: TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
-} & MakeGETAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithoutBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
 
-export function makeGETAPIRoute<
+export function makeAPIRouteWithoutBody<
   TransformedQueryAndPathParamsT,
   ResponseT extends RawResponse,
   AuthParamsT = {},
@@ -104,13 +93,13 @@ export function makeGETAPIRoute<
   apiFunc: (
     request: TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
-} & MakeGETAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithoutBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
 
-export function makeGETAPIRoute<
+export function makeAPIRouteWithoutBody<
   TransformedQueryAndPathParamsT,
   ResponseT extends RedirectResponse,
   AuthParamsT = {},
@@ -127,7 +116,7 @@ export function makeGETAPIRoute<
   apiFunc: (
     request: TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
-} & MakeGETAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithoutBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
@@ -135,7 +124,7 @@ export function makeGETAPIRoute<
 
 // End overloads
 
-export function makeGETAPIRoute<
+export function makeAPIRouteWithoutBody<
   TransformedQueryAndPathParamsT,
   ResponseT,
   AuthParamsT = {},
@@ -151,7 +140,7 @@ export function makeGETAPIRoute<
   apiFunc: (request: any) => Promise<ResponseT>;
   responseFormat?: APIRouteResponseFormat;
   additionalHeaders?: Record<string, string>;
-} & MakeGETAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithoutBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT

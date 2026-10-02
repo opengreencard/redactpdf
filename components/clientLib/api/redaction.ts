@@ -1,14 +1,14 @@
 import type { UploadFileForRedactionResponse } from '../../../app/api/redaction/uploadFileForRedaction';
 import type {
+  BoundingBox,
   GetRedactionResponse,
-  ManualRedactionBoundingBox,
   RedactionBoundingBox,
 } from '../../../lib/models/redactionTypes';
 import {
-  GETRouteData,
-  makeClientGETRoute,
-  makeClientPOSTRoute,
-  POSTRouteData,
+  ClientAPIRouteWithBodyData,
+  ClientAPIRouteWithoutBodyData,
+  makeClientAPIRouteWithBody,
+  makeClientAPIRouteWithoutBody,
 } from './common';
 
 /** Client input for uploading one PDF for redaction. */
@@ -17,22 +17,28 @@ export interface UploadFileForRedactionClientRequest {
 }
 
 /** Upload a PDF and return the key for its redaction page. */
-export const uploadFileForRedactionClient = makeClientPOSTRoute<
+export const uploadFileForRedactionClient = makeClientAPIRouteWithBody<
   UploadFileForRedactionClientRequest,
   {},
   UploadFileForRedactionResponse
->(({ file }): POSTRouteData<never> => {
-  const formData = new FormData();
-  formData.append('file', file);
-  return { url: '/api/redaction', body: formData };
+>({
+  method: 'POST',
+  dataToUrlQueryStringAndBody: ({
+    file,
+  }): ClientAPIRouteWithBodyData<never> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return { url: '/api/redaction', body: formData };
+  },
 });
 
 /** Fetch the current state of one redaction document. */
-export const getRedactionClient = makeClientGETRoute<
+export const getRedactionClient = makeClientAPIRouteWithoutBody<
   { key: string },
   GetRedactionResponse
 >({
-  dataToUrlAndQueryString: ({ key }): GETRouteData => ({
+  method: 'GET',
+  dataToUrlAndQueryString: ({ key }): ClientAPIRouteWithoutBodyData => ({
     url: `/api/redaction/${key}`,
   }),
 });
@@ -43,11 +49,12 @@ export interface GenerateRedactedPDFClientRequest {
 }
 
 /** Fetch the finished redacted PDF as bytes for a caller to download. */
-export const generateRedactedPDFClient = makeClientGETRoute<
+export const generateRedactedPDFClient = makeClientAPIRouteWithoutBody<
   GenerateRedactedPDFClientRequest,
   ArrayBuffer
 >({
-  dataToUrlAndQueryString: ({ key }): GETRouteData => ({
+  method: 'GET',
+  dataToUrlAndQueryString: ({ key }): ClientAPIRouteWithoutBodyData => ({
     url: `/api/redaction/${key}/generate`,
   }),
   responseType: 'arraybuffer',
@@ -56,47 +63,81 @@ export const generateRedactedPDFClient = makeClientGETRoute<
 /** Client input for drawing a manual redaction box. */
 export interface AddRedactionBoundingBoxClientRequest {
   key: string;
-  boxes: ManualRedactionBoundingBox[];
+  page: number;
+  box: BoundingBox;
 }
 
-/**
- * Persist a newly drawn box.
- * Shim until task 2.15: the page keeps its optimistic boxes on success.
- */
-export async function addRedactionBoundingBoxClient(
-  _request: AddRedactionBoundingBoxClientRequest
-): Promise<void> {
-  // Task 2.15 replaces this with POST /api/redaction/:key/redacted.
-}
+/** Persist a newly drawn box. */
+export const addRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
+  Omit<AddRedactionBoundingBoxClientRequest, 'key'>,
+  { key: string },
+  GetRedactionResponse
+>({
+  method: 'POST',
+  dataToUrlQueryStringAndBody: ({
+    key,
+    page,
+    box,
+  }): ClientAPIRouteWithBodyData<
+    Omit<AddRedactionBoundingBoxClientRequest, 'key'>
+  > => ({
+    url: `/api/redaction/${key}/redacted`,
+    body: { page, box },
+  }),
+});
 
 /** Client input for removing a redaction box. */
 export interface DeleteRedactionBoundingBoxClientRequest {
   key: string;
-  boxes: RedactionBoundingBox[];
+  page: number;
+  box: BoundingBox;
+  type: RedactionBoundingBox['type'];
 }
 
-/**
- * Persist a box deletion.
- * Shim until task 2.15: the page keeps its optimistic boxes on success.
- */
-export async function deleteRedactionBoundingBoxClient(
-  _request: DeleteRedactionBoundingBoxClientRequest
-): Promise<void> {
-  // Task 2.15 replaces this with DELETE /api/redaction/:key/redacted.
-}
+/** Persist a box deletion. */
+export const deleteRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
+  Omit<DeleteRedactionBoundingBoxClientRequest, 'key'>,
+  { key: string },
+  GetRedactionResponse
+>({
+  method: 'DELETE',
+  dataToUrlQueryStringAndBody: ({
+    key,
+    page,
+    box,
+    type,
+  }): ClientAPIRouteWithBodyData<
+    Omit<DeleteRedactionBoundingBoxClientRequest, 'key'>
+  > => ({
+    url: `/api/redaction/${key}/redacted`,
+    body: { page, box, type },
+  }),
+});
 
 /** Client input for toggling a box's enabled flag. */
 export interface ToggleRedactionBoundingBoxClientRequest {
   key: string;
-  boxes: RedactionBoundingBox[];
+  page: number;
+  box: BoundingBox;
+  type: RedactionBoundingBox['type'];
 }
 
-/**
- * Persist an enabled/hidden toggle.
- * Shim until task 2.15: the page keeps its optimistic boxes on success.
- */
-export async function toggleRedactionBoundingBoxClient(
-  _request: ToggleRedactionBoundingBoxClientRequest
-): Promise<void> {
-  // Task 2.15 replaces this with PATCH /api/redaction/:key/redacted.
-}
+/** Persist an enabled/hidden toggle. */
+export const toggleRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
+  Omit<ToggleRedactionBoundingBoxClientRequest, 'key'>,
+  { key: string },
+  GetRedactionResponse
+>({
+  method: 'PATCH',
+  dataToUrlQueryStringAndBody: ({
+    key,
+    page,
+    box,
+    type,
+  }): ClientAPIRouteWithBodyData<
+    Omit<ToggleRedactionBoundingBoxClientRequest, 'key'>
+  > => ({
+    url: `/api/redaction/${key}/redacted`,
+    body: { page, box, type },
+  }),
+});

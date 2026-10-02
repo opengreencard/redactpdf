@@ -1,5 +1,5 @@
-import { APIRouteBodyFormat } from '../../../lib/api/apiRouteCommon';
-import { makePOSTAPIRoute } from '../../../lib/api/makePOSTAPIRoute';
+import { APIRouteBodyFormat } from '../../../lib/api/makeAPIRoute';
+import { makeAPIRouteWithBody } from '../../../lib/api/makeAPIRouteWithBody';
 import { ApplicationError } from '../../../lib/errors/applicationError';
 import {
   UploadFileForRedactionRequest,
@@ -8,11 +8,12 @@ import {
 } from './uploadFileForRedaction';
 
 /** Accept one uploaded PDF and start its redaction job. */
-export const POST = makePOSTAPIRoute<
+export const POST = makeAPIRouteWithBody<
   { body: FormData },
   {},
   UploadFileForRedactionResponse
 >({
+  method: 'POST',
   bodyFormat: APIRouteBodyFormat.formData,
   apiFunc: async (request): Promise<UploadFileForRedactionResponse> => {
     const file = request.body.get('file');
