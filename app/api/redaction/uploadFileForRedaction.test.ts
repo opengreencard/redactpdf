@@ -1,3 +1,4 @@
+import { PDFDocument } from '@cantoo/pdf-lib';
 import { putObject } from '../../../lib/storage/storageAPI';
 import { PartialInstance } from '../../../lib/db/types';
 import Redaction, {
@@ -22,9 +23,11 @@ describe(uploadFileForRedaction, () => {
   let onePagePDF: Buffer;
   let tooManyPagesPDF: Buffer;
 
-  beforeAll(() => {
-    onePagePDF = makePDFBuffer(1);
-    tooManyPagesPDF = makePDFBuffer(_maxRedactionPageCount + 1);
+  beforeAll(async () => {
+    [onePagePDF, tooManyPagesPDF] = await Promise.all([
+      makePDFBuffer(1),
+      makePDFBuffer(_maxRedactionPageCount + 1),
+    ]);
   });
 
   beforeEach(() => {
@@ -136,67 +139,25 @@ describe(uploadFileForRedaction, () => {
 });
 
 /**
- * Create a small in-memory PDF with exactly `pageCount` pages.
- *
- * A hand-written PDF keeps the test independent from checked-in binary
- * fixtures: upload validation only needs the PDF structure and page count.
+ * Create a small in-memory PDF with exactly `pageCount` pages for upload tests.
  */
-function makePDFBuffer(pageCount: number): Buffer {
-  const content = 'BT /F1 24 Tf 100 700 Td (Sensitive text) Tj ET';
-  const firstContentObjectNumber = pageCount + 3;
-  const fontObjectNumber = 2 * pageCount + 3;
-  const pageObjectNumbers = Array.from(
-    { length: pageCount },
-    (_, pageIndex) => pageIndex + 3
-  );
-  const contentObjectNumbers = Array.from(
-    { length: pageCount },
-    (_, pageIndex) => firstContentObjectNumber + pageIndex
-  );
-  const objects: string[] = [
-    '<< /Type /Catalog /Pages 2 0 R >>',
-    `<< /Type /Pages /Kids [${pageObjectNumbers
-      .map((objectNumber) => `${objectNumber} 0 R`)
-      .join(' ')}] /Count ${pageCount} >>`,
-    ...pageObjectNumbers.map(
-      (objectNumber, pageIndex): string =>
-        `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] ` +
-        `/Resources << /Font << /F1 ${fontObjectNumber} 0 R >> >> ` +
-        `/Contents ${contentObjectNumbers[pageIndex]} 0 R >>`
-    ),
-    ...contentObjectNumbers.map(
-      (): string =>
-        `<< /Length ${Buffer.byteLength(content, 'binary')} >>\nstream\n` +
-        `${content}\nendstream`
-    ),
-    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
-  ];
-  const offsets: number[] = [0];
-  let pdf = '%PDF-1.4\n';
-
-  objects.forEach((object, objectIndex) => {
-    offsets.push(Buffer.byteLength(pdf, 'binary'));
-    pdf += `${objectIndex + 1} 0 obj\n${object}\nendobj\n`;
-  });
-
-  const xrefOffset = Buffer.byteLength(pdf, 'binary');
-  pdf += `xref\n0 ${objects.length + 1}\n`;
-  pdf += '0000000000 65535 f \n';
-  for (const offset of offsets.slice(1)) {
-    pdf += `${String(offset).padStart(10, '0')} 00000 n \n`;
+async function makePDFBuffer(pageCount: number): Promise<Buffer> {
+  const pdf = await PDFDocument.create();
+  for (let page = 0; page < pageCount; page += 1) {
+    pdf.addPage();
   }
-  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\n`;
-  pdf += `startxref\n${xrefOffset}\n%%EOF`;
-
-  return Buffer.from(pdf, 'binary');
+  return Buffer.from(await pdf.save());
 }
 
 /**
  * Create a valid PDF whose page tree has no pages.
  *
- * This minimal PDF object graph keeps `/Count 0` while remaining loadable by
- * PDF.js. The catalog, page-tree, cross-reference, and trailer layout follows
- * the minimal-PDF examples at
+ * @cantoo/pdf-lib serializes `PDFDocument.create()` with no explicit pages as
+ * one page when saving, so the regular helper cannot exercise the zero-page
+ * validation. This minimal PDF object graph keeps `/Count 0` while remaining
+ * loadable by PDF.js (used for page counting in production). The catalog,
+ * page-tree, cross-reference, and trailer layout follows the minimal-PDF
+ * examples at
  * https://stackoverflow.com/questions/12662596/minimal-pdf-example-in-pdf-specification
  * and https://pdfa.org/the-smallest-possible-valid-pdf/. An empty `/Kids`
  * array is intentionally used here to test the parser's zero-page behavior;

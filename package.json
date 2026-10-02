@@ -63,6 +63,7 @@
     "zstd-napi": "^0.0.13"
   },
   "devDependencies": {
+    "@cantoo/pdf-lib": "^2.8.4",
     "@naverpay/eslint-plugin-use-client": "^0.0.2",
     "@next/eslint-plugin-next": "^14.2.35",
     "@storybook/nextjs": "^10.5.8",
@@ -97,6 +98,7 @@
     "eslint-plugin-react-hooks": "^4.6.2",
     "eslint-plugin-redaction": "link:dev/eslint",
     "eslint-plugin-testing-library": "6.2.2",
+    "html-entities": "^2.3.2",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "lefthook": "^2.1.10",

@@ -1781,6 +1781,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@cantoo/pdf-lib@npm:^2.8.4":
+  version: 2.11.1
+  resolution: "@cantoo/pdf-lib@npm:2.11.1"
+  dependencies:
+    culori: "npm:>=4"
+    fflate: "npm:^0.8.2"
+    node-html-better-parser: "npm:>=1.5.9"
+    tslib: "npm:>=2"
+  peerDependencies:
+    html-entities: ">=2.3.2"
+  checksum: 10c0/f4e44fc1b8e4586fe87444e5af408dd7f655b9e8d2f1b37bdff2bbea590aa8551707f28b45f7e2ce2cad1f6cf1dedb3763ae66525d509054b68f631eb56c933c
+  languageName: node
+  linkType: hard
+
 "@csstools/color-helpers@npm:^5.1.0":
   version: 5.1.0
   resolution: "@csstools/color-helpers@npm:5.1.0"
@@ -7280,6 +7294,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"culori@npm:>=4":
+  version: 4.0.2
+  resolution: "culori@npm:4.0.2"
+  checksum: 10c0/5d3c952b947ac5915409bab513e1d2e8bd813caa491af8ded0c769fdc1186a5ff61fb3c59fc8edf5393237d92074dbc54a492e6e99cb039dd6535d5d96106bfe
+  languageName: node
+  linkType: hard
+
 "damerau-levenshtein@npm:^1.0.8":
   version: 1.0.8
   resolution: "damerau-levenshtein@npm:1.0.8"
@@ -8773,6 +8794,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fflate@npm:^0.8.2":
+  version: 0.8.3
+  resolution: "fflate@npm:0.8.3"
+  checksum: 10c0/eab181ca37f5348ae76d4b6f840e0026e30220e33153289ac942222d8b9638237d486507dbcc09878d724095bd354993a2ee48bbee99c8f2c6440d4448719aa7
+  languageName: node
+  linkType: hard
+
 "figures@npm:^6.1.0":
   version: 6.1.0
   resolution: "figures@npm:6.1.0"
@@ -9603,7 +9631,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"html-entities@npm:^2.1.0":
+"html-entities@npm:^2.1.0, html-entities@npm:^2.3.2":
   version: 2.6.0
   resolution: "html-entities@npm:2.6.0"
   checksum: 10c0/7c8b15d9ea0cd00dc9279f61bab002ba6ca8a7a0f3c36ed2db3530a67a9621c017830d1d2c1c65beb9b8e3436ea663e9cf8b230472e0e413359399413b27c8b7
@@ -11961,6 +11989,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"node-html-better-parser@npm:>=1.5.9":
+  version: 1.5.9
+  resolution: "node-html-better-parser@npm:1.5.9"
+  dependencies:
+    html-entities: "npm:^2.3.2"
+  checksum: 10c0/e3847e9a66847983b405d4573e9a2be45aef94bdf603f49d26a6905cae589d43d2e7e549232f08dcf39c0e9855c4584c934a953df170de4f4cac0a285a3b5223
+  languageName: node
+  linkType: hard
+
 "node-int64@npm:^0.4.0":
   version: 0.4.0
   resolution: "node-int64@npm:0.4.0"
@@ -13555,6 +13592,7 @@ __metadata:
     "@auth/sequelize-adapter": "npm:^2.11.3"
     "@aws-sdk/client-s3": "npm:^3.1111.0"
     "@aws-sdk/s3-request-presigner": "npm:^3.1111.0"
+    "@cantoo/pdf-lib": "npm:^2.8.4"
     "@fortawesome/fontawesome-svg-core": "npm:^7.3.1"
     "@fortawesome/free-brands-svg-icons": "npm:^7.3.1"
     "@fortawesome/free-solid-svg-icons": "npm:^7.3.1"
@@ -13601,6 +13639,7 @@ __metadata:
     eslint-plugin-testing-library: "npm:6.2.2"
     fast-json-stable-stringify: "npm:^2.1.0"
     glob: "npm:^13.0.6"
+    html-entities: "npm:^2.3.2"
     jest: "npm:^30.4.2"
     jest-environment-jsdom: "npm:^30.4.1"
     lefthook: "npm:^2.1.10"
@@ -15477,17 +15516,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"tslib@npm:>=2, tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2, tslib@npm:^2.7.0, tslib@npm:^2.8.0, tslib@npm:^2.8.1":
+  version: 2.8.1
+  resolution: "tslib@npm:2.8.1"
+  checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
+  languageName: node
+  linkType: hard
+
 "tslib@npm:^1.11.1, tslib@npm:^1.8.1":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: 10c0/69ae09c49eea644bc5ebe1bca4fa4cc2c82b7b3e02f43b84bd891504edf66dbc6b2ec0eef31a957042de2269139e4acff911e6d186a258fb14069cd7f6febce2
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.0.0, tslib@npm:^2.0.1, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.4.0, tslib@npm:^2.6.2, tslib@npm:^2.7.0, tslib@npm:^2.8.0, tslib@npm:^2.8.1":
-  version: 2.8.1
-  resolution: "tslib@npm:2.8.1"
-  checksum: 10c0/9c4759110a19c53f992d9aae23aac5ced636e99887b51b9e61def52611732872ff7668757d4e4c61f19691e36f4da981cd9485e869b4a7408d689f6bf1f14e62
   languageName: node
   linkType: hard
 
