@@ -5,11 +5,17 @@ services:
       MARIADB_DATABASE: redaction_development
       MARIADB_PASSWORD: ${DB_PASS:-redaction}
       MARIADB_ROOT_PASSWORD: redaction-root
-      MARIADB_USER: redaction
+      # MariaDB's MARIADB_* initialization variables support one application
+      # user. The mounted SQL file adds the separate test user below.
+      MARIADB_USER: redaction_development
     ports:
       - '3306:3306'
     volumes:
       - redaction-mariadb:/var/lib/mysql
+      # Run the extra test database/user setup inside MariaDB's initialization
+      # directory. This lets development and test share one local server
+      # without sharing credentials.
+      - ./docker/mariadb/10-create-test-database.sql:/docker-entrypoint-initdb.d/10-create-test-database.sql:ro
     healthcheck:
       test: ['CMD', 'healthcheck.sh', '--connect', '--innodb_initialized']
       interval: 5s
