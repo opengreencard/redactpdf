@@ -1,6 +1,8 @@
 import { ApplicationError } from '../../../../lib/errors/applicationError';
 import { PartialInstance } from '../../../../lib/db/types';
-import Redaction, { RedactionAttributes } from '../../../../lib/models/Redaction';
+import Redaction, {
+  RedactionAttributes,
+} from '../../../../lib/models/Redaction';
 import { RedactionStatus } from '../../../../lib/models/redactionTypes';
 import { getUnreachableError } from '../../../../lib/typescript/getUnreachableError';
 
