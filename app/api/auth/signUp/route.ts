@@ -1,8 +1,17 @@
 import { SignUpRequestBody, SignUpResponse, signUpServer } from './signUp';
-import { makeAPIRouteWithBody } from '../../../../lib/api/makeAPIRouteWithBody';
+import {
+  makeAPIRouteWithBody,
+  MakeAPIRouteWithBodyTypes,
+} from '../../../../lib/api/makeAPIRouteWithBody';
+
+type SignUpRoute = MakeAPIRouteWithBodyTypes<
+  SignUpRequestBody,
+  {},
+  SignUpResponse
+>;
 
 export const POST = makeAPIRouteWithBody<
-  SignUpRequestBody, // RequestBodyT
-  {}, // TransformedQueryAndPathParamsT
-  SignUpResponse // ResponseT
+  SignUpRoute['requestBody'],
+  SignUpRoute['queryAndPathParams'],
+  SignUpRoute['response']
 >({ method: 'POST', apiFunc: signUpServer });

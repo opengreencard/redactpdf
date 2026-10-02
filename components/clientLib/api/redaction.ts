@@ -1,9 +1,10 @@
 import type { UploadFileForRedactionResponse } from '../../../app/api/redaction/uploadFileForRedaction';
+import type { GetRedactionResponse } from '../../../lib/models/redactionTypes';
 import type {
-  BoundingBox,
-  GetRedactionResponse,
-  RedactionBoundingBox,
-} from '../../../lib/models/redactionTypes';
+  MutateRedactionBoundingBoxesBody,
+  MutateRedactionBoundingBoxesPathParams,
+  MutateRedactionBoundingBoxesRequest,
+} from '../../../app/api/redaction/[key]/redacted/mutateRedactionBoundingBoxes';
 import {
   ClientAPIRouteWithBodyData,
   ClientAPIRouteWithoutBodyData,
@@ -60,87 +61,24 @@ export const generateRedactedPDFClient = makeClientAPIRouteWithoutBody<
   responseType: 'arraybuffer',
 });
 
-/**
- * Client input for drawing a manual redaction box. We don't send `type` —
- * the server always creates a `manual` box.
- *
- * Keep in sync with `AddRedactionBoundingBoxRequest` in
- * `app/api/redaction/[key]/redacted/addRedactionBoundingBox.ts`.
- */
-interface AddRedactionBoundingBoxClientRequest {
-  key: string;
-  page: number;
-  box: BoundingBox;
-}
+export type MutateRedactionBoundingBoxesClientRequest =
+  MutateRedactionBoundingBoxesRequest;
 
-/** POST one newly drawn box. The server always stores it as `manual`. */
-export const addRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
-  Omit<AddRedactionBoundingBoxClientRequest, 'key'>,
-  { key: string },
+/**
+ * POST add / delete / setEnabled in one body. `key` is the path; the rest
+ * is JSON so we can send a list of mutations.
+ */
+export const mutateRedactionBoundingBoxesClient = makeClientAPIRouteWithBody<
+  MutateRedactionBoundingBoxesBody,
+  MutateRedactionBoundingBoxesPathParams,
   GetRedactionResponse
 >({
   method: 'POST',
   dataToUrlQueryStringAndBody: ({
     key,
-    page,
-    box,
-  }): ClientAPIRouteWithBodyData<
-    Omit<AddRedactionBoundingBoxClientRequest, 'key'>
-  > => ({
+    mutations,
+  }): ClientAPIRouteWithBodyData<MutateRedactionBoundingBoxesBody> => ({
     url: `/api/redaction/${key}/redacted`,
-    body: { page, box },
-  }),
-});
-
-/**
- * Identity of an existing box. Delete and toggle both look up this way.
- *
- * Keep in sync with `LocateRedactionBoundingBoxRequest` in
- * `app/api/redaction/[key]/redacted/deleteRedactionBoundingBox.ts`.
- */
-interface LocateRedactionBoundingBoxClientRequest {
-  key: string;
-  page: number;
-  box: BoundingBox;
-  type: RedactionBoundingBox['type'];
-}
-
-/** DELETE with a JSON body so we can send `{ page, box, type }`. */
-export const deleteRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
-  Omit<LocateRedactionBoundingBoxClientRequest, 'key'>,
-  { key: string },
-  GetRedactionResponse
->({
-  method: 'DELETE',
-  dataToUrlQueryStringAndBody: ({
-    key,
-    page,
-    box,
-    type,
-  }): ClientAPIRouteWithBodyData<
-    Omit<LocateRedactionBoundingBoxClientRequest, 'key'>
-  > => ({
-    url: `/api/redaction/${key}/redacted`,
-    body: { page, box, type },
-  }),
-});
-
-/** PATCH `enabled` on one box. Identity matches delete. */
-export const toggleRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
-  Omit<LocateRedactionBoundingBoxClientRequest, 'key'>,
-  { key: string },
-  GetRedactionResponse
->({
-  method: 'PATCH',
-  dataToUrlQueryStringAndBody: ({
-    key,
-    page,
-    box,
-    type,
-  }): ClientAPIRouteWithBodyData<
-    Omit<LocateRedactionBoundingBoxClientRequest, 'key'>
-  > => ({
-    url: `/api/redaction/${key}/redacted`,
-    body: { page, box, type },
+    body: { mutations },
   }),
 });

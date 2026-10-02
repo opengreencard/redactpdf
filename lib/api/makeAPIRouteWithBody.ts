@@ -35,6 +35,24 @@ type MakeAPIRouteWithBodyAuthQueryPathOptions<
 >;
 
 /**
+ * Named slots for `makeAPIRouteWithBody` type parameters so call sites can
+ * write `Route['requestBody']` instead of remembering the generic order.
+ */
+export interface MakeAPIRouteWithBodyTypes<
+  RequestBodyT,
+  QueryAndPathParamsT,
+  ResponseT,
+  AuthParamsT = {},
+  PathParamsT extends {} = {},
+> {
+  requestBody: RequestBodyT;
+  queryAndPathParams: QueryAndPathParamsT;
+  response: ResponseT;
+  authParams: AuthParamsT;
+  pathParams: PathParamsT;
+}
+
+/**
  * Wrap an API function that reads a JSON or FormData body.
  *
  * Overloads exist because TypeScript cannot express the constraints we need

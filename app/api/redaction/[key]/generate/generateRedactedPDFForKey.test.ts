@@ -36,29 +36,22 @@ describe(generateRedactedPDFForKey, () => {
     expect(generateRedactedPDF).not.toHaveBeenCalled();
   });
 
-  it('throws a 409 error while the redaction is still processing', async () => {
-    const redaction = await FakeData.makeDBRedaction({
+  it.each([
+    {
       status: RedactionStatus.redacting,
-    });
-
-    await expect(
-      generateRedactedPDFForKey({ key: redaction.key })
-    ).rejects.toMatchObject({ statusCode: 409 });
-
-    expect(generateRedactedPDF).not.toHaveBeenCalled();
-  });
-
-  it('throws a different 409 error after processing failed', async () => {
-    const redaction = await FakeData.makeDBRedaction({
+      message:
+        'This redaction is still being processed. Please try again later.',
+    },
+    {
       status: RedactionStatus.error,
-    });
+      message: 'This redaction encountered an error and is not ready.',
+    },
+  ])('throws 409 when status is $status', async ({ status, message }) => {
+    const redaction = await FakeData.makeDBRedaction({ status });
 
     await expect(
       generateRedactedPDFForKey({ key: redaction.key })
-    ).rejects.toMatchObject({
-      statusCode: 409,
-      message: 'This redaction encountered an error and is not ready.',
-    });
+    ).rejects.toMatchObject({ statusCode: 409, message });
 
     expect(generateRedactedPDF).not.toHaveBeenCalled();
   });

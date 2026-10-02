@@ -7,11 +7,10 @@ import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback
 import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import { useAPICall } from '../../lib/hookUtilities/useAPICall';
 import {
-  addRedactionBoundingBoxClient,
-  deleteRedactionBoundingBoxClient,
   getRedactionClient,
-  toggleRedactionBoundingBoxClient,
+  mutateRedactionBoundingBoxesClient,
 } from '../clientLib/api/redaction';
+import type { RedactionBoundingBoxMutation } from '../../app/api/redaction/[key]/redacted/mutateRedactionBoundingBoxes';
 import { APICallState } from '../../lib/typescript/apiCallState';
 import {
   GetRedactionResponse,
@@ -71,7 +70,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         applyOptimistic: (
           current: RedactedGetRedactionResponse
         ) => RedactedGetRedactionResponse,
-        persist: () => Promise<GetRedactionResponse | null>
+        mutations: RedactionBoundingBoxMutation[]
       ) => {
         const previous = getRedactedResult(redactionState);
         if (!previous) {
@@ -83,18 +82,16 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         setStateResult(optimistic);
 
         try {
-          const persisted = await persist();
-          if (persisted) {
-            setStateResult(persisted);
-          }
+          setStateResult(
+            await mutateRedactionBoundingBoxesClient({
+              key: redactionKey,
+              mutations,
+            })
+          );
         } catch (err) {
-          // A bulk loop may have saved some boxes already, so reload instead
-          // of rolling back to `previous`.
-          try {
-            setStateResult(await getRedactionClient({ key: redactionKey }));
-          } catch {
-            setStateResult(previous);
-          }
+          // One POST applies the whole batch or none of it, so we can roll
+          // back to the pre-click boxes.
+          setStateResult(previous);
           const notification: NotificationData = {
             color: 'red',
             title: 'Could not update redactions',
@@ -111,17 +108,14 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       async (boxes: ManualRedactionBoundingBox[]) => {
         await persistBoxMutation(
           (current) => addBoundingBoxesToResponse(current, boxes),
-          () =>
-            persistBoxesSequentially(boxes, (box) =>
-              addRedactionBoundingBoxClient({
-                key: redactionKey,
-                page: box.page,
-                box: box.box,
-              })
-            )
+          boxes.map((box): RedactionBoundingBoxMutation => ({
+            op: 'add',
+            page: box.page,
+            box: box.box,
+          }))
         );
       },
-      [persistBoxMutation, redactionKey]
+      [persistBoxMutation]
     );
 
     const handleAddBoundingBox = useConvertSingleArgumentToArray(
@@ -132,36 +126,33 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       async (boxes: RedactionBoundingBox[]) => {
         await persistBoxMutation(
           (current) => removeBoundingBoxesFromResponse(current, boxes),
-          () =>
-            persistBoxesSequentially(boxes, (box) =>
-              deleteRedactionBoundingBoxClient({
-                key: redactionKey,
-                page: box.page,
-                box: box.box,
-                type: box.type,
-              })
-            )
+          boxes.map((box): RedactionBoundingBoxMutation => ({
+            op: 'delete',
+            page: box.page,
+            box: box.box,
+            type: box.type,
+          }))
         );
       },
-      [persistBoxMutation, redactionKey]
+      [persistBoxMutation]
     );
 
     const handleToggleBoundingBoxes = useMemoizedCallback(
       async (boxes: RedactionBoundingBox[]) => {
         await persistBoxMutation(
           (current) => toggleBoundingBoxesInResponse(current, boxes),
-          () =>
-            persistBoxesSequentially(boxes, (box) =>
-              toggleRedactionBoundingBoxClient({
-                key: redactionKey,
-                page: box.page,
-                box: box.box,
-                type: box.type,
-              })
-            )
+          boxes.map((box): RedactionBoundingBoxMutation => ({
+            // Send the intended flag so a missed request cannot invert
+            // the next click.
+            op: 'setEnabled',
+            page: box.page,
+            box: box.box,
+            type: box.type,
+            enabled: !box.enabled,
+          }))
         );
       },
-      [persistBoxMutation, redactionKey]
+      [persistBoxMutation]
     );
 
     return (
@@ -200,22 +191,4 @@ function getErrorMessage(err: unknown): string {
     return err.message;
   }
   return 'Something went wrong. Please try again.';
-}
-
-/**
- * One HTTP request per box, in order, so two saves do not overwrite each
- * other on the JSON column.
- */
-async function persistBoxesSequentially<BoxT>(
-  boxes: BoxT[],
-  persistOne: (box: BoxT) => Promise<GetRedactionResponse>
-): Promise<GetRedactionResponse | null> {
-  let last: GetRedactionResponse | null = null;
-  for (const box of boxes) {
-    // We await in the loop on purpose; Promise.all would race the JSON
-    // writes.
-    // eslint-disable-next-line no-await-in-loop
-    last = await persistOne(box);
-  }
-  return last;
 }

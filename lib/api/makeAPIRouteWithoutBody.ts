@@ -32,6 +32,23 @@ type MakeAPIRouteWithoutBodyAuthQueryPathOptions<
 >;
 
 /**
+ * Named slots for `makeAPIRouteWithoutBody` type parameters so call sites can
+ * write `Route['queryAndPathParams']` instead of remembering the generic
+ * order.
+ */
+export interface MakeAPIRouteWithoutBodyTypes<
+  QueryAndPathParamsT,
+  ResponseT,
+  AuthParamsT = {},
+  PathParamsT extends {} = {},
+> {
+  queryAndPathParams: QueryAndPathParamsT;
+  response: ResponseT;
+  authParams: AuthParamsT;
+  pathParams: PathParamsT;
+}
+
+/**
  * Wrap an API function that has no request body (query and path params only).
  *
  * Overloads exist because TypeScript cannot express "when responseFormat is

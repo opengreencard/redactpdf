@@ -2,18 +2,28 @@ import {
   APIRouteResponseFormat,
   RawResponse,
 } from '../../../../../lib/api/makeAPIRoute';
-import { makeAPIRouteWithoutBody } from '../../../../../lib/api/makeAPIRouteWithoutBody';
+import {
+  makeAPIRouteWithoutBody,
+  MakeAPIRouteWithoutBodyTypes,
+} from '../../../../../lib/api/makeAPIRouteWithoutBody';
 import {
   GenerateRedactedPDFForKeyRequest,
   generateRedactedPDFForKey,
 } from './generateRedactedPDFForKey';
 
-/** Return the generated redacted PDF for download. */
-export const GET = makeAPIRouteWithoutBody<
+type GenerateRedactedPDFRoute = MakeAPIRouteWithoutBodyTypes<
   GenerateRedactedPDFForKeyRequest,
   RawResponse,
   {},
-  { key: string }
+  GenerateRedactedPDFForKeyRequest
+>;
+
+/** Return the generated redacted PDF for download. */
+export const GET = makeAPIRouteWithoutBody<
+  GenerateRedactedPDFRoute['queryAndPathParams'],
+  GenerateRedactedPDFRoute['response'],
+  GenerateRedactedPDFRoute['authParams'],
+  GenerateRedactedPDFRoute['pathParams']
 >({
   method: 'GET',
   apiFunc: generateRedactedPDFForKey,

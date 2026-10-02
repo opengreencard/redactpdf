@@ -1,59 +1,45 @@
-import { makeAPIRouteWithBody } from '../../../../../lib/api/makeAPIRouteWithBody';
 import {
-  AddRedactionBoundingBoxRequest,
-  addRedactionBoundingBox,
-} from './addRedactionBoundingBox';
+  makeAPIRouteWithBody,
+  MakeAPIRouteWithBodyTypes,
+} from '../../../../../lib/api/makeAPIRouteWithBody';
 import {
-  LocateRedactionBoundingBoxRequest,
-  deleteRedactionBoundingBox,
-} from './deleteRedactionBoundingBox';
-import { toggleRedactionBoundingBox } from './toggleRedactionBoundingBox';
+  MutateRedactionBoundingBoxesBody,
+  MutateRedactionBoundingBoxesPathParams,
+  mutateRedactionBoundingBoxes,
+} from './mutateRedactionBoundingBoxes';
 import type { GetRedactionResponse } from '../../../../../lib/models/redactionTypes';
 
-/** One box per request so two saves don't overwrite the JSON column. */
-export const POST = makeAPIRouteWithBody<
-  Omit<AddRedactionBoundingBoxRequest, 'key'>,
-  { key: string },
+type MutateRedactionBoundingBoxesRoute = MakeAPIRouteWithBodyTypes<
+  MutateRedactionBoundingBoxesBody,
+  MutateRedactionBoundingBoxesPathParams,
   GetRedactionResponse,
   {},
-  { key: string }
->({
-  method: 'POST',
-  apiFunc: addRedactionBoundingBox,
-  makeQueryAndPathParams: keyFromPath,
-});
+  MutateRedactionBoundingBoxesPathParams
+>;
 
 /**
- * JSON body rather than query params so we can send the full
- * `{ page, box, type }` identity — Axios DELETE `data` is fine.
+ * Apply add / delete / setEnabled in one save so two JSON writes cannot
+ * clobber each other.
  */
-export const DELETE = makeAPIRouteWithBody<
-  Omit<LocateRedactionBoundingBoxRequest, 'key'>,
-  { key: string },
-  GetRedactionResponse,
-  {},
-  { key: string }
+export const POST = makeAPIRouteWithBody<
+  MutateRedactionBoundingBoxesRoute['requestBody'],
+  MutateRedactionBoundingBoxesRoute['queryAndPathParams'],
+  MutateRedactionBoundingBoxesRoute['response'],
+  MutateRedactionBoundingBoxesRoute['authParams'],
+  MutateRedactionBoundingBoxesRoute['pathParams']
 >({
-  method: 'DELETE',
-  apiFunc: deleteRedactionBoundingBox,
+  method: 'POST',
+  apiFunc: mutateRedactionBoundingBoxes,
   makeQueryAndPathParams: keyFromPath,
 });
 
-/** Flip `enabled` on one existing box. Same identity body as DELETE. */
-export const PATCH = makeAPIRouteWithBody<
-  Omit<LocateRedactionBoundingBoxRequest, 'key'>,
-  { key: string },
-  GetRedactionResponse,
-  {},
-  { key: string }
->({
-  method: 'PATCH',
-  apiFunc: toggleRedactionBoundingBox,
-  makeQueryAndPathParams: keyFromPath,
-});
-
-function keyFromPath({ pathParams }: { pathParams: { key: string } }): {
-  key: string;
-} {
-  return { key: pathParams.key };
+function keyFromPath({
+  pathParams,
+}: {
+  pathParams: MutateRedactionBoundingBoxesPathParams;
+}): MutateRedactionBoundingBoxesPathParams {
+  const params: MutateRedactionBoundingBoxesPathParams = {
+    key: pathParams.key,
+  };
+  return params;
 }

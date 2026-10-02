@@ -1,13 +1,23 @@
-import { makeAPIRouteWithoutBody } from '../../../../lib/api/makeAPIRouteWithoutBody';
+import {
+  makeAPIRouteWithoutBody,
+  MakeAPIRouteWithoutBodyTypes,
+} from '../../../../lib/api/makeAPIRouteWithoutBody';
 import { GetRedactionRequest, getRedaction } from './getRedaction';
 import { GetRedactionResponse } from '../../../../lib/models/redactionTypes';
 
-/** Return the current state of one redaction job for polling. */
-export const GET = makeAPIRouteWithoutBody<
+type GetRedactionRoute = MakeAPIRouteWithoutBodyTypes<
   GetRedactionRequest,
   GetRedactionResponse,
   {},
-  { key: string }
+  GetRedactionRequest
+>;
+
+/** Return the current state of one redaction job for polling. */
+export const GET = makeAPIRouteWithoutBody<
+  GetRedactionRoute['queryAndPathParams'],
+  GetRedactionRoute['response'],
+  GetRedactionRoute['authParams'],
+  GetRedactionRoute['pathParams']
 >({
   method: 'GET',
   apiFunc: getRedaction,

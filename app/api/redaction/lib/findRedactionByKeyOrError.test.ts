@@ -32,29 +32,24 @@ describe(findRedactionByKeyOrError, () => {
 });
 
 describe(assertIsRedactedOrThrowApplicationError, () => {
-  it('throws 409 while redacting', () => {
-    expect(() =>
-      assertIsRedactedOrThrowApplicationError({
-        status: RedactionStatus.redacting,
-      })
-    ).toThrow(
-      'This redaction is still being processed. Please try again later.'
-    );
-  });
-
-  it('throws 409 after processing failed', () => {
-    expect(() =>
-      assertIsRedactedOrThrowApplicationError({
-        status: RedactionStatus.error,
-      })
-    ).toThrow('This redaction encountered an error and is not ready.');
-  });
-
-  it('allows a finished redaction', () => {
-    expect(() =>
-      assertIsRedactedOrThrowApplicationError({
-        status: RedactionStatus.redacted,
-      })
-    ).not.toThrow();
+  it.each([
+    {
+      status: RedactionStatus.redacting,
+      message:
+        'This redaction is still being processed. Please try again later.',
+    },
+    {
+      status: RedactionStatus.error,
+      message: 'This redaction encountered an error and is not ready.',
+    },
+    { status: RedactionStatus.redacted, message: null },
+  ])('$status', ({ status, message }) => {
+    let thrownMessage: string | null = null;
+    try {
+      assertIsRedactedOrThrowApplicationError({ status });
+    } catch (err) {
+      thrownMessage = err instanceof Error ? err.message : String(err);
+    }
+    expect(thrownMessage).toBe(message);
   });
 });

@@ -4,14 +4,106 @@ import type { RedactionAttributes } from '../../../../../lib/models/Redaction';
 import type {
   BoundingBox,
   GetRedactionResponse,
+  ManualRedactionBoundingBox,
   RedactionBoundingBox,
 } from '../../../../../lib/models/redactionTypes';
 import { isSameRedactionBoundingBox } from '../../../../../lib/models/redactionBoundingBoxIdentity';
+import { getUnreachableError } from '../../../../../lib/typescript/getUnreachableError';
 import { getRedaction } from '../getRedaction';
 import {
   assertIsRedactedOrThrowApplicationError,
   findRedactionByKeyOrError,
 } from '../../lib/findRedactionByKeyOrError';
+
+/**
+ * Identity of an existing box. Delete and setEnabled look up this way.
+ */
+export interface LocateRedactionBoundingBoxRequest {
+  page: number;
+  box: BoundingBox;
+  type: RedactionBoundingBox['type'];
+}
+
+/**
+ * Draw a new box. Callers don't send `type` — we always create `manual`.
+ */
+export interface AddRedactionBoundingBoxMutation {
+  op: 'add';
+  page: number;
+  box: BoundingBox;
+}
+
+/** Remove one automatic or manual box. */
+export interface DeleteRedactionBoundingBoxMutation extends LocateRedactionBoundingBoxRequest {
+  op: 'delete';
+}
+
+/**
+ * Write `enabled` to a specific value so a missed request cannot invert the
+ * next click.
+ */
+export interface SetRedactionBoundingBoxEnabledMutation extends LocateRedactionBoundingBoxRequest {
+  op: 'setEnabled';
+  enabled: boolean;
+}
+
+export type RedactionBoundingBoxMutation =
+  | AddRedactionBoundingBoxMutation
+  | DeleteRedactionBoundingBoxMutation
+  | SetRedactionBoundingBoxEnabledMutation;
+
+/**
+ * Path `key` plus the JSON body. The client sends this whole object; the
+ * route splits `key` into the URL.
+ */
+export interface MutateRedactionBoundingBoxesRequest {
+  key: string;
+  mutations: RedactionBoundingBoxMutation[];
+}
+
+export type MutateRedactionBoundingBoxesPathParams = Pick<
+  MutateRedactionBoundingBoxesRequest,
+  'key'
+>;
+
+export type MutateRedactionBoundingBoxesBody = Omit<
+  MutateRedactionBoundingBoxesRequest,
+  'key'
+>;
+
+/**
+ * Apply every mutation in order, then save once. A throw before save leaves
+ * the JSON column unchanged, so the client can roll back optimistic edits.
+ */
+export async function mutateRedactionBoundingBoxes({
+  key,
+  mutations,
+}: MutateRedactionBoundingBoxesRequest): Promise<GetRedactionResponse> {
+  const redaction = await findRedactionByKeyOrError({
+    key,
+    attributes: [...mutationAttributes],
+  });
+  assertIsRedactedOrThrowApplicationError(redaction);
+
+  if (mutations.length === 0) {
+    return getRedaction({ key });
+  }
+
+  let { redactionBoundingBoxes } = redaction;
+  for (const mutation of mutations) {
+    redactionBoundingBoxes = applyRedactionBoundingBoxMutation({
+      boxes: redactionBoundingBoxes,
+      mutation,
+      pageCount: redaction.pageCount,
+    });
+  }
+
+  return saveRedactionBoundingBoxes({
+    key,
+    redaction,
+    redactionBoundingBoxes,
+  });
+}
 
 // `id` is required so Sequelize can UPDATE instead of attempting a global save.
 const mutationAttributes = [
@@ -26,38 +118,70 @@ type MutationRedaction = PartialInstance<
   (typeof mutationAttributes)[number]
 >;
 
-/**
- * Load a finished redaction and reject bad page/box numbers before we
- * mutate. Add, delete, and toggle all go through here so they share the
- * same 400/409 errors.
- */
-export async function loadRedactionForBoundingBoxMutation({
-  key,
-  page,
-  box,
+function applyRedactionBoundingBoxMutation({
+  boxes,
+  mutation,
+  pageCount,
 }: {
-  key: string;
-  page: number;
-  box: BoundingBox;
-}): Promise<MutationRedaction> {
-  const redaction = await findRedactionByKeyOrError({
-    key,
-    attributes: [...mutationAttributes],
-  });
-  assertIsRedactedOrThrowApplicationError(redaction);
-  assertValidPageAndBoxOrThrowApplicationError({
-    page,
-    box,
-    pageCount: redaction.pageCount,
-  });
-  return redaction;
+  boxes: RedactionBoundingBox[];
+  mutation: RedactionBoundingBoxMutation;
+  pageCount: number;
+}): RedactionBoundingBox[] {
+  switch (mutation.op) {
+    case 'add': {
+      assertValidPageAndBoxOrThrowApplicationError({
+        page: mutation.page,
+        box: mutation.box,
+        pageCount,
+      });
+      const manualBox: ManualRedactionBoundingBox = {
+        type: 'manual',
+        page: mutation.page,
+        box: mutation.box,
+        enabled: true,
+      };
+      return [...boxes, manualBox];
+    }
+    case 'delete': {
+      assertValidPageAndBoxOrThrowApplicationError({
+        page: mutation.page,
+        box: mutation.box,
+        pageCount,
+      });
+      const index = findRedactionBoundingBoxIndexOrThrowApplicationError({
+        boxes,
+        locate: mutation,
+      });
+      return boxes.filter(
+        (_existing, existingIndex) => existingIndex !== index
+      );
+    }
+    case 'setEnabled': {
+      assertValidPageAndBoxOrThrowApplicationError({
+        page: mutation.page,
+        box: mutation.box,
+        pageCount,
+      });
+      const index = findRedactionBoundingBoxIndexOrThrowApplicationError({
+        boxes,
+        locate: mutation,
+      });
+      return boxes.map((existing, existingIndex): RedactionBoundingBox =>
+        existingIndex === index
+          ? { ...existing, enabled: mutation.enabled }
+          : existing
+      );
+    }
+    default:
+      throw getUnreachableError(mutation);
+  }
 }
 
 /**
  * Persist boxes by assigning a new array. The JSON TEXT setter only runs on
  * `set`; in-place `push` / `enabled =` would silently no-op.
  */
-export async function saveRedactionBoundingBoxes({
+async function saveRedactionBoundingBoxes({
   key,
   redaction,
   redactionBoundingBoxes,
@@ -77,19 +201,15 @@ export async function saveRedactionBoundingBoxes({
  * Boxes don't have ids — we match type, page, and coordinates. If two
  * boxes share that identity, we update the first one.
  */
-export function findRedactionBoundingBoxIndexOrThrowApplicationError({
+function findRedactionBoundingBoxIndexOrThrowApplicationError({
   boxes,
-  page,
-  box,
-  type,
+  locate,
 }: {
   boxes: RedactionBoundingBox[];
-  page: number;
-  box: BoundingBox;
-  type: RedactionBoundingBox['type'];
+  locate: LocateRedactionBoundingBoxRequest;
 }): number {
   const index = boxes.findIndex((existing) =>
-    isSameRedactionBoundingBox(existing, { type, page, box })
+    isSameRedactionBoundingBox(existing, locate)
   );
   if (index === -1) {
     throw new ApplicationError('We could not find that redaction box.', 404);
