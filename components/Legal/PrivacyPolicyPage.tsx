@@ -6,7 +6,7 @@ import LegalPage from './LegalPage';
 const PrivacyPolicyPage: React.FunctionComponent = React.memo(
   function PrivacyPolicyPage() {
     return (
-      <LegalPage title="Privacy Policy" lastUpdated="August 24, 2026">
+      <LegalPage title="Privacy Policy" lastUpdated="October 2, 2026">
         <Stack gap="xl">
           <Text>
             This Privacy Policy explains how RedactPDF.ai
