@@ -528,12 +528,12 @@ const faqItems: FaqItem[] = [
   {
     question: 'What happens to my PDF?',
     answer:
-      'Your original file, page images, and working files are deleted within one hour of upload.',
+      'Your original file, page images, and working files are deleted about an hour after you last had the review page open, or about an hour after upload if you never open it.',
   },
   {
     question: 'Do you send files to a cloud AI model?',
     answer:
-      'Yes. A cloud vision model in the United States identifies likely sensitive content. We do not claim client-side encryption or EU-only hosting. Files are then deleted within one hour.',
+      'Yes. A cloud vision model in the United States identifies likely sensitive content. We do not claim client-side encryption or EU-only hosting. Files are then deleted about an hour after you last had the review page open.',
   },
   {
     question: 'Is this open source?',

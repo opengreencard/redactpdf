@@ -165,10 +165,11 @@ const PrivacyPolicyPage: React.FunctionComponent = React.memo(
             <Title order={2}>6. Retention and Deletion</Title>
             <Text>
               Our design is to delete original PDFs, page images, and working
-              redaction artifacts within one hour of upload. Account details,
-              security logs, and limited operational records may be retained
-              longer when reasonably necessary to provide the Service, prevent
-              abuse, resolve disputes, or comply with law.
+              redaction artifacts about an hour after you last had the review
+              page open, or about an hour after upload if you never open it.
+              Account details, security logs, and limited operational records
+              may be retained longer when reasonably necessary to provide the
+              Service, prevent abuse, resolve disputes, or comply with law.
             </Text>
             <Text>
               Deletion may not immediately remove copies in backups, browser

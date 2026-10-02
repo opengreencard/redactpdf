@@ -137,10 +137,11 @@ const TermsOfUsePage: React.FunctionComponent = React.memo(
             <Title order={2}>8. Deletion of Uploaded Files</Title>
             <Text>
               Our design is to delete original PDFs, page images, and working
-              redaction artifacts within one hour of upload. Deletion may not
-              immediately remove copies held in backups, browser caches, or
-              third-party systems, and we cannot guarantee recovery after
-              deletion.
+              redaction artifacts about an hour after you last had the review
+              page open, or about an hour after upload if you never open it.
+              Deletion may not immediately remove copies held in backups,
+              browser caches, or third-party systems, and we cannot guarantee
+              recovery after deletion.
             </Text>
           </Stack>
 

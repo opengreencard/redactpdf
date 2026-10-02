@@ -53,6 +53,7 @@ export async function uploadFileForRedaction({
     redactionBoundingBoxes: [],
     status: RedactionStatus.redacting,
     errorMessage: null,
+    openedAt: new Date(),
   });
 
   try {

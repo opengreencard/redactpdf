@@ -5,9 +5,11 @@ import type { NotificationData } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { useAPICall } from '../../lib/hookUtilities/useAPICall';
+import { useInterval } from '../../lib/hookUtilities/useInterval';
 import {
   getRedactionClient,
   mutateRedactionBoundingBoxesClient,
+  touchRedactionOpenedAtClient,
 } from '../clientLib/api/redaction';
 import {
   RedactionBoundingBoxMutation,
@@ -37,7 +39,8 @@ export interface RedactionPageProps {
 
 /**
  * Client container for `/redact/:key`. Polls getRedaction until the document
- * leaves `redacting`, then owns optimistic box edits.
+ * leaves `redacting`, pings openedAt while the tab is open, then owns
+ * optimistic box edits.
  */
 const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
   function RedactionPage(props: RedactionPageProps) {
@@ -68,6 +71,19 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       // eslint-disable-next-line no-void
       void fetchRedaction({ key: redactionKey });
     }, [fetchRedaction, redactionKey]);
+
+    // Keep the document out of hourly cleanup while this tab is open.
+    // useInterval does not fire on mount, so ping once immediately.
+    useEffect(() => {
+      // Fire-and-forget: a failed ping is retried on the next interval tick.
+      // eslint-disable-next-line no-void
+      void touchRedactionOpenedAtClient({ key: redactionKey });
+    }, [redactionKey]);
+
+    useInterval(() => {
+      // eslint-disable-next-line no-void
+      void touchRedactionOpenedAtClient({ key: redactionKey });
+    }, 60 * 1000);
 
     const persistBoxMutation = useMemoizedCallback(
       async (

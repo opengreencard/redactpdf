@@ -44,6 +44,21 @@ export const getRedactionClient = makeClientAPIRouteWithoutBody<
   }),
 });
 
+/** Refresh openedAt so cleanup will not delete an open review tab. */
+export const touchRedactionOpenedAtClient = makeClientAPIRouteWithBody<
+  {},
+  { key: string },
+  Record<string, never>
+>({
+  method: 'POST',
+  dataToUrlQueryStringAndBody: ({
+    key,
+  }): ClientAPIRouteWithBodyData<{}> => ({
+    url: `/api/redaction/${key}/open`,
+    body: {},
+  }),
+});
+
 /** Public key for the generate route. The server loads boxes itself. */
 export interface GenerateRedactedPDFClientRequest {
   key: string;

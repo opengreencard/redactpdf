@@ -38,6 +38,12 @@ export interface RedactionAttributes {
   status: RedactionStatus;
   /** If the redaction errors, the error message that we got */
   errorMessage: string | null;
+  /**
+   * Last time a browser tab reported this document was open. Starts as the
+   * upload time; POST /api/redaction/:key/open refreshes it. Cleanup deletes
+   * when this is older than `_deleteOldRedactionHours`.
+   */
+  openedAt: Date;
   createdAt: Date;
 }
 
@@ -96,11 +102,16 @@ const Redaction = db.define<
       allowNull: true,
       defaultValue: null,
     },
+    openedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     indexes: [
       { name: 'key', unique: true, fields: ['key'] },
-      { name: 'createdAt_id', fields: ['createdAt', 'id'] },
+      { name: 'openedAt_id', fields: ['openedAt', 'id'] },
     ],
   }
 );
