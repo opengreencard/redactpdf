@@ -42,6 +42,8 @@ if ! echo "$transcriptJson" | jq empty 2>/dev/null; then
   exit 1
 fi
 
+# Disable warning about using variables in single quotes
+# shellcheck disable=SC2016
 jqFormatTime='
   def format_time(time):
     (time // 0 | floor) as $totalSeconds |
