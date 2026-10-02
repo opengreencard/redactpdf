@@ -53,6 +53,7 @@ jqFormatTime='
 # Screen URLs the recorder had open. Same unauthenticated GraphQL the share
 # page uses (VideoLinksAndSettings); skip this section if Loom has none.
 linksJson=$(curl -s 'https://www.loom.com/graphql' \
+  --max-time 10 \
   -X POST \
   -H 'content-type: application/json' \
   --data "{\"operationName\":\"VideoLinksAndSettings\",\"variables\":{\"videoId\":\"${videoId}\"},\"query\":\"query VideoLinksAndSettings(\$videoId: ID!) { videoLinksAndSettings(videoId: \$videoId) { ... on VideoLinksAndSettings { links { url title startMs } } ... on GenericError { message } } }\"}") || true
