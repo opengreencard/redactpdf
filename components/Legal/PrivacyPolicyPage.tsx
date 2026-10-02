@@ -147,7 +147,7 @@ const PrivacyPolicyPage: React.FunctionComponent = React.memo(
           <Stack gap="sm">
             <Title order={2}>5. Automated and Cloud AI Processing</Title>
             <Text>
-              RedactPDF.ai uses Gemini 3.7 Flash, operated by Google Cloud, to
+              RedactPDF.ai uses Gemini 3.8 Flash, operated by Google Cloud, to
               identify potential personally identifiable information in uploaded
               PDF pages. This processing is automated and can produce missed
               detections or false positives.

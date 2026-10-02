@@ -5,8 +5,7 @@
 - License: Public domain as a work of the United States government
 - Attribution: Internal Revenue Service
 - Retrieved: 2026-08-26
-- Conversion: Pages 1 and 2 copied from the downloaded PDF with
-  `@cantoo/pdf-lib` via
-  `yarn manual-jest lib/redaction/__testData__/irs1040Scenario2First2Pages.manual.test.ts`.
+- Contents: Pages 1 and 2 from the downloaded PDF.
 - Use: Official e-file test scenario containing synthetic taxpayer data; it is
-  not a user document.
+  not a user document. The adjacent manual test verifies that the committed
+  fixture remains readable.

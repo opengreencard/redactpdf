@@ -42,15 +42,16 @@ export interface GenerateRedactedPDFClientRequest {
   key: string;
 }
 
-/**
- * Download the redacted PDF.
- * Shim until task 2.16: succeeds without triggering a browser download.
- */
-export async function generateRedactedPDFClient(
-  _request: GenerateRedactedPDFClientRequest
-): Promise<void> {
-  // Task 2.16 replaces this with the arraybuffer download helper.
-}
+/** Fetch the finished redacted PDF as bytes for a caller to download. */
+export const generateRedactedPDFClient = makeClientGETRoute<
+  GenerateRedactedPDFClientRequest,
+  ArrayBuffer
+>({
+  dataToUrlAndQueryString: ({ key }): GETRouteData => ({
+    url: `/api/redaction/${key}/generate`,
+  }),
+  responseType: 'arraybuffer',
+});
 
 /** Client input for drawing a manual redaction box. */
 export interface AddRedactionBoundingBoxClientRequest {

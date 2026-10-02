@@ -8,7 +8,7 @@ Requirements: Node 26, Yarn 4.14.1, and Docker.
 
 ```bash
 cp .env.development.example .env.development
-docker compose up -d mariadb
+docker-compose --env-file .env.development up -d mariadb
 yarn install
 yarn init-db-dev
 yarn dev

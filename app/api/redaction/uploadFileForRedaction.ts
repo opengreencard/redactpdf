@@ -1,4 +1,4 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { ApplicationError } from '../../../lib/errors/applicationError';
 import Redaction, { generateRedactionKey } from '../../../lib/models/Redaction';
 import { RedactionStatus } from '../../../lib/models/redactionTypes';
@@ -43,7 +43,7 @@ export async function uploadFileForRedaction({
   }
 
   const key = generateRedactionKey();
-  const pageCount = await getPDFPageCount(buffer);
+  const pageCount = await _getPDFPageCount(buffer);
 
   const putFilePromise = putRedactionFile(buffer, 'application/pdf', key);
   const createRedactionPromise = Redaction.create({
@@ -87,17 +87,31 @@ export async function uploadFileForRedaction({
   }
 }
 
-async function getPDFPageCount(buffer: Buffer): Promise<number> {
-  let pdf: PDFDocument;
+/**
+ * Count the pages in an uploaded PDF and apply the upload page limit.
+ *
+ * PDF.js can recover the page tree in some valid form PDFs exported by Adobe
+ * Designer that other PDF parsers report as having zero pages.
+ *
+ * Exported for testing.
+ */
+export async function _getPDFPageCount(buffer: Buffer): Promise<number> {
+  let pageCount: number;
   try {
-    pdf = await PDFDocument.load(buffer, { ignoreEncryption: true });
+    const pdf = await getDocument({
+      data: Uint8Array.from(buffer),
+    }).promise;
+    try {
+      pageCount = pdf.numPages;
+    } finally {
+      await pdf.destroy();
+    }
   } catch (error) {
     throw new ApplicationError(
       `Invalid PDF file (${error.message}). Please upload a valid PDF.`
     );
   }
 
-  const pageCount = pdf.getPageCount();
   if (pageCount === 0) {
     throw new ApplicationError('The uploaded PDF does not contain any pages.');
   }

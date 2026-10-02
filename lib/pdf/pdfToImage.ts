@@ -1,8 +1,8 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
 import { fromBuffer } from 'pdf2pic';
 import sharp from 'sharp';
 import { PageSize } from '../models/redactionTypes';
 import { promiseAllThrottled } from '../utilities/promiseAllThrottled';
+import { getPDFPageSizes } from './getPDFPageSizes';
 
 /** One rasterized PDF page and its image pixel size. */
 export interface PDFPagePNG {
@@ -28,9 +28,8 @@ export async function processPDFPagesInBatches(
   pdf: Uint8Array,
   onPage: (image: PDFPageImage) => Promise<void>
 ): Promise<{ rasterizationTimeMs: number }> {
-  const document = await PDFDocument.load(pdf, { ignoreEncryption: true });
-  const pages = document.getPages();
-  if (pages.length === 0) {
+  const pageSizes = await getPDFPageSizes(pdf);
+  if (pageSizes.length === 0) {
     return { rasterizationTimeMs: 0 };
   }
 
@@ -47,12 +46,15 @@ export async function processPDFPagesInBatches(
 
   for (
     let batchStart = 0;
-    batchStart < pages.length;
+    batchStart < pageSizes.length;
     batchStart += pdfPageProcessingBatchSize
   ) {
     const pageNumbers = Array.from(
       {
-        length: Math.min(pdfPageProcessingBatchSize, pages.length - batchStart),
+        length: Math.min(
+          pdfPageProcessingBatchSize,
+          pageSizes.length - batchStart
+        ),
       },
       (_, batchIndex) => batchStart + batchIndex + 1
     );
@@ -70,7 +72,7 @@ export async function processPDFPagesInBatches(
     await promiseAllThrottled(
       results.map((result, resultIndex) => async (): Promise<void> => {
         const pageNumber = pageNumbers[resultIndex];
-        const { width, height } = pages[pageNumber - 1].getSize();
+        const { width, height } = pageSizes[pageNumber - 1];
         const pageSize: PageSize = {
           width: Math.round((width * targetDPI) / 72),
           height: Math.round((height * targetDPI) / 72),

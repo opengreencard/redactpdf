@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 650,
+    "prompt_tokens": 1748,
+    "total_tokens": 3556
+  },
+  "id": "JAO_aq7UDeOw1MkPwdPcmA4",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "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"
+          }
+        },
+        "content": "{\n  \"boxes\": [\n    {\"dataType\": \"personPhoto\", \"text\": \"person photo\", \"minX\": 25, \"minY\": 228, \"maxX\": 339, \"maxY\": 846},\n    {\"dataType\": \"personPhoto\", \"text\": \"ghost photo\", \"minX\": 835, \"minY\": 447, \"maxX\": 978, \"maxY\": 712},\n    {\"dataType\": \"idNumber\", \"text\": \"C03005988\", \"minX\": 718, \"minY\": 247, \"maxX\": 911, \"maxY\": 298},\n    {\"dataType\": \"other\", \"text\": \"EXEMPLAR\", \"minX\": 639, \"minY\": 326, \"maxX\": 928, \"maxY\": 395},\n    {\"dataType\": \"personName\", \"text\": \"TRAVELER\", \"minX\": 403, \"minY\": 385, \"maxX\": 563, \"maxY\": 427},\n    {\"dataType\": \"personName\", \"text\": \"HAPPY\", \"minX\": 478, \"minY\": 497, \"maxX\": 580, \"maxY\": 535},\n    {\"dataType\": \"dateOfBirth\", \"text\": \"1 JAN 1981\", \"minX\": 583, \"minY\": 606, \"maxX\": 739, \"maxY\": 647},\n    {\"dataType\": \"address\", \"text\": \"NEW YORK, U.S.A.\", \"minX\": 479, \"minY\": 720, \"maxX\": 742, \"maxY\": 766},\n    {\"dataType\": \"issueDate\", \"text\": \"30 NOV 2009\", \"minX\": 486, \"minY\": 818, \"maxX\": 668, \"maxY\": 863},\n    {\"dataType\": \"expiryDate\", \"text\": \"29 NOV 2019\", \"minX\": 704, \"minY\": 819, \"maxX\": 885, \"maxY\": 862},\n    {\"dataType\": \"idNumber\", \"text\": \"M-6131821-07\", \"minX\": 62, \"minY\": 866, \"maxX\": 258, \"maxY\": 908},\n    {\"dataType\": \"idNumber\", \"text\": \"1-02781-0\", \"minX\": 808, \"minY\": 874, \"maxX\": 929, \"maxY\": 911},\n    {\"dataType\": \"idNumber\", \"text\": \"43309-W27S+\", \"minX\": 5, \"minY\": 433, \"maxX\": 26, \"maxY\": 875}\n  ]\n}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1790903082,
+  "model": "gemini-3.8-flash",
+  "timing": {
+    "msToFirstToken": 5560,
+    "outputTokensPerSecond": 407.52351097178683,
+    "totalTimeMs": 7155
+  }
+}

@@ -7,7 +7,11 @@ import { notifications } from '@mantine/notifications';
 import Button from '../designSystem/Button/Button';
 import { useAPICall } from '../../lib/hookUtilities/useAPICall';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
-import { generateRedactedPDFClient } from '../clientLib/api/redaction';
+import {
+  GenerateRedactedPDFClientRequest,
+  generateRedactedPDFClient,
+} from '../clientLib/api/redaction';
+import { downloadArrayBufferAsFile } from '../clientLib/downloadArrayBufferAsFile';
 import type { RedactedGetRedactionResponse } from '../../lib/models/redactionTypes';
 import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
 import RedactionBoundingBoxList, {
@@ -40,7 +44,19 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
       redaction,
     };
     const { call: startDownload, state: downloadState } = useAPICall(
-      generateRedactedPDFClient
+      useMemoizedCallback(
+        async ({ key }: GenerateRedactedPDFClientRequest): Promise<void> => {
+          const arrayBuffer = await generateRedactedPDFClient({
+            key,
+          });
+          downloadArrayBufferAsFile({
+            arrayBuffer,
+            contentType: 'application/pdf',
+            fileName: 'redacted.pdf',
+          });
+        },
+        []
+      )
     );
     const isDownloadPending = downloadState?.status === 'inProgress';
 

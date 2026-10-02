@@ -14,9 +14,13 @@ if (existsSync(nonsecretEnvPath)) {
 /* eslint-disable-next-line no-restricted-syntax -- typed via JSDoc NextConfig */
 const nextConfig = {
   reactStrictMode: true,
-  // Keep Node-only packages out of the bundled server graph. sequelize loads
-  // its MariaDB dialect at runtime; zstd-napi ships a native addon.
-  serverExternalPackages: ['sequelize', 'zstd-napi'],
+  // Keep these Node-only packages out of the bundled server graph:
+  // - sequelize loads its MariaDB dialect at runtime.
+  // - zstd-napi ships a native addon.
+  // - pdfjs-dist imports its worker relative to its own package, so
+  //   externalizing it keeps that import anchored in node_modules instead of
+  //   a missing Turbopack `.next` chunk.
+  serverExternalPackages: ['sequelize', 'zstd-napi', 'pdfjs-dist'],
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
   },

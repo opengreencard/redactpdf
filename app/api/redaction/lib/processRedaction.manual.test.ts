@@ -1,7 +1,6 @@
 import { promises as fs } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { PDFDocument } from '@cantoo/pdf-lib';
 import { processRedaction } from './processRedaction';
 import FakeData from '../../../../lib/testUtilities/FakeData';
 import Redaction, {
@@ -11,6 +10,7 @@ import Redaction, {
 import { PartialInstance } from '../../../../lib/db/types';
 import { RedactionStatus } from '../../../../lib/models/redactionTypes';
 import { generateRedactedPDF } from '../../../../lib/pdf/generateRedactedPDF';
+import { getPDFPageSizes } from '../../../../lib/pdf/getPDFPageSizes';
 import { describeManualTest } from '../../../../lib/testUtilities/testTypes';
 
 describeManualTest(() => {
@@ -35,10 +35,7 @@ describeManualTest(() => {
     const inputPath = path.resolve(inputPathValue);
     const configuredOutputPath = process.env.REDACTION_OUTPUT_PATH;
     const inputPDF = await fs.readFile(inputPath);
-    const sourcePDF = await PDFDocument.load(inputPDF, {
-      ignoreEncryption: true,
-    });
-    const pageCount = sourcePDF.getPageCount();
+    const pageCount = (await getPDFPageSizes(inputPDF)).length;
     const redactionKey = generateRedactionKey();
     const outputPath = configuredOutputPath
       ? path.resolve(configuredOutputPath)

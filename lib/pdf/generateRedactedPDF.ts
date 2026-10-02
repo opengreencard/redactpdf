@@ -1,8 +1,8 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
 import { redact, verify, type RedactionRegion } from 'scrubzero';
 import { ApplicationError } from '../errors/applicationError';
-import { PageSize, RedactionBoundingBox } from '../models/redactionTypes';
+import { RedactionBoundingBox } from '../models/redactionTypes';
 import { isNotNullOrUndefined } from '../typescript/isNotNullOrUndefined';
+import { getPDFPageSizes } from './getPDFPageSizes';
 
 export interface GenerateRedactedPDFOptions {
   pdf: Buffer;
@@ -14,14 +14,8 @@ export async function generateRedactedPDF({
   pdf,
   redactionBoundingBoxes,
 }: GenerateRedactedPDFOptions): Promise<Buffer> {
-  let pdfDocument: PDFDocument;
   try {
-    pdfDocument = await PDFDocument.load(pdf, { ignoreEncryption: true });
-    const pages = pdfDocument.getPages();
-    const pageSizes = pages.map((sourcePage): PageSize => {
-      const { width, height } = sourcePage.getSize();
-      return { width, height };
-    });
+    const pageSizes = await getPDFPageSizes(pdf);
     const regions = redactionBoundingBoxes
       .filter(({ enabled }) => enabled)
       .map(({ box, page }): RedactionRegion | null => {
@@ -31,7 +25,11 @@ export async function generateRedactedPDF({
         const region: RedactionRegion = {
           page,
           x: box.minX * pageSize.width,
-          y: (1 - box.maxY) * pageSize.height,
+          // Both our normalized boxes and scrubzero measure y from the
+          // top-left. For example, minY=0.1 on a 792-point page means
+          // y=79.2, not 0.9*792 as it would in a bottom-left coordinate
+          // system. See https://github.com/Liiift-Studio/scrubzero#redactionregion.
+          y: box.minY * pageSize.height,
           width: (box.maxX - box.minX) * pageSize.width,
           height: (box.maxY - box.minY) * pageSize.height,
           color: [0, 0, 0],

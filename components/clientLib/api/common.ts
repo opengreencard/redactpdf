@@ -1,4 +1,8 @@
-import axios, { AxiosProgressEvent, AxiosResponse } from 'axios';
+import axios, {
+  AxiosProgressEvent,
+  AxiosRequestConfig,
+  AxiosResponse,
+} from 'axios';
 import { ApplicationError } from '../../../lib/errors/applicationError';
 
 /** Return type for POST route data transformation functions */
@@ -13,6 +17,12 @@ export interface POSTRouteData<RequestBodyT> {
 export interface GETRouteData {
   url: string;
   queryParams?: Record<string, string | number | boolean | undefined | null>;
+}
+
+/** Options shared by all client route factories. */
+interface ClientRouteOptions {
+  /** Axios response format, such as `arraybuffer` for file downloads. */
+  responseType?: AxiosRequestConfig['responseType'];
 }
 
 /** Options for POST route client functions. */
@@ -34,7 +44,8 @@ export function makeClientPOSTRoute<
 >(
   dataToUrlQueryStringAndBody: (
     data: RequestBodyT & RequestPathAndQueryParamsT
-  ) => POSTRouteData<RequestBodyT>
+  ) => POSTRouteData<RequestBodyT>,
+  { responseType }: ClientRouteOptions = {}
 ): (
   data: RequestBodyT & RequestPathAndQueryParamsT,
   options?: ClientPOSTRouteOptions
@@ -51,6 +62,7 @@ export function makeClientPOSTRoute<
         url,
         params: queryParams,
         data: body,
+        responseType,
         onUploadProgress: onUploadProgress
           ? (progressEvent: AxiosProgressEvent): void => {
               const progress: number | undefined =
@@ -69,9 +81,10 @@ export function makeClientPOSTRoute<
 /** Make a client function that would make a GET request */
 export function makeClientGETRoute<RequestT, ResponseT>({
   dataToUrlAndQueryString,
+  responseType,
 }: {
   dataToUrlAndQueryString: (data: RequestT) => GETRouteData;
-}): (data: RequestT) => Promise<ResponseT> {
+} & ClientRouteOptions): (data: RequestT) => Promise<ResponseT> {
   return async (data: RequestT): Promise<ResponseT> => {
     const { url, queryParams } = dataToUrlAndQueryString(data);
     return makeRequestAndHandleErrors(() =>
@@ -79,6 +92,7 @@ export function makeClientGETRoute<RequestT, ResponseT>({
         method: 'GET',
         url,
         params: queryParams,
+        responseType,
       })
     );
   };
@@ -96,19 +110,56 @@ async function makeRequestAndHandleErrors<ResponseT>(
     const response = await request();
     return response.data;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.data) {
-      const errorData = error.response.data;
-      if (
-        typeof errorData === 'object' &&
-        errorData.success === false &&
-        typeof errorData.message === 'string'
-      ) {
-        throw new ApplicationError(errorData.message);
-      }
+    const errorMessage = getApplicationErrorMessage(error);
+    if (errorMessage) {
+      throw new ApplicationError(errorMessage);
     }
 
     throw new ApplicationError(
       'We ran into an unexpected error; please try again later.'
     );
   }
+}
+
+function getApplicationErrorMessage(error: unknown): string | null {
+  if (!axios.isAxiosError(error) || !error.response?.data) {
+    return null;
+  }
+
+  const responseData: unknown = error.response.data;
+  let errorData: unknown = responseData;
+
+  // Axios normally exposes an ArrayBuffer in the browser for an
+  // `arraybuffer` request. Node adapters and test doubles may expose the same
+  // bytes as a Uint8Array instead; both need to be decoded before parsing the
+  // JSON error envelope.
+  if (
+    responseData instanceof ArrayBuffer ||
+    responseData instanceof Uint8Array
+  ) {
+    try {
+      errorData = JSON.parse(new TextDecoder().decode(responseData));
+    } catch {
+      return null;
+    }
+  } else if (typeof responseData === 'string') {
+    try {
+      errorData = JSON.parse(responseData);
+    } catch {
+      return null;
+    }
+  }
+
+  if (
+    typeof errorData === 'object' &&
+    errorData !== null &&
+    'success' in errorData &&
+    'message' in errorData &&
+    errorData.success === false &&
+    typeof errorData.message === 'string'
+  ) {
+    return errorData.message;
+  }
+
+  return null;
 }

@@ -3,7 +3,7 @@ services:
     image: mariadb:11
     environment:
       MARIADB_DATABASE: redaction_development
-      MARIADB_PASSWORD: redaction
+      MARIADB_PASSWORD: ${DB_PASS:-redaction}
       MARIADB_ROOT_PASSWORD: redaction-root
       MARIADB_USER: redaction
     ports:
