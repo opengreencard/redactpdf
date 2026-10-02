@@ -15,13 +15,12 @@ import { ApplicationError } from '../errors/applicationError';
  *    `process.env.PROVIDER_API_KEY` and the provider's OpenAI-compatible
  *    base URL.
  *
- * Production redaction uses `gemini`; other providers are for testing and
- * model comparisons.
+ * Production redaction uses `gemini`. `openAI` is optional for local testing
+ * and model comparisons.
  */
 export enum OpenAICompatibleProvider {
-  deepInfra = 'deepInfra',
-  openAI = 'openAI',
   gemini = 'gemini',
+  openAI = 'openAI',
 }
 
 /** Options for one streaming OpenAI-compatible completion. */
@@ -115,17 +114,13 @@ const providerConfigurations: Record<
   OpenAICompatibleProvider,
   ProviderConfiguration
 > = {
-  [OpenAICompatibleProvider.deepInfra]: {
-    apiKey: process.env.DEEPINFRA_API_KEY,
-    baseURL: 'https://api.deepinfra.com/v1/openai',
+  [OpenAICompatibleProvider.gemini]: {
+    apiKey: process.env.GEMINI_API_KEY,
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
   },
   [OpenAICompatibleProvider.openAI]: {
     apiKey: process.env.OPENAI_API_KEY,
     baseURL: 'https://api.openai.com/v1',
-  },
-  [OpenAICompatibleProvider.gemini]: {
-    apiKey: process.env.GEMINI_API_KEY,
-    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
   },
 };
 

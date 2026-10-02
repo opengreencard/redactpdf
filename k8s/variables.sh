@@ -17,9 +17,8 @@ export ACME_EMAIL=letsencrypt@redactpdf.ai
 # Keep CLUSTER_NAME in sync with the default in k8s/setup-cluster.sh.
 export CLUSTER_NAME=redaction-production
 
-# Keep DB_FIREWALL_NAME in sync with sysadmin/create-db-server.sh and
-# dev/add-db-firewall-ip.sh.
-export DB_FIREWALL_NAME=redaction-prod-db
+# Production MariaDB is the shared OpenGreenCard host in
+# .env.production.nonsecret, not a cluster-local database.
 
 # Keep REGION in sync with the default in k8s/setup-cluster.sh.
 export REGION=sfo3

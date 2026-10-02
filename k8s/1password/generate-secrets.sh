@@ -78,7 +78,7 @@ s3AccessKeyId=''
 s3SecretAccessKey=''
 googleClientId=''
 googleClientSecret=''
-deepinfraApiKey=''
+geminiApiKey=''
 
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'S3_ACCESS_KEY_ID'; then
   echo 'Enter external provider secrets:'
@@ -103,10 +103,10 @@ if [ "$OVERWRITE" = 'true' ] || ! hasField 'GOOGLE_CLIENT_SECRET'; then
   [ -n "$googleClientSecret" ] || { echo 'Error: Google OAuth client secret is required.'; exit 1; }
 fi
 
-if [ "$OVERWRITE" = 'true' ] || ! hasField 'DEEPINFRA_API_KEY'; then
-  read -rsp 'Deep Infra API key (https://deepinfra.com/dash/api_keys): ' deepinfraApiKey
+if [ "$OVERWRITE" = 'true' ] || ! hasField 'GEMINI_API_KEY'; then
+  read -rsp 'Gemini API key (https://aistudio.google.com/apikey): ' geminiApiKey
   echo
-  [ -n "$deepinfraApiKey" ] || { echo 'Error: Deep Infra API key is required.'; exit 1; }
+  [ -n "$geminiApiKey" ] || { echo 'Error: Gemini API key is required.'; exit 1; }
 fi
 
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'DB_PASS'; then
@@ -135,7 +135,7 @@ addField 'GOOGLE_CLIENT_ID' "$googleClientId"
 addField 'GOOGLE_CLIENT_SECRET' "$googleClientSecret"
 addField 'S3_ACCESS_KEY_ID' "$s3AccessKeyId"
 addField 'S3_SECRET_ACCESS_KEY' "$s3SecretAccessKey"
-addField 'DEEPINFRA_API_KEY' "$deepinfraApiKey"
+addField 'GEMINI_API_KEY' "$geminiApiKey"
 
 if [ ${#fieldAssignments[@]} -eq 0 ]; then
   echo "No new or missing fields to add. All secrets are already set in $itemFQN."
