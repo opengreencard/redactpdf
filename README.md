@@ -14,15 +14,32 @@ yarn init-db-dev
 yarn dev
 ```
 
-The development database uses `redaction_development` as its database user,
-while tests use `redaction_test`. The Compose initialization script creates the
-test database and user when the MariaDB volume is created. `yarn jest` selects
-the test configuration automatically. Cloud credentials are only needed for
-the upload and redaction pipeline.
+The development database uses `redaction_development`. Cloud credentials are
+only needed for the upload and redaction pipeline.
+
+## Running tests locally
+
+Jest uses the separate `redaction_test` database and MariaDB user:
+
+```bash
+cp .env.test.example .env.test
+docker-compose --env-file .env.development up -d mariadb
+yarn jest
+```
+
+The Compose initialization script creates the test database and user when the
+MariaDB volume is first created. If the volume already exists, apply the
+idempotent setup once:
+
+```bash
+docker-compose exec -T mariadb mariadb -uroot -predaction-root \
+  < docker/mariadb/10-create-test-database.sql
+```
 
 ## Checks
 
 ```bash
+yarn build
 yarn typecheck
 yarn lint
 yarn jest
