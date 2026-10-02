@@ -1782,20 +1782,16 @@ __metadata:
   linkType: hard
 
 "@cantoo/pdf-lib@npm:^2.8.4":
-  version: 2.8.4
-  resolution: "@cantoo/pdf-lib@npm:2.8.4"
+  version: 2.11.1
+  resolution: "@cantoo/pdf-lib@npm:2.11.1"
   dependencies:
-    "@pdf-lib/standard-fonts": "npm:^1.0.0"
-    "@pdf-lib/upng": "npm:^1.0.1"
-    color: "npm:^4.2.3"
-    crypto-js: "npm:^4.2.0"
-    html-entities: "npm:^2.3.2"
+    culori: "npm:>=4"
+    fflate: "npm:^0.8.2"
     node-html-better-parser: "npm:>=1.5.9"
-    pako: "npm:^2.2.0"
     tslib: "npm:>=2"
   peerDependencies:
-    html-entities: ^2.3.2
-  checksum: 10c0/467b7e0193029c02a38a99050ee9d25edb88b60b8bb26928057243357c7bd633579cb6416c353d7e9572b28e5864782fb304d4a260d8fd35c2dfbc862537ba90
+    html-entities: ">=2.3.2"
+  checksum: 10c0/f4e44fc1b8e4586fe87444e5af408dd7f655b9e8d2f1b37bdff2bbea590aa8551707f28b45f7e2ce2cad1f6cf1dedb3763ae66525d509054b68f631eb56c933c
   languageName: node
   linkType: hard
 
@@ -6927,30 +6923,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"color-name@npm:^1.0.0, color-name@npm:~1.1.4":
+"color-name@npm:~1.1.4":
   version: 1.1.4
   resolution: "color-name@npm:1.1.4"
   checksum: 10c0/a1a3f914156960902f46f7f56bc62effc6c94e84b2cae157a526b1c1f74b677a47ec602bf68a61abfa2b42d15b7c5651c6dbe72a43af720bc588dff885b10f95
-  languageName: node
-  linkType: hard
-
-"color-string@npm:^1.9.0":
-  version: 1.9.1
-  resolution: "color-string@npm:1.9.1"
-  dependencies:
-    color-name: "npm:^1.0.0"
-    simple-swizzle: "npm:^0.2.2"
-  checksum: 10c0/b0bfd74c03b1f837f543898b512f5ea353f71630ccdd0d66f83028d1f0924a7d4272deb278b9aef376cacf1289b522ac3fb175e99895283645a2dc3a33af2404
-  languageName: node
-  linkType: hard
-
-"color@npm:^4.2.3":
-  version: 4.2.3
-  resolution: "color@npm:4.2.3"
-  dependencies:
-    color-convert: "npm:^2.0.1"
-    color-string: "npm:^1.9.0"
-  checksum: 10c0/7fbe7cfb811054c808349de19fb380252e5e34e61d7d168ec3353e9e9aacb1802674bddc657682e4e9730c2786592a4de6f8283e7e0d3870b829bb0b7b2f6118
   languageName: node
   linkType: hard
 
@@ -7200,13 +7176,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"crypto-js@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "crypto-js@npm:4.2.0"
-  checksum: 10c0/8fbdf9d56f47aea0794ab87b0eb9833baf80b01a7c5c1b0edc7faf25f662fb69ab18dc2199e2afcac54670ff0cd9607a9045a3f7a80336cccd18d77a55b9fdf0
-  languageName: node
-  linkType: hard
-
 "css-functions-list@npm:^3.3.3":
   version: 3.3.3
   resolution: "css-functions-list@npm:3.3.3"
@@ -7322,6 +7291,13 @@ __metadata:
   version: 3.2.3
   resolution: "csstype@npm:3.2.3"
   checksum: 10c0/cd29c51e70fa822f1cecd8641a1445bed7063697469d35633b516e60fe8c1bde04b08f6c5b6022136bb669b64c63d4173af54864510fbb4ee23281801841a3ce
+  languageName: node
+  linkType: hard
+
+"culori@npm:>=4":
+  version: 4.0.2
+  resolution: "culori@npm:4.0.2"
+  checksum: 10c0/5d3c952b947ac5915409bab513e1d2e8bd813caa491af8ded0c769fdc1186a5ff61fb3c59fc8edf5393237d92074dbc54a492e6e99cb039dd6535d5d96106bfe
   languageName: node
   linkType: hard
 
@@ -8818,6 +8794,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fflate@npm:^0.8.2":
+  version: 0.8.3
+  resolution: "fflate@npm:0.8.3"
+  checksum: 10c0/eab181ca37f5348ae76d4b6f840e0026e30220e33153289ac942222d8b9638237d486507dbcc09878d724095bd354993a2ee48bbee99c8f2c6440d4448719aa7
+  languageName: node
+  linkType: hard
+
 "figures@npm:^6.1.0":
   version: 6.1.0
   resolution: "figures@npm:6.1.0"
@@ -9970,13 +9953,6 @@ __metadata:
   version: 0.2.1
   resolution: "is-arrayish@npm:0.2.1"
   checksum: 10c0/e7fb686a739068bb70f860b39b67afc62acc62e36bb61c5f965768abce1873b379c563e61dd2adad96ebb7edf6651111b385e490cf508378959b0ed4cac4e729
-  languageName: node
-  linkType: hard
-
-"is-arrayish@npm:^0.3.1":
-  version: 0.3.4
-  resolution: "is-arrayish@npm:0.3.4"
-  checksum: 10c0/1fa672a2f0bedb74154440310f616c0b6e53a95cf0625522ae050f06626d1cabd1a3d8085c882dc45c61ad0e7df2529aff122810b3b4a552880bf170d6df94e0
   languageName: node
   linkType: hard
 
@@ -12606,13 +12582,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pako@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "pako@npm:2.2.0"
-  checksum: 10c0/e5d31de1940fdd13cc4014296b0026112483d0834bce4856ca29c8af8438d030c6416986a0f6df7d5372cae18d6dd6c57f48b24a49d6c207c0a4cc66af15c07d
-  languageName: node
-  linkType: hard
-
 "param-case@npm:^3.0.4":
   version: 3.0.4
   resolution: "param-case@npm:3.0.4"
@@ -12825,7 +12794,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pdfjs-dist@npm:^4.0.379":
+"pdfjs-dist@npm:^4.0.379, pdfjs-dist@npm:^4.10.38":
   version: 4.10.38
   resolution: "pdfjs-dist@npm:4.10.38"
   dependencies:
@@ -13670,6 +13639,7 @@ __metadata:
     eslint-plugin-testing-library: "npm:6.2.2"
     fast-json-stable-stringify: "npm:^2.1.0"
     glob: "npm:^13.0.6"
+    html-entities: "npm:^2.3.2"
     jest: "npm:^30.4.2"
     jest-environment-jsdom: "npm:^30.4.1"
     lefthook: "npm:^2.1.10"
@@ -13682,6 +13652,7 @@ __metadata:
     openai: "npm:^7.4.0"
     patch-package: "npm:^8.0.1"
     pdf2pic: "npm:^3.2.0"
+    pdfjs-dist: "npm:^4.10.38"
     postcss: "npm:^8.5.26"
     postcss-preset-mantine: "npm:^1.18.0"
     postcss-simple-vars: "npm:^7.0.1"
@@ -14474,15 +14445,6 @@ __metadata:
     once: "npm:^1.3.1"
     simple-concat: "npm:^1.0.0"
   checksum: 10c0/b0649a581dbca741babb960423248899203165769747142033479a7dc5e77d7b0fced0253c731cd57cf21e31e4d77c9157c3069f4448d558ebc96cf9e1eebcf0
-  languageName: node
-  linkType: hard
-
-"simple-swizzle@npm:^0.2.2":
-  version: 0.2.4
-  resolution: "simple-swizzle@npm:0.2.4"
-  dependencies:
-    is-arrayish: "npm:^0.3.1"
-  checksum: 10c0/846c3fdd1325318d5c71295cfbb99bfc9edc4c8dffdda5e6e9efe30482bbcd32cf360fc2806f46ac43ff7d09bcfaff20337bb79f826f0e6a8e366efd3cdd7868
   languageName: node
   linkType: hard
 

@@ -23,7 +23,7 @@ export interface GetRedactionBoundingBoxesResult {
  * Coordinates are integers from 0 through 1000 in the model response, then
  * converted to the normalized coordinates used by the app.
  *
- * Gemini 3.7 Flash is intentionally used here because local comparisons show
+ * Gemini 3.8 Flash is intentionally used here because local comparisons show
  * it is more exhaustive at finding sensitive content, including repeated or
  * faint values, than the previous Flash Lite model.
  */
@@ -85,7 +85,7 @@ function requestRedactionVision(
 ): ReturnType<typeof createOpenAICompatibleCompletion> {
   return createOpenAICompatibleCompletion({
     provider: OpenAICompatibleProvider.gemini,
-    model: 'gemini-3.7-flash',
+    model: 'gemini-3.8-flash',
     reasoning_effort: 'medium',
     messages: [
       {

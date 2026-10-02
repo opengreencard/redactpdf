@@ -9,6 +9,7 @@ import { RedactionStatus } from '../../../lib/models/redactionTypes';
 import { getRedactionFile } from '../../../lib/storage/storageFunctions/redactionFile';
 import { processRedaction } from './lib/processRedaction';
 import {
+  _getPDFPageCount,
   _maxRedactionFileSizeBytes,
   _maxRedactionPageCount,
   uploadFileForRedaction,
@@ -51,6 +52,10 @@ describe(uploadFileForRedaction, () => {
     expect(redaction?.redactionBoundingBoxes).toEqual([]);
     const storedPDF = await getRedactionFile(result.key);
     expect(storedPDF).toEqual(onePagePDF);
+  });
+
+  it('counts pages in a valid PDF', async () => {
+    await expect(_getPDFPageCount(onePagePDF)).resolves.toBe(1);
   });
 
   it('rejects invalid PDF bytes without side effects', async () => {
@@ -134,11 +139,7 @@ describe(uploadFileForRedaction, () => {
 });
 
 /**
- * Create a small in-memory PDF with exactly `pageCount` pages.
- *
- * Using pdf-lib keeps the test independent from checked-in binary fixtures:
- * each page is an empty page because upload validation only needs the PDF
- * structure and page count.
+ * Create a small in-memory PDF with exactly `pageCount` pages for upload tests.
  */
 async function makePDFBuffer(pageCount: number): Promise<Buffer> {
   const pdf = await PDFDocument.create();
@@ -154,12 +155,13 @@ async function makePDFBuffer(pageCount: number): Promise<Buffer> {
  * @cantoo/pdf-lib serializes `PDFDocument.create()` with no explicit pages as
  * one page when saving, so the regular helper cannot exercise the zero-page
  * validation. This minimal PDF object graph keeps `/Count 0` while remaining
- * loadable by the same library used by the application. The catalog, page-tree,
- * cross-reference, and trailer layout follows the minimal-PDF examples at
+ * loadable by PDF.js (used for page counting in production). The catalog,
+ * page-tree, cross-reference, and trailer layout follows the minimal-PDF
+ * examples at
  * https://stackoverflow.com/questions/12662596/minimal-pdf-example-in-pdf-specification
- * and https://pdfa.org/the-smallest-possible-valid-pdf/. An empty `/Kids` array
- * is intentionally used here to test the parser's zero-page behavior; it is
- * not a fully conforming PDF page tree.
+ * and https://pdfa.org/the-smallest-possible-valid-pdf/. An empty `/Kids`
+ * array is intentionally used here to test the parser's zero-page behavior;
+ * it is not a fully conforming PDF page tree.
  */
 function makeZeroPagePDFBuffer(): Buffer {
   return Buffer.from(

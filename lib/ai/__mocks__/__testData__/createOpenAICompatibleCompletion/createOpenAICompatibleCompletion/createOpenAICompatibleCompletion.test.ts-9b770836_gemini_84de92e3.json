@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 7,
+    "prompt_tokens": 8,
+    "total_tokens": 81
+  },
+  "id": "KwO_apvVI4KT1MkPkbSD2Q0",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "EoADCv0CAWkUfROynfRWo3CQiLim/lauCnKu92YC76F5DrCLIqtpw5rR/nj/yCOLgpVSdY95ZZV8++wgZpwABlfqvjlLY3jhvedh0VbCFRbhaD475jysm+krk8QznWKny3e95yG4xm8DMVfcWkWfv3/xno4bifjDyIZaQp0+aE+wsPCJZjCoz/zguwBg72zEzIr6/AuJhd+zAOgG6zSN6rgOcOPZYKLknEEEvIg8Sv9ipLccWdMr+QX01VsL7MupG7IrJsBFb5Q0q2jCYTlHRIvbIzyBx5uPZe3PeeQ6l1rQmRhElk5i3EqigoBaui1a6Kku7YsqtE6thOe0UFgoLRPbCmCYO9H+GbIgKn/Bt0adhz0sKvzHi+LlwZwb6btWkTgSqqiKvy0Tqftbol/uiDSHuxKzcdNpDsiiqTzfhDfmziZPe5rsHlGKDLzW8ORJmhBaIlGFazexEsT754RkSU3P9Kx0elkbWBQzNK4LDYgv3PuEHus0HSZ6HL1bx+PK0Blh"
+          }
+        },
+        "content": "1 + 1 = 2",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1790903084,
+  "model": "gemini-3.8-flash",
+  "timing": {
+    "msToFirstToken": 824,
+    "outputTokensPerSecond": 777.7777777777778,
+    "totalTimeMs": 833
+  }
+}

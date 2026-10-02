@@ -1,6 +1,6 @@
 ---
 name: fetch-loom-transcript
-description: Fetches transcripts from Loom videos. Use when you need a transcript from a Loom video but only have a Loom video link, or when the user mentions needing a transcript from a Loom video.
+description: Fetches transcripts and on-screen URLs from Loom videos. Use when you need a transcript from a Loom video but only have a Loom video link, or when the user mentions needing a transcript from a Loom video.
 ---
 
 # Fetch Loom Transcript
@@ -17,8 +17,13 @@ For example:
 bash .cursor/skills/fetch-loom-transcript/scripts/fetch-loom-transcript.sh 'https://www.loom.com/share/6fe805595cbc46f5a6b689ca9bfebd55'
 ```
 
-The script outputs the transcript with timestamps. Only outputs the transcript
-(no informational messages) unless there's an error.
+The script prints:
+
+- Screen URLs shown during the recording, with timestamps (omitted when Loom
+  didn't capture any)
+- The transcript with timestamps
+
+No other informational messages unless there's an error.
 
 IMPORTANT: Always wrap the Loom URL in single quotes when running the command.
 The script will strip query parameters automatically (for example,

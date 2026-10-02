@@ -11,9 +11,30 @@
 
 ## Checks
 
+- Build: `yarn build`
 - Typecheck: `yarn typecheck`
 - Lint: `yarn lint`
 - Tests: `yarn jest`
+
+## Local Jest database
+
+Jest uses the separate `redaction_test` database and `redaction_test` MariaDB
+user. To configure a local checkout:
+
+```bash
+cp .env.test.example .env.test
+docker-compose --env-file .env.development up -d mariadb
+```
+
+The Compose SQL initialization script creates the test database and user when
+the MariaDB volume is first created. If the volume already exists from before
+the separate development user was added, follow the existing-volume migration
+in the README before applying that idempotent test setup:
+
+```bash
+docker-compose exec -T mariadb mariadb -uroot -predaction-root \
+  < docker/mariadb/10-create-test-database.sql
+```
 
 - Keep this public repository independent from OpenGreenCard. Do not copy
   immigration forms, user data, credentials, or product-specific domain code.

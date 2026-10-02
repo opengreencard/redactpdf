@@ -198,7 +198,7 @@ describe(getRedactionBoundingBoxes, () => {
           dataType: RedactedDataType.personName,
           text: /^Sam$/i,
           minimumCount: 1,
-          // Gemini 3.7 was notably more exhaustive around the dependent's
+          // Gemini 3.8 was notably more exhaustive around the dependent's
           // name, including the son's repeated name in the dependents table.
         },
       ],
@@ -302,7 +302,7 @@ describe(getRedactionBoundingBoxes, () => {
         expect(box.box.maxY).toBeLessThanOrEqual(1);
       }
       // These are minimum coverage checks rather than exact totals because
-      // Gemini 3.7 is notably better at exhaustive removal, especially for
+      // Gemini 3.8 is notably better at exhaustive removal, especially for
       // repeated, faint, or secondary sensitive values.
       for (const expectedRedaction of expectedRedactions) {
         if (!matchesExpectedRedaction(result.boxes, expectedRedaction)) {

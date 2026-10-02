@@ -1,0 +1,211 @@
+---
+description: Guidelines for writing code comments
+alwaysApply: true
+---
+
+Err on the side of commenting in more places. Keep each comment concise.
+
+- Comment (with `/** */`) every exported function and React component.
+- Comment (with `/** */`) on component props, function inputs, internal state
+  variables and callbacks within a component/hook that might
+  need a bit more explaining
+- Comment with `//` inside long functions to explain what it's doing, or above
+  code to explain why we're doing something, what's unusual, etc. if not obvious
+  from the code.
+
+## What to write
+
+Write **why**, how to use it, or an example with real data or real-world uses
+— not a restatement of the next line.
+
+```ts
+// Bad: restates the function name
+// Gets the place block before first place in this section
+const placeBeforeSection = getPlaceBlockBeforeFirstPlaceInSection({...});
+
+// Good: why we need this value
+// We want to show distances to the first place on this day at the top of
+// the day.
+const placeBeforeSection = getPlaceBlockBeforeFirstPlaceInSection({...});
+```
+
+- Include lots of links: link to the source for workarounds, API docs,
+  StackOverflow, etc. A publicly accessible agent/chat link may be included
+  when useful.
+- For unintuitive or hacky code, say what you're doing and why it's safe and
+  needed vs. the more obvious code
+- If two sites must stay aligned, put a `Keep in sync` comment on both
+  sides that names the other file or symbol
+  - When adding another location, update every existing comment to list all
+    current locations
+  - When more than two locations stay aligned, list them as bullets
+  - In `package.json`, add a `__…-comment__` string next to a script or
+    dependency when it should stay aligned with related code changes. For
+    dependency notes, use the `__dependencyComments__` object when appropriate.
+  - On copied numbers that go stale (ratings, list prices), add a
+    last-updated date
+- If adding a TODO, always link to the Notion task that should later implement
+  it; include a spec number too when one exists.
+- Don't restate the signature or parameters, or anything you can infer from the
+  name
+- Describe what this value does in this file. Don't list which parents pass
+  it, or which sources currently exist. Those lists go stale.
+- Don't describe how this version differs from an earlier draft, branch, or
+  conversation ("no longer doing X", "master never had that"). Explain the
+  current code on its own.
+- Read comments out loud: is this how you would say it to a (human) colleague?
+  If not, rewrite so it's easier to read. A few lines is enough. If a comment
+  is turning into a paragraph, shorten it or split it next to the lines it
+  explains.
+
+## When to delete
+
+Delete a comment that only restates the next line, the identifier, or the
+function name, and has no why to add. Prefer no comment over a restatement.
+
+After extracting a function, drop the leftover comment if the new name
+already says the same thing.
+
+## Placement
+
+Prefer several small comments placed next to the specific code they explain
+over one large comment block (e.g. at the top of a file or test) that covers
+many unrelated points at once. A reader looking at one piece of code shouldn't
+have to scroll away to find the explanation.
+
+Bad: one big comment up front covering several unrelated points
+
+```typescript
+// This test checks angle calculations for cardinal directions. 0 degrees
+// means no rotation, so the point stays the same. 90 degrees rotates a
+// quarter turn, swapping x and y. 180 degrees flips both signs.
+it.each([...])('rotates $angle', ({ angle, expected }) => {
+  expect(rotate(point, angle)).toEqual(expected);
+});
+
+// If the multiplier is more than 1, this is good, but doesn't need attention,
+// so we just log it. If the multiplier is less than 1, this might be a bad sign
+// and we should investigate, so we alert. If there's no change, it's
+// unfortunate we're not increasing, but it's no big deal, so we just log it.
+if (multiplier > 1) logIncrease();
+else if (multiplier < 1) alertDecrease();
+else logChecked();
+```
+
+Good: each explanation lives next to the case it explains
+
+```typescript
+it.each([
+  // No rotation: the point is unchanged.
+  { angle: 0, expected: point },
+  // Quarter turn: x and y swap.
+  { angle: 90, expected: swapped },
+  // Half turn: both signs flip.
+  { angle: 180, expected: negated },
+])('rotates $angle', ({ angle, expected }) => {
+  expect(rotate(point, angle)).toEqual(expected);
+});
+
+// This is good, but doesn't need attention, so we just log it
+if (multiplier > 1) logIncrease();
+// This might be a bad sign and we should investigate, so we alert
+else if (multiplier < 1) alertDecrease();
+// It's unfortunate we're not increasing, but it's no big deal, so we just log it
+else logChecked();
+```
+
+## Match the code
+
+After you change code, re-read comments near the edits (and any files,
+functions, or types the comment refers to).
+
+If the comment is outdated, update or delete it.
+
+## Tone
+
+- Casual and conversational.
+- Use we, I, and contractions (I'm, isn't).
+- Use short, simple sentences.
+- Prefer active voice.
+- Avoid double negatives and use positive framing.
+- Use plain words that any engineer can follow, not jargon for people already
+  familiar with the code.
+- Use bullets and numbering to break up long paragraphs.
+  If a comment is more than 4 lines of solid prose:
+  - Option 1: break into paragraphs
+  - Option 2: have parts be bullets/numbered bullets
+
+Avoid AI-isms (load-bearing, drift) and long words when a short one will work.
+
+Example:
+
+```ts
+// Bad: step list, negative framing, says what caller already knows
+/**
+ * Preprocessed import parts: skip Spaces put when the same user already has
+ * a `MediaImport` row for this input hash; otherwise upload originals then run
+ * `callback`. Deletes fresh uploads when `callback` throws.
+ */
+export async function uploadImportFromMediaFilesFromBuffers<T>({}) {}
+
+// Good: what does it do, context with examples. Longer, but simpler sentences
+// and flow
+// Upload files that a user had uploaded for us to import into a trip and that
+// we had pre-processed (e.g., by resizing images), then call a callback with
+// paths to the uploaded files.
+//
+// This function will avoid re-uploading files that it seems like we'd already
+// uploaded.
+//
+// Also, if the callback throws, we'll delete the files so we don't leave them
+// orphaned.
+export async function uploadImportFromMediaFilesFromBuffers<T>({}) {}
+
+// Bad: lots of long sentences that use passive voice and jargon (e.g.,
+// "overview copy")
+/**
+ * Minimum height so the slideshow card fills leftover height at default text
+ * size and stays tall enough for the screenshot when overview copy grows.
+ * Measured in the full-height sheet on a typical phone; bump and check a
+ * device if the overview copy or screenshots drift.
+ */
+const minSlideshowCardHeight = 300;
+
+// Better: shorter sentences, plainer words
+/**
+ * We want to make sure that the slideshow card with the image is always at
+ * least this tall. That way, even if the text above it grows, the image
+ * doesn't get shrunk down too much such that it's hard to see.
+ *
+ * Keep in sync with screenshot dimensions: if e.g., we switch to landscape
+ * screenshots, change this.
+ */
+const minSlideshowCardHeight = 300;
+
+// Note: using `/suggest-eslint-or-cursor-rules`? If you see other bad comments,
+// feel free to add them here along with the corrected comment.
+```
+
+## Format
+
+Wrap comments at 80 characters (including leading indent: the text might be
+shorter than 80 characters if very indented)
+
+- `/** */` above declarations: functions, types, props, state
+- `//` for inline notes, comments above JSX props
+- `{/* */}` for single-line JSX comments
+- Multi-line comments inside JSX:
+
+```tsx
+{
+  // This is a multi-line comment. Wrap it at 80 characters
+  // including the leading whitespace.
+}
+<SomeComponent
+  // Here's some comments above a certain prop
+  someProp={123}
+>
+```
+
+If a comment is more than about four lines of prose, split it into bullets
+or numbered bullets.

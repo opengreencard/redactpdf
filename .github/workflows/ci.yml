@@ -50,7 +50,7 @@ jobs:
           MARIADB_DATABASE: redaction_test
           MARIADB_PASSWORD: redaction
           MARIADB_ROOT_PASSWORD: redaction-root
-          MARIADB_USER: redaction
+          MARIADB_USER: redaction_test
         ports:
           - 3306:3306
         options: >-
@@ -62,7 +62,7 @@ jobs:
       APP_MODE: test
       DB_HOST: 127.0.0.1
       DB_DATABASE: redaction_test
-      DB_USER: redaction
+      DB_USER: redaction_test
       DB_PASS: redaction
       AUTH_SECRET: ci-only-secret
       # Jest globalSetup only recreates tables when this is set. The MariaDB

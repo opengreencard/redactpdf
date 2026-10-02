@@ -597,14 +597,6 @@ const commonNoRestrictedSyntaxRules = [
       'Use async/await instead of .then()/.catch(). For concurrent work with isolated errors, use an async IIFE inside Promise.all or promiseAllThrottled.',
   },
   {
-    // Bad: PDFDocument.load(buffer) — no or incomplete options
-    // Good: PDFDocument.load(buffer, { ignoreEncryption: true })
-    selector:
-      'CallExpression[callee.type="MemberExpression"][callee.object.type="Identifier"][callee.object.name="PDFDocument"][callee.property.type="Identifier"][callee.property.name="load"][arguments.length<2], CallExpression[callee.type="MemberExpression"][callee.object.type="Identifier"][callee.object.name="PDFDocument"][callee.property.type="Identifier"][callee.property.name="load"] > ObjectExpression:not(:has(Property[key.name="ignoreEncryption"][value.type="Literal"][value.value="true"]))',
-    message:
-      'Always pass { ignoreEncryption: true } as the second argument to PDFDocument.load() to handle encrypted PDFs.',
-  },
-  {
     // Forbid:
     // _.sortBy(blah, 'someKey')
     // _.sortBy(blah, ['someKey'])
