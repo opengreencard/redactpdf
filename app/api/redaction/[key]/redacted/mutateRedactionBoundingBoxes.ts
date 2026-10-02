@@ -13,13 +13,14 @@ import {
   findRedactionByKeyOrError,
 } from '../../lib/findRedactionByKeyOrError';
 
+// `id` is required so Sequelize can UPDATE instead of attempting a global save.
 const mutationAttributes: (
-  'status' | 'pageCount' | 'redactionBoundingBoxes'
-)[] = ['status', 'pageCount', 'redactionBoundingBoxes'];
+  'id' | 'status' | 'pageCount' | 'redactionBoundingBoxes'
+)[] = ['id', 'status', 'pageCount', 'redactionBoundingBoxes'];
 
 type MutationRedaction = PartialInstance<
   RedactionAttributes,
-  'status' | 'pageCount' | 'redactionBoundingBoxes'
+  'id' | 'status' | 'pageCount' | 'redactionBoundingBoxes'
 >;
 
 /**
