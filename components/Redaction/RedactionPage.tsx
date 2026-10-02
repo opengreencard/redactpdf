@@ -33,14 +33,15 @@ import {
 import RedactionPageInner from './RedactionPageInner';
 
 export interface RedactionPageProps {
+  /** Which redaction this page is reviewing. */
   redactionKey: string;
   isLoggedIn: boolean;
 }
 
 /**
- * Client container for `/redact/:key`. Polls getRedaction until the document
- * leaves `redacting`, pings openedAt while the tab is open, then owns
- * optimistic box edits.
+ * Review page for one uploaded PDF. We poll until analysis finishes, ping
+ * openedAt so idle cleanup doesn't delete a tab that's still open, then
+ * save box edits with an optimistic UI.
  */
 const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
   function RedactionPage(props: RedactionPageProps) {
@@ -72,7 +73,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       void fetchRedaction({ key: redactionKey });
     }, [fetchRedaction, redactionKey]);
 
-    // Keep the document out of hourly cleanup while this tab is open.
+    // Keep the document out of idle cleanup while this tab is open.
     // useInterval does not fire on mount, so ping once immediately.
     useEffect(() => {
       // Fire-and-forget: a failed ping is retried on the next interval tick.
@@ -80,7 +81,10 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       void touchRedactionOpenedAtClient({ key: redactionKey });
     }, [redactionKey]);
 
+    // Once a minute is often enough vs the idle TTL, and cheap.
+    // Keep in sync with the "once a minute" note on `touchRedactionOpenedAt`.
     useInterval(() => {
+      // Fire-and-forget: a failed ping is retried on the next interval tick.
       // eslint-disable-next-line no-void
       void touchRedactionOpenedAtClient({ key: redactionKey });
     }, 60 * 1000);

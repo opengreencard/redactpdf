@@ -7,27 +7,40 @@ import { getStorageKeyForRedactionFile } from '../../lib/storage/storageFunction
 import { deleteObjects } from '../../lib/storage/storageAPI';
 import { promiseAllThrottled } from '../../lib/utilities/promiseAllThrottled';
 
-/** Idle TTL in hours. Tests age rows with ±0.01 around this value. */
+/**
+ * How long a document can sit with no open review tab before we delete it.
+ * Upload counts as the first "open", so files nobody ever reviews still
+ * expire. FAQ, privacy, and terms say "about an hour" to match this.
+ *
+ * Keep in sync with `openedAt` on `RedactionAttributes` in
+ * `lib/models/Redaction.ts`.
+ */
 export const _deleteOldRedactionHours = 1;
 
-/** Options for one cleanup pass. */
-export interface DeleteOldRedactionsOptions {
+interface DeleteOldRedactionsOptions {
+  /** How idle a row must be before we consider it. */
   olderThanMs: number;
+  /** True when we should delete files and rows; false is a dry run. */
   makeChanges: boolean;
 }
 
-/** How many stale rows we inspected and how many we actually deleted. */
-export interface DeleteOldRedactionsResult {
+interface DeleteOldRedactionsResult {
+  /** Rows whose openedAt was past the cutoff, including dry-run. */
   checked: number;
+  /** Rows we actually destroyed. Stays 0 on a dry run. */
   deleted: number;
 }
 
 /**
- * Delete redaction originals, page images, and DB rows that have not been
- * opened for `olderThanMs`.
+ * Delete originals, page images, and DB rows that nobody has had open for
+ * `olderThanMs`.
  *
- * Uses an ascending `(openedAt, id)` keyset so dry-run can walk every stale
- * row once. Spaces deletes go through batched `deleteObjects`.
+ * We page with an `(openedAt, id)` keyset instead of OFFSET:
+ * - Dry-run has to visit every stale row once
+ * - OFFSET would keep returning the same first page, because we aren't
+ *   deleting those rows
+ *
+ * Spaces deletes go through batched `deleteObjects`.
  */
 export async function deleteOldRedactions({
   olderThanMs,
@@ -43,12 +56,16 @@ export async function deleteOldRedactions({
   });
 }
 
+// How many stale rows we handle per query. Small enough that a failed
+// Spaces delete only leaves a limited batch for the next hourly retry.
+// Keep in sync with `staleRowCount` in deleteOldRedactions.lib.test.ts.
 const batchSize = 100;
 
 // S3 DeleteObjects accepts at most 1000 keys.
 // https://docs.aws.amazon.com/AmazonS3/latest/API/API_DeleteObjects.html
 const maxKeysPerDelete = 1000;
 
+// Last `(openedAt, id)` we already visited, so the next page starts after it.
 interface OpenedAtIdCursor {
   openedAt: Date;
   id: number;
@@ -61,6 +78,8 @@ interface DeleteOldRedactionsRecursiveOptions {
   counts: DeleteOldRedactionsResult;
 }
 
+// Enough to delete Spaces objects and walk the keyset. We skip heavy
+// columns like bounding boxes.
 const staleRedactionAttributes = [
   'id',
   'key',
@@ -73,6 +92,13 @@ type StaleRedaction = PartialInstance<
   (typeof staleRedactionAttributes)[number]
 >;
 
+/**
+ * One keyset page: optionally delete, then continue after the last row.
+ *
+ * If Spaces delete fails, we leave the DB rows in place so the next hourly
+ * run retries them. We still continue this run so one bad batch doesn't
+ * block later rows.
+ */
 async function deleteOldRedactionsRecursive({
   cutoffDate,
   makeChanges,
@@ -98,6 +124,7 @@ async function deleteOldRedactionsRecursive({
   if (makeChanges) {
     try {
       await deleteStorageKeys(keys);
+      // Cap concurrent row deletes so we don't stampede the DB.
       await promiseAllThrottled(
         rows.map((row) => async () => row.destroy()),
         10
@@ -113,10 +140,15 @@ async function deleteOldRedactionsRecursive({
     }
   }
 
+  const lastRow = rows[rows.length - 1];
+  const nextCursor: OpenedAtIdCursor = {
+    openedAt: lastRow.openedAt,
+    id: lastRow.id,
+  };
   return deleteOldRedactionsRecursive({
     cutoffDate,
     makeChanges,
-    cursor: cursorFromLastRow(rows),
+    cursor: nextCursor,
     counts: nextCounts,
   });
 }
@@ -133,6 +165,9 @@ async function fetchStaleRedactionBatch({
     where: {
       ...(cursor
         ? {
+            // `(openedAt, id) > cursor`. Sequelize can't compare tuples, so
+            // we expand it: a later openedAt, or the same openedAt with a
+            // higher id. That way we never revisit a row we already saw.
             [Op.or]: [
               { openedAt: { [Op.gt]: cursor.openedAt } },
               {
@@ -177,13 +212,4 @@ async function deleteStorageKeys(keys: string[]): Promise<void> {
     }),
     1
   );
-}
-
-function cursorFromLastRow(rows: StaleRedaction[]): OpenedAtIdCursor {
-  const lastRow = rows[rows.length - 1];
-  const cursor: OpenedAtIdCursor = {
-    openedAt: lastRow.openedAt,
-    id: lastRow.id,
-  };
-  return cursor;
 }

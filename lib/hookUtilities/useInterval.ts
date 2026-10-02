@@ -1,39 +1,33 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useScreenFocused } from './useScreenFocused';
 
 /**
- * Makes using setInterval work well in a React Hooks environment; normally,
- * setInterval would reference stale variables on every run (since it relies
- * on the Javascript closure)
+ * Call `callback` on a delay, always using the latest callback. A plain
+ * `setInterval` would keep the first render's closure, so it'd see stale
+ * props and state.
  *
- * Copy/pasted from React core developer Dan Abramov's blog, which also
- * explains why it's challenging, with small adjustments so that it
- * typechecks
- *
+ * Copied from Dan Abramov's writeup, with small changes so it typechecks:
  * https://overreacted.io/making-setinterval-declarative-with-react-hooks/
  *
- * On mobile, this also stops checking if the screen isn't focused. On web,
- * `useScreenFocused` always returns true, so a background tab still ticks.
+ * A background tab still ticks. We want that: an open-but-unfocused tab
+ * should keep its interval running.
  */
 export function useInterval(
   callback: () => unknown,
-  /** Delay between each invocation. If `null`, will stop the interval */
+  /** Ms between ticks. Pass `null` to pause without unmounting. */
   delayMs: number | null
 ): void {
-  const screenFocused = useScreenFocused();
   const savedCallback = useRef<(() => unknown) | null>(null);
 
-  // Remember the latest callback.
   useEffect(() => {
     savedCallback.current = callback;
   }, [callback]);
 
-  // Set up the interval.
   useEffect(() => {
-    // If the screen isn't focused, clear interval
-    if (!screenFocused) return undefined;
+    // Returning undefined skips creating an interval. The previous effect's
+    // cleanup already cleared the old one, so this pauses when delayMs is
+    // null.
     if (delayMs === null) return undefined;
 
     const tick = (): void => {
@@ -41,5 +35,5 @@ export function useInterval(
     };
     const id = setInterval(tick, delayMs);
     return () => clearInterval(id);
-  }, [delayMs, screenFocused]);
+  }, [delayMs]);
 }

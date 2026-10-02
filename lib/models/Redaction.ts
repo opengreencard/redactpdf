@@ -39,9 +39,12 @@ export interface RedactionAttributes {
   /** If the redaction errors, the error message that we got */
   errorMessage: string | null;
   /**
-   * Last time a browser tab reported this document was open. Starts as the
-   * upload time; POST /api/redaction/:key/open refreshes it. Cleanup deletes
-   * when this is older than `_deleteOldRedactionHours`.
+   * Last time a review tab said this document was still open. We set it at
+   * upload so unused uploads expire too. Cleanup deletes rows older than
+   * `_deleteOldRedactionHours`.
+   *
+   * Keep in sync with `_deleteOldRedactionHours` in
+   * `scripts/cron/deleteOldRedactions.lib.ts`.
    */
   openedAt: Date;
   createdAt: Date;
@@ -111,6 +114,8 @@ const Redaction = db.define<
   {
     indexes: [
       { name: 'key', unique: true, fields: ['key'] },
+      // Cleanup walks stale rows by `(openedAt, id)`. This index makes
+      // that keyset cheap.
       { name: 'openedAt_id', fields: ['openedAt', 'id'] },
     ],
   }

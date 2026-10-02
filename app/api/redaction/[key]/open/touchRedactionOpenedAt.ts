@@ -1,7 +1,7 @@
 import { ApplicationError } from '../../../../../lib/errors/applicationError';
 import Redaction from '../../../../../lib/models/Redaction';
 
-/** Parameters used to refresh a redaction document's last-opened time. */
+/** Which redaction the open review tab is pinging. */
 export interface TouchRedactionOpenedAtRequest {
   key: string;
 }
@@ -9,8 +9,10 @@ export interface TouchRedactionOpenedAtRequest {
 /**
  * Record that a browser tab still has this redaction open.
  *
- * Cleanup deletes documents one hour after the last ping, so the review page
- * calls this on mount and about once a minute while the tab stays open.
+ * Call this on mount and about once a minute while the tab is open, so
+ * cleanup doesn't treat an active review as idle.
+ *
+ * Keep in sync with the `60 * 1000` interval in `RedactionPage`.
  */
 export async function touchRedactionOpenedAt({
   key,

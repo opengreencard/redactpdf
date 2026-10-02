@@ -53,6 +53,8 @@ export async function uploadFileForRedaction({
     redactionBoundingBoxes: [],
     status: RedactionStatus.redacting,
     errorMessage: null,
+    // Cleanup clocks from openedAt; upload is the first "open" so files
+    // nobody ever reviews still expire after the idle TTL.
     openedAt: new Date(),
   });
 

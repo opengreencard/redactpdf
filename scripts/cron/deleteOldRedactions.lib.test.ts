@@ -19,7 +19,9 @@ import {
   deleteOldRedactions,
 } from './deleteOldRedactions.lib';
 
+// Just past the TTL, so cleanup should select these.
 const staleHours = _deleteOldRedactionHours + 0.01;
+// Just inside the TTL, so cleanup should leave these alone.
 const freshHours = _deleteOldRedactionHours - 0.01;
 const olderThanMs = _deleteOldRedactionHours * 60 * 60 * 1000;
 
@@ -160,6 +162,8 @@ describe(deleteOldRedactions, () => {
   });
 
   describe('more than 100 stale rows', () => {
+    // Keep in sync with `batchSize` in deleteOldRedactions.lib.ts. One extra
+    // row forces a second keyset page.
     const staleRowCount = 101;
     let redactionKeys: string[];
 

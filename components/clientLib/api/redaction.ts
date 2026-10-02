@@ -44,7 +44,7 @@ export const getRedactionClient = makeClientAPIRouteWithoutBody<
   }),
 });
 
-/** Refresh openedAt so cleanup will not delete an open review tab. */
+/** Ping openedAt so cleanup leaves a still-open review tab alone. */
 export const touchRedactionOpenedAtClient = makeClientAPIRouteWithBody<
   {},
   { key: string },

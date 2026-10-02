@@ -1,7 +1,10 @@
 import { S3Bucket } from '../buckets';
 import { makeStorageFunctions } from '../storageFunctions';
 
-/** Build the private Spaces key for an uploaded original PDF. */
+/**
+ * Spaces path for the original PDF. Upload and cleanup share this so we
+ * delete the same object we wrote.
+ */
 export function getStorageKeyForRedactionFile(key: string): string {
   return `redactions/${key}/original.pdf`;
 }
