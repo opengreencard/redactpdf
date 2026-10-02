@@ -4,23 +4,13 @@ import {
   addRedactionBoundingBox,
 } from './addRedactionBoundingBox';
 import {
-  DeleteRedactionBoundingBoxRequest,
+  LocateRedactionBoundingBoxRequest,
   deleteRedactionBoundingBox,
 } from './deleteRedactionBoundingBox';
-import {
-  ToggleRedactionBoundingBoxRequest,
-  toggleRedactionBoundingBox,
-} from './toggleRedactionBoundingBox';
+import { toggleRedactionBoundingBox } from './toggleRedactionBoundingBox';
 import type { GetRedactionResponse } from '../../../../../lib/models/redactionTypes';
 
-function keyFromPath({ pathParams }: { pathParams: { key: string } }): {
-  key: string;
-} {
-  const params: { key: string } = { key: pathParams.key };
-  return params;
-}
-
-/** Draw a manual box. Body is `{ page, box }`. */
+/** One box per request so two saves don't overwrite the JSON column. */
 export const POST = makeAPIRouteWithBody<
   Omit<AddRedactionBoundingBoxRequest, 'key'>,
   { key: string },
@@ -34,11 +24,11 @@ export const POST = makeAPIRouteWithBody<
 });
 
 /**
- * Remove a box. JSON body rather than query params so we can send the full
+ * JSON body rather than query params so we can send the full
  * `{ page, box, type }` identity — Axios DELETE `data` is fine.
  */
 export const DELETE = makeAPIRouteWithBody<
-  Omit<DeleteRedactionBoundingBoxRequest, 'key'>,
+  Omit<LocateRedactionBoundingBoxRequest, 'key'>,
   { key: string },
   GetRedactionResponse,
   {},
@@ -49,9 +39,9 @@ export const DELETE = makeAPIRouteWithBody<
   makeQueryAndPathParams: keyFromPath,
 });
 
-/** Flip `enabled` on an existing box. Body is `{ page, box, type }`. */
+/** Flip `enabled` on one existing box. Same identity body as DELETE. */
 export const PATCH = makeAPIRouteWithBody<
-  Omit<ToggleRedactionBoundingBoxRequest, 'key'>,
+  Omit<LocateRedactionBoundingBoxRequest, 'key'>,
   { key: string },
   GetRedactionResponse,
   {},
@@ -61,3 +51,9 @@ export const PATCH = makeAPIRouteWithBody<
   apiFunc: toggleRedactionBoundingBox,
   makeQueryAndPathParams: keyFromPath,
 });
+
+function keyFromPath({ pathParams }: { pathParams: { key: string } }): {
+  key: string;
+} {
+  return { key: pathParams.key };
+}

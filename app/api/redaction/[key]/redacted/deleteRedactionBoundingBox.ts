@@ -9,7 +9,12 @@ import {
   saveRedactionBoundingBoxes,
 } from './mutateRedactionBoundingBoxes';
 
-/** Identity of an existing box. Delete and toggle both look up this way. */
+/**
+ * Identity of an existing box. Delete and toggle both look up this way.
+ *
+ * Keep in sync with `LocateRedactionBoundingBoxClientRequest` in
+ * `components/clientLib/api/redaction.ts`.
+ */
 export interface LocateRedactionBoundingBoxRequest {
   key: string;
   page: number;
@@ -17,16 +22,16 @@ export interface LocateRedactionBoundingBoxRequest {
   type: RedactionBoundingBox['type'];
 }
 
-export type DeleteRedactionBoundingBoxRequest =
-  LocateRedactionBoundingBoxRequest;
-
-/** Remove one automatic or manual box and return the updated review payload. */
+/**
+ * Remove a box from the document. Toggle hides; this actually drops the
+ * row so it won't come back on refresh.
+ */
 export async function deleteRedactionBoundingBox({
   key,
   page,
   box,
   type,
-}: DeleteRedactionBoundingBoxRequest): Promise<GetRedactionResponse> {
+}: LocateRedactionBoundingBoxRequest): Promise<GetRedactionResponse> {
   const redaction = await loadRedactionForBoundingBoxMutation({
     key,
     page,

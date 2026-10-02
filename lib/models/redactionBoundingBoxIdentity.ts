@@ -1,6 +1,9 @@
 import type { BoundingBox, RedactionBoundingBox } from './redactionTypes';
 
-/** Match by type, page, and exact coordinates — not `enabled` or automatic text. */
+/**
+ * Match by type, page, and exact coordinates — not `enabled` or automatic
+ * text.
+ */
 export function isSameRedactionBoundingBox(
   left: Pick<RedactionBoundingBox, 'type' | 'page' | 'box'>,
   right: Pick<RedactionBoundingBox, 'type' | 'page' | 'box'>

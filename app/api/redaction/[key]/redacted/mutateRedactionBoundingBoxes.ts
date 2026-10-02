@@ -27,7 +27,9 @@ type MutationRedaction = PartialInstance<
 >;
 
 /**
- * Load a finished redaction and reject bad page/box numbers before we mutate.
+ * Load a finished redaction and reject bad page/box numbers before we
+ * mutate. Add, delete, and toggle all go through here so they share the
+ * same 400/409 errors.
  */
 export async function loadRedactionForBoundingBoxMutation({
   key,
@@ -64,14 +66,17 @@ export async function saveRedactionBoundingBoxes({
   redaction: MutationRedaction;
   redactionBoundingBoxes: RedactionBoundingBox[];
 }): Promise<GetRedactionResponse> {
-  // JSON TEXT setter only runs on assignment, not in-place mutation.
+  // We have to assign on this instance; a copy wouldn't save the same row.
   // eslint-disable-next-line no-param-reassign
   redaction.redactionBoundingBoxes = redactionBoundingBoxes;
   await redaction.save();
   return getRedaction({ key });
 }
 
-/** First box with the same type, page, and coordinates. */
+/**
+ * Boxes don't have ids — we match type, page, and coordinates. If two
+ * boxes share that identity, we update the first one.
+ */
 export function findRedactionBoundingBoxIndexOrThrowApplicationError({
   boxes,
   page,
@@ -92,6 +97,10 @@ export function findRedactionBoundingBoxIndexOrThrowApplicationError({
   return index;
 }
 
+/**
+ * Pages are 1-based like the PDF viewer. Coordinates are 0–1 so they
+ * survive page-size changes.
+ */
 function assertValidPageAndBoxOrThrowApplicationError({
   page,
   box,

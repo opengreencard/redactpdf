@@ -6,8 +6,11 @@ import Redaction, {
 import { RedactionStatus } from '../../../../lib/models/redactionTypes';
 import { getUnreachableError } from '../../../../lib/typescript/getUnreachableError';
 
-/** Props so `attributes` is the source of the returned `PartialInstance` keys. */
-export interface FindRedactionByKeyOrErrorProps<
+/**
+ * Props so `attributes` is the source of the returned `PartialInstance`
+ * keys.
+ */
+interface FindRedactionByKeyOrErrorProps<
   Attrs extends keyof RedactionAttributes,
 > {
   key: string;

@@ -1,19 +1,10 @@
 import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
 import FakeData from '../../../../../lib/testUtilities/FakeData';
-import {
-  BoundingBox,
-  RedactionStatus,
-} from '../../../../../lib/models/redactionTypes';
+import type { RedactionInstance } from '../../../../../lib/models/Redaction';
+import { RedactionStatus } from '../../../../../lib/models/redactionTypes';
 import { addRedactionBoundingBox } from './addRedactionBoundingBox';
 
 describe(addRedactionBoundingBox, () => {
-  const box: BoundingBox = {
-    minX: 0.1,
-    minY: 0.2,
-    maxX: 0.3,
-    maxY: 0.4,
-  };
-
   it('appends a manual box', async () => {
     const autoBox = ClientFakeData.makeAutoRedactionBoundingBox({ page: 1 });
     const redaction = await FakeData.makeDBRedaction({
@@ -36,7 +27,7 @@ describe(addRedactionBoundingBox, () => {
     }
     expect(result.redactionBoundingBoxes).toEqual([
       autoBox,
-      { type: 'manual', page: 2, box, enabled: true },
+      ClientFakeData.makeManualRedactionBoundingBox({ page: 2, box }),
     ]);
   });
 
@@ -78,48 +69,54 @@ describe(addRedactionBoundingBox, () => {
     ).rejects.toMatchObject({ statusCode: 409 });
   });
 
-  it.each([{ page: 0 }, { page: 3 }, { page: 1.5 }])(
-    'rejects page $page',
-    async ({ page }) => {
-      const redaction = await FakeData.makeDBRedaction({
+  describe('input validation', () => {
+    let redaction: RedactionInstance;
+
+    beforeAll(async () => {
+      redaction = await FakeData.makeDBRedaction({
         pageCount: 2,
         status: RedactionStatus.redacted,
       });
+    });
 
+    it.each([{ page: 0 }, { page: 3 }, { page: 1.5 }])(
+      'rejects page $page',
+      async ({ page }) => {
+        await expect(
+          addRedactionBoundingBox({
+            key: redaction.key,
+            page,
+            box,
+          })
+        ).rejects.toMatchObject({ statusCode: 400 });
+      }
+    );
+
+    it.each([
+      {
+        box: ClientFakeData.makeBoundingBox({ minX: 0.5, maxX: 0.5 }),
+      },
+      {
+        box: ClientFakeData.makeBoundingBox({ maxX: 1.1 }),
+      },
+      {
+        box: ClientFakeData.makeBoundingBox({ minX: Number.NaN }),
+      },
+      {
+        box: ClientFakeData.makeBoundingBox({
+          maxX: Number.POSITIVE_INFINITY,
+        }),
+      },
+    ])('rejects invalid box coordinates', async ({ box: invalidBox }) => {
       await expect(
         addRedactionBoundingBox({
           key: redaction.key,
-          page,
-          box,
+          page: 1,
+          box: invalidBox,
         })
       ).rejects.toMatchObject({ statusCode: 400 });
-    }
-  );
-
-  it.each([
-    {
-      box: { minX: 0.5, minY: 0.1, maxX: 0.5, maxY: 0.2 },
-    },
-    {
-      box: { minX: 0, minY: 0, maxX: 1.1, maxY: 1 },
-    },
-    {
-      box: { minX: Number.NaN, minY: 0, maxX: 1, maxY: 1 },
-    },
-    {
-      box: { minX: 0, minY: 0, maxX: Number.POSITIVE_INFINITY, maxY: 1 },
-    },
-  ])('rejects invalid box coordinates', async ({ box: invalidBox }) => {
-    const redaction = await FakeData.makeDBRedaction({
-      status: RedactionStatus.redacted,
     });
-
-    await expect(
-      addRedactionBoundingBox({
-        key: redaction.key,
-        page: 1,
-        box: invalidBox,
-      })
-    ).rejects.toMatchObject({ statusCode: 400 });
   });
+
+  const box = ClientFakeData.makeBoundingBox();
 });

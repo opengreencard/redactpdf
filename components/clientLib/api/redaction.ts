@@ -12,7 +12,7 @@ import {
 } from './common';
 
 /** Client input for uploading one PDF for redaction. */
-export interface UploadFileForRedactionClientRequest {
+interface UploadFileForRedactionClientRequest {
   file: File;
 }
 
@@ -60,14 +60,20 @@ export const generateRedactedPDFClient = makeClientAPIRouteWithoutBody<
   responseType: 'arraybuffer',
 });
 
-/** Client input for drawing a manual redaction box. */
-export interface AddRedactionBoundingBoxClientRequest {
+/**
+ * Client input for drawing a manual redaction box. We don't send `type` —
+ * the server always creates a `manual` box.
+ *
+ * Keep in sync with `AddRedactionBoundingBoxRequest` in
+ * `app/api/redaction/[key]/redacted/addRedactionBoundingBox.ts`.
+ */
+interface AddRedactionBoundingBoxClientRequest {
   key: string;
   page: number;
   box: BoundingBox;
 }
 
-/** Persist a newly drawn box. */
+/** POST one newly drawn box. The server always stores it as `manual`. */
 export const addRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
   Omit<AddRedactionBoundingBoxClientRequest, 'key'>,
   { key: string },
@@ -86,20 +92,22 @@ export const addRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
   }),
 });
 
-/** Identity of an existing box. Delete and toggle both look up this way. */
-export interface LocateRedactionBoundingBoxClientRequest {
+/**
+ * Identity of an existing box. Delete and toggle both look up this way.
+ *
+ * Keep in sync with `LocateRedactionBoundingBoxRequest` in
+ * `app/api/redaction/[key]/redacted/deleteRedactionBoundingBox.ts`.
+ */
+interface LocateRedactionBoundingBoxClientRequest {
   key: string;
   page: number;
   box: BoundingBox;
   type: RedactionBoundingBox['type'];
 }
 
-export type DeleteRedactionBoundingBoxClientRequest =
-  LocateRedactionBoundingBoxClientRequest;
-
-/** Persist a box deletion. */
+/** DELETE with a JSON body so we can send `{ page, box, type }`. */
 export const deleteRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
-  Omit<DeleteRedactionBoundingBoxClientRequest, 'key'>,
+  Omit<LocateRedactionBoundingBoxClientRequest, 'key'>,
   { key: string },
   GetRedactionResponse
 >({
@@ -110,19 +118,16 @@ export const deleteRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
     box,
     type,
   }): ClientAPIRouteWithBodyData<
-    Omit<DeleteRedactionBoundingBoxClientRequest, 'key'>
+    Omit<LocateRedactionBoundingBoxClientRequest, 'key'>
   > => ({
     url: `/api/redaction/${key}/redacted`,
     body: { page, box, type },
   }),
 });
 
-export type ToggleRedactionBoundingBoxClientRequest =
-  LocateRedactionBoundingBoxClientRequest;
-
-/** Persist an enabled/hidden toggle. */
+/** PATCH `enabled` on one box. Identity matches delete. */
 export const toggleRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
-  Omit<ToggleRedactionBoundingBoxClientRequest, 'key'>,
+  Omit<LocateRedactionBoundingBoxClientRequest, 'key'>,
   { key: string },
   GetRedactionResponse
 >({
@@ -133,7 +138,7 @@ export const toggleRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
     box,
     type,
   }): ClientAPIRouteWithBodyData<
-    Omit<ToggleRedactionBoundingBoxClientRequest, 'key'>
+    Omit<LocateRedactionBoundingBoxClientRequest, 'key'>
   > => ({
     url: `/api/redaction/${key}/redacted`,
     body: { page, box, type },

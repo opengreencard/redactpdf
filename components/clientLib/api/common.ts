@@ -26,7 +26,7 @@ interface ClientRouteOptions {
 }
 
 /** Extra options for body routes that upload files. */
-export interface ClientAPIRouteWithBodyCallOptions {
+interface ClientAPIRouteWithBodyCallOptions {
   /** Called with upload progress as a value between 0 and 1. */
   onUploadProgress?: (progress: number) => void;
 }
@@ -34,8 +34,8 @@ export interface ClientAPIRouteWithBodyCallOptions {
 /**
  * Make a client function for POST, DELETE, or PATCH.
  *
- * DELETE still sends JSON via Axios `data` so we can identify a box by
- * `{ page, box, type }` instead of query params.
+ * DELETE still sends a JSON body via Axios `data`. Query params aren't a
+ * good fit for a nested identity object.
  */
 export function makeClientAPIRouteWithBody<
   RequestBodyT,
@@ -82,7 +82,10 @@ export function makeClientAPIRouteWithBody<
   };
 }
 
-/** Make a client function for GET. */
+/**
+ * Make a client GET function. GET has no body, so we only turn the request
+ * into a URL and query string.
+ */
 export function makeClientAPIRouteWithoutBody<RequestT, ResponseT>({
   method,
   dataToUrlAndQueryString,

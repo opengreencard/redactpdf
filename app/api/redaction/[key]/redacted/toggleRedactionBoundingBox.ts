@@ -9,16 +9,16 @@ import {
 } from './mutateRedactionBoundingBoxes';
 import type { LocateRedactionBoundingBoxRequest } from './deleteRedactionBoundingBox';
 
-export type ToggleRedactionBoundingBoxRequest =
-  LocateRedactionBoundingBoxRequest;
-
-/** Flip `enabled` on one box and return the updated review payload. */
+/**
+ * Flip `enabled` without changing the box identity. Hidden boxes stay in
+ * the JSON so the user can undo.
+ */
 export async function toggleRedactionBoundingBox({
   key,
   page,
   box,
   type,
-}: ToggleRedactionBoundingBoxRequest): Promise<GetRedactionResponse> {
+}: LocateRedactionBoundingBoxRequest): Promise<GetRedactionResponse> {
   const redaction = await loadRedactionForBoundingBoxMutation({
     key,
     page,

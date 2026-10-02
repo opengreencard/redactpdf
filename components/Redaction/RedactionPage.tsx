@@ -212,7 +212,8 @@ async function persistBoxesSequentially<BoxT>(
 ): Promise<GetRedactionResponse | null> {
   let last: GetRedactionResponse | null = null;
   for (const box of boxes) {
-    // Sequential JSON saves; overlapping writes would clobber the column.
+    // We await in the loop on purpose; Promise.all would race the JSON
+    // writes.
     // eslint-disable-next-line no-await-in-loop
     last = await persistOne(box);
   }

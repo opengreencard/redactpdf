@@ -5,7 +5,8 @@ import { generateRedactedPDF } from '../../../../../lib/pdf/generateRedactedPDF'
 import { RedactionStatus } from '../../../../../lib/models/redactionTypes';
 import { generateRedactedPDFForKey } from './generateRedactedPDFForKey';
 
-// The PDF transformation itself is covered by lib/pdf/generateRedactedPDF.test.ts.
+// The PDF transformation itself is covered by
+// lib/pdf/generateRedactedPDF.test.ts.
 // PDF generation is slow, so this suite focuses on document lookup, storage
 // access, status gating, and raw response data.
 jest.mock('../../../../../lib/pdf/generateRedactedPDF', () => {

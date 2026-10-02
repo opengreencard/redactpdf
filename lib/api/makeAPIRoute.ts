@@ -6,7 +6,10 @@ import { getAuthState } from '../auth/nextAuth';
 import { getUnreachableError } from '../typescript/getUnreachableError';
 import { UserAttributes } from '../models/User';
 
-/** Minimal route-handler types used by the with-body and without-body factories. */
+/**
+ * Minimal route-handler types used by the with-body and without-body
+ * factories.
+ */
 export interface AppRouteHandlerFnContext {
   params: Promise<Record<string, string | string[] | undefined>>;
 }
@@ -17,10 +20,10 @@ export type AppRouteHandlerFn = (
 ) => Promise<Response>;
 
 /**
- * Run a function that powers an API, and return its response as JSON or an error
- * if it fails
+ * Run a function that powers an API, and return its response as JSON or
+ * an error if it fails.
  */
-export async function runFunctionAndHandleErrorsJSON<ResponseT>(
+async function runFunctionAndHandleErrorsJSON<ResponseT>(
   func: () => Promise<ResponseT>,
   // Polling endpoints can use this to prevent stale status or edited data from
   // being served by a browser or intermediary cache.
@@ -52,12 +55,13 @@ export interface RawResponse {
 }
 
 /**
- * Run a function that powers an API, and return its raw response or an error
- * if it fails. The response will be returned directly without JSON serialization.
+ * Run a function that powers an API, and return its raw response or an
+ * error if it fails. The response is sent as-is, without JSON
+ * serialization.
  */
-export async function runFunctionAndHandleErrorsRaw<
-  ResponseT extends RawResponse,
->(func: () => Promise<ResponseT>): Promise<NextResponse> {
+async function runFunctionAndHandleErrorsRaw<ResponseT extends RawResponse>(
+  func: () => Promise<ResponseT>
+): Promise<NextResponse> {
   const result = await runFunctionAndHandleErrorsBase(func);
 
   if (result.success) {
@@ -95,7 +99,7 @@ export interface RedirectResponse {
  * Run a function that powers an API, and return a redirect response or an error
  * if it fails. The response will redirect the user to the specified URL.
  */
-export async function runFunctionAndHandleErrorsRedirect<
+async function runFunctionAndHandleErrorsRedirect<
   ResponseT extends RedirectResponse,
 >(func: () => Promise<ResponseT>): Promise<NextResponse> {
   const result = await runFunctionAndHandleErrorsBase(func);
@@ -165,7 +169,8 @@ type ResponseResult<T> =
     };
 
 /**
- * Base function that handles running a function and catching errors, returning a standardized result
+ * Run `func` and catch errors so callers can serialize success or failure
+ * the same way.
  */
 async function runFunctionAndHandleErrorsBase<ResponseT>(
   func: () => Promise<ResponseT>
@@ -191,30 +196,6 @@ async function runFunctionAndHandleErrorsBase<ResponseT>(
     }
   }
 }
-
-/**
- * Function that can be passed into an API route that will map from
- * the Next.js Session object to parameters to pass into the API function that
- * depend on the logged-in user.
- *
- * @example
- * ```ts
- * async function echoUserName(userName: string | null) {
- *   return userName;
- * }
- *
- * export const GET = makeAPIRouteWithoutBody({
- *   method: 'GET',
- *   apiFunc: echoUserName,
- *   injectAuth: async (session) => ({
- *     userName: session?.user.name,
- *   }),
- * });
- * ```
- */
-export type InjectAuthFunction<AuthParamsT> = (
-  session: Session | null
-) => Promise<AuthParamsT>;
 
 export interface MakeRequestParamsFromRequestOptions<
   TransformedQueryAndPathParamsT,
@@ -299,7 +280,7 @@ export async function getLoggedInUserOrError(): Promise<UserAttributes> {
   return authState.user;
 }
 
-export type MakeQueryAndPathParamsFunction<
+type MakeQueryAndPathParamsFunction<
   TransformedQueryAndPathParamsT,
   PathParamsT extends {} = {},
 > = (options: {

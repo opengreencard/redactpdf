@@ -8,14 +8,22 @@ import {
   saveRedactionBoundingBoxes,
 } from './mutateRedactionBoundingBoxes';
 
-/** Draw one manual box onto a finished redaction. */
+/**
+ * Callers don't send `type` — we always create a `manual` box.
+ *
+ * Keep in sync with `AddRedactionBoundingBoxClientRequest` in
+ * `components/clientLib/api/redaction.ts`.
+ */
 export interface AddRedactionBoundingBoxRequest {
   key: string;
   page: number;
   box: BoundingBox;
 }
 
-/** Append a manual box and return the updated review payload. */
+/**
+ * Draw a new box on a finished redaction. We always set `enabled: true` so
+ * it shows up on the review page right away.
+ */
 export async function addRedactionBoundingBox({
   key,
   page,

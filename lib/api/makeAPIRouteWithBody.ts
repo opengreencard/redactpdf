@@ -11,6 +11,7 @@ import {
   runFunctionAndHandleErrors,
 } from './makeAPIRoute';
 import { getUnreachableError } from '../typescript/getUnreachableError';
+import { FailureResponse } from '../types/response';
 
 type MakeAPIRouteWithBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
@@ -41,7 +42,8 @@ type MakeAPIRouteWithBodyAuthQueryPathOptions<
  *
  * - When `bodyFormat` is `formData`, the request body type must contain a
  *   `body: FormData` field so callers can access `request.body.get(...)`.
- * - When `responseFormat` is `raw`, the response type must extend `RawResponse`.
+ * - When `responseFormat` is `raw`, the response type must extend
+ *   `RawResponse`.
  * - When `responseFormat` is `redirect`, the response type must extend
  *   `RedirectResponse`.
  */
@@ -255,7 +257,10 @@ export function makeAPIRouteWithBody<
       // eslint-disable-next-line no-console
       console.error(error);
       return NextResponse.json(
-        { success: false, message: 'Invalid request body' },
+        {
+          success: false,
+          message: 'Invalid request body',
+        } satisfies FailureResponse,
         { status: 400 }
       );
     }
