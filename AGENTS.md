@@ -27,8 +27,9 @@ docker-compose --env-file .env.development up -d mariadb
 ```
 
 The Compose SQL initialization script creates the test database and user when
-the MariaDB volume is first created. If the volume already exists, apply that
-idempotent setup once:
+the MariaDB volume is first created. If the volume already exists from before
+the separate development user was added, follow the existing-volume migration
+in the README before applying that idempotent test setup:
 
 ```bash
 docker-compose exec -T mariadb mariadb -uroot -predaction-root \

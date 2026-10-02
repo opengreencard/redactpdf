@@ -28,8 +28,24 @@ yarn jest
 ```
 
 The Compose initialization script creates the test database and user when the
-MariaDB volume is first created. If the volume already exists, apply the
-idempotent setup once:
+MariaDB volume is first created. If you already have a `redaction-mariadb`
+volume from before the separate development user was added, run this
+idempotent migration once. It reads the development password from the running
+MariaDB service, so it stays in sync with `DB_PASS` in `.env.development`:
+
+```bash
+docker-compose --env-file .env.development exec -T mariadb \
+  sh -c 'mariadb -uroot -predaction-root -e "
+    CREATE DATABASE IF NOT EXISTS redaction_development;
+    CREATE USER IF NOT EXISTS '\''redaction_development'\''@'\''%'\'' IDENTIFIED BY '\''$MARIADB_PASSWORD'\'';
+    ALTER USER '\''redaction_development'\''@'\''%'\'' IDENTIFIED BY '\''$MARIADB_PASSWORD'\'';
+    GRANT ALL PRIVILEGES ON redaction_development.* TO '\''redaction_development'\''@'\''%'\'';
+    FLUSH PRIVILEGES;
+  "'
+```
+
+The migration preserves existing data and can be run more than once. Then
+apply the test database and user setup:
 
 ```bash
 docker-compose exec -T mariadb mariadb -uroot -predaction-root \
