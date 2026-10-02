@@ -14,13 +14,16 @@ import {
 } from '../../lib/findRedactionByKeyOrError';
 
 // `id` is required so Sequelize can UPDATE instead of attempting a global save.
-const mutationAttributes: (
-  'id' | 'status' | 'pageCount' | 'redactionBoundingBoxes'
-)[] = ['id', 'status', 'pageCount', 'redactionBoundingBoxes'];
+const mutationAttributes = [
+  'id',
+  'status',
+  'pageCount',
+  'redactionBoundingBoxes',
+] as const;
 
 type MutationRedaction = PartialInstance<
   RedactionAttributes,
-  'id' | 'status' | 'pageCount' | 'redactionBoundingBoxes'
+  (typeof mutationAttributes)[number]
 >;
 
 /**
@@ -37,7 +40,7 @@ export async function loadRedactionForBoundingBoxMutation({
 }): Promise<MutationRedaction> {
   const redaction = await findRedactionByKeyOrError({
     key,
-    attributes: mutationAttributes,
+    attributes: [...mutationAttributes],
   });
   assertIsRedactedOrThrowApplicationError(redaction);
   assertValidPageAndBoxOrThrowApplicationError({
@@ -48,7 +51,10 @@ export async function loadRedactionForBoundingBoxMutation({
   return redaction;
 }
 
-/** JSON TEXT only updates when we assign a new array, not when we mutate in place. */
+/**
+ * Persist boxes by assigning a new array. The JSON TEXT setter only runs on
+ * `set`; in-place `push` / `enabled =` would silently no-op.
+ */
 export async function saveRedactionBoundingBoxes({
   key,
   redaction,
@@ -58,7 +64,7 @@ export async function saveRedactionBoundingBoxes({
   redaction: MutationRedaction;
   redactionBoundingBoxes: RedactionBoundingBox[];
 }): Promise<GetRedactionResponse> {
-  // JSON TEXT only updates when we set the field, not when we mutate in place.
+  // JSON TEXT setter only runs on assignment, not in-place mutation.
   // eslint-disable-next-line no-param-reassign
   redaction.redactionBoundingBoxes = redactionBoundingBoxes;
   await redaction.save();

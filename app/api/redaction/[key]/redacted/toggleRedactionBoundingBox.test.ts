@@ -1,23 +1,11 @@
-import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
-import FakeData from '../../../../../lib/testUtilities/FakeData';
 import { RedactionStatus } from '../../../../../lib/models/redactionTypes';
 import { toggleRedactionBoundingBox } from './toggleRedactionBoundingBox';
+import { _makeMixedRedactedRedaction } from './mutateRedactionBoundingBoxesTestCommon';
+import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
 
 describe(toggleRedactionBoundingBox, () => {
   it('flips an automatic box false then true', async () => {
-    const autoBox = ClientFakeData.makeAutoRedactionBoundingBox({
-      page: 1,
-      enabled: true,
-    });
-    const manualBox = ClientFakeData.makeManualRedactionBoundingBox({
-      page: 2,
-      enabled: true,
-    });
-    const redaction = await FakeData.makeDBRedaction({
-      pageCount: 2,
-      status: RedactionStatus.redacted,
-      redactionBoundingBoxes: [autoBox, manualBox],
-    });
+    const { redaction, autoBox } = await _makeMixedRedactedRedaction();
 
     const first = await toggleRedactionBoundingBox({
       key: redaction.key,
@@ -45,14 +33,7 @@ describe(toggleRedactionBoundingBox, () => {
   });
 
   it('flips a manual box false then true', async () => {
-    const manualBox = ClientFakeData.makeManualRedactionBoundingBox({
-      page: 1,
-      enabled: true,
-    });
-    const redaction = await FakeData.makeDBRedaction({
-      status: RedactionStatus.redacted,
-      redactionBoundingBoxes: [manualBox],
-    });
+    const { redaction, manualBox } = await _makeMixedRedactedRedaction();
 
     const first = await toggleRedactionBoundingBox({
       key: redaction.key,
@@ -73,16 +54,13 @@ describe(toggleRedactionBoundingBox, () => {
     if (second.status !== RedactionStatus.redacted) {
       throw new Error('Expected a redacted response');
     }
-    expect(first.redactionBoundingBoxes[0]?.enabled).toBe(false);
-    expect(second.redactionBoundingBoxes[0]?.enabled).toBe(true);
+    expect(first.redactionBoundingBoxes[0]?.enabled).toBe(true);
+    expect(first.redactionBoundingBoxes[1]?.enabled).toBe(false);
+    expect(second.redactionBoundingBoxes[1]?.enabled).toBe(true);
   });
 
   it('throws a 404 ApplicationError for an unknown box', async () => {
-    const autoBox = ClientFakeData.makeAutoRedactionBoundingBox({ page: 1 });
-    const redaction = await FakeData.makeDBRedaction({
-      status: RedactionStatus.redacted,
-      redactionBoundingBoxes: [autoBox],
-    });
+    const { redaction } = await _makeMixedRedactedRedaction();
 
     await expect(
       toggleRedactionBoundingBox({

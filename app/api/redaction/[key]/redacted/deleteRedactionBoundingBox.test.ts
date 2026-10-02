@@ -1,19 +1,13 @@
-import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
-import FakeData from '../../../../../lib/testUtilities/FakeData';
 import { RedactionStatus } from '../../../../../lib/models/redactionTypes';
 import { deleteRedactionBoundingBox } from './deleteRedactionBoundingBox';
+import { _makeMixedRedactedRedaction } from './mutateRedactionBoundingBoxesTestCommon';
+import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
+import FakeData from '../../../../../lib/testUtilities/FakeData';
 
 describe(deleteRedactionBoundingBox, () => {
   it('removes a manual box and leaves the automatic box', async () => {
-    const [autoBox, manualBox] = [
-      ClientFakeData.makeAutoRedactionBoundingBox({ page: 1 }),
-      ClientFakeData.makeManualRedactionBoundingBox({ page: 2 }),
-    ];
-    const redaction = await FakeData.makeDBRedaction({
-      pageCount: 2,
-      status: RedactionStatus.redacted,
-      redactionBoundingBoxes: [autoBox, manualBox],
-    });
+    const { redaction, autoBox, manualBox } =
+      await _makeMixedRedactedRedaction();
 
     const result = await deleteRedactionBoundingBox({
       key: redaction.key,
@@ -29,15 +23,8 @@ describe(deleteRedactionBoundingBox, () => {
   });
 
   it('removes an automatic box and leaves the manual box', async () => {
-    const [autoBox, manualBox] = [
-      ClientFakeData.makeAutoRedactionBoundingBox({ page: 1 }),
-      ClientFakeData.makeManualRedactionBoundingBox({ page: 2 }),
-    ];
-    const redaction = await FakeData.makeDBRedaction({
-      pageCount: 2,
-      status: RedactionStatus.redacted,
-      redactionBoundingBoxes: [autoBox, manualBox],
-    });
+    const { redaction, autoBox, manualBox } =
+      await _makeMixedRedactedRedaction();
 
     const result = await deleteRedactionBoundingBox({
       key: redaction.key,
@@ -53,11 +40,7 @@ describe(deleteRedactionBoundingBox, () => {
   });
 
   it('throws a 404 ApplicationError for an unknown box', async () => {
-    const autoBox = ClientFakeData.makeAutoRedactionBoundingBox({ page: 1 });
-    const redaction = await FakeData.makeDBRedaction({
-      status: RedactionStatus.redacted,
-      redactionBoundingBoxes: [autoBox],
-    });
+    const { redaction } = await _makeMixedRedactedRedaction();
 
     await expect(
       deleteRedactionBoundingBox({

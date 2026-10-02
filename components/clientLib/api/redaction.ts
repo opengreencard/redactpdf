@@ -86,13 +86,16 @@ export const addRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
   }),
 });
 
-/** Client input for removing a redaction box. */
-export interface DeleteRedactionBoundingBoxClientRequest {
+/** Identity of an existing box. Delete and toggle both look up this way. */
+export interface LocateRedactionBoundingBoxClientRequest {
   key: string;
   page: number;
   box: BoundingBox;
   type: RedactionBoundingBox['type'];
 }
+
+export type DeleteRedactionBoundingBoxClientRequest =
+  LocateRedactionBoundingBoxClientRequest;
 
 /** Persist a box deletion. */
 export const deleteRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
@@ -114,13 +117,8 @@ export const deleteRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
   }),
 });
 
-/** Client input for toggling a box's enabled flag. */
-export interface ToggleRedactionBoundingBoxClientRequest {
-  key: string;
-  page: number;
-  box: BoundingBox;
-  type: RedactionBoundingBox['type'];
-}
+export type ToggleRedactionBoundingBoxClientRequest =
+  LocateRedactionBoundingBoxClientRequest;
 
 /** Persist an enabled/hidden toggle. */
 export const toggleRedactionBoundingBoxClient = makeClientAPIRouteWithBody<
