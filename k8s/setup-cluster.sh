@@ -137,12 +137,40 @@ END
 # `doctl kubernetes cluster create` is not idempotent — it errors if the cluster
 # name is already taken. We check first so re-running the script is safe.
 if doctl kubernetes cluster get "$CLUSTER_NAME" > /dev/null 2>&1; then
-  echo "Cluster $CLUSTER_NAME already exists, skipping creation."
+  echo "Cluster $CLUSTER_NAME already exists; updating tags."
+  doctl kubernetes cluster update "$CLUSTER_NAME" --tag "$CLUSTER_TAG"
+  doctl kubernetes cluster node-pool update "$CLUSTER_NAME" webservers \
+    --tag "$CLUSTER_TAG"
 else
   doctl kubernetes cluster create "$CLUSTER_NAME" \
-    --node-pool "name=webservers;size=s-4vcpu-8gb;count=2;auto-scale=false" \
+    --tag "$CLUSTER_TAG" \
+    --node-pool "name=webservers;size=s-4vcpu-8gb;count=2;auto-scale=false;tag=$CLUSTER_TAG" \
     --1-clicks metrics-server,ingress-nginx,cert-manager \
     --region "$REGION"
+fi
+
+# Allow this cluster's worker nodes to connect to MariaDB. The custom tag is
+# stable across cluster recreation, while the node-pool tag follows replaced
+# worker nodes automatically.
+firewallID=$(doctl compute firewall list --output json \
+  | jq -r --arg name "$DB_FIREWALL_NAME" \
+    '.[] | select(.name == $name) | .id')
+if [ -z "$firewallID" ]; then
+  echo "Error: Firewall '$DB_FIREWALL_NAME' was not found."
+  exit 1
+fi
+
+firewallJSON=$(doctl compute firewall get "$firewallID" --output json)
+# Cloud Firewall source tags must exist as DigitalOcean Compute tags first.
+doctl compute tag create "$CLUSTER_TAG" 2>/dev/null || true
+
+if ! printf '%s' "$firewallJSON" | jq -e \
+  --arg clusterTag "$CLUSTER_TAG" \
+  'any(.[0].inbound_rules[]; .protocol == "tcp" and .ports == "3306" and
+    (($clusterTag as $tag | (.sources.tags // []) | index($tag)) != null))' \
+  > /dev/null; then
+  doctl compute firewall add-rules "$firewallID" \
+    --inbound-rules "protocol:tcp,ports:3306,tag:$CLUSTER_TAG"
 fi
 
 # Ensure kubectl is pointed at the right cluster, even if the cluster already

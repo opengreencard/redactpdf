@@ -17,5 +17,13 @@ export ACME_EMAIL=letsencrypt@redactpdf.ai
 # Keep CLUSTER_NAME in sync with the default in k8s/setup-cluster.sh.
 export CLUSTER_NAME=redaction-production
 
+# DigitalOcean tag applied to the cluster and every worker node pool. The
+# database Cloud Firewall uses this tag as the MariaDB source allowlist.
+export CLUSTER_TAG=redaction-production
+
+# Keep this in sync with `fwName` in the immigration GitLab repository:
+# https://gitlab.com/travelchime/immigration/-/blob/main/sysadmin/create-db-server.sh
+export DB_FIREWALL_NAME=immigration-prod-db
+
 # Keep REGION in sync with the default in k8s/setup-cluster.sh.
 export REGION=sfo3
