@@ -210,61 +210,50 @@ const LandingPageDetectList: React.FunctionComponent = React.memo(
 const LandingPagePrivacy: React.FunctionComponent = React.memo(
   function LandingPagePrivacy() {
     return (
-      <Box bg="dark.9" py="xl">
+      <Box bg="gray.0" py="xl">
         <Container size={siteContainerSize}>
           <Stack gap="xl">
             <Stack gap="sm" maw={680}>
               <Group gap="sm">
-                <Box w={24} h={2} bg="blue.4" />
-                <Text c="blue.3" fw="bold" size="xs" tt="uppercase" lts={2}>
+                <Box w={24} h={2} bg="green.6" />
+                <Text c="green.7" fw="bold" size="xs" tt="uppercase" lts={2}>
                   Privacy and open source
                 </Text>
               </Group>
-              <Title order={2} c="white">
-                What happens to your PDF
-              </Title>
-              <Text c="dark.2" size="lg">
+              <Title order={2}>What happens to your PDF</Title>
+              <Text c="dimmed" size="lg">
                 See how we handle your file and what each redaction removes. You
                 can check the source code yourself.
               </Text>
             </Stack>
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
               {privacyCards.map((card) => (
-                <Card
-                  key={card.title}
-                  bg="dark.8"
-                  p="lg"
-                  h="100%"
-                  withBorder
-                  style={{ borderColor: 'var(--mantine-color-dark-5)' }}
-                >
+                <Card key={card.title} bg="white" p="lg" h="100%" withBorder>
                   <Stack gap="sm">
                     <Group gap="md" wrap="nowrap">
                       <ThemeIcon
-                        variant="transparent"
+                        variant="light"
                         radius="md"
                         size="xl"
-                        color="blue"
+                        color="green"
                       >
                         <FontAwesomeIcon icon={card.icon} />
                       </ThemeIcon>
                       <Stack gap={0}>
-                        <Title order={3} c="white">
-                          {card.title}
-                        </Title>
-                        <Text c="dark.2" size="sm">
+                        <Title order={3}>{card.title}</Title>
+                        <Text c="dimmed" size="sm">
                           {card.subtitle}
                         </Text>
                       </Stack>
                     </Group>
-                    <Text c="dark.1" size="sm">
+                    <Text c="dimmed" size="sm">
                       {card.description}
                     </Text>
                   </Stack>
                 </Card>
               ))}
             </SimpleGrid>
-            <Text c="dark.2" size="sm">
+            <Text c="dimmed" size="sm">
               To find likely sensitive information, we send page images to
               Gemini 3.8 Flash on Google Cloud in the United States.
             </Text>
