@@ -1,5 +1,4 @@
 import '../../lib/allDatabaseModels';
-import '../../lib/models/Associations';
 import { runRedactionBackgroundWorker } from './redactionBackgroundWorker.lib';
 
 async function main(): Promise<void> {

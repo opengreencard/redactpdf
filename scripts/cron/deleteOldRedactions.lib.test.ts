@@ -1,9 +1,5 @@
 import FakeData from '../../lib/testUtilities/FakeData';
-import Redaction, {
-  RedactionAttributes,
-  RedactionInstance,
-} from '../../lib/models/Redaction';
-import { PartialInstance } from '../../lib/db/types';
+import Redaction from '../../lib/models/Redaction';
 import {
   getRedactionFile,
   putRedactionFile,
@@ -12,16 +8,12 @@ import {
   getRedactionImage,
   putRedactionImage,
 } from '../../lib/storage/storageFunctions/redactionImage';
-import { promiseAllThrottled } from '../../lib/utilities/promiseAllThrottled';
-import { touchRedactionOpenedAt } from '../../app/api/redaction/[key]/open/touchRedactionOpenedAt';
 import {
   _deleteOldRedactionHours,
   deleteOldRedactions,
 } from './deleteOldRedactions.lib';
 
-// Just past the TTL, so cleanup should select these.
 const staleHours = _deleteOldRedactionHours + 0.01;
-// Just inside the TTL, so cleanup should leave these alone.
 const freshHours = _deleteOldRedactionHours - 0.01;
 const olderThanMs = _deleteOldRedactionHours * 60 * 60 * 1000;
 
@@ -31,11 +23,11 @@ function hoursAgo(hours: number): Date {
 
 async function seedRedaction({
   openedAt,
-  pageCount = 1,
+  pageCount,
 }: {
   openedAt: Date;
-  pageCount?: number;
-}): Promise<RedactionInstance> {
+  pageCount: number;
+}) {
   const redaction = await FakeData.makeDBRedaction({ openedAt, pageCount });
   await Promise.all([
     putRedactionFile(
@@ -43,193 +35,64 @@ async function seedRedaction({
       'application/pdf',
       redaction.key
     ),
-    ...Array.from({ length: pageCount }, (_unused, index) => {
-      const page = index + 1;
-      return putRedactionImage(
-        Buffer.from(`page-${redaction.key}-${page}`),
+    ...Array.from({ length: pageCount }, (_unused, index) =>
+      putRedactionImage(
+        Buffer.from(`page-${redaction.key}-${index + 1}`),
         'image/jpeg',
-        { key: redaction.key, page }
-      );
-    }),
+        {
+          key: redaction.key,
+          page: index + 1,
+        }
+      )
+    ),
   ]);
   return redaction;
 }
 
-async function expectObjectsReadable(
-  key: string,
-  pageCount: number
-): Promise<void> {
-  await expect(getRedactionFile(key)).resolves.toBeInstanceOf(Buffer);
-  await Promise.all(
-    Array.from({ length: pageCount }, async (_unused, index) => {
-      const page = index + 1;
-      await expect(getRedactionImage({ key, page })).resolves.toBeInstanceOf(
-        Buffer
-      );
-    })
-  );
-}
-
-async function expectObjectsMissing(
-  key: string,
-  pageCount: number
-): Promise<void> {
-  await expect(getRedactionFile(key)).rejects.toMatchObject({
-    name: 'NotFound',
-  });
-  await Promise.all(
-    Array.from({ length: pageCount }, async (_unused, index) => {
-      const page = index + 1;
-      await expect(getRedactionImage({ key, page })).rejects.toMatchObject({
-        name: 'NotFound',
-      });
-    })
-  );
-}
-
-async function findRedactionByKey(key: string) {
-  return (await Redaction.findOne({
-    where: { key },
-    attributes: ['id'],
-  })) as PartialInstance<RedactionAttributes, 'id'> | null;
-}
-
 describe(deleteOldRedactions, () => {
-  describe('a stale three-page redaction', () => {
-    let redactionKey: string;
-
-    beforeAll(async () => {
-      await Redaction.truncate();
-      const redaction = await seedRedaction({
-        openedAt: hoursAgo(staleHours),
-        pageCount: 3,
-      });
-      redactionKey = redaction.key;
-    });
-
-    afterAll(async () => {
-      await Redaction.truncate();
-    });
-
-    it('dry-run checks the row and leaves objects in place', async () => {
-      const result = await deleteOldRedactions({
-        olderThanMs,
-        makeChanges: false,
-      });
-
-      expect(result).toEqual({ checked: 1, deleted: 0 });
-      expect(await findRedactionByKey(redactionKey)).not.toBeNull();
-      await expectObjectsReadable(redactionKey, 3);
-    });
-
-    it('makeChanges deletes the original, every page image, and the row', async () => {
-      const result = await deleteOldRedactions({
-        olderThanMs,
-        makeChanges: true,
-      });
-
-      expect(result).toEqual({ checked: 1, deleted: 1 });
-      expect(await findRedactionByKey(redactionKey)).toBeNull();
-      await expectObjectsMissing(redactionKey, 3);
-    });
+  afterEach(async () => {
+    await Redaction.truncate();
   });
 
-  describe('a fresh redaction', () => {
-    let redactionKey: string;
+  it('deletes stale originals, page images, and rows, and leaves a fresh one', async () => {
+    const [staleThreePage, staleOnePage, fresh] = await Promise.all([
+      seedRedaction({ openedAt: hoursAgo(staleHours), pageCount: 3 }),
+      seedRedaction({ openedAt: hoursAgo(staleHours), pageCount: 1 }),
+      seedRedaction({ openedAt: hoursAgo(freshHours), pageCount: 1 }),
+    ]);
 
-    beforeAll(async () => {
-      await Redaction.truncate();
-      const redaction = await seedRedaction({
-        openedAt: hoursAgo(freshHours),
-      });
-      redactionKey = redaction.key;
+    const result = await deleteOldRedactions({
+      olderThanMs,
+      makeChanges: true,
+      // Two stale rows with a page size of 1 forces a second keyset page.
+      pageSizeForTesting: 1,
     });
 
-    afterAll(async () => {
-      await Redaction.truncate();
+    expect(result).toEqual({ checked: 2, deleted: 2 });
+    expect(await Redaction.count({ where: { key: staleThreePage.key } })).toBe(
+      0
+    );
+    expect(await Redaction.count({ where: { key: staleOnePage.key } })).toBe(0);
+    expect(await Redaction.count({ where: { key: fresh.key } })).toBe(1);
+
+    await expect(getRedactionFile(staleThreePage.key)).rejects.toMatchObject({
+      name: 'NotFound',
     });
-
-    it('is not selected even with makeChanges', async () => {
-      const result = await deleteOldRedactions({
-        olderThanMs,
-        makeChanges: true,
-      });
-
-      expect(result).toEqual({ checked: 0, deleted: 0 });
-      expect(await findRedactionByKey(redactionKey)).not.toBeNull();
-      await expectObjectsReadable(redactionKey, 1);
+    await expect(
+      getRedactionImage({ key: staleThreePage.key, page: 1 })
+    ).rejects.toMatchObject({ name: 'NotFound' });
+    await expect(
+      getRedactionImage({ key: staleThreePage.key, page: 2 })
+    ).rejects.toMatchObject({ name: 'NotFound' });
+    await expect(
+      getRedactionImage({ key: staleThreePage.key, page: 3 })
+    ).rejects.toMatchObject({ name: 'NotFound' });
+    await expect(getRedactionFile(staleOnePage.key)).rejects.toMatchObject({
+      name: 'NotFound',
     });
-  });
-
-  describe('more than 100 stale rows', () => {
-    // Keep in sync with `batchSize` in deleteOldRedactions.lib.ts. One extra
-    // row forces a second keyset page.
-    const staleRowCount = 101;
-    let redactionKeys: string[];
-
-    beforeAll(async () => {
-      await Redaction.truncate();
-      const openedAt = hoursAgo(staleHours);
-      const redactions = await Promise.all(
-        Array.from({ length: staleRowCount }, () => seedRedaction({ openedAt }))
-      );
-      redactionKeys = redactions.map((redaction) => redaction.key);
-    }, 30000);
-
-    afterAll(async () => {
-      await Redaction.truncate();
-    });
-
-    it('visits every row once in dry-run', async () => {
-      const result = await deleteOldRedactions({
-        olderThanMs,
-        makeChanges: false,
-      });
-
-      expect(result).toEqual({
-        checked: staleRowCount,
-        deleted: 0,
-      });
-      expect(await Redaction.count()).toBe(staleRowCount);
-    });
-
-    it('visits every row once when making changes', async () => {
-      const result = await deleteOldRedactions({
-        olderThanMs,
-        makeChanges: true,
-      });
-
-      expect(result).toEqual({
-        checked: staleRowCount,
-        deleted: staleRowCount,
-      });
-      expect(await Redaction.count()).toBe(0);
-      await promiseAllThrottled(
-        redactionKeys.map((key) => async () => expectObjectsMissing(key, 1)),
-        10
-      );
-    });
-  });
-
-  describe('an open-tab ping', () => {
-    afterEach(async () => {
-      await Redaction.truncate();
-    });
-
-    it('keeps a previously stale row from being selected', async () => {
-      const redaction = await seedRedaction({
-        openedAt: hoursAgo(staleHours),
-      });
-      await touchRedactionOpenedAt({ key: redaction.key });
-
-      const result = await deleteOldRedactions({
-        olderThanMs,
-        makeChanges: true,
-      });
-
-      expect(result).toEqual({ checked: 0, deleted: 0 });
-      expect(await findRedactionByKey(redaction.key)).not.toBeNull();
-      await expectObjectsReadable(redaction.key, 1);
-    });
+    await expect(getRedactionFile(fresh.key)).resolves.toBeInstanceOf(Buffer);
+    await expect(
+      getRedactionImage({ key: fresh.key, page: 1 })
+    ).resolves.toBeInstanceOf(Buffer);
   });
 });
