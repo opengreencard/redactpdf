@@ -71,8 +71,8 @@ const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
 export default LandingPageInner;
 
 /**
- * Keeps the primary upload action beside the product promise and trust
- * signals.
+ * Puts the headline, upload button, and badges together so visitors can
+ * start without scrolling.
  */
 const LandingPageHero: React.FunctionComponent = React.memo(
   function LandingPageHero() {
@@ -123,7 +123,7 @@ const LandingPageHero: React.FunctionComponent = React.memo(
   }
 );
 
-/** Shows visitors where suggested redactions will appear in the review flow. */
+/** Holds space for before-and-after samples of a redacted page. */
 const LandingPageBeforeAfter: React.FunctionComponent = React.memo(
   function LandingPageBeforeAfter() {
     return (
@@ -235,7 +235,7 @@ const LandingPageDetectList: React.FunctionComponent = React.memo(
   }
 );
 
-/** Makes file handling and redaction behavior visible before an upload. */
+/** Shows how we handle files and what a redaction actually removes. */
 const LandingPagePrivacy: React.FunctionComponent = React.memo(
   function LandingPagePrivacy() {
     return (
@@ -363,7 +363,8 @@ interface PricingCellProps {
 }
 
 /**
- * Renders links and checkmarks used as semantic values in the pricing table.
+ * Some pricing cells are a checkmark or a jump link, not just the raw
+ * string.
  */
 const PricingCell: React.FunctionComponent<PricingCellProps> = React.memo(
   function PricingCell(props: PricingCellProps) {
@@ -432,7 +433,7 @@ const LandingPageWhyFree: React.FunctionComponent = React.memo(
   }
 );
 
-/** Answers privacy and redaction questions near the end of the landing page. */
+/** Answers common questions about privacy and how redaction works. */
 const LandingPageFaq: React.FunctionComponent = React.memo(
   function LandingPageFaq() {
     return (
