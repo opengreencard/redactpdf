@@ -79,7 +79,6 @@ s3SecretAccessKey=''
 googleClientId=''
 googleClientSecret=''
 geminiApiKey=''
-deepinfraApiKey=''
 
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'S3_ACCESS_KEY_ID'; then
   echo 'Enter external provider secrets:'
@@ -110,14 +109,6 @@ if [ "$OVERWRITE" = 'true' ] || ! hasField 'GEMINI_API_KEY'; then
   [ -n "$geminiApiKey" ] || { echo 'Error: Gemini API key is required.'; exit 1; }
 fi
 
-# Stored in 1Password for local / production-env model comparisons.
-# Production pods do not get this key.
-if [ "$OVERWRITE" = 'true' ] || ! hasField 'DEEPINFRA_API_KEY'; then
-  read -rsp 'Deep Infra API key (https://deepinfra.com/dash/api_keys): ' deepinfraApiKey
-  echo
-  [ -n "$deepinfraApiKey" ] || { echo 'Error: Deep Infra API key is required.'; exit 1; }
-fi
-
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'DB_PASS'; then
   dbPass=$(openssl rand -base64 32)
 fi
@@ -145,7 +136,6 @@ addField 'GOOGLE_CLIENT_SECRET' "$googleClientSecret"
 addField 'S3_ACCESS_KEY_ID' "$s3AccessKeyId"
 addField 'S3_SECRET_ACCESS_KEY' "$s3SecretAccessKey"
 addField 'GEMINI_API_KEY' "$geminiApiKey"
-addField 'DEEPINFRA_API_KEY' "$deepinfraApiKey"
 
 if [ ${#fieldAssignments[@]} -eq 0 ]; then
   echo "No new or missing fields to add. All secrets are already set in $itemFQN."

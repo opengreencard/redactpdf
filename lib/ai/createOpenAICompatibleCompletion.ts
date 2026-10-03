@@ -13,7 +13,7 @@ import { ApplicationError } from '../errors/applicationError';
  *   injects `GEMINI_API_KEY`.
  * - `deepInfra`: optional. Local or production-env model comparisons.
  * - `openAI`: optional. Local or production-env model comparisons.
- * Keep the optional keys in `.env.*` / 1Password, not in the Kubernetes
+ * Keep the optional keys in local `.env.*` files, not in the Kubernetes
  * Secret.
  *
  * To add a provider:
