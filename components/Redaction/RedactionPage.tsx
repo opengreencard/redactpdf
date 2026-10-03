@@ -17,7 +17,7 @@ import { APICallState } from '../../lib/typescript/apiCallState';
 import type {
   GetRedactionResponse,
   RedactedGetRedactionResponse,
-} from '../../lib/redaction/redactionAPI';
+} from '../../app/api/redaction/[key]/getRedaction';
 import {
   ManualRedactionBoundingBox,
   RedactionBoundingBox,

@@ -1,9 +1,9 @@
+import type { GetRedactionResponse } from '../../../app/api/redaction/[key]/getRedaction';
+import type { UploadFileForRedactionResponse } from '../../../app/api/redaction/uploadFileForRedaction';
 import type {
-  GetRedactionResponse,
-  UploadFileForRedactionResponse,
   MutateRedactionBoundingBoxesBody,
   MutateRedactionBoundingBoxesPathParams,
-} from '../../../lib/redaction/redactionAPI';
+} from '../../../app/api/redaction/[key]/redacted/mutateRedactionBoundingBoxes';
 import type {
   ClientAPIRouteWithBodyData,
   ClientAPIRouteWithoutBodyData,

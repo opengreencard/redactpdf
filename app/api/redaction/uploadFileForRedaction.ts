@@ -6,7 +6,6 @@ import {
   deleteRedactionFile,
   putRedactionFile,
 } from '../../../lib/storage/storageFunctions/redactionFile';
-import type { UploadFileForRedactionResponse } from '../../../lib/redaction/redactionAPI';
 import { processRedaction } from './lib/processRedaction';
 
 /** Maximum upload size. Exported for use in tests. */
@@ -18,6 +17,12 @@ export const _maxRedactionPageCount = 100;
 /** The server input for creating a redaction document. */
 export interface UploadFileForRedactionRequest {
   buffer: Buffer;
+}
+
+/** The key and page count needed to open the redaction page after upload. */
+export interface UploadFileForRedactionResponse {
+  key: string;
+  pageCount: number;
 }
 
 /**

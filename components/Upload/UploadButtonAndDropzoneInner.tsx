@@ -20,7 +20,7 @@ import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { APICallState } from '../../lib/typescript/apiCallState';
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
-import type { UploadFileForRedactionResponse } from '../../lib/redaction/redactionAPI';
+import type { UploadFileForRedactionResponse } from '../../app/api/redaction/uploadFileForRedaction';
 import classes from './UploadButtonAndDropzone.module.css';
 
 export interface UploadButtonAndDropzoneInnerProps {

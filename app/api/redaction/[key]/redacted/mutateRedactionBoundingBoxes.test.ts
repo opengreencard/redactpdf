@@ -1,7 +1,7 @@
 import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
 import FakeData from '../../../../../lib/testUtilities/FakeData';
 import type { RedactionInstance } from '../../../../../lib/models/Redaction';
-import type { GetRedactionResponse } from '../../../../../lib/redaction/redactionAPI';
+import type { GetRedactionResponse } from '../getRedaction';
 import {
   BoundingBox,
   RedactionBoundingBox,

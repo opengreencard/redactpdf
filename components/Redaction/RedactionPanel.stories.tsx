@@ -5,7 +5,7 @@ import {
   RedactedDataType,
   type RedactionBoundingBox,
 } from '../../lib/redaction/redactionTypes';
-import type { RedactedGetRedactionResponse } from '../../lib/redaction/redactionAPI';
+import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { makeFakeHandler } from '../../lib/storybook';

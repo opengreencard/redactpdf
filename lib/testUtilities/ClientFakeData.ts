@@ -9,7 +9,7 @@ import {
 import type {
   GenericGetRedactionResponse,
   RedactedGetRedactionResponse,
-} from '../redaction/redactionAPI';
+} from '../../app/api/redaction/[key]/getRedaction';
 import type { PageSize } from '../pdf/pdfTypes';
 import type { OpenAICompatibleCompletionResult } from '../ai/createOpenAICompatibleCompletion';
 

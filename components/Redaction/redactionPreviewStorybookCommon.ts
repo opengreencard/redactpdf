@@ -1,7 +1,7 @@
 import irsPage from '../../lib/redaction/__testData__/irs1040Scenario2.jpg';
 import passportPage from '../../lib/redaction/__testData__/usPassportCardSpecimen.jpg';
 import { TestRedactionBoundingBoxes } from '../../lib/redaction/__testData__/RedactionBoundingBoxes';
-import type { RedactedGetRedactionResponse } from '../../lib/redaction/redactionAPI';
+import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 import type { PageSize } from '../../lib/pdf/pdfTypes';
 import type {
   RedactionBoundingBox,
