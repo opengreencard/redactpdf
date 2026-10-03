@@ -59,7 +59,7 @@ const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
       // client component.
       <LandingPageUploadModalProvider>
         <LandingPageHero />
-        <LandingPageBeforeAfter />
+        <LandingPageExampleDocuments />
         <LandingPageHowItWorks />
         <LandingPageDetectList />
         <LandingPagePrivacy />
@@ -121,13 +121,13 @@ const LandingPageHero: React.FunctionComponent = React.memo(
   }
 );
 
-const LandingPageBeforeAfter: React.FunctionComponent = React.memo(
-  function LandingPageBeforeAfter() {
+const LandingPageExampleDocuments: React.FunctionComponent = React.memo(
+  function LandingPageExampleDocuments() {
     return (
       <Container size={siteContainerSize} py="xl">
         <Stack gap="lg">
           <Title order={2} ta="center">
-            Before / after
+            Example redacted documents
           </Title>
           {
             // Passport plus a 1040 cropped to the same aspect ratio so the

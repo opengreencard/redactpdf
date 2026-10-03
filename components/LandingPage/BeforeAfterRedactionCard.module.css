@@ -1,9 +1,9 @@
-.imageButton {
+.sampleImageButton {
   transition: opacity 150ms ease;
 }
 
-.imageButton:hover,
-.imageButton:focus-within {
+.sampleImageButton:hover,
+.sampleImageButton:focus-within {
   /* A light dim is enough to show the still is clickable. */
   opacity: 0.8;
 }
