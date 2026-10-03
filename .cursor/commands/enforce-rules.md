@@ -37,6 +37,9 @@ After all rule-review passes:
    - `yarn eslint --fix <changed files>`
    - `yarn jest <touched test>` where applicable.
 2. Stage and commit a fresh commit (never amend) using:
+   - Stage only edits made by the rule passes. Do not include pre-existing
+     changes. If rule-pass edits overlap existing changes and cannot be
+     separated safely, stop without committing or pushing.
 
    ```
    Used /enforce-rules command
