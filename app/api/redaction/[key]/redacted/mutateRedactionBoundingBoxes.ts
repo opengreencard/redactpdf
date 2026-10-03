@@ -3,31 +3,20 @@ import type {
   BoundingBox,
   ManualRedactionBoundingBox,
   RedactionBoundingBox,
-} from '../../../../../lib/models/redactionTypes';
-import { RedactionBoundingBoxType } from '../../../../../lib/models/redactionTypes';
-import {
-  RedactionBoundingBoxMutation,
-  RedactionBoundingBoxMutationOp,
-} from '../../../../../lib/redaction/redactionBoundingBoxMutation';
-import { isSameRedactionBoundingBox } from '../../../../../lib/models/redactionBoundingBoxIdentity';
+} from '../../../../../lib/redaction/redactionTypes';
+import { RedactionBoundingBoxType } from '../../../../../lib/redaction/redactionTypes';
+import { RedactionBoundingBoxMutationOp } from '../../../../../lib/redaction/redactionBoundingBoxMutation';
+import type { RedactionBoundingBoxMutation } from '../../../../../lib/redaction/redactionBoundingBoxMutation';
+import type {
+  MutateRedactionBoundingBoxesBody,
+  MutateRedactionBoundingBoxesPathParams,
+} from '../../../../../lib/redaction/redactionAPI';
+import { isSameRedactionBoundingBox } from '../../../../../lib/redaction/redactionBoundingBoxIdentity';
 import { getUnreachableError } from '../../../../../lib/typescript/getUnreachableError';
 import {
   assertIsRedactedOrThrowApplicationError,
   findRedactionByKeyOrError,
 } from '../../lib/findRedactionByKeyOrError';
-
-/** Public URL key. The route reads this from the path, not the JSON body. */
-export interface MutateRedactionBoundingBoxesPathParams {
-  key: string;
-}
-
-/**
- * Box edits to apply in order. Kept off the path so we can send a list,
- * not one query param per field.
- */
-export interface MutateRedactionBoundingBoxesBody {
-  mutations: RedactionBoundingBoxMutation[];
-}
 
 /**
  * Apply every mutation in order, then save once. A throw before save leaves

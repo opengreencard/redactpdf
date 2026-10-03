@@ -3,7 +3,7 @@ import {
   MakeAPIRouteWithoutBodyTypes,
 } from '../../../../lib/api/makeAPIRouteWithoutBody';
 import { GetRedactionRequest, getRedaction } from './getRedaction';
-import { GetRedactionResponse } from '../../../../lib/models/redactionTypes';
+import type { GetRedactionResponse } from '../../../../lib/redaction/redactionAPI';
 
 type GetRedactionRoute = MakeAPIRouteWithoutBodyTypes<
   GetRedactionRequest,

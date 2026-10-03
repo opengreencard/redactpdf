@@ -1,11 +1,12 @@
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { ApplicationError } from '../../../lib/errors/applicationError';
 import Redaction, { generateRedactionKey } from '../../../lib/models/Redaction';
-import { RedactionStatus } from '../../../lib/models/redactionTypes';
+import { RedactionStatus } from '../../../lib/redaction/redactionTypes';
 import {
   deleteRedactionFile,
   putRedactionFile,
 } from '../../../lib/storage/storageFunctions/redactionFile';
+import type { UploadFileForRedactionResponse } from '../../../lib/redaction/redactionAPI';
 import { processRedaction } from './lib/processRedaction';
 
 /** Maximum upload size. Exported for use in tests. */
@@ -17,12 +18,6 @@ export const _maxRedactionPageCount = 100;
 /** The server input for creating a redaction document. */
 export interface UploadFileForRedactionRequest {
   buffer: Buffer;
-}
-
-/** The key and page count needed to open the redaction page. */
-export interface UploadFileForRedactionResponse {
-  key: string;
-  pageCount: number;
 }
 
 /**

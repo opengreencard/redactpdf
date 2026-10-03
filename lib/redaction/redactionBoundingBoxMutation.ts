@@ -1,5 +1,5 @@
-import type { BoundingBox } from '../models/redactionTypes';
-import { RedactionBoundingBoxType } from '../models/redactionTypes';
+import type { BoundingBox } from './redactionTypes';
+import { RedactionBoundingBoxType } from './redactionTypes';
 
 /**
  * One kind of box edit the client can persist. Add draws a new box; delete

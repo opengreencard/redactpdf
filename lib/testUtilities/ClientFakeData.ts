@@ -1,14 +1,16 @@
 import {
   AutoRedactionBoundingBox,
   BoundingBox,
-  GenericGetRedactionResponse,
   ManualRedactionBoundingBox,
-  PageSize,
   RedactedDataType,
-  RedactedGetRedactionResponse,
   RedactionBoundingBoxType,
   RedactionStatus,
-} from '../models/redactionTypes';
+} from '../redaction/redactionTypes';
+import type {
+  GenericGetRedactionResponse,
+  RedactedGetRedactionResponse,
+} from '../redaction/redactionAPI';
+import type { PageSize } from '../pdf/pdfTypes';
 import type { OpenAICompatibleCompletionResult } from '../ai/createOpenAICompatibleCompletion';
 
 /**

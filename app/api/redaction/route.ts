@@ -4,9 +4,9 @@ import {
   MakeAPIRouteWithBodyTypes,
 } from '../../../lib/api/makeAPIRouteWithBody';
 import { ApplicationError } from '../../../lib/errors/applicationError';
+import type { UploadFileForRedactionResponse } from '../../../lib/redaction/redactionAPI';
 import {
   UploadFileForRedactionRequest,
-  UploadFileForRedactionResponse,
   uploadFileForRedaction,
 } from './uploadFileForRedaction';
 

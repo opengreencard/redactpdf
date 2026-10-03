@@ -1,8 +1,5 @@
 import sharp from 'sharp';
-import {
-  RedactedDataType,
-  RedactionBoundingBoxType,
-} from '../models/redactionTypes';
+import { RedactedDataType, RedactionBoundingBoxType } from './redactionTypes';
 import {
   annotateJPEGWithRedactionBoxes,
   type RedactionBoxToAnnotate,

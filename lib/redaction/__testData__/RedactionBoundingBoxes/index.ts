@@ -1,6 +1,6 @@
 import IRS1040Scenario2JSON from './IRS1040Scenario2.json';
 import USPassportCardSpecimen from './USPassportCardSpecimen.json';
-import type { SinglePageRedactionBoundingBox } from '../../../models/redactionTypes';
+import type { SinglePageRedactionBoundingBox } from '../../redactionTypes';
 
 /**
  * Redaction boxes generated from the corresponding fixture images.

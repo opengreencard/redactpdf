@@ -3,7 +3,7 @@ import { PartialInstance } from '../../../../lib/db/types';
 import Redaction, {
   RedactionAttributes,
 } from '../../../../lib/models/Redaction';
-import { RedactionStatus } from '../../../../lib/models/redactionTypes';
+import { RedactionStatus } from '../../../../lib/redaction/redactionTypes';
 import { getUnreachableError } from '../../../../lib/typescript/getUnreachableError';
 
 /**

@@ -4,10 +4,10 @@ import db from '../db';
 import { WithOptionalId } from '../db/types';
 import { makeJSONGetter, makeJSONSetter } from './jsonDatabaseUtilities';
 import {
-  PageSize,
   RedactionBoundingBox,
   RedactionStatus,
-} from './redactionTypes';
+} from '../redaction/redactionTypes';
+import type { PageSize } from '../pdf/pdfTypes';
 
 /** The fixed length used for unguessable redaction lookup keys. */
 export const redactionKeyLength = 32;

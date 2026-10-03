@@ -1,15 +1,15 @@
 import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
 import FakeData from '../../../../../lib/testUtilities/FakeData';
 import type { RedactionInstance } from '../../../../../lib/models/Redaction';
+import type { GetRedactionResponse } from '../../../../../lib/redaction/redactionAPI';
 import {
   BoundingBox,
-  GetRedactionResponse,
   RedactionBoundingBox,
   RedactionBoundingBoxType,
   RedactionStatus,
-} from '../../../../../lib/models/redactionTypes';
+} from '../../../../../lib/redaction/redactionTypes';
 import { RedactionBoundingBoxMutationOp } from '../../../../../lib/redaction/redactionBoundingBoxMutation';
-import { isSameRedactionBoundingBox } from '../../../../../lib/models/redactionBoundingBoxIdentity';
+import { isSameRedactionBoundingBox } from '../../../../../lib/redaction/redactionBoundingBoxIdentity';
 import { getRedaction } from '../getRedaction';
 import { mutateRedactionBoundingBoxes } from './mutateRedactionBoundingBoxes';
 

@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { Box, Stack } from '@mantine/core';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
-import type { ManualRedactionBoundingBox } from '../../lib/models/redactionTypes';
+import type { ManualRedactionBoundingBox } from '../../lib/redaction/redactionTypes';
 import RedactionPreviewPages, {
   RedactionPreviewPagesProps,
   RedactionPreviewPagesRef,

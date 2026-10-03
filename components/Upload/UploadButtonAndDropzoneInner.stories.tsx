@@ -7,7 +7,7 @@ import {
   makeErrorState,
   makeInProgressState,
 } from '../../lib/typescript/apiCallState';
-import type { UploadFileForRedactionResponse } from '../../app/api/redaction/uploadFileForRedaction';
+import type { UploadFileForRedactionResponse } from '../../lib/redaction/redactionAPI';
 import { delay } from '../../lib/utilities/delay';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import UploadButtonAndDropzoneInner from './UploadButtonAndDropzoneInner';

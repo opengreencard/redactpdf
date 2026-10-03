@@ -13,7 +13,7 @@ import {
   RedactedDataType,
   RedactionBoundingBoxType,
   type RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import { useCallbackWithPrefix } from '../../lib/hookUtilities/useCallbackWithPrefix';
 import { useStopPropagation } from '../../lib/hookUtilities/useStopPropagation';

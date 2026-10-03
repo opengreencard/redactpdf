@@ -1,10 +1,10 @@
 import { ApplicationError } from '../../../../lib/errors/applicationError';
-import {
+import type {
   GenericGetRedactionResponse,
   GetRedactionResponse,
   RedactedGetRedactionResponse,
-  RedactionStatus,
-} from '../../../../lib/models/redactionTypes';
+} from '../../../../lib/redaction/redactionAPI';
+import { RedactionStatus } from '../../../../lib/redaction/redactionTypes';
 import { getUnreachableError } from '../../../../lib/typescript/getUnreachableError';
 import { findRedactionByKeyOrError } from '../lib/findRedactionByKeyOrError';
 

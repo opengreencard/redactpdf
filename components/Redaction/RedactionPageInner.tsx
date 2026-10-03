@@ -14,13 +14,15 @@ import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { delay } from '../../lib/utilities/delay';
-import {
+import type {
   GetRedactionResponse,
   RedactedGetRedactionResponse,
+} from '../../lib/redaction/redactionAPI';
+import {
   ManualRedactionBoundingBox,
   RedactionBoundingBox,
   RedactionStatus,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import RedactionError from './RedactionError';
 import RedactionPanel from './RedactionPanel';
 import { getRedactionImageUrl } from '../../lib/storage/getRedactionImageUrl';

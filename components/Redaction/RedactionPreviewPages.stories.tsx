@@ -7,7 +7,7 @@ import { makeFakeHandler } from '../../lib/storybook';
 import type {
   ManualRedactionBoundingBox,
   RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import RedactionPreviewPages, {
   RedactionPreviewPagesProps,
 } from './RedactionPreviewPages';

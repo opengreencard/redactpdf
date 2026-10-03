@@ -2,11 +2,11 @@ import {
   makeAPIRouteWithBody,
   MakeAPIRouteWithBodyTypes,
 } from '../../../../../lib/api/makeAPIRouteWithBody';
-import {
+import type {
   MutateRedactionBoundingBoxesBody,
   MutateRedactionBoundingBoxesPathParams,
-  mutateRedactionBoundingBoxes,
-} from './mutateRedactionBoundingBoxes';
+} from '../../../../../lib/redaction/redactionAPI';
+import { mutateRedactionBoundingBoxes } from './mutateRedactionBoundingBoxes';
 
 type MutateRedactionBoundingBoxesRoute = MakeAPIRouteWithBodyTypes<
   MutateRedactionBoundingBoxesBody,

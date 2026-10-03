@@ -5,13 +5,15 @@ import {
   makeDoneState,
   makeErrorState,
 } from '../../lib/typescript/apiCallState';
-import {
+import type {
   GetRedactionResponse,
-  ManualRedactionBoundingBox,
   RedactedGetRedactionResponse,
+} from '../../lib/redaction/redactionAPI';
+import {
+  ManualRedactionBoundingBox,
   RedactionBoundingBox,
   RedactionStatus,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import RedactionPageInner from './RedactionPageInner';

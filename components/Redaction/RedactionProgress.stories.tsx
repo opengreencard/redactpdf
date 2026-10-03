@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
-import type { GetRedactionResponse } from '../../lib/models/redactionTypes';
+import type { GetRedactionResponse } from '../../lib/redaction/redactionAPI';
 import { estimatedMsPerPage } from '../../lib/redaction/estimatedMsPerPage';
 import RedactionProgress, { RedactionProgressProps } from './RedactionProgress';
 

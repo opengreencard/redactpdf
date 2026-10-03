@@ -35,9 +35,9 @@ import {
   RedactionBoundingBoxType,
   type BoundingBox,
   type ManualRedactionBoundingBox,
-  type RedactedGetRedactionResponse,
   type RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
+import type { RedactedGetRedactionResponse } from '../../lib/redaction/redactionAPI';
 
 export interface RedactionPreviewPagesProps {
   redactionKey: string;

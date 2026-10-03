@@ -1,12 +1,14 @@
-import type { UploadFileForRedactionResponse } from '../../../app/api/redaction/uploadFileForRedaction';
-import type { GetRedactionResponse } from '../../../lib/models/redactionTypes';
 import type {
+  GetRedactionResponse,
+  UploadFileForRedactionResponse,
   MutateRedactionBoundingBoxesBody,
   MutateRedactionBoundingBoxesPathParams,
-} from '../../../app/api/redaction/[key]/redacted/mutateRedactionBoundingBoxes';
-import {
+} from '../../../lib/redaction/redactionAPI';
+import type {
   ClientAPIRouteWithBodyData,
   ClientAPIRouteWithoutBodyData,
+} from './common';
+import {
   makeClientAPIRouteWithBody,
   makeClientAPIRouteWithoutBody,
 } from './common';

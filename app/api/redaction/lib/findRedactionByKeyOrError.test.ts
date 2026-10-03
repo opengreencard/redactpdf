@@ -1,5 +1,5 @@
 import FakeData from '../../../../lib/testUtilities/FakeData';
-import { RedactionStatus } from '../../../../lib/models/redactionTypes';
+import { RedactionStatus } from '../../../../lib/redaction/redactionTypes';
 import {
   assertIsRedactedOrThrowApplicationError,
   findRedactionByKeyOrError,

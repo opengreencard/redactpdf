@@ -12,7 +12,7 @@ import {
   generateRedactedPDFClient,
 } from '../clientLib/api/redaction';
 import { downloadArrayBufferAsFile } from '../clientLib/downloadArrayBufferAsFile';
-import type { RedactedGetRedactionResponse } from '../../lib/models/redactionTypes';
+import type { RedactedGetRedactionResponse } from '../../lib/redaction/redactionAPI';
 import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
 import RedactionBoundingBoxList, {
   RedactionBoundingBoxListProps,

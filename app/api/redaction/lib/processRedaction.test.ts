@@ -9,10 +9,10 @@ import Redaction, {
 } from '../../../../lib/models/Redaction';
 import { PartialInstance } from '../../../../lib/db/types';
 import {
-  PageSize,
   RedactionBoundingBox,
   RedactionStatus,
-} from '../../../../lib/models/redactionTypes';
+} from '../../../../lib/redaction/redactionTypes';
+import type { PageSize } from '../../../../lib/pdf/pdfTypes';
 import { getRedactionImage } from '../../../../lib/storage/storageFunctions/redactionImage';
 import { putRedactionFile } from '../../../../lib/storage/storageFunctions/redactionFile';
 import { promiseAllThrottled } from '../../../../lib/utilities/promiseAllThrottled';

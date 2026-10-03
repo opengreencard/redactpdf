@@ -2,7 +2,7 @@ import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
 import FakeData from '../../../../../lib/testUtilities/FakeData';
 import { putRedactionFile } from '../../../../../lib/storage/storageFunctions/redactionFile';
 import { generateRedactedPDF } from '../../../../../lib/pdf/generateRedactedPDF';
-import { RedactionStatus } from '../../../../../lib/models/redactionTypes';
+import { RedactionStatus } from '../../../../../lib/redaction/redactionTypes';
 import { generateRedactedPDFForKey } from './generateRedactedPDFForKey';
 
 // The PDF transformation itself is covered by

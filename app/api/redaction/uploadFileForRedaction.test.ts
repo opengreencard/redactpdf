@@ -5,7 +5,7 @@ import Redaction, {
   RedactionAttributes,
   redactionKeyLength,
 } from '../../../lib/models/Redaction';
-import { RedactionStatus } from '../../../lib/models/redactionTypes';
+import { RedactionStatus } from '../../../lib/redaction/redactionTypes';
 import { getRedactionFile } from '../../../lib/storage/storageFunctions/redactionFile';
 import { processRedaction } from './lib/processRedaction';
 import {

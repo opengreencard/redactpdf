@@ -2,10 +2,10 @@ import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import {
   RedactionBoundingBoxType,
   type ManualRedactionBoundingBox,
-  type RedactedGetRedactionResponse,
   type RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
-import { isSameRedactionBoundingBox } from '../../lib/models/redactionBoundingBoxIdentity';
+} from '../../lib/redaction/redactionTypes';
+import type { RedactedGetRedactionResponse } from '../../lib/redaction/redactionAPI';
+import { isSameRedactionBoundingBox } from '../../lib/redaction/redactionBoundingBoxIdentity';
 
 /**
  * Optimistic GET payload after the user draws a box, so the preview

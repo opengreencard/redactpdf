@@ -3,7 +3,7 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { Stack } from '@mantine/core';
 import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
-import type { RedactionBoundingBox } from '../../lib/models/redactionTypes';
+import type { RedactionBoundingBox } from '../../lib/redaction/redactionTypes';
 import {
   removeBoundingBoxesFromArray,
   setBoundingBoxesEnabledInArray,

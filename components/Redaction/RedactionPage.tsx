@@ -14,13 +14,15 @@ import {
   RedactionBoundingBoxMutationOp,
 } from '../../lib/redaction/redactionBoundingBoxMutation';
 import { APICallState } from '../../lib/typescript/apiCallState';
-import {
+import type {
   GetRedactionResponse,
-  ManualRedactionBoundingBox,
   RedactedGetRedactionResponse,
+} from '../../lib/redaction/redactionAPI';
+import {
+  ManualRedactionBoundingBox,
   RedactionBoundingBox,
   RedactionStatus,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import {
   addBoundingBoxesToResponse,
   removeBoundingBoxesFromResponse,

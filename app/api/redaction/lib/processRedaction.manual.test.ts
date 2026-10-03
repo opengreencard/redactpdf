@@ -8,7 +8,7 @@ import Redaction, {
   generateRedactionKey,
 } from '../../../../lib/models/Redaction';
 import { PartialInstance } from '../../../../lib/db/types';
-import { RedactionStatus } from '../../../../lib/models/redactionTypes';
+import { RedactionStatus } from '../../../../lib/redaction/redactionTypes';
 import { generateRedactedPDF } from '../../../../lib/pdf/generateRedactedPDF';
 import { getPDFPageSizes } from '../../../../lib/pdf/getPDFPageSizes';
 import { describeManualTest } from '../../../../lib/testUtilities/testTypes';

@@ -1,9 +1,9 @@
 import type { RedactionInstance } from '../../../../lib/models/Redaction';
 import {
-  PageSize,
   RedactionBoundingBox,
   RedactionStatus,
-} from '../../../../lib/models/redactionTypes';
+} from '../../../../lib/redaction/redactionTypes';
+import type { PageSize } from '../../../../lib/pdf/pdfTypes';
 import {
   compressImage,
   processPDFPagesInBatches,

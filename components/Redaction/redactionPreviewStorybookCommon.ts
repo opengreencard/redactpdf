@@ -1,12 +1,12 @@
 import irsPage from '../../lib/redaction/__testData__/irs1040Scenario2.jpg';
 import passportPage from '../../lib/redaction/__testData__/usPassportCardSpecimen.jpg';
 import { TestRedactionBoundingBoxes } from '../../lib/redaction/__testData__/RedactionBoundingBoxes';
+import type { RedactedGetRedactionResponse } from '../../lib/redaction/redactionAPI';
+import type { PageSize } from '../../lib/pdf/pdfTypes';
 import type {
-  PageSize,
-  RedactedGetRedactionResponse,
   RedactionBoundingBox,
   SinglePageRedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 
 /**

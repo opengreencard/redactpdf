@@ -1,7 +1,7 @@
 import {
   RedactedDataType,
   type RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { _groupRedactionBoundingBoxes } from './RedactionBoundingBoxList';
 

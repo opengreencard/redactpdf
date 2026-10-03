@@ -5,7 +5,7 @@ import { Stack } from '@mantine/core';
 import {
   RedactedDataType,
   type RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { makeFakeHandler } from '../../lib/storybook';

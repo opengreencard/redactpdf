@@ -2,7 +2,8 @@ import Redaction, {
   generateRedactionKey,
   RedactionCreationAttributes,
 } from '../models/Redaction';
-import { PageSize, RedactionStatus } from '../models/redactionTypes';
+import { RedactionStatus } from '../redaction/redactionTypes';
+import type { PageSize } from '../pdf/pdfTypes';
 import { RequiredWithUndefined } from '../typescript/requiredWithUndefined';
 
 // Keep the builder collection inferred so its public keys stay synchronized

@@ -1,7 +1,5 @@
-import {
-  type RedactedGetRedactionResponse,
-  type RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+import { type RedactionBoundingBox } from '../../lib/redaction/redactionTypes';
+import type { RedactedGetRedactionResponse } from '../../lib/redaction/redactionAPI';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import {
   addBoundingBoxesToResponse,
