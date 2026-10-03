@@ -2,6 +2,13 @@
 
 import { useEffect, useRef } from 'react';
 
+interface UseIntervalOptions {
+  /** Ms between ticks. Pass `null` to pause without unmounting. */
+  delayMs: number | null;
+  /** Invoke once as soon as the hook mounts, then on each delay. */
+  runOnMount?: boolean;
+}
+
 /**
  * Call `callback` on a delay, always using the latest callback. A plain
  * `setInterval` would keep the first render's closure, so it'd see stale
@@ -19,14 +26,9 @@ import { useEffect, useRef } from 'react';
  */
 export function useInterval(
   callback: () => unknown,
-  /** Ms between ticks. Pass `null` to pause without unmounting. */
-  delayMs: number | null,
-  options: {
-    /** Invoke once as soon as the hook mounts, then on each delay. */
-    runOnMount?: boolean;
-  } = {}
+  options: UseIntervalOptions
 ): void {
-  const { runOnMount = false } = options;
+  const { delayMs, runOnMount = false } = options;
   const savedCallback = useRef<(() => unknown) | null>(null);
 
   // Separate effect so a new callback doesn't reset the interval.

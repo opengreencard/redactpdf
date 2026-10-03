@@ -23,7 +23,7 @@ describe(useInterval, () => {
         callback: () => void;
         delayMs: number | null;
       }
-    >(({ callback, delayMs }) => useInterval(callback, delayMs), {
+    >(({ callback, delayMs }) => useInterval(callback, { delayMs }), {
       initialProps: { callback: first, delayMs: 1000 },
     });
 
@@ -38,7 +38,9 @@ describe(useInterval, () => {
 
   it('invokes immediately when runOnMount is true', () => {
     const callback = jest.fn();
-    renderHook(() => useInterval(callback, 1000, { runOnMount: true }));
+    renderHook(() =>
+      useInterval(callback, { delayMs: 1000, runOnMount: true })
+    );
 
     expect(callback).toHaveBeenCalledTimes(1);
     jest.advanceTimersByTime(1000);
@@ -53,7 +55,7 @@ describe(useInterval, () => {
         callback: () => void;
         delayMs: number | null;
       }
-    >(({ callback: cb, delayMs }) => useInterval(cb, delayMs), {
+    >(({ callback: cb, delayMs }) => useInterval(cb, { delayMs }), {
       initialProps: { callback, delayMs: 1000 as number | null },
     });
 

@@ -81,7 +81,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       // eslint-disable-next-line no-void
       void touchRedactionOpenedAtClient({ key: redactionKey });
     }, [redactionKey]);
-    useInterval(pingOpenedAt, 60 * 1000, { runOnMount: true });
+    useInterval(pingOpenedAt, { delayMs: 60 * 1000, runOnMount: true });
 
     const persistBoxMutation = useMemoizedCallback(
       async (
