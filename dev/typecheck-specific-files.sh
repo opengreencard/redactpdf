@@ -13,9 +13,9 @@ cd "$DIR/.." || exit 1
 
 # tsc ignores the project configuration when source files are passed directly.
 # Use a temporary project so targeted checks keep the repository's settings.
-files_json=$(printf '%s\n' "$@" | jq --raw-input . | jq --slurp .)
+filesJSON=$(printf '%s\n' "$@" | jq --raw-input . | jq --slurp .)
 jq --null-input \
-  --argjson files "$files_json" \
+  --argjson files "$filesJSON" \
   '{
     extends: "./tsconfig",
     include: ([
@@ -24,7 +24,7 @@ jq --null-input \
     ] + $files)
   }' > tsconfig.tmp.json
 
-exit_code=0
-yarn tsc --project tsconfig.tmp.json || exit_code=$?
+exitCode=0
+yarn tsc --project tsconfig.tmp.json || exitCode=$?
 rm -f tsconfig.tmp.json
-exit "$exit_code"
+exit "$exitCode"
