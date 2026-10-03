@@ -101,26 +101,8 @@ exportAwsCredentialsFromKeyJson() {
 
 envFileHasPlaceholderS3Credentials() {
   local envFilePath="$1"
-  local accessKeyId=''
-  local secretAccessKey=''
-  local line=''
-
-  # A blank line means the credential was never set. Env files copied from
-  # the old examples still contain the replace-with text, which is the
-  # same "not a real key" state.
-  line="$(grep -E '^S3_ACCESS_KEY_ID=' "$envFilePath" | head -n 1 || true)"
-  accessKeyId="${line#S3_ACCESS_KEY_ID=}"
-  line="$(grep -E '^S3_SECRET_ACCESS_KEY=' "$envFilePath" | head -n 1 || true)"
-  secretAccessKey="${line#S3_SECRET_ACCESS_KEY=}"
-
-  if [ -z "$accessKeyId" ] || [ -z "$secretAccessKey" ]; then
-    return 0
-  fi
-  if [ "$accessKeyId" = 'replace-with-s3-access-key-id' ] \
-    || [ "$secretAccessKey" = 'replace-with-s3-secret-access-key' ]; then
-    return 0
-  fi
-  return 1
+  grep -q '^S3_ACCESS_KEY_ID=replace-with-s3-access-key-id' "$envFilePath" \
+    || grep -q '^S3_SECRET_ACCESS_KEY=replace-with-s3-secret-access-key' "$envFilePath"
 }
 
 setupSpacesForEnvironment() {

@@ -14,9 +14,9 @@ yarn init-db-dev
 yarn dev
 ```
 
-The development database uses `redaction_development`. `DB_PASS` in the
-example matches Compose. Set `AUTH_SECRET` (`openssl rand -base64 32`)
-before signing in. API key lines can stay empty until you upload a PDF.
+The development database uses `redaction_development`. The placeholder
+secrets are enough to run the app. Real Google, Spaces, and model keys are
+only needed when you upload a PDF for redaction.
 
 ## Running tests locally
 

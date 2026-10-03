@@ -1,23 +1,20 @@
 #!/usr/bin/env bash
 # Cursor Cloud Agent start.
 #
-# Docker is not supervised by systemd in this VM. On each boot this starts
-# dockerd, MariaDB from docker-compose.yml, syncs tables, then leaves
-# `yarn dev` in the foreground. Safe to run again.
+# Starts Docker, MariaDB from docker-compose.yml, then `yarn dev`.
+# Safe to run again.
 set -euo pipefail
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-REPO_ROOT="$( cd "$DIR/.." && pwd )"
+cd "$DIR/.."
 
-# /exec-daemon/node is Node 22. This app requires Node 26 in /usr/local.
+# The VM also has Node 22 on PATH. This app needs Node 26.
 export PATH="/usr/local/bin:${PATH}"
-cd "$REPO_ROOT"
 
-# bash -l does not refresh group membership, so the docker group on the
-# socket is not reliable. Passwordless sudo is available in this image.
+# bash -l does not pick up the docker group, and systemd is not running.
+# fuse-overlayfs is set in /etc/docker/daemon.json because the VM root is
+# already overlayfs, so Docker's usual overlay2 driver cannot nest.
 if ! sudo docker info >/dev/null 2>&1; then
-  # fuse-overlayfs is set in /etc/docker/daemon.json because the VM root
-  # is already overlayfs, so Docker's default overlay2 driver cannot nest.
   sudo bash -c 'nohup dockerd >/var/log/dockerd.log 2>&1 &'
 fi
 
