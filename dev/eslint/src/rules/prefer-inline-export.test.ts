@@ -57,5 +57,14 @@ ruleTester.run('prefer-inline-export', rule, {
         { messageId: 'preferInlineExport' },
       ],
     },
+    {
+      code: `
+        enum Status {
+          Ready,
+        }
+        export { Status };
+      `,
+      errors: [{ messageId: 'preferInlineExport' }],
+    },
   ],
 });

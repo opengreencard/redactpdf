@@ -1,7 +1,12 @@
 import { AST_NODE_TYPES, TSESLint, TSESTree } from '@typescript-eslint/utils';
 import { createRule } from '../util';
 
-const reportableDefTypes = new Set(['ClassName', 'FunctionName', 'Variable']);
+const reportableDefTypes = new Set([
+  'ClassName',
+  'FunctionName',
+  'TSEnumName',
+  'Variable',
+]);
 
 /**
  * Prefer `export const { put: putX } = makeStorageFunctions(...)` (or
