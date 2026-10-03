@@ -16,6 +16,11 @@ export enum BeforeAfterSide {
   after = 'after',
 }
 
+/** Mobile still image. Exported for tests. */
+export const _mobileSampleImageTestId = 'before-after-mobile-image';
+/** After freeze button. Exported for tests. */
+export const _freezeAfterButtonTestId = 'before-after-freeze-after';
+
 export interface BeforeAfterRedactionCardProps {
   beforeSrc: string;
   afterSrc: string;
@@ -100,6 +105,7 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                 height={height}
                 label="Before"
                 onOpen={null}
+                imageTestId={null}
               />
               <SampleStill
                 src={afterSrc}
@@ -108,6 +114,7 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                 height={height}
                 label="After"
                 onOpen={null}
+                imageTestId={null}
               />
             </SimpleGrid>
           </Box>
@@ -126,6 +133,7 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                   visibleSide === BeforeAfterSide.before ? 'Before' : 'After'
                 }
                 onOpen={openLightbox}
+                imageTestId={_mobileSampleImageTestId}
               />
               <Group grow>
                 {
@@ -149,6 +157,7 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                   }
                   keyboardShortcut={null}
                   onClick={handleFreezeAfter}
+                  data-testid={_freezeAfterButtonTestId}
                 >
                   After
                 </Button>
@@ -170,6 +179,7 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
               height={height}
               label="Before"
               onOpen={null}
+              imageTestId={null}
             />
             <SampleStill
               src={afterSrc}
@@ -178,6 +188,7 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
               height={height}
               label="After"
               onOpen={null}
+              imageTestId={null}
             />
           </SimpleGrid>
         </Modal>
@@ -195,12 +206,14 @@ interface SampleStillProps {
   label: string;
   /** Pass a handler to make the still open the mobile lightbox. */
   onOpen: (() => unknown) | null;
+  /** Test id on the image, or null when this still is not queried. */
+  imageTestId: string | null;
 }
 
 /** One labeled still. Pass `onOpen` to make the image open the lightbox. */
 const SampleStill: React.FunctionComponent<SampleStillProps> = React.memo(
   function SampleStill(props) {
-    const { src, alt, width, height, label, onOpen } = props;
+    const { src, alt, width, height, label, onOpen, imageTestId } = props;
 
     return (
       <Stack gap={4}>
@@ -213,10 +226,22 @@ const SampleStill: React.FunctionComponent<SampleStillProps> = React.memo(
             onClick={onOpen}
             aria-label={`Open ${label.toLowerCase()} sample fullscreen`}
           >
-            <SampleImage src={src} alt={alt} width={width} height={height} />
+            <SampleImage
+              src={src}
+              alt={alt}
+              width={width}
+              height={height}
+              testId={imageTestId}
+            />
           </ButtonDiv>
         ) : (
-          <SampleImage src={src} alt={alt} width={width} height={height} />
+          <SampleImage
+            src={src}
+            alt={alt}
+            width={width}
+            height={height}
+            testId={imageTestId}
+          />
         )}
       </Stack>
     );
@@ -228,12 +253,13 @@ interface SampleImageProps {
   alt: string;
   width: number;
   height: number;
+  testId: string | null;
 }
 
 /** Shared still sizing so the tall passport and short 1040 crop match. */
 const SampleImage: React.FunctionComponent<SampleImageProps> = React.memo(
   function SampleImage(props) {
-    const { src, alt, width, height } = props;
+    const { src, alt, width, height, testId } = props;
     return (
       <Image
         src={src}
@@ -241,11 +267,11 @@ const SampleImage: React.FunctionComponent<SampleImageProps> = React.memo(
         width={width}
         height={height}
         w="100%"
-        h="auto"
         // Cap height so both samples occupy a similar slot on the card.
         mah={360}
         fit="contain"
         radius="sm"
+        data-testid={testId ?? undefined}
       />
     );
   }
