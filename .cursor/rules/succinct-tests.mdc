@@ -1,0 +1,17 @@
+---
+description: Keep tests focused. Don't duplicate cases that exercise the same path.
+globs: '**/*.test.ts,**/*.test.tsx'
+alwaysApply: true
+---
+
+Don't duplicate the same case for every union variant when the code path is
+shared. One representative value is enough unless the type changes behavior.
+
+```ts
+// Avoid — add/delete behave the same for automatic and manual boxes
+it('deletes an automatic box', ...);
+it('deletes a manual box', ...);
+
+// Prefer — one variant covers the shared lookup
+it('deletes a box by page, type, and coordinates', ...);
+```

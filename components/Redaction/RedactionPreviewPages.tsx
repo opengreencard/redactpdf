@@ -558,6 +558,8 @@ export default RedactionPreviewPages;
  * Coordinates are clamped so dragging outside the image still creates a valid
  * box in the image coordinate system.
  */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export function _clientRectToNormalizedBox(
   rect: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>,
   start: Point,

@@ -76,6 +76,8 @@ export default createRule({
   },
 });
 
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 function buildFixes(
   context: TSESLint.RuleContext<'requireSequelizeTypeAssertion', []>,
   fixer: TSESLint.RuleFixer,

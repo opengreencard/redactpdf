@@ -22,6 +22,16 @@ files.
 - Internal helper functions used only within the same module.
 - Symbols that maintain encapsulation boundaries.
 - Implementation details that tests don't need to access directly.
+- Server-only runtime data from a module the client imports. Keep prompts,
+  Zod wire schemas, and similar values next to the server function.
+  Sharing types with `import type` is fine.
+
+```ts
+// Avoid — client imports redactionTypes and also gets the prompt copy
+export const redactedDataTypeToDescription = { ... };
+
+// Prefer — keep the copy in getRedactionBoundingBoxes.ts
+```
 
 ## Examples
 

@@ -103,6 +103,8 @@ export interface MakeRequestParamsFromRequestOptions<
  * Run a function that powers an API and serialize its response according to
  * the requested response format.
  */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export async function runFunctionAndHandleErrors<ResponseT>(
   responseFormat: APIRouteResponseFormat,
   func: () => Promise<ResponseT>,

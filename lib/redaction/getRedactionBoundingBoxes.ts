@@ -125,6 +125,8 @@ const redactionResponseSchema: z.ZodType<RedactionResponse> = z.object({
   boxes: redactionBoxSchema.array(),
 });
 
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 function requestRedactionVision(
   imageDataURL: string,
   prompt: string,

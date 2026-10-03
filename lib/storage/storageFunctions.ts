@@ -112,6 +112,8 @@ function delay(ms: number) {
 }
 
 /** Run a S3 operation with retries if we get a SlowDown or other error */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export async function runWithRetries<RetType>(
   func: () => PromiseLike<RetType>,
   retriesLeft: number = 3,
@@ -166,6 +168,8 @@ interface PutStringDataCompressionOptions {
 }
 
 /** Creates a function that puts something into our S3 bucket */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 function makePutStringDataFunc<KeyT = string>(
   keyTransform: (key: KeyT) => string,
   accessLevel: 'public-read' | 'private',
@@ -176,6 +180,8 @@ function makePutStringDataFunc<KeyT = string>(
     key: KeyT,
     data: string,
     options: Partial<PutStringDataCompressionOptions> = {}
+    // TODO: Use a keyed parameter object now that max-params is 2.
+    // eslint-disable-next-line max-params
   ) => {
     const rawBuffer = Buffer.from(data, 'utf8');
     let bufferToUpload: Buffer;
@@ -232,6 +238,8 @@ export interface PutDataOptions {
 }
 
 /** Creates a function that puts something binary into our S3 bucket */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 function makePutDataFunc<KeyT = string>(
   keyTransform: (key: KeyT) => string,
   accessLevel: 'public-read' | 'private',
@@ -242,6 +250,8 @@ function makePutDataFunc<KeyT = string>(
     mimeType: string,
     key: KeyT,
     options: PutDataOptions = {}
+    // TODO: Use a keyed parameter object now that max-params is 2.
+    // eslint-disable-next-line max-params
   ) => {
     const { downloadFilename, contentEncoding } = options;
     return runWithRetries(() =>

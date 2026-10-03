@@ -84,6 +84,8 @@ interface MockFunctionOptions<ResultT> {
  * that return other data types, override the `serializeFile` and
  * `deserializeFile` functions.
  */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export function makeMockedPassThroughFunction<
   FunctionT extends (...args: any[]) => Promise<unknown>,
 >(
