@@ -27,8 +27,6 @@ import type { GetRedactionResponse } from '../../app/api/redaction/[key]/getReda
 
 - Test the server function (e.g. `getRedaction.ts`), not `route.ts`, for business
   logic, auth, and error handling.
-- Add `route.test.ts` only when you need to assert HTTP-level wiring such as response
-  headers or status codes.
 
 ## Polling GET endpoints
 
