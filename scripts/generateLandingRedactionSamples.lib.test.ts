@@ -30,9 +30,11 @@ describe(generateLandingRedactionSamples, () => {
     if (!irsBefore || !dutchBefore) {
       throw new Error('Expected both before samples to be generated.');
     }
-    // The 1040 crop should be a short header strip, not a full letter page.
-    expect(irsBefore.height).toBeLessThan(irsBefore.width);
-    expect(irsBefore.height).toBeLessThan(dutchBefore.height);
+    // The 1040 is cropped to the passport's width/height ratio.
+    expect(irsBefore.width / irsBefore.height).toBeCloseTo(
+      dutchBefore.width / dutchBefore.height,
+      3
+    );
 
     const afterBytes = await fs.readFile(
       path.join(outputDirectory, 'irs1040-after.jpg')
@@ -40,9 +42,9 @@ describe(generateLandingRedactionSamples, () => {
     const { data, info } = await sharp(afterBytes)
       .raw()
       .toBuffer({ resolveWithObject: true });
-    // A pixel inside the SSN field on the cropped header should be black.
-    const ssnX = Math.round(info.width * 0.86);
-    const ssnY = Math.round(info.height * 0.2);
+    // A pixel inside the SSN field on the cropped page should be black.
+    const ssnX = Math.round(info.width * 0.88);
+    const ssnY = Math.round(info.height * 0.12);
     const offset = (ssnY * info.width + ssnX) * info.channels;
     expect(data[offset]).toBe(0);
     expect(data[offset + 1]).toBe(0);

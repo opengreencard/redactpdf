@@ -23,7 +23,8 @@ interface GeneratedLandingSample {
  * Dutch boxes come from the recorded vision response for
  * `dutchPassportSpecimen.jpg` (0–1000 model coords, divided by 1000). IRS
  * uses `TestRedactionBoundingBoxes.irs1040Scenario2` and is cropped to the
- * identity header so the card is closer to the passport's size.
+ * Dutch passport's width/height ratio so the two cards match. The 1040 is
+ * a bit wider, so we keep the full height and trim the sides.
  *
  * Keep in sync with `dutchPassportSample` and `irs1040Sample` in
  * `landingRedactionSamples.ts`. After we write new JPEGs, copy the printed
@@ -49,8 +50,14 @@ export async function generateLandingRedactionSamples({
     irsSource,
     TestRedactionBoundingBoxes.irs1040Scenario2.map((box) => box.box)
   );
-  const irsBefore = await cropNormalized(irsSource, irs1040IdentityCrop);
-  const irsAfter = await cropNormalized(irsAfterFull, irs1040IdentityCrop);
+  const dutchMetadata = await sharp(dutchSource).metadata();
+  if (!dutchMetadata.width || !dutchMetadata.height) {
+    throw new Error('The Dutch passport sample is missing image dimensions.');
+  }
+  // Same width/height ratio as the passport so the two cards line up.
+  const passportAspect = dutchMetadata.width / dutchMetadata.height;
+  const irsBefore = await cropToAspect(irsSource, passportAspect);
+  const irsAfter = await cropToAspect(irsAfterFull, passportAspect);
 
   const files: { fileName: string; bytes: Uint8Array }[] = [
     { fileName: 'dutch-passport-before.jpg', bytes: dutchSource },
@@ -78,32 +85,38 @@ export async function generateLandingRedactionSamples({
   );
 }
 
-async function cropNormalized(
+/**
+ * Center-crop so the result has `targetAspect` (width / height).
+ *
+ * A letter 1040 is wider than a passport, so we keep the full height and
+ * trim the left and right margins.
+ */
+async function cropToAspect(
   image: Uint8Array,
-  crop: BoundingBox
+  targetAspect: number
 ): Promise<Uint8Array> {
   const metadata = await sharp(image).metadata();
   if (!metadata.width || !metadata.height) {
     throw new Error('The image to crop does not have image dimensions.');
   }
-  const left = Math.round(crop.minX * metadata.width);
-  const top = Math.round(crop.minY * metadata.height);
-  const width = Math.round((crop.maxX - crop.minX) * metadata.width);
-  const height = Math.round((crop.maxY - crop.minY) * metadata.height);
+  const { width, height } = metadata;
+  const currentAspect = width / height;
+  let left = 0;
+  let top = 0;
+  let cropWidth = width;
+  let cropHeight = height;
+  if (currentAspect > targetAspect) {
+    cropWidth = Math.round(height * targetAspect);
+    left = Math.round((width - cropWidth) / 2);
+  } else if (currentAspect < targetAspect) {
+    cropHeight = Math.round(width / targetAspect);
+    top = Math.round((height - cropHeight) / 2);
+  }
   return sharp(image)
-    .extract({ left, top, width, height })
+    .extract({ left, top, width: cropWidth, height: cropHeight })
     .jpeg({ quality: 85, progressive: false })
     .toBuffer();
 }
-
-// Tight crop around the 1040 name / SSN / address block so the card is
-// closer to the Dutch passport's visual size.
-const irs1040IdentityCrop: BoundingBox = {
-  minX: 0.02,
-  minY: 0.08,
-  maxX: 0.98,
-  maxY: 0.27,
-};
 
 // Keep in sync with the recorded Gemini boxes in
 // `lib/ai/__mocks__/__testData__/createOpenAICompatibleCompletion/createOpenAICompatibleCompletion/getRedactionBoundingBoxes.test.ts-5b304f96_gemini_82b7fd22.json`.
