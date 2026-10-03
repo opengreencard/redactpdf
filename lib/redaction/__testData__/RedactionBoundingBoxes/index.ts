@@ -1,3 +1,4 @@
+import DutchPassportSpecimenJSON from './DutchPassportSpecimen.json';
 import IRS1040Scenario2JSON from './IRS1040Scenario2.json';
 import USPassportCardSpecimen from './USPassportCardSpecimen.json';
 import type { SinglePageRedactionBoundingBox } from '../../redactionTypes';
@@ -10,6 +11,8 @@ import type { SinglePageRedactionBoundingBox } from '../../redactionTypes';
  * single-page vision function.
  */
 export const TestRedactionBoundingBoxes = {
+  dutchPassportSpecimen:
+    DutchPassportSpecimenJSON as SinglePageRedactionBoundingBox[],
   irs1040Scenario2: IRS1040Scenario2JSON as SinglePageRedactionBoundingBox[],
   usPassportCardSpecimen:
     USPassportCardSpecimen as SinglePageRedactionBoundingBox[],

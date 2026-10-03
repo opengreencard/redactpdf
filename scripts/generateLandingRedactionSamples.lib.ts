@@ -3,7 +3,6 @@ import path from 'node:path';
 import sharp from 'sharp';
 import { burnRedactionBoxesOnImage } from '../lib/redaction/burnRedactionBoxesOnImage';
 import { TestRedactionBoundingBoxes } from '../lib/redaction/__testData__/RedactionBoundingBoxes';
-import type { BoundingBox } from '../lib/redaction/redactionTypes';
 import { promiseAllThrottled } from '../lib/utilities/promiseAllThrottled';
 
 interface GenerateLandingRedactionSamplesOptions {
@@ -15,20 +14,24 @@ interface GeneratedLandingSample {
   fileName: string;
   width: number;
   height: number;
+  jpegBytes: number;
+  pngBytes: number;
 }
 
 /**
- * Write the public before/after JPEGs for the landing-page sample cards.
+ * Write the public before/after images for the landing-page sample cards.
  *
- * Dutch boxes come from the recorded vision response for
- * `dutchPassportSpecimen.jpg` (0–1000 model coords, divided by 1000). IRS
- * uses `TestRedactionBoundingBoxes.irs1040Scenario2` and is cropped to the
- * Dutch passport's width/height ratio so the two cards match. The 1040 is
- * a bit wider, so we keep the full height and trim the sides.
+ * Dutch boxes come from `TestRedactionBoundingBoxes.dutchPassportSpecimen`.
+ * IRS uses `TestRedactionBoundingBoxes.irs1040Scenario2` and is cropped to
+ * the Dutch passport's width/height ratio so the two cards match. The 1040
+ * is a bit wider, so we keep the full height and trim the sides.
+ *
+ * Each still is then fit inside 1280×1280 and encoded as both JPEG 85
+ * (mozjpeg) and PNG; we keep whichever file is smaller.
  *
  * Keep in sync with `dutchPassportSample` and `irs1040Sample` in
- * `landingRedactionSamples.ts`. After we write new JPEGs, copy the printed
- * width/height into those objects.
+ * `landingRedactionSamples.ts`. After we write new files, copy the printed
+ * width/height and file names into those objects.
  */
 export async function generateLandingRedactionSamples({
   outputDirectory,
@@ -41,7 +44,7 @@ export async function generateLandingRedactionSamples({
   );
   const dutchAfter = await burnRedactionBoxesOnImage(
     dutchSource,
-    dutchPassportBoxes
+    TestRedactionBoundingBoxes.dutchPassportSpecimen.map((box) => box.box)
   );
   const irsSource = await fs.readFile(
     path.join(fixturesDirectory, 'irs1040Scenario2.jpg')
@@ -59,30 +62,83 @@ export async function generateLandingRedactionSamples({
   const irsBefore = await cropToAspect(irsSource, passportAspect);
   const irsAfter = await cropToAspect(irsAfterFull, passportAspect);
 
-  const files: { fileName: string; bytes: Uint8Array }[] = [
-    { fileName: 'dutch-passport-before.jpg', bytes: dutchSource },
-    { fileName: 'dutch-passport-after.jpg', bytes: dutchAfter },
-    { fileName: 'irs1040-before.jpg', bytes: irsBefore },
-    { fileName: 'irs1040-after.jpg', bytes: irsAfter },
+  const files: { baseName: string; bytes: Uint8Array }[] = [
+    { baseName: 'dutch-passport-before', bytes: dutchSource },
+    { baseName: 'dutch-passport-after', bytes: dutchAfter },
+    { baseName: 'irs1040-before', bytes: irsBefore },
+    { baseName: 'irs1040-after', bytes: irsAfter },
   ];
 
   return promiseAllThrottled(
     files.map((file) => async (): Promise<GeneratedLandingSample> => {
-      const outputPath = path.join(outputDirectory, file.fileName);
-      await fs.writeFile(outputPath, file.bytes);
-      const metadata = await sharp(file.bytes).metadata();
-      if (!metadata.width || !metadata.height) {
-        throw new Error(`${file.fileName} is missing image dimensions.`);
-      }
+      const encoded = await resizeAndCompressLandingSample(file.bytes);
+      const fileName = `${file.baseName}.${encoded.extension}`;
+      const outputPath = path.join(outputDirectory, fileName);
+      const otherExtension = encoded.extension === 'jpg' ? 'png' : 'jpg';
+      // Drop the losing format so we don't leave a stale jpg next to a png.
+      await fs.rm(
+        path.join(outputDirectory, `${file.baseName}.${otherExtension}`),
+        { force: true }
+      );
+      await fs.writeFile(outputPath, encoded.bytes);
       const generated: GeneratedLandingSample = {
-        fileName: file.fileName,
-        width: metadata.width,
-        height: metadata.height,
+        fileName,
+        width: encoded.width,
+        height: encoded.height,
+        jpegBytes: encoded.jpegBytes,
+        pngBytes: encoded.pngBytes,
       };
       return generated;
     }),
     4
   );
+}
+
+/**
+ * Fit inside 1280×1280, then pick the smaller of JPEG 85 and PNG.
+ *
+ * Photos usually win as JPEG. A sparse form can win as PNG, so we encode
+ * both and keep the smaller file. mozjpeg is the same encoder ImageOptim
+ * uses for "JPEG 85%".
+ *
+ * @see https://github.com/ImageOptim/ImageOptim
+ */
+async function resizeAndCompressLandingSample(image: Uint8Array): Promise<{
+  bytes: Uint8Array;
+  extension: 'jpg' | 'png';
+  width: number;
+  height: number;
+  jpegBytes: number;
+  pngBytes: number;
+}> {
+  const resized = sharp(image)
+    .rotate()
+    .resize(maxLandingSampleEdgePx, maxLandingSampleEdgePx, {
+      fit: 'inside',
+      withoutEnlargement: true,
+    });
+  // `metadata()` ignores resize, so we read dimensions from the encoded
+  // buffer. https://github.com/lovell/sharp/issues/157
+  const [jpeg, png] = await Promise.all([
+    resized
+      .clone()
+      .jpeg({ quality: 85, mozjpeg: true })
+      .toBuffer({ resolveWithObject: true }),
+    resized.clone().png({ compressionLevel: 9 }).toBuffer({
+      resolveWithObject: true,
+    }),
+  ]);
+
+  const usePNG = png.data.length < jpeg.data.length;
+  const info = usePNG ? png.info : jpeg.info;
+  return {
+    bytes: usePNG ? png.data : jpeg.data,
+    extension: usePNG ? 'png' : 'jpg',
+    width: info.width,
+    height: info.height,
+    jpegBytes: jpeg.data.length,
+    pngBytes: png.data.length,
+  };
 }
 
 /**
@@ -114,24 +170,8 @@ async function cropToAspect(
   }
   return sharp(image)
     .extract({ left, top, width: cropWidth, height: cropHeight })
-    .jpeg({ quality: 85, progressive: false })
     .toBuffer();
 }
 
-// Keep in sync with the recorded Gemini boxes in
-// `lib/ai/__mocks__/__testData__/createOpenAICompatibleCompletion/createOpenAICompatibleCompletion/getRedactionBoundingBoxes.test.ts-5b304f96_gemini_82b7fd22.json`.
-const dutchPassportBoxes: BoundingBox[] = [
-  { minX: 0.877, minY: 0.098, maxX: 0.944, maxY: 0.427 },
-  { minX: 0.052, minY: 0.569, maxX: 0.31, maxY: 0.804 },
-  { minX: 0.724, minY: 0.569, maxX: 0.836, maxY: 0.585 },
-  { minX: 0.33, minY: 0.597, maxX: 0.477, maxY: 0.631 },
-  { minX: 0.331, minY: 0.642, maxX: 0.51, maxY: 0.657 },
-  { minX: 0.331, minY: 0.668, maxX: 0.552, maxY: 0.684 },
-  { minX: 0.331, minY: 0.698, maxX: 0.439, maxY: 0.715 },
-  { minX: 0.621, minY: 0.663, maxX: 0.742, maxY: 0.77 },
-  { minX: 0.331, minY: 0.753, maxX: 0.536, maxY: 0.768 },
-  { minX: 0.75, minY: 0.753, maxX: 0.955, maxY: 0.768 },
-  { minX: 0.335, minY: 0.797, maxX: 0.585, maxY: 0.835 },
-  { minX: 0.068, minY: 0.882, maxX: 0.928, maxY: 0.898 },
-  { minX: 0.068, minY: 0.915, maxX: 0.926, maxY: 0.932 },
-];
+// Keep in sync with `landingRedactionSamples.test.ts`.
+const maxLandingSampleEdgePx = 1280;

@@ -102,6 +102,7 @@ function groupEnabledBoxesByPage(
   return boxesByPage;
 }
 
-// 150 DPI is sharp enough to read remaining labels on a letter page without
-// the 72 DPI vision-pipeline softness. Last updated 2026-10-03.
-const flattenedPageDPI = 150;
+// 300 DPI so a printed flattened page still looks sharp. The vision
+// pipeline uses 72 DPI; that's too soft once we replace the PDF page
+// with a JPEG.
+const flattenedPageDPI = 300;

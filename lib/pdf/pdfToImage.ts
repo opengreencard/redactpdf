@@ -117,10 +117,16 @@ export async function rasterizePDFPages(
 
   const dpi = options.dpi ?? targetDPI;
   const pageSizes = await getPDFPageSizes(pdf);
+  const requestedPageSizes = uniquePageNumbers.map(
+    (pageNumber) => pageSizes[pageNumber - 1]
+  );
+  // Flatten at 300 DPI needs a canvas larger than the vision 2048 square.
+  // Otherwise a letter page would be rasterized at 2048 and then upscaled.
+  const canvasSize = getRasterCanvasSize(requestedPageSizes, dpi);
   const converter = fromBuffer(Buffer.from(pdf), {
     preserveAspectRatio: true,
-    width: rasterSize,
-    height: rasterSize,
+    width: canvasSize,
+    height: canvasSize,
     format: 'png',
     density: dpi,
   });
@@ -155,6 +161,21 @@ export async function compressImage(
   return sharp(pngBuffer)
     .jpeg({ quality: jpegQuality, progressive: false })
     .toBuffer();
+}
+
+/**
+ * Smallest square canvas that can hold every requested page at `dpi`
+ * without upscaling. Vision stays on 2048; flatten at 300 DPI grows this.
+ */
+function getRasterCanvasSize(pageSizes: PageSize[], dpi: number): number {
+  const maxEdge = Math.max(
+    rasterSize,
+    ...pageSizes.flatMap((pageSize) => [
+      Math.round((pageSize.width * dpi) / 72),
+      Math.round((pageSize.height * dpi) / 72),
+    ])
+  );
+  return maxEdge;
 }
 
 /** Shared pdf2pic canvas so mixed page sizes still rasterize. */

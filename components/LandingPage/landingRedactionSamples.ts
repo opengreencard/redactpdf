@@ -13,7 +13,7 @@ interface LandingRedactionSample extends Pick<
  *
  * Keep in sync with `generateLandingRedactionSamples`: rerun
  * `yarn swc-node scripts/generateLandingRedactionSamples.ts` and copy the
- * printed width/height here. Last updated 2026-10-03.
+ * printed width/height and file names here.
  */
 export const dutchPassportSample: LandingRedactionSample = {
   title: 'Dutch passport',
@@ -22,15 +22,15 @@ export const dutchPassportSample: LandingRedactionSample = {
   beforeAlt: 'Dutch passport specimen before redaction',
   afterAlt:
     'Dutch passport specimen after names, dates, and photos are blacked out',
-  width: 1920,
-  height: 2778,
+  width: 885,
+  height: 1280,
 };
 
 /**
  * IRS 1040 stills cropped to the Dutch passport aspect ratio.
  *
  * Keep in sync with `generateLandingRedactionSamples` (same as
- * `dutchPassportSample`). Last updated 2026-10-03.
+ * `dutchPassportSample`).
  */
 export const irs1040Sample: LandingRedactionSample = {
   title: 'IRS Form 1040',
@@ -38,6 +38,6 @@ export const irs1040Sample: LandingRedactionSample = {
   afterSrc: '/samples/irs1040-after.jpg',
   beforeAlt: 'IRS Form 1040 before redaction',
   afterAlt: 'IRS Form 1040 after names, SSNs, and the address are blacked out',
-  width: 1140,
-  height: 1650,
+  width: 884,
+  height: 1280,
 };
