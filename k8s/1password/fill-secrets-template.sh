@@ -51,7 +51,7 @@ googleClientId=$(op read "$itemFQN/GOOGLE_CLIENT_ID" < /dev/null)
 googleClientSecret=$(op read "$itemFQN/GOOGLE_CLIENT_SECRET" < /dev/null)
 s3AccessKeyId=$(op read "$itemFQN/S3_ACCESS_KEY_ID" < /dev/null)
 s3SecretAccessKey=$(op read "$itemFQN/S3_SECRET_ACCESS_KEY" < /dev/null)
-geminiApiKey=$(op read "$itemFQN/GEMINI_API_KEY" < /dev/null)
+geminiAPIKey=$(op read "$itemFQN/GEMINI_API_KEY" < /dev/null)
 
 mkdir -p "$DIR/../config"
 
@@ -64,7 +64,7 @@ sed \
   -e "s|%GOOGLE_CLIENT_SECRET%|$googleClientSecret|g" \
   -e "s|%S3_ACCESS_KEY_ID%|$s3AccessKeyId|g" \
   -e "s|%S3_SECRET_ACCESS_KEY%|$s3SecretAccessKey|g" \
-  -e "s|%GEMINI_API_KEY%|$geminiApiKey|g" \
+  -e "s|%GEMINI_API_KEY%|$geminiAPIKey|g" \
   "$DIR/../templates/secret.template.yml" > "$DIR/../config/secret.yml"
 
 # Ensure kubectl is connected before applying the secret to the cluster.
