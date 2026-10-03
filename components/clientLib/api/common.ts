@@ -129,7 +129,7 @@ async function makeRequestAndHandleErrors<ResponseT>(
   }
 }
 
-function getApplicationErrorMessage(error: unknown): string | null {
+function getApplicationErrorMessage(error: Error): string | null {
   if (!axios.isAxiosError(error) || !error.response?.data) {
     return null;
   }

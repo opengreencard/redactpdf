@@ -39,6 +39,7 @@ async function makeDBRedaction(
       redactionBoundingBoxes: options.redactionBoundingBoxes ?? [],
       status,
       errorMessage: options.errorMessage ?? null,
+      openedAt: options.openedAt ?? new Date(),
     };
 
   return Redaction.create(creationAttributes);

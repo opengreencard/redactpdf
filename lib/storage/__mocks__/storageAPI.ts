@@ -61,7 +61,7 @@ export const deleteObject: typeof origDeleteObject = async (key, _options) => {
 };
 
 /** Bulk delete multiple objects */
-export const deleteObjects: typeof origDeleteObjects = async (
+const deleteObjectsImplementation: typeof origDeleteObjects = async (
   keys,
   _options
 ) => {
@@ -71,6 +71,10 @@ export const deleteObjects: typeof origDeleteObjects = async (
   const response: DeleteObjectsCommandOutput = { $metadata: {} };
   return response;
 };
+
+export const deleteObjects = jest.fn(
+  deleteObjectsImplementation
+) as typeof origDeleteObjects;
 
 /**
  * This error is meant to mirror the actual error that the AWS S3 API

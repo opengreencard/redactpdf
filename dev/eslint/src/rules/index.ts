@@ -3,6 +3,7 @@ import enumMemberNameMatchesValue from './enum-member-name-matches-value';
 import jsxMultilineCommentStyle from './jsx-multiline-comment-style';
 import noImportReexport from './no-import-reexport';
 import noUnexportedUnderscoreFunctions from './no-unexported-underscore-functions';
+import preferInlineExport from './prefer-inline-export';
 import requireFindByPkAttributes from './require-find-by-pk-attributes';
 import requireSequelizeTypeAssertion from './require-sequelize-type-assertion';
 
@@ -16,6 +17,7 @@ export const rules = {
   'jsx-multiline-comment-style': jsxMultilineCommentStyle,
   'no-import-reexport': noImportReexport,
   'no-unexported-underscore-functions': noUnexportedUnderscoreFunctions,
+  'prefer-inline-export': preferInlineExport,
   'require-find-by-pk-attributes': requireFindByPkAttributes,
   'require-sequelize-type-assertion': requireSequelizeTypeAssertion,
 };

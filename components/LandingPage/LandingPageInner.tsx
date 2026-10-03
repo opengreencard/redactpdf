@@ -38,6 +38,7 @@ import {
   siteName,
   wanderlogUrl,
 } from '../../lib/config/brand';
+import { _deleteOldRedactionHoursText } from '../../lib/redaction/deleteOldRedactionHours';
 import { siteContainerSize } from '../SiteChrome/SiteChrome';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
 import LandingPageHeroDropzone from './LandingPageHeroDropzone';
@@ -102,7 +103,7 @@ const LandingPageHero: React.FunctionComponent = React.memo(
                     Open source
                   </Badge>
                   <Badge variant="outline" color="gray">
-                    Deleted within one hour
+                    Deleted {_deleteOldRedactionHoursText}
                   </Badge>
                 </Group>
               </Stack>
@@ -457,7 +458,7 @@ interface PrivacyCard {
 
 const privacyCards: PrivacyCard[] = [
   {
-    title: 'Deleted within one hour',
+    title: `Deleted ${_deleteOldRedactionHoursText}`,
     description: 'Originals, page images, and working files are removed.',
     icon: faClock,
   },
@@ -527,13 +528,11 @@ const faqItems: FaqItem[] = [
   },
   {
     question: 'What happens to my PDF?',
-    answer:
-      'Your original file, page images, and working files are deleted within one hour of upload.',
+    answer: `Your original file, page images, and working files are deleted ${_deleteOldRedactionHoursText}.`,
   },
   {
     question: 'Do you send files to a cloud AI model?',
-    answer:
-      'Yes. A cloud vision model in the United States identifies likely sensitive content. We do not claim client-side encryption or EU-only hosting. Files are then deleted within one hour.',
+    answer: `Yes. A cloud vision model in the United States identifies likely sensitive content. We do not claim client-side encryption or EU-only hosting. Files are then deleted ${_deleteOldRedactionHoursText}.`,
   },
   {
     question: 'Is this open source?',

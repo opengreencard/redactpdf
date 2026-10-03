@@ -5,9 +5,11 @@ import type { NotificationData } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { useAPICall } from '../../lib/hookUtilities/useAPICall';
+import { useInterval } from '../../lib/hookUtilities/useInterval';
 import {
   getRedactionClient,
   mutateRedactionBoundingBoxesClient,
+  touchRedactionOpenedAtClient,
 } from '../clientLib/api/redaction';
 import {
   RedactionBoundingBoxMutation,
@@ -31,13 +33,15 @@ import {
 import RedactionPageInner from './RedactionPageInner';
 
 export interface RedactionPageProps {
+  /** Identifies this upload. We send it on each openedAt ping. */
   redactionKey: string;
   isLoggedIn: boolean;
 }
 
 /**
- * Client container for `/redact/:key`. Polls getRedaction until the document
- * leaves `redacting`, then owns optimistic box edits.
+ * Review page for one uploaded PDF. We poll until analysis finishes, ping
+ * openedAt so idle cleanup doesn't delete a tab that's still open, then
+ * save box edits with an optimistic UI.
  */
 const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
   function RedactionPage(props: RedactionPageProps) {
@@ -68,6 +72,16 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       // eslint-disable-next-line no-void
       void fetchRedaction({ key: redactionKey });
     }, [fetchRedaction, redactionKey]);
+
+    // Keep the document out of idle cleanup while this tab is open.
+    // Once a minute is often enough vs the idle TTL, and cheap.
+    // Keep in sync with the "once a minute" note on `touchRedactionOpenedAt`.
+    const pingOpenedAt = useMemoizedCallback(() => {
+      // Fire-and-forget: a failed ping is retried on the next interval tick.
+      // eslint-disable-next-line no-void
+      void touchRedactionOpenedAtClient({ key: redactionKey });
+    }, [redactionKey]);
+    useInterval(pingOpenedAt, { delayMs: 60 * 1000, runOnMount: true });
 
     const persistBoxMutation = useMemoizedCallback(
       async (
@@ -191,9 +205,6 @@ function getRedactedResult(
   return null;
 }
 
-function getErrorMessage(err: unknown): string {
-  if (err instanceof Error) {
-    return err.message;
-  }
-  return 'Something went wrong. Please try again.';
+function getErrorMessage(err: Error): string {
+  return err.message;
 }

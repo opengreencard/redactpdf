@@ -44,6 +44,19 @@ export const getRedactionClient = makeClientAPIRouteWithoutBody<
   }),
 });
 
+/** Ping openedAt so cleanup leaves a still-open review tab alone. */
+export const touchRedactionOpenedAtClient = makeClientAPIRouteWithBody<
+  {},
+  { key: string },
+  Record<string, never>
+>({
+  method: 'POST',
+  dataToUrlQueryStringAndBody: ({ key }): ClientAPIRouteWithBodyData<{}> => ({
+    url: `/api/redaction/${key}/open`,
+    body: {},
+  }),
+});
+
 /** Public key for the generate route. The server loads boxes itself. */
 export interface GenerateRedactedPDFClientRequest {
   key: string;

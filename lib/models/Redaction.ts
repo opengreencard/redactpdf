@@ -38,6 +38,12 @@ export interface RedactionAttributes {
   status: RedactionStatus;
   /** If the redaction errors, the error message that we got */
   errorMessage: string | null;
+  /**
+   * Last time a review tab said this document was still open. We set it at
+   * upload so unused uploads expire too. Cleanup deletes rows older than
+   * `_deleteOldRedactionHours`.
+   */
+  openedAt: Date;
   createdAt: Date;
 }
 
@@ -96,11 +102,18 @@ const Redaction = db.define<
       allowNull: true,
       defaultValue: null,
     },
+    openedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+      defaultValue: DataTypes.NOW,
+    },
   },
   {
     indexes: [
       { name: 'key', unique: true, fields: ['key'] },
-      { name: 'createdAt_id', fields: ['createdAt', 'id'] },
+      // Cleanup walks stale rows by `(openedAt, id)`. This index makes
+      // that keyset cheap.
+      { name: 'openedAt_id', fields: ['openedAt', 'id'] },
     ],
   }
 );

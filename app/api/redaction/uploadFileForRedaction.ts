@@ -53,6 +53,10 @@ export async function uploadFileForRedaction({
     redactionBoundingBoxes: [],
     status: RedactionStatus.redacting,
     errorMessage: null,
+    // Cleanup clocks from openedAt. Upload is the first "open": if nobody
+    // ever reviews the file, we still want it to expire after the idle
+    // window instead of sitting around forever.
+    openedAt: new Date(),
   });
 
   try {

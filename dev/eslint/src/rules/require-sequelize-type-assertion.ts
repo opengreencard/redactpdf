@@ -5,8 +5,9 @@ import { createRule } from '../util';
  * Requires typed results when Sequelize queries select a subset of columns.
  *
  * A query with `attributes` can no longer safely be treated as a complete model
- * instance. The fixer expresses that subset with `PartialInstance` and keeps
- * Sequelize's nullable result for `findOne` and `findByPk`.
+ * instance. The fixer expresses that subset with `PartialInstance`, keeps
+ * Sequelize's nullable result for `findOne` and `findByPk`, and preserves the
+ * promise when the query is not awaited.
  */
 export default createRule({
   name: 'require-sequelize-type-assertion',
@@ -56,10 +57,11 @@ export default createRule({
         if (!attributesProperty && !hasIdentifierSpread) return;
 
         const { parent } = node;
+        const isAwaited = parent.type === AST_NODE_TYPES.AwaitExpression;
         const isAsserted =
           parent.type === AST_NODE_TYPES.TSAsExpression ||
           parent.type === AST_NODE_TYPES.TSTypeAssertion ||
-          (parent.type === AST_NODE_TYPES.AwaitExpression &&
+          (isAwaited &&
             (parent.parent?.type === AST_NODE_TYPES.TSAsExpression ||
               parent.parent?.type === AST_NODE_TYPES.TSTypeAssertion));
         if (isAsserted) return;
@@ -68,7 +70,14 @@ export default createRule({
           node,
           messageId: 'requireSequelizeTypeAssertion',
           fix: attributesProperty
-            ? (fixer) => buildFixes(context, fixer, node, attributesProperty)
+            ? (fixer) =>
+                buildFixes({
+                  context,
+                  fixer,
+                  node,
+                  attributesProperty,
+                  isAwaited,
+                })
             : undefined,
         });
       },
@@ -76,14 +85,19 @@ export default createRule({
   },
 });
 
-// TODO: Use a keyed parameter object now that max-params is 2.
-// eslint-disable-next-line max-params
-function buildFixes(
-  context: TSESLint.RuleContext<'requireSequelizeTypeAssertion', []>,
-  fixer: TSESLint.RuleFixer,
-  node: TSESTree.CallExpression,
-  attributesProperty: TSESTree.Property
-): TSESLint.RuleFix[] {
+function buildFixes({
+  context,
+  fixer,
+  node,
+  attributesProperty,
+  isAwaited,
+}: {
+  context: TSESLint.RuleContext<'requireSequelizeTypeAssertion', []>;
+  fixer: TSESLint.RuleFixer;
+  node: TSESTree.CallExpression;
+  attributesProperty: TSESTree.Property;
+  isAwaited: boolean;
+}): TSESLint.RuleFix[] {
   if (
     node.callee.type !== AST_NODE_TYPES.MemberExpression ||
     node.callee.object.type !== AST_NODE_TYPES.Identifier ||
@@ -151,13 +165,16 @@ function buildFixes(
     );
   }
 
-  const assertion = `PartialInstance<${attributesName}, ${attributeNames.join(
+  const partialInstance = `PartialInstance<${attributesName}, ${attributeNames.join(
     ' | '
   )}>`;
   const nullable = ['findOne', 'findByPk'].includes(node.callee.property.name)
     ? ` | null`
     : '[]';
-  fixes.push(fixer.insertTextAfter(node, ` as ${assertion}${nullable}`));
+  const assertion = isAwaited
+    ? `${partialInstance}${nullable}`
+    : `Promise<${partialInstance}${nullable}>`;
+  fixes.push(fixer.insertTextAfter(node, ` as ${assertion}`));
   return fixes;
 }
 

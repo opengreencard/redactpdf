@@ -1,0 +1,91 @@
+/**
+ * @jest-environment jsdom
+ */
+
+import { renderHook } from '@testing-library/react';
+import { useInterval } from './useInterval';
+
+describe(useInterval, () => {
+  beforeEach(() => {
+    jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] });
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('invokes the latest callback on each tick', () => {
+    const first = jest.fn();
+    const second = jest.fn();
+    const { rerender } = renderHook<
+      void,
+      {
+        callback: () => void;
+        delayMs: number | null;
+      }
+    >(({ callback, delayMs }) => useInterval(callback, { delayMs }), {
+      initialProps: { callback: first, delayMs: 1000 },
+    });
+
+    jest.advanceTimersByTime(1000);
+    expect(first).toHaveBeenCalledTimes(1);
+
+    rerender({ callback: second, delayMs: 1000 });
+    jest.advanceTimersByTime(1000);
+    expect(first).toHaveBeenCalledTimes(1);
+    expect(second).toHaveBeenCalledTimes(1);
+  });
+
+  it('invokes immediately when runOnMount is true', () => {
+    const callback = jest.fn();
+    renderHook(() =>
+      useInterval(callback, { delayMs: 1000, runOnMount: true })
+    );
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    jest.advanceTimersByTime(1000);
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
+  it('does not rerun the mount callback when the callback changes', () => {
+    const first = jest.fn();
+    const second = jest.fn();
+    const { rerender } = renderHook<
+      void,
+      {
+        callback: () => void;
+      }
+    >(
+      ({ callback }) =>
+        useInterval(callback, { delayMs: 1000, runOnMount: true }),
+      {
+        initialProps: { callback: first },
+      }
+    );
+
+    rerender({ callback: second });
+
+    expect(first).toHaveBeenCalledTimes(1);
+    expect(second).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(1000);
+    expect(second).toHaveBeenCalledTimes(1);
+  });
+
+  it('stops when delayMs is null', () => {
+    const callback = jest.fn();
+    const { rerender } = renderHook<
+      void,
+      {
+        callback: () => void;
+        delayMs: number | null;
+      }
+    >(({ callback: cb, delayMs }) => useInterval(cb, { delayMs }), {
+      initialProps: { callback, delayMs: 1000 as number | null },
+    });
+
+    rerender({ callback, delayMs: null });
+    jest.advanceTimersByTime(5000);
+    expect(callback).not.toHaveBeenCalled();
+  });
+});

@@ -1,0 +1,20 @@
+---
+description: Catch values are Error. Do not annotate them as unknown or cast with as Error.
+globs: '**/*.ts,**/*.tsx'
+alwaysApply: true
+---
+
+`useUnknownInCatchVariables` is false, so `catch (error)` is already
+`Error`. Do not write `catch (error: unknown)` or `error as Error`.
+
+```ts
+// Avoid
+} catch (error: unknown) {
+  const message = (error as Error).message;
+}
+
+// Prefer
+} catch (error) {
+  const message = error.message;
+}
+```

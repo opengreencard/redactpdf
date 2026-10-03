@@ -170,7 +170,7 @@ async function processImage({
         visionTimeMs: 0,
         succeeded: false,
       },
-      errorMessage: error instanceof Error ? error.message : String(error),
+      errorMessage: error.message,
     };
     return processResult;
   }
@@ -178,9 +178,9 @@ async function processImage({
 
 async function markRedactionAsError(
   redaction: RedactionInstance,
-  error: unknown
+  error: Error
 ): Promise<void> {
-  const errorMessage = error instanceof Error ? error.message : String(error);
+  const errorMessage = error.message;
 
   try {
     await redaction.update({

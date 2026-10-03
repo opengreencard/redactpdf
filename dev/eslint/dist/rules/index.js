@@ -9,6 +9,7 @@ const enum_member_name_matches_value_1 = __importDefault(require("./enum-member-
 const jsx_multiline_comment_style_1 = __importDefault(require("./jsx-multiline-comment-style"));
 const no_import_reexport_1 = __importDefault(require("./no-import-reexport"));
 const no_unexported_underscore_functions_1 = __importDefault(require("./no-unexported-underscore-functions"));
+const prefer_inline_export_1 = __importDefault(require("./prefer-inline-export"));
 const require_find_by_pk_attributes_1 = __importDefault(require("./require-find-by-pk-attributes"));
 const require_sequelize_type_assertion_1 = __importDefault(require("./require-sequelize-type-assertion"));
 // Disable warning about explicitly typing objects: in this case, having
@@ -20,6 +21,7 @@ exports.rules = {
     'jsx-multiline-comment-style': jsx_multiline_comment_style_1.default,
     'no-import-reexport': no_import_reexport_1.default,
     'no-unexported-underscore-functions': no_unexported_underscore_functions_1.default,
+    'prefer-inline-export': prefer_inline_export_1.default,
     'require-find-by-pk-attributes': require_find_by_pk_attributes_1.default,
     'require-sequelize-type-assertion': require_sequelize_type_assertion_1.default,
 };
