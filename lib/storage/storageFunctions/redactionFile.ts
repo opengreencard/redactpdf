@@ -9,7 +9,7 @@ function getStorageKeyForRedactionFile(key: string): string {
   return `redactions/${key}/original.pdf`;
 }
 
-const {
+export const {
   put: putRedactionFile,
   get: getRedactionFile,
   delete: deleteRedactionFile,
@@ -18,10 +18,3 @@ const {
   public: false,
   bucket: S3Bucket.files,
 });
-
-export {
-  putRedactionFile,
-  getRedactionFile,
-  deleteRedactionFile,
-  bulkDeleteRedactionFile,
-};
