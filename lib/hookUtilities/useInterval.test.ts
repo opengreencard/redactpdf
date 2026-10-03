@@ -47,6 +47,31 @@ describe(useInterval, () => {
     expect(callback).toHaveBeenCalledTimes(2);
   });
 
+  it('does not rerun the mount callback when the callback changes', () => {
+    const first = jest.fn();
+    const second = jest.fn();
+    const { rerender } = renderHook<
+      void,
+      {
+        callback: () => void;
+      }
+    >(
+      ({ callback }) =>
+        useInterval(callback, { delayMs: 1000, runOnMount: true }),
+      {
+        initialProps: { callback: first },
+      }
+    );
+
+    rerender({ callback: second });
+
+    expect(first).toHaveBeenCalledTimes(1);
+    expect(second).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(1000);
+    expect(second).toHaveBeenCalledTimes(1);
+  });
+
   it('stops when delayMs is null', () => {
     const callback = jest.fn();
     const { rerender } = renderHook<

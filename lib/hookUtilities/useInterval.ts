@@ -40,7 +40,7 @@ export function useInterval(
     if (!runOnMount || delayMs === null) return;
 
     if (savedCallback.current) savedCallback.current();
-  }, [callback, delayMs, runOnMount]);
+  }, [delayMs, runOnMount]);
 
   useEffect(() => {
     // Returning undefined skips creating an interval. The previous effect's
