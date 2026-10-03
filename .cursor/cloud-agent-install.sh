@@ -9,6 +9,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR/.."
 
 # The VM also has Node 22 on PATH. This app needs Node 26.
+# Keep in sync with .cursor/cloud-agent-start.sh.
 export PATH="/usr/local/bin:${PATH}"
 
 # The replace-with-... placeholders are enough to boot. Skip the copy when

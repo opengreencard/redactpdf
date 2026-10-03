@@ -9,6 +9,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "$DIR/.."
 
 # The VM also has Node 22 on PATH. This app needs Node 26.
+# Keep in sync with .cursor/cloud-agent-install.sh.
 export PATH="/usr/local/bin:${PATH}"
 
 # bash -l does not pick up the docker group, and systemd is not running.
