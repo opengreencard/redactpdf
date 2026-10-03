@@ -103,7 +103,7 @@ const LandingPageHero: React.FunctionComponent = React.memo(
                     Open source
                   </Badge>
                   <Badge variant="outline" color="gray">
-                    Deleted within one hour
+                    Deleted {_deleteOldRedactionHoursText}
                   </Badge>
                 </Group>
               </Stack>
@@ -458,7 +458,7 @@ interface PrivacyCard {
 
 const privacyCards: PrivacyCard[] = [
   {
-    title: 'Deleted within one hour',
+    title: `Deleted ${_deleteOldRedactionHoursText}`,
     description: 'Originals, page images, and working files are removed.',
     icon: faClock,
   },
