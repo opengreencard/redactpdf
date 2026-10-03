@@ -13,9 +13,15 @@ const {
   put: putRedactionFile,
   get: getRedactionFile,
   delete: deleteRedactionFile,
+  bulkDelete: bulkDeleteRedactionFile,
 } = makeStorageFunctions(getStorageKeyForRedactionFile, {
   public: false,
   bucket: S3Bucket.files,
 });
 
-export { putRedactionFile, getRedactionFile, deleteRedactionFile };
+export {
+  putRedactionFile,
+  getRedactionFile,
+  deleteRedactionFile,
+  bulkDeleteRedactionFile,
+};

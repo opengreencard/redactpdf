@@ -640,6 +640,16 @@ const commonNoRestrictedSyntaxRules = [
       'Prefer direct named or default imports over namespace imports so each dependency is explicit.',
   },
   ...forbiddenMockRules,
+  {
+    // mysql2 uses process.nextTick to deliver query results. Faking it makes
+    // Sequelize operations hang unless these two APIs remain real.
+    selector:
+      'CallExpression[callee.object.name="jest"][callee.property.name="useFakeTimers"]:not(:has(Property[key.name="doNotFake"])), ' +
+      'CallExpression[callee.object.name="jest"][callee.property.name="useFakeTimers"]:has(Property[key.name="doNotFake"]):not(:has(Property[key.name="doNotFake"] Literal[value="nextTick"])), ' +
+      'CallExpression[callee.object.name="jest"][callee.property.name="useFakeTimers"]:has(Property[key.name="doNotFake"]):not(:has(Property[key.name="doNotFake"] Literal[value="setImmediate"]))',
+    message:
+      'jest.useFakeTimers() must include { doNotFake: ["nextTick", "setImmediate"] } to prevent hangs with mysql2/Sequelize. Suppress with // eslint-disable-next-line no-restricted-syntax only if testing pure timers without DB code.',
+  },
 ];
 
 const commonNoRestrictedSyntaxRulesForNonTests = [

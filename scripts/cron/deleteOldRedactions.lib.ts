@@ -1,19 +1,14 @@
 import { Op } from 'sequelize';
 import { PartialInstance } from '../../lib/db/types';
 import Redaction, { RedactionAttributes } from '../../lib/models/Redaction';
-import { S3Bucket } from '../../lib/storage/buckets';
-import { makeRedactionImageStorageKey } from '../../lib/storage/redactionImageKey';
-import { getStorageKeyForRedactionFile } from '../../lib/storage/storageFunctions/redactionFile';
-import { deleteObjects } from '../../lib/storage/storageAPI';
-import { promiseAllThrottled } from '../../lib/utilities/promiseAllThrottled';
+import type { RedactionImageKeyOptions } from '../../lib/storage/redactionImageKey';
+import { bulkDeleteRedactionImage } from '../../lib/storage/storageFunctions/redactionImage';
+import { bulkDeleteRedactionFile } from '../../lib/storage/storageFunctions/redactionFile';
 
 /**
  * How long a document can sit with no open review tab before we delete it.
  * Upload counts as the first "open", so files nobody ever reviews still
  * expire. FAQ, privacy, and terms say "about an hour" to match this.
- *
- * Keep in sync with `openedAt` on `RedactionAttributes` in
- * `lib/models/Redaction.ts`.
  */
 export const _deleteOldRedactionHours = 1;
 
@@ -35,12 +30,11 @@ interface DeleteOldRedactionsResult {
  * Delete originals, page images, and DB rows that nobody has had open for
  * `olderThanMs`.
  *
- * We page with an `(openedAt, id)` keyset instead of OFFSET:
- * - Dry-run has to visit every stale row once
- * - OFFSET would keep returning the same first page, because we aren't
- *   deleting those rows
+ * We page with an `(openedAt, id)` keyset instead of OFFSET. Dry-run has to
+ * visit every stale row once, because it doesn't delete rows.
  *
- * Spaces deletes go through batched `deleteObjects`.
+ * Spaces deletes use one bulk request for PDFs and one for page images per
+ * batch, split into the 1,000-key limit accepted by S3.
  */
 export async function deleteOldRedactions({
   olderThanMs,
@@ -48,12 +42,47 @@ export async function deleteOldRedactions({
 }: DeleteOldRedactionsOptions): Promise<DeleteOldRedactionsResult> {
   const cutoffDate = new Date(Date.now() - olderThanMs);
   const counts: DeleteOldRedactionsResult = { checked: 0, deleted: 0 };
-  return deleteOldRedactionsRecursive({
-    cutoffDate,
-    makeChanges,
-    cursor: null,
-    counts,
-  });
+  let cursor: OpenedAtIdCursor | null = null;
+  let rows: StaleRedaction[] = [];
+
+  do {
+    // The cursor must advance only after this page has been fetched.
+    // eslint-disable-next-line no-await-in-loop
+    rows = await fetchStaleRedactionBatch({ cutoffDate, cursor });
+    if (rows.length === 0) break;
+
+    counts.checked += rows.length;
+    console.info(
+      `${makeChanges ? 'Deleting' : 'Would delete'} ${rows.length} redactions`
+    );
+
+    if (makeChanges) {
+      try {
+        // Keep storage and database deletion ordered so failed storage cleanup
+        // leaves the row available for the next hourly retry.
+        // eslint-disable-next-line no-await-in-loop
+        await deleteStorageForRedactions(rows);
+        // eslint-disable-next-line no-await-in-loop
+        await Redaction.destroy({ where: { id: rows.map((row) => row.id) } });
+        counts.deleted += rows.length;
+      } catch (error) {
+        // Leave failed rows in the database so the next hourly pass retries
+        // their storage and database cleanup.
+        console.info(
+          'Skipping DB destroy for this batch after a cleanup failure',
+          error
+        );
+      }
+    }
+
+    const lastRow = rows[rows.length - 1];
+    cursor = {
+      openedAt: lastRow.openedAt,
+      id: lastRow.id,
+    };
+  } while (rows.length > 0);
+
+  return counts;
 }
 
 // How many stale rows we handle per query. Small enough that a failed
@@ -71,13 +100,6 @@ interface OpenedAtIdCursor {
   id: number;
 }
 
-interface DeleteOldRedactionsRecursiveOptions {
-  cutoffDate: Date;
-  makeChanges: boolean;
-  cursor: OpenedAtIdCursor | null;
-  counts: DeleteOldRedactionsResult;
-}
-
 // Enough to delete Spaces objects and walk the keyset. We skip heavy
 // columns like bounding boxes.
 const staleRedactionAttributes = [
@@ -92,67 +114,6 @@ type StaleRedaction = PartialInstance<
   (typeof staleRedactionAttributes)[number]
 >;
 
-/**
- * One keyset page: optionally delete, then continue after the last row.
- *
- * If Spaces delete fails, we leave the DB rows in place so the next hourly
- * run retries them. We still continue this run so one bad batch doesn't
- * block later rows.
- */
-async function deleteOldRedactionsRecursive({
-  cutoffDate,
-  makeChanges,
-  cursor,
-  counts,
-}: DeleteOldRedactionsRecursiveOptions): Promise<DeleteOldRedactionsResult> {
-  const rows = await fetchStaleRedactionBatch({ cutoffDate, cursor });
-  if (rows.length === 0) {
-    return counts;
-  }
-
-  const keys = storageKeysForRedactions(rows);
-  console.info(
-    `${makeChanges ? 'Deleting' : 'Would delete'} ${rows.length} redactions`,
-    keys
-  );
-
-  const nextCounts: DeleteOldRedactionsResult = {
-    checked: counts.checked + rows.length,
-    deleted: counts.deleted,
-  };
-
-  if (makeChanges) {
-    try {
-      await deleteStorageKeys(keys);
-      // Cap concurrent row deletes so we don't stampede the DB.
-      await promiseAllThrottled(
-        rows.map((row) => async () => row.destroy()),
-        10
-      );
-      nextCounts.deleted += rows.length;
-    } catch (error) {
-      // Skip destroy so the next hourly pass retries this batch. Recurse with
-      // the cursor anyway so later rows in this run can still be cleaned.
-      console.info(
-        'Skipping DB destroy for this batch after a Spaces delete failed',
-        error
-      );
-    }
-  }
-
-  const lastRow = rows[rows.length - 1];
-  const nextCursor: OpenedAtIdCursor = {
-    openedAt: lastRow.openedAt,
-    id: lastRow.id,
-  };
-  return deleteOldRedactionsRecursive({
-    cutoffDate,
-    makeChanges,
-    cursor: nextCursor,
-    counts: nextCounts,
-  });
-}
-
 async function fetchStaleRedactionBatch({
   cutoffDate,
   cursor,
@@ -165,14 +126,13 @@ async function fetchStaleRedactionBatch({
     where: {
       ...(cursor
         ? {
-            // `(openedAt, id) > cursor`. Sequelize can't compare tuples, so
-            // we expand it: a later openedAt, or the same openedAt with a
-            // higher id. That way we never revisit a row we already saw.
+            // `(openedAt, id) < cursor` in descending order. Sequelize can't
+            // compare tuples, so expand the comparison to keep both sort keys.
             [Op.or]: [
-              { openedAt: { [Op.gt]: cursor.openedAt } },
+              { openedAt: { [Op.lt]: cursor.openedAt } },
               {
                 openedAt: cursor.openedAt,
-                id: { [Op.gt]: cursor.id },
+                id: { [Op.lt]: cursor.id },
               },
             ],
           }
@@ -180,36 +140,42 @@ async function fetchStaleRedactionBatch({
       openedAt: { [Op.lt]: cutoffDate },
     },
     order: [
-      ['openedAt', 'ASC'],
-      ['id', 'ASC'],
+      ['openedAt', 'DESC'],
+      ['id', 'DESC'],
     ],
     limit: batchSize,
   })) as StaleRedaction[];
 }
 
-function storageKeysForRedactions(rows: StaleRedaction[]): string[] {
-  return rows.flatMap((row) => {
-    const imageKeys = Array.from(
-      { length: row.pageCount },
-      (_unused, index): string =>
-        makeRedactionImageStorageKey({ key: row.key, page: index + 1 })
-    );
-    return [getStorageKeyForRedactionFile(row.key), ...imageKeys];
-  });
+async function deleteStorageForRedactions(
+  rows: StaleRedaction[]
+): Promise<void> {
+  await deleteInChunks(
+    rows.map((row) => row.key),
+    bulkDeleteRedactionFile
+  );
+
+  await deleteInChunks(
+    rows.flatMap((row) =>
+      Array.from(
+        { length: row.pageCount },
+        (_unused, index): RedactionImageKeyOptions => ({
+          key: row.key,
+          page: index + 1,
+        })
+      )
+    ),
+    bulkDeleteRedactionImage
+  );
 }
 
-async function deleteStorageKeys(keys: string[]): Promise<void> {
-  const chunks: string[][] = [];
+async function deleteInChunks<KeyT>(
+  keys: KeyT[],
+  deleteKeys: (keys: KeyT[]) => Promise<unknown>
+): Promise<void> {
   for (let i = 0; i < keys.length; i += maxKeysPerDelete) {
-    chunks.push(keys.slice(i, i + maxKeysPerDelete));
+    // Keep requests sequential so a failed chunk leaves a bounded retry set.
+    // eslint-disable-next-line no-await-in-loop
+    await deleteKeys(keys.slice(i, i + maxKeysPerDelete));
   }
-
-  // One chunk at a time so a failed DeleteObjects call fails the whole batch
-  // instead of racing other chunks.
-  await promiseAllThrottled(
-    chunks.map((chunk) => async () => {
-      await deleteObjects(chunk, { bucket: S3Bucket.files });
-    }),
-    1
-  );
 }

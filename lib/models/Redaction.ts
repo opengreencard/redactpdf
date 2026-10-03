@@ -42,9 +42,6 @@ export interface RedactionAttributes {
    * Last time a review tab said this document was still open. We set it at
    * upload so unused uploads expire too. Cleanup deletes rows older than
    * `_deleteOldRedactionHours`.
-   *
-   * Keep in sync with `_deleteOldRedactionHours` in
-   * `scripts/cron/deleteOldRedactions.lib.ts`.
    */
   openedAt: Date;
   createdAt: Date;

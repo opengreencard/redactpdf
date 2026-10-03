@@ -7,7 +7,7 @@ import { useInterval } from './useInterval';
 
 describe(useInterval, () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] });
   });
 
   afterEach(() => {

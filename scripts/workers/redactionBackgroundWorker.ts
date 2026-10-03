@@ -1,13 +1,21 @@
+import '../../lib/allDatabaseModels';
+import '../../lib/models/Associations';
+import { runRedactionBackgroundWorker } from './redactionBackgroundWorker.lib';
+
 async function main(): Promise<void> {
   try {
-    // The cleanup worker is introduced in task 3.2. Keep this executable
-    // intentionally inert so deployments can add the process before its job is
-    // implemented.
-  } catch (error) {
+    const controller = new AbortController();
+    process.once('SIGTERM', () => controller.abort());
+    process.once('SIGINT', () => controller.abort());
+
+    await runRedactionBackgroundWorker({ signal: controller.signal });
+  } catch (error: unknown) {
+    // Worker failures need operational diagnostics.
     // eslint-disable-next-line no-console
     console.error(error);
     process.exitCode = 1;
   }
 }
 
-main();
+// eslint-disable-next-line no-void
+void main();

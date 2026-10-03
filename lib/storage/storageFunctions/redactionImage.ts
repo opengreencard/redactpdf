@@ -7,6 +7,7 @@ import { makeStorageFunctions } from '../storageFunctions';
 
 export const {
   delete: deleteRedactionImage,
+  bulkDelete: bulkDeleteRedactionImage,
   get: getRedactionImage,
   put: putRedactionImage,
 } = makeStorageFunctions<RedactionImageKeyOptions>(
