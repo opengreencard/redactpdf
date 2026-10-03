@@ -158,8 +158,7 @@ const LandingPageHowItWorks: React.FunctionComponent = React.memo(
                 How to redact a PDF
               </Title>
               <Text ta="center" c="dimmed">
-                It usually takes a few minutes, and you decide what gets
-                redacted.
+                You decide what gets redacted before we create the finished PDF.
               </Text>
             </Stack>
             <SimpleGrid cols={{ base: 1, sm: 3 }}>
