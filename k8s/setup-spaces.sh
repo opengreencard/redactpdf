@@ -34,9 +34,9 @@ Examples:
   bash k8s/setup-spaces.sh --env development
   bash k8s/setup-spaces.sh --env all
 
-By default, scoped keys are created only when the env file still has placeholder
-S3 credentials. Pass --regenerate-keys to create a new key and update the env
-file. Old keys are not deleted automatically.
+By default, scoped keys are created only when the env file has empty or
+placeholder S3 credentials. Pass --regenerate-keys to create a new key and
+update the env file. Old keys are not deleted automatically.
 END
 }
 

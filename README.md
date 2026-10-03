@@ -14,8 +14,9 @@ yarn init-db-dev
 yarn dev
 ```
 
-The development database uses `redaction_development`. Cloud credentials are
-only needed for the upload and redaction pipeline.
+The development database uses `redaction_development`. `DB_PASS` in the
+example matches Compose. Set `AUTH_SECRET` (`openssl rand -base64 32`)
+before signing in. API key lines can stay empty until you upload a PDF.
 
 ## Running tests locally
 

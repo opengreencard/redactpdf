@@ -48,18 +48,20 @@ docker-compose exec -T mariadb mariadb -uroot -predaction-root \
 
 ## Cursor Cloud specific instructions
 
-- The environment `start` script already starts Docker, MariaDB, `yarn
-  init-db-dev`, and `yarn dev` on port 3000. Use that server instead of
-  starting another one.
+- Install is `.cursor/cloud-agent-install.sh`. Start is
+  `.cursor/cloud-agent-start.sh`. Start uses Docker (not systemd) to run
+  MariaDB from `docker-compose.yml`, then `yarn init-db-dev` and `yarn dev`
+  on port 3000. Use that server instead of starting another one.
 - Node 26 is installed at `/usr/local/bin`. Login shells prepend it. Check
   with `bash -lc 'node -v'`. The base image also has Node 22 earlier on
   `PATH`.
-- `install` creates `.env.development` and `.env.test` from the examples
-  when they are missing. `DB_PASS` is `redaction`, which matches
-  `docker-compose.yml`. Google, Spaces, and model API values are local
-  placeholders. The landing page, email/password signup, and `yarn jest`
-  do not call those services. Uploading a PDF for redaction needs real
-  Spaces and Gemini credentials.
+- Install copies `.env.development` and `.env.test` from the examples when
+  they are missing, then fills blank development keys. `DB_PASS` stays
+  `redaction`, matching `docker-compose.yml`. Other blank development keys
+  become `local-dev-only`. Test keys stay blank. A new `KEY=` line in an
+  example is picked up on the next install. The landing page, email/password
+  signup, and `yarn jest` do not call Google, Spaces, or the model APIs.
+  Uploading a PDF for redaction needs real Spaces and Gemini credentials.
 - GraphicsMagick and Ghostscript are installed for the PDF tests. MariaDB
   is the Compose service `mariadb` (`docker compose --env-file
   .env.development`). The first volume init also creates `redaction_test`.
