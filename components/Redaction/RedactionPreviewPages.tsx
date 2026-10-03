@@ -30,7 +30,6 @@ import { getRedactionImageUrl } from '../../lib/storage/getRedactionImageUrl';
 import ActionIcon from '../designSystem/ActionIcon';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import classes from './RedactionPreviewPages.module.css';
-import { redactionPreviewPagesPadding } from './redactionLayout';
 import {
   RedactionBoundingBoxType,
   type BoundingBox,
@@ -116,8 +115,8 @@ const RedactionPreviewPages = forwardRef<
     const [selectedBoxKey, setSelectedBoxKey] = useState<string | null>(null);
 
     /**
-     * Notify the parent once the padded canvas has a measurable width so
-     * initial fit-to-width zoom can use the actual available content area.
+     * Notify the parent once the canvas has a measurable width so initial
+     * fit-to-width zoom can use the actual available content area.
      */
     const handleContainerResize = useMemoizedCallback((): void => {
       const container = containerRef.current;
@@ -463,7 +462,10 @@ const RedactionPreviewPages = forwardRef<
         ref={containerRef}
         flex={1}
         mih={0}
-        p={redactionPreviewPagesPadding}
+        // Sit the first page flush against the toolbar and the left pane.
+        // Extra canvas padding was reading as leftover chrome around the
+        // document.
+        p={0}
         bg="gray.2"
         style={{ overflow: 'auto' }}
       >
