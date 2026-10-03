@@ -5,7 +5,7 @@ import _ from 'lodash';
 import { Box, Stack } from '@mantine/core';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
-import type { ManualRedactionBoundingBox } from '../../lib/models/redactionTypes';
+import type { ManualRedactionBoundingBox } from '../../lib/redaction/redactionTypes';
 import RedactionPreviewPages, {
   RedactionPreviewPagesProps,
   RedactionPreviewPagesRef,
@@ -57,7 +57,7 @@ export interface RedactionPreviewProps
       | 'redactionKey'
       | 'redactionResponse'
       | 'onDeleteBoundingBox'
-      | 'onToggleBoundingBox'
+      | 'onEnabledChange'
     >,
     RedactionPreviewToolbarPassThroughProps,
     RedactionPreviewPagesPassThroughProps {}
@@ -70,7 +70,7 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
       redactionResponse,
       onAddBoundingBox,
       onDeleteBoundingBox,
-      onToggleBoundingBox,
+      onEnabledChange,
       redactionPreviewPagesRef,
       initialIsRedactingForTesting = false,
       ...passThroughProps
@@ -182,7 +182,7 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
           zoomPercent={zoomPercent}
           onRedact={isRedacting ? onAddBoundingBox : null}
           onDeleteBoundingBox={onDeleteBoundingBox}
-          onToggleBoundingBox={onToggleBoundingBox}
+          onEnabledChange={onEnabledChange}
           getUrlForRedactionImageForTesting={getUrlForRedactionImageForTesting}
         />
       </Stack>

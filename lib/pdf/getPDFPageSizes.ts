@@ -1,5 +1,5 @@
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
-import { PageSize } from '../models/redactionTypes';
+import type { PageSize } from './pdfTypes';
 
 /** Read each PDF page's dimensions using the parser used for page counting. */
 export async function getPDFPageSizes(pdf: Uint8Array): Promise<PageSize[]> {

@@ -1,6 +1,6 @@
 import { fromBuffer } from 'pdf2pic';
 import sharp from 'sharp';
-import { PageSize } from '../models/redactionTypes';
+import type { PageSize } from './pdfTypes';
 import { promiseAllThrottled } from '../utilities/promiseAllThrottled';
 import { getPDFPageSizes } from './getPDFPageSizes';
 

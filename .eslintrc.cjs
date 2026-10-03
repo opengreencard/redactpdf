@@ -819,6 +819,13 @@ module.exports = {
       'error',
       { functions: false, classes: true, variables: false },
     ],
+    // Three or more parameters should be one keyed object so call sites
+    // stay readable and argument order cannot silently swap.
+    //
+    // Avoid: function save(boxes, enabled, extra)
+    // Prefer: function save({ boxes, enabled, extra })
+    'max-params': ['error', 2],
+
     // Disable unary operator warning: ++ and -- are pretty safe
     'no-plusplus': 'off',
     // Allow continue statements in loops when they improve readability

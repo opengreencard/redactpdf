@@ -1,7 +1,7 @@
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { ApplicationError } from '../../../lib/errors/applicationError';
 import Redaction, { generateRedactionKey } from '../../../lib/models/Redaction';
-import { RedactionStatus } from '../../../lib/models/redactionTypes';
+import { RedactionStatus } from '../../../lib/redaction/redactionTypes';
 import {
   deleteRedactionFile,
   putRedactionFile,
@@ -19,7 +19,7 @@ export interface UploadFileForRedactionRequest {
   buffer: Buffer;
 }
 
-/** The key and page count needed to open the redaction page. */
+/** The key and page count needed to open the redaction page after upload. */
 export interface UploadFileForRedactionResponse {
   key: string;
   pageCount: number;

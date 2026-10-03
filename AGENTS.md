@@ -12,7 +12,8 @@
 ## Checks
 
 - Build: `yarn build`
-- Typecheck: `yarn typecheck`
+- Typecheck: `yarn typecheck` (whole project) or
+  `yarn typecheck:files -- <file.ts> [...]` (specific files)
 - Lint: `yarn lint`
 - Tests: `yarn jest`
 

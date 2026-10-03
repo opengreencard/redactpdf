@@ -5,21 +5,22 @@ import {
   makeDoneState,
   makeErrorState,
 } from '../../lib/typescript/apiCallState';
-import {
+import type {
   GetRedactionResponse,
-  ManualRedactionBoundingBox,
   RedactedGetRedactionResponse,
+} from '../../app/api/redaction/[key]/getRedaction';
+import {
+  ManualRedactionBoundingBox,
   RedactionBoundingBox,
   RedactionStatus,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
-import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import RedactionPageInner from './RedactionPageInner';
 import {
   addBoundingBoxesToResponse,
   removeBoundingBoxesFromResponse,
-  toggleBoundingBoxesInResponse,
+  setBoundingBoxesEnabledInResponse,
 } from './redactionBoundingBoxes';
 import {
   getStorybookRedactionImageUrl,
@@ -83,16 +84,13 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       []
     );
 
-    const handleAddBoundingBoxes = useMemoizedCallback(
-      (boxes: ManualRedactionBoundingBox[]) => {
+    const handleAddBoundingBox = useMemoizedCallback(
+      (box: ManualRedactionBoundingBox) => {
         updateRedaction((current) =>
-          addBoundingBoxesToResponse(current, boxes)
+          addBoundingBoxesToResponse(current, [box])
         );
       },
       [updateRedaction]
-    );
-    const handleAddBoundingBox = useConvertSingleArgumentToArray(
-      handleAddBoundingBoxes
     );
     const handleDeleteBoundingBoxes = useMemoizedCallback(
       (boxes: RedactionBoundingBox[]) => {
@@ -102,10 +100,10 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       },
       [updateRedaction]
     );
-    const handleToggleBoundingBoxes = useMemoizedCallback(
-      (boxes: RedactionBoundingBox[]) => {
+    const handleBoundingBoxesEnabledChange = useMemoizedCallback(
+      (boxes: RedactionBoundingBox[], enabled: boolean) => {
         updateRedaction((current) =>
-          toggleBoundingBoxesInResponse(current, boxes)
+          setBoundingBoxesEnabledInResponse({ current, boxes, enabled })
         );
       },
       [updateRedaction]
@@ -117,7 +115,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
         isLoggedIn={false}
         onAddBoundingBox={handleAddBoundingBox}
         onDeleteBoundingBoxes={handleDeleteBoundingBoxes}
-        onToggleBoundingBoxes={handleToggleBoundingBoxes}
+        onEnabledChange={handleBoundingBoxesEnabledChange}
         getUrlForRedactionImageForTesting={getStorybookRedactionImageUrl}
       />
     );

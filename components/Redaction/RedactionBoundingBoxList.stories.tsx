@@ -5,13 +5,13 @@ import { Stack } from '@mantine/core';
 import {
   RedactedDataType,
   type RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { makeFakeHandler } from '../../lib/storybook';
 import {
   removeBoundingBoxesFromArray,
-  toggleBoundingBoxesInArray,
+  setBoundingBoxesEnabledInArray,
 } from './redactionBoundingBoxes';
 import RedactionBoundingBoxList, {
   RedactionBoundingBoxListProps,
@@ -60,10 +60,14 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       },
       []
     );
-    const handleToggle = useMemoizedCallback(
-      (boxesToToggle: RedactionBoundingBox[]) => {
+    const handleBoundingBoxesEnabledChange = useMemoizedCallback(
+      (boxesToChange: RedactionBoundingBox[], enabled: boolean) => {
         setBoxes((current) =>
-          toggleBoundingBoxesInArray(current, boxesToToggle)
+          setBoundingBoxesEnabledInArray({
+            current,
+            boxes: boxesToChange,
+            enabled,
+          })
         );
       },
       []
@@ -72,7 +76,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       redactionBoundingBoxes: boxes,
       onRedactionClick,
       onDeleteBoundingBoxes: handleDelete,
-      onToggleBoundingBoxes: handleToggle,
+      onEnabledChange: handleBoundingBoxesEnabledChange,
     };
 
     return (

@@ -156,6 +156,8 @@ export async function getObject(
  * Set the access control level (i.e. whether public users can download it)
  * associated with an object
  */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export async function putObjectAcl(
   key: string,
   acl: BucketCannedACL,

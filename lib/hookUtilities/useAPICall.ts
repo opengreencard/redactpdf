@@ -178,6 +178,8 @@ export function useAPICall<ResultT, ArgsT extends any[]>(
  * return <SomeComponent responses={responsesById} onSave={handleSaveAll} />;
  * ```
  */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export async function callAPI<ResultT>(
   apiCall: Promise<ResultT>,
   setState: (state: APICallState<ResultT>) => unknown,

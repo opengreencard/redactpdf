@@ -84,6 +84,8 @@ export function useDebounceWithCancel<T extends unknown[]>(
  * // ~100ms later, value = 20
  * ```
  */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export function useExtractedDebounce<T extends unknown[], K extends unknown[]>(
   callback: (...args: T) => unknown,
   extract: (...args: K) => T,
@@ -103,6 +105,8 @@ export function useExtractedDebounce<T extends unknown[], K extends unknown[]>(
  * This is useful in cases where setting `delay` to `null` is not feasible, for
  * example, on unmount
  */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export function useExtractedDebounceWithCancel<
   T extends unknown[],
   K extends unknown[],

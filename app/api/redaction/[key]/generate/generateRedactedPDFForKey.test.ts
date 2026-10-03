@@ -2,10 +2,11 @@ import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
 import FakeData from '../../../../../lib/testUtilities/FakeData';
 import { putRedactionFile } from '../../../../../lib/storage/storageFunctions/redactionFile';
 import { generateRedactedPDF } from '../../../../../lib/pdf/generateRedactedPDF';
-import { RedactionStatus } from '../../../../../lib/models/redactionTypes';
+import { RedactionStatus } from '../../../../../lib/redaction/redactionTypes';
 import { generateRedactedPDFForKey } from './generateRedactedPDFForKey';
 
-// The PDF transformation itself is covered by lib/pdf/generateRedactedPDF.test.ts.
+// The PDF transformation itself is covered by
+// lib/pdf/generateRedactedPDF.test.ts.
 // PDF generation is slow, so this suite focuses on document lookup, storage
 // access, status gating, and raw response data.
 jest.mock('../../../../../lib/pdf/generateRedactedPDF', () => {
@@ -35,30 +36,22 @@ describe(generateRedactedPDFForKey, () => {
     expect(generateRedactedPDF).not.toHaveBeenCalled();
   });
 
-  it('throws a 409 error while the redaction is still processing', async () => {
-    const redaction = await FakeData.makeDBRedaction({
+  it.each([
+    {
       status: RedactionStatus.redacting,
-    });
-
-    await expect(
-      generateRedactedPDFForKey({ key: redaction.key })
-    ).rejects.toMatchObject({ statusCode: 409 });
-
-    expect(generateRedactedPDF).not.toHaveBeenCalled();
-  });
-
-  it('throws a different 409 error after processing failed', async () => {
-    const redaction = await FakeData.makeDBRedaction({
-      status: RedactionStatus.error,
-    });
-
-    await expect(
-      generateRedactedPDFForKey({ key: redaction.key })
-    ).rejects.toMatchObject({
-      statusCode: 409,
       message:
-        'This redaction encountered an error and is not ready for download.',
-    });
+        'This redaction is still being processed. Please try again later.',
+    },
+    {
+      status: RedactionStatus.error,
+      message: 'This redaction encountered an error and is not ready.',
+    },
+  ])('throws 409 when status is $status', async ({ status, message }) => {
+    const redaction = await FakeData.makeDBRedaction({ status });
+
+    await expect(
+      generateRedactedPDFForKey({ key: redaction.key })
+    ).rejects.toMatchObject({ statusCode: 409, message });
 
     expect(generateRedactedPDF).not.toHaveBeenCalled();
   });

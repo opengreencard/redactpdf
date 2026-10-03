@@ -1,6 +1,6 @@
 import { redact, verify, type RedactionRegion } from 'scrubzero';
 import { ApplicationError } from '../errors/applicationError';
-import { RedactionBoundingBox } from '../models/redactionTypes';
+import { RedactionBoundingBox } from '../redaction/redactionTypes';
 import { isNotNullOrUndefined } from '../typescript/isNotNullOrUndefined';
 import { getPDFPageSizes } from './getPDFPageSizes';
 

@@ -31,12 +31,13 @@ import ActionIcon from '../designSystem/ActionIcon';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import classes from './RedactionPreviewPages.module.css';
 import { redactionPreviewPagesPadding } from './redactionLayout';
-import type {
-  BoundingBox,
-  ManualRedactionBoundingBox,
-  RedactedGetRedactionResponse,
-  RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+import {
+  RedactionBoundingBoxType,
+  type BoundingBox,
+  type ManualRedactionBoundingBox,
+  type RedactionBoundingBox,
+} from '../../lib/redaction/redactionTypes';
+import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 
 export interface RedactionPreviewPagesProps {
   redactionKey: string;
@@ -50,7 +51,7 @@ export interface RedactionPreviewPagesProps {
    */
   onRedact: ((box: ManualRedactionBoundingBox) => unknown) | null;
   onDeleteBoundingBox: (box: RedactionBoundingBox) => unknown;
-  onToggleBoundingBox: (box: RedactionBoundingBox) => unknown;
+  onEnabledChange: (box: RedactionBoundingBox, enabled: boolean) => unknown;
   /** Storybook / tests only — same shape as `getRedactionImageUrl`. */
   getUrlForRedactionImageForTesting?: typeof getRedactionImageUrl;
 }
@@ -95,7 +96,7 @@ const RedactionPreviewPages = forwardRef<
       zoomPercent,
       onRedact,
       onDeleteBoundingBox,
-      onToggleBoundingBox,
+      onEnabledChange,
       getUrlForRedactionImageForTesting,
     } = props;
     const { pageSizes, redactionBoundingBoxes } = redactionResponse;
@@ -371,7 +372,7 @@ const RedactionPreviewPages = forwardRef<
           return;
         }
         const manualBox: ManualRedactionBoundingBox = {
-          type: 'manual',
+          type: RedactionBoundingBoxType.manual,
           page,
           box,
           enabled: true,
@@ -415,10 +416,10 @@ const RedactionPreviewPages = forwardRef<
           (candidate) => makeBoundingBoxKey(candidate) === boxKey
         );
         if (box) {
-          onToggleBoundingBox(box);
+          onEnabledChange(box, !box.enabled);
         }
       },
-      [onToggleBoundingBox, redactionBoundingBoxes]
+      [onEnabledChange, redactionBoundingBoxes]
     );
     const deleteBoxByKey = useMemoizedCallback(
       (boxKey: string): void => {
@@ -431,8 +432,7 @@ const RedactionPreviewPages = forwardRef<
       },
       [onDeleteBoundingBox, redactionBoundingBoxes]
     );
-    const handleToggleBoundingBox =
-      useCallbackWithPrefix<[string]>(toggleBoxByKey);
+    const handleEnabledChange = useCallbackWithPrefix<[string]>(toggleBoxByKey);
     const handleDeleteBoundingBox =
       useCallbackWithPrefix<[string]>(deleteBoxByKey);
 
@@ -535,7 +535,7 @@ const RedactionPreviewPages = forwardRef<
                         isSelected={selectedBoxKey === boxKey}
                         boxRef={setBoxElementWithKey(boxKey)}
                         onSelectedChange={handleSelectedChange(boxKey)}
-                        onToggle={handleToggleBoundingBox(boxKey)}
+                        onEnabledChange={handleEnabledChange(boxKey)}
                         onDelete={handleDeleteBoundingBox(boxKey)}
                       />
                     );
@@ -558,6 +558,8 @@ export default RedactionPreviewPages;
  * Coordinates are clamped so dragging outside the image still creates a valid
  * box in the image coordinate system.
  */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export function _clientRectToNormalizedBox(
   rect: Pick<DOMRect, 'left' | 'top' | 'width' | 'height'>,
   start: Point,
@@ -582,7 +584,7 @@ interface RedactionBoxOverlayProps {
   isSelected: boolean;
   boxRef: (element: HTMLElement | null) => void;
   onSelectedChange: (isSelected: boolean) => unknown;
-  onToggle: () => unknown;
+  onEnabledChange: () => unknown;
   onDelete: () => unknown;
 }
 
@@ -598,7 +600,7 @@ const RedactionBoxOverlay: React.FunctionComponent<RedactionBoxOverlayProps> =
       isSelected,
       boxRef,
       onSelectedChange,
-      onToggle,
+      onEnabledChange,
       onDelete,
     } = props;
     const { box } = redactionBox;
@@ -610,7 +612,7 @@ const RedactionBoxOverlay: React.FunctionComponent<RedactionBoxOverlayProps> =
       [onSelectedChange]
     );
 
-    const handleToggle = useStopPropagation(onToggle);
+    const handleEnabledChange = useStopPropagation(onEnabledChange);
     const handleDelete = useStopPropagation(onDelete);
 
     const handleClick = useMemoizedCallback((): void => {
@@ -660,7 +662,7 @@ const RedactionBoxOverlay: React.FunctionComponent<RedactionBoxOverlayProps> =
             <ActionIcon
               tooltip="Toggle redaction on/off"
               variant="subtle"
-              onClick={handleToggle}
+              onClick={handleEnabledChange}
             >
               <FontAwesomeIcon
                 icon={redactionBox.enabled ? faEye : faEyeSlash}

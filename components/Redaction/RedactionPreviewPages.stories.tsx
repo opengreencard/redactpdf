@@ -7,13 +7,13 @@ import { makeFakeHandler } from '../../lib/storybook';
 import type {
   ManualRedactionBoundingBox,
   RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
 import RedactionPreviewPages, {
   RedactionPreviewPagesProps,
 } from './RedactionPreviewPages';
 import {
   removeBoundingBoxesFromArray,
-  toggleBoundingBoxesInArray,
+  setBoundingBoxesEnabledInArray,
 } from './redactionBoundingBoxes';
 import {
   getStorybookRedactionImageUrl,
@@ -32,7 +32,7 @@ const defaultProps: RedactionPreviewPagesProps = {
   zoomPercent: 42,
   onRedact: null,
   onDeleteBoundingBox: makeFakeHandler('onDeleteBoundingBox'),
-  onToggleBoundingBox: makeFakeHandler('onToggleBoundingBox'),
+  onEnabledChange: makeFakeHandler('onEnabledChange'),
   getUrlForRedactionImageForTesting: getStorybookRedactionImageUrl,
 };
 
@@ -51,57 +51,78 @@ const Template: StoryFn<RedactionPreviewPagesProps> = (args) => (
 
 export const Default: StoryFn<RedactionPreviewPagesProps> = Template.bind({});
 
-interface DrawModeStoryProps {
+interface StoryWrapperProps {
   initialBoxes: RedactionBoundingBox[];
   zoomPercent: number;
 }
 
-const DrawModeTemplate: StoryFn<DrawModeStoryProps> = (args) => {
-  const { initialBoxes, zoomPercent } = args;
-  const [boxes, setBoxes] = useState(initialBoxes);
-  const handleRedact = useMemoizedCallback(
-    (box: ManualRedactionBoundingBox): void => {
-      setBoxes((current) => [...current, box]);
-    },
-    []
-  );
-  const handleDelete = useMemoizedCallback(
-    (boxesToDelete: RedactionBoundingBox[]): void => {
-      setBoxes((current) =>
-        removeBoundingBoxesFromArray(current, boxesToDelete)
-      );
-    },
-    []
-  );
-  const handleToggle = useMemoizedCallback(
-    (boxesToToggle: RedactionBoundingBox[]): void => {
-      setBoxes((current) => toggleBoundingBoxesInArray(current, boxesToToggle));
-    },
-    []
-  );
-  const onDeleteBoundingBox = useConvertSingleArgumentToArray(handleDelete);
-  const onToggleBoundingBox = useConvertSingleArgumentToArray(handleToggle);
-  return (
-    <Stack h="80vh">
-      <Text>Draw a rectangle on a page to add a manual redaction.</Text>
-      <RedactionPreviewPages
-        redactionKey="storybook-key"
-        redactionResponse={makeStorybookRedactedResponse({
-          redactionBoundingBoxes: boxes,
-        })}
-        onScrolledPageChange={scrolledPageHandler}
-        onContainerReady={containerReadyHandler}
-        zoomPercent={zoomPercent}
-        onRedact={handleRedact}
-        onDeleteBoundingBox={onDeleteBoundingBox}
-        onToggleBoundingBox={onToggleBoundingBox}
-        getUrlForRedactionImageForTesting={getStorybookRedactionImageUrl}
-      />
-    </Stack>
-  );
-};
+/**
+ * Owns page boxes so Storybook can draw, delete, and enable redactions
+ * without going through the real mutation API.
+ */
+const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
+  function StoryWrapper(props: StoryWrapperProps) {
+    const { initialBoxes, zoomPercent } = props;
+    const [boxes, setBoxes] = useState(initialBoxes);
+    const handleRedact = useMemoizedCallback(
+      (box: ManualRedactionBoundingBox): void => {
+        setBoxes((current) => [...current, box]);
+      },
+      []
+    );
+    const handleDelete = useMemoizedCallback(
+      (boxesToDelete: RedactionBoundingBox[]): void => {
+        setBoxes((current) =>
+          removeBoundingBoxesFromArray(current, boxesToDelete)
+        );
+      },
+      []
+    );
+    const handleEnabledChange = useMemoizedCallback(
+      (boxesToChange: RedactionBoundingBox[], enabled: boolean): void => {
+        setBoxes((current) =>
+          setBoundingBoxesEnabledInArray({
+            current,
+            boxes: boxesToChange,
+            enabled,
+          })
+        );
+      },
+      []
+    );
+    const handleDeleteBoundingBoxForSingleBox =
+      useConvertSingleArgumentToArray(handleDelete);
+    const handleEnabledChangeForSingleBox = useMemoizedCallback(
+      (box: RedactionBoundingBox, enabled: boolean): unknown =>
+        handleEnabledChange([box], enabled),
+      [handleEnabledChange]
+    );
+    return (
+      <Stack h="80vh">
+        <Text>Draw a rectangle on a page to add a manual redaction.</Text>
+        <RedactionPreviewPages
+          redactionKey="storybook-key"
+          redactionResponse={makeStorybookRedactedResponse({
+            redactionBoundingBoxes: boxes,
+          })}
+          onScrolledPageChange={scrolledPageHandler}
+          onContainerReady={containerReadyHandler}
+          zoomPercent={zoomPercent}
+          onRedact={handleRedact}
+          onDeleteBoundingBox={handleDeleteBoundingBoxForSingleBox}
+          onEnabledChange={handleEnabledChangeForSingleBox}
+          getUrlForRedactionImageForTesting={getStorybookRedactionImageUrl}
+        />
+      </Stack>
+    );
+  }
+);
 
-export const DrawMode: StoryFn<DrawModeStoryProps> = DrawModeTemplate.bind({});
+const DrawModeTemplate: StoryFn<StoryWrapperProps> = (args) => (
+  <StoryWrapper {...args} />
+);
+
+export const DrawMode: StoryFn<StoryWrapperProps> = DrawModeTemplate.bind({});
 DrawMode.args = {
   initialBoxes: storybookPreviewRedactionBoundingBoxes,
   zoomPercent: 42,

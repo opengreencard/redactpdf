@@ -7,9 +7,8 @@ import {
 import {
   type SinglePageRedactionBoundingBox,
   RedactedDataType,
-  redactedDataTypeSchema,
-  redactedDataTypeToDescription,
-} from '../models/redactionTypes';
+  RedactionBoundingBoxType,
+} from './redactionTypes';
 
 /** Redaction boxes and token usage returned for one page. */
 export interface GetRedactionBoundingBoxesResult {
@@ -58,6 +57,54 @@ interface RedactionResponse {
   boxes: RedactionBoxContent[];
 }
 
+/**
+ * Zod schema kept next to the vision response parser because the browser
+ * never needs the model's wire-format validation details.
+ */
+const redactedDataTypeSchema: z.ZodType<RedactedDataType> =
+  z.enum(RedactedDataType);
+
+/**
+ * Prompt-only explanations for each sensitive-data category. Keep these
+ * server-side so the client bundle only receives the enum values it renders.
+ */
+const redactedDataTypeToDescription: Record<RedactedDataType, string> = {
+  [RedactedDataType.personName]:
+    "A person's name, including surnames, given names, and initials.",
+  [RedactedDataType.organizationName]:
+    'A company, employer, school, or other organization name.',
+  [RedactedDataType.address]:
+    'A physical or mailing address, or a place of birth.',
+  [RedactedDataType.email]: 'An email address.',
+  [RedactedDataType.phone]: 'A phone or fax number.',
+  [RedactedDataType.dateOfBirth]: 'A date of birth.',
+  [RedactedDataType.issueDate]:
+    'The date a document or identification was issued.',
+  [RedactedDataType.expiryDate]:
+    'The date a document or identification expires.',
+  [RedactedDataType.idNumber]:
+    'A unique identifier such as an SSN, ITIN, passport number, driver license, A-number, vehicle VIN, or license plate.',
+  [RedactedDataType.accountNumber]:
+    'A financial or customer account number, including bank accounts, routing numbers, credit cards, and IBAN.',
+  [RedactedDataType.documentOrCaseId]:
+    'A case, docket, or file number that identifies a specific matter or person. Omit generic printed form titles such as "Form 1040"; this type is often left visible.',
+  [RedactedDataType.dollarAmount]:
+    'A currency amount, such as wages, a balance, or a transaction total.',
+  [RedactedDataType.sensitiveQuantity]:
+    'A non-monetary quantity that could be sensitive, such as a number of shares or units owned, size of a house, etc.',
+  [RedactedDataType.username]: 'An online username, handle, or login.',
+  [RedactedDataType.url]:
+    'A personal or identifying URL, such as a profile page or a link that contains a name or account. Do not include generic public websites.',
+  [RedactedDataType.health]:
+    'Health information, including diagnoses, medications, and medical record numbers.',
+  [RedactedDataType.personPhoto]:
+    'A photograph of a person, including passport and ID portraits.',
+  [RedactedDataType.signature]: 'A handwritten or digital signature.',
+  [RedactedDataType.barcode]: 'A barcode or QR code.',
+  [RedactedDataType.other]:
+    'Other content that could identify or embarrass someone and does not fit a more specific type.',
+};
+
 const redactionCoordinateSchema = z.number().finite().int().min(0).max(1000);
 
 const redactionBoxSchema: z.ZodType<RedactionBoxContent> = z
@@ -78,6 +125,8 @@ const redactionResponseSchema: z.ZodType<RedactionResponse> = z.object({
   boxes: redactionBoxSchema.array(),
 });
 
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 function requestRedactionVision(
   imageDataURL: string,
   prompt: string,
@@ -164,7 +213,7 @@ function mapRedactionBoxToBoundingBox(
   rawBox: RedactionBoxContent
 ): SinglePageRedactionBoundingBox {
   const boundingBox: SinglePageRedactionBoundingBox = {
-    type: 'automatic',
+    type: RedactionBoundingBoxType.automatic,
     dataType: rawBox.dataType,
     text: rawBox.text,
     box: {

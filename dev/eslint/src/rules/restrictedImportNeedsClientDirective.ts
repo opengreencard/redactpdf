@@ -72,6 +72,8 @@ export default createRule({
      * - import statement `import { danger } from 'pkg';`
      * -> registers the `danger` import for reporting.
      */
+    // TODO: Use a keyed parameter object now that max-params is 2.
+    // eslint-disable-next-line max-params
     function registerRestrictedImport(
       source: string,
       importName: string,

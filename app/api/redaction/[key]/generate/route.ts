@@ -1,20 +1,31 @@
 import {
   APIRouteResponseFormat,
   RawResponse,
-} from '../../../../../lib/api/apiRouteCommon';
-import { makeGETAPIRoute } from '../../../../../lib/api/makeGETAPIRoute';
+} from '../../../../../lib/api/makeAPIRoute';
+import {
+  makeAPIRouteWithoutBody,
+  MakeAPIRouteWithoutBodyTypes,
+} from '../../../../../lib/api/makeAPIRouteWithoutBody';
 import {
   GenerateRedactedPDFForKeyRequest,
   generateRedactedPDFForKey,
 } from './generateRedactedPDFForKey';
 
-/** Return the generated redacted PDF for download. */
-export const GET = makeGETAPIRoute<
+type GenerateRedactedPDFRoute = MakeAPIRouteWithoutBodyTypes<
   GenerateRedactedPDFForKeyRequest,
   RawResponse,
   {},
-  { key: string }
+  GenerateRedactedPDFForKeyRequest
+>;
+
+/** Return the generated redacted PDF for download. */
+export const GET = makeAPIRouteWithoutBody<
+  GenerateRedactedPDFRoute['queryAndPathParams'],
+  GenerateRedactedPDFRoute['response'],
+  GenerateRedactedPDFRoute['authParams'],
+  GenerateRedactedPDFRoute['pathParams']
 >({
+  method: 'GET',
   apiFunc: generateRedactedPDFForKey,
   responseFormat: APIRouteResponseFormat.raw,
   makeQueryAndPathParams: ({

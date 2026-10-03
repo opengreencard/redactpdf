@@ -1,15 +1,38 @@
 import { ApplicationError } from '../../../../lib/errors/applicationError';
-import Redaction, {
-  RedactionAttributes,
-} from '../../../../lib/models/Redaction';
-import { PartialInstance } from '../../../../lib/db/types';
-import {
-  GenericGetRedactionResponse,
-  GetRedactionResponse,
-  RedactedGetRedactionResponse,
-  RedactionStatus,
-} from '../../../../lib/models/redactionTypes';
+import type { PageSize } from '../../../../lib/pdf/pdfTypes';
+import type { RedactionBoundingBox } from '../../../../lib/redaction/redactionTypes';
+import { RedactionStatus } from '../../../../lib/redaction/redactionTypes';
 import { getUnreachableError } from '../../../../lib/typescript/getUnreachableError';
+import { findRedactionByKeyOrError } from '../lib/findRedactionByKeyOrError';
+
+/** Fields shared by every browser-safe redaction response. */
+interface GetRedactionResponseCommon {
+  pageCount: number;
+  createdAt: string;
+}
+
+/**
+ * Response while processing is still running or after it failed.
+ * Boxes are omitted so the review UI cannot render a half-built list.
+ */
+export interface GenericGetRedactionResponse extends GetRedactionResponseCommon {
+  status: RedactionStatus.redacting | RedactionStatus.error;
+}
+
+/** Response after page images and redaction suggestions are available. */
+export interface RedactedGetRedactionResponse extends GetRedactionResponseCommon {
+  status: RedactionStatus.redacted;
+  pageSizes: PageSize[];
+  redactionBoundingBoxes: RedactionBoundingBox[];
+}
+
+/**
+ * Browser-safe polling payload. Incomplete and failed jobs share
+ * `GenericGetRedactionResponse`; only a finished job includes page image
+ * sizes.
+ */
+export type GetRedactionResponse =
+  GenericGetRedactionResponse | RedactedGetRedactionResponse;
 
 /** Parameters used to look up one redaction document. */
 export interface GetRedactionRequest {
@@ -25,8 +48,8 @@ export interface GetRedactionRequest {
 export async function getRedaction({
   key,
 }: GetRedactionRequest): Promise<GetRedactionResponse> {
-  const redaction = (await Redaction.findOne({
-    where: { key },
+  const redaction = await findRedactionByKeyOrError({
+    key,
     attributes: [
       'status',
       'pageCount',
@@ -34,18 +57,7 @@ export async function getRedaction({
       'redactionBoundingBoxes',
       'createdAt',
     ],
-  })) as PartialInstance<
-    RedactionAttributes,
-    | 'status'
-    | 'pageCount'
-    | 'pageSizes'
-    | 'redactionBoundingBoxes'
-    | 'createdAt'
-  > | null;
-
-  if (!redaction) {
-    throw new ApplicationError('We could not find this redaction.', 404);
-  }
+  });
 
   const commonResponse: Omit<GenericGetRedactionResponse, 'status'> = {
     pageCount: redaction.pageCount,

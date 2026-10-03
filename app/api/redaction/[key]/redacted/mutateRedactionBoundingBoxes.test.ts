@@ -1,0 +1,287 @@
+import ClientFakeData from '../../../../../lib/testUtilities/ClientFakeData';
+import FakeData from '../../../../../lib/testUtilities/FakeData';
+import type { RedactionInstance } from '../../../../../lib/models/Redaction';
+import type { GetRedactionResponse } from '../getRedaction';
+import {
+  BoundingBox,
+  RedactionBoundingBox,
+  RedactionBoundingBoxType,
+  RedactionStatus,
+} from '../../../../../lib/redaction/redactionTypes';
+import { RedactionBoundingBoxMutationOp } from '../../../../../lib/redaction/redactionBoundingBoxMutation';
+import { isSameRedactionBoundingBox } from '../../../../../lib/redaction/redactionBoundingBoxIdentity';
+import { getRedaction } from '../getRedaction';
+import { mutateRedactionBoundingBoxes } from './mutateRedactionBoundingBoxes';
+
+describe(mutateRedactionBoundingBoxes, () => {
+  it('appends a manual box', async () => {
+    const autoBox = ClientFakeData.makeAutoRedactionBoundingBox({ page: 1 });
+    const redaction = await FakeData.makeDBRedaction({
+      pageCount: 2,
+      status: RedactionStatus.redacted,
+      redactionBoundingBoxes: [autoBox],
+    });
+
+    await mutateRedactionBoundingBoxes({
+      key: redaction.key,
+      mutations: [{ op: RedactionBoundingBoxMutationOp.add, page: 2, box }],
+    });
+
+    const result = await getRedaction({ key: redaction.key });
+    expect(result.createdAt).toEqual(expect.any(String));
+    expect(result.createdAt).not.toBeInstanceOf(Date);
+    expect(redactedBoxes(result)).toEqual([
+      autoBox,
+      ClientFakeData.makeManualRedactionBoundingBox({ page: 2, box }),
+    ]);
+  });
+
+  it.each([
+    { status: RedactionStatus.redacting },
+    { status: RedactionStatus.error },
+  ])('rejects mutations while status is $status', async ({ status }) => {
+    const redaction = await FakeData.makeDBRedaction({ status });
+
+    await expect(
+      mutateRedactionBoundingBoxes({
+        key: redaction.key,
+        mutations: [{ op: RedactionBoundingBoxMutationOp.add, page: 1, box }],
+      })
+    ).rejects.toMatchObject({ statusCode: 409 });
+  });
+
+  it('throws a 404 ApplicationError for an unknown key', async () => {
+    await expect(
+      mutateRedactionBoundingBoxes({
+        key: 'unknown-redaction-key',
+        mutations: [{ op: RedactionBoundingBoxMutationOp.add, page: 1, box }],
+      })
+    ).rejects.toMatchObject({ statusCode: 404 });
+  });
+
+  describe('input validation', () => {
+    let redaction: RedactionInstance;
+
+    beforeAll(async () => {
+      redaction = await FakeData.makeDBRedaction({
+        pageCount: 2,
+        status: RedactionStatus.redacted,
+      });
+    });
+
+    it.each([{ page: 0 }, { page: 3 }, { page: 1.5 }])(
+      'rejects page $page',
+      async ({ page }) => {
+        await expect(
+          mutateRedactionBoundingBoxes({
+            key: redaction.key,
+            mutations: [{ op: RedactionBoundingBoxMutationOp.add, page, box }],
+          })
+        ).rejects.toMatchObject({ statusCode: 400 });
+      }
+    );
+
+    it.each([
+      {
+        box: ClientFakeData.makeBoundingBox({ minX: 0.5, maxX: 0.5 }),
+      },
+      {
+        box: ClientFakeData.makeBoundingBox({ maxX: 1.1 }),
+      },
+      {
+        box: ClientFakeData.makeBoundingBox({ minX: Number.NaN }),
+      },
+      {
+        box: ClientFakeData.makeBoundingBox({
+          maxX: Number.POSITIVE_INFINITY,
+        }),
+      },
+    ])('rejects invalid box coordinates', async ({ box: invalidBox }) => {
+      await expect(
+        mutateRedactionBoundingBoxes({
+          key: redaction.key,
+          mutations: [
+            {
+              op: RedactionBoundingBoxMutationOp.add,
+              page: 1,
+              box: invalidBox,
+            },
+          ],
+        })
+      ).rejects.toMatchObject({ statusCode: 400 });
+    });
+  });
+
+  it.each([
+    { label: 'manual', deleted: RedactionBoundingBoxType.manual },
+    { label: 'automatic', deleted: RedactionBoundingBoxType.automatic },
+  ])('removes a $label box and leaves the other', async ({ deleted }) => {
+    const { redaction, autoBox, manualBox } =
+      await makeMixedRedactedRedaction();
+    const target =
+      deleted === RedactionBoundingBoxType.manual ? manualBox : autoBox;
+
+    await mutateRedactionBoundingBoxes({
+      key: redaction.key,
+      mutations: [
+        {
+          op: RedactionBoundingBoxMutationOp.delete,
+          page: target.page,
+          box: target.box,
+          type: deleted,
+        },
+      ],
+    });
+
+    expect(redactedBoxes(await getRedaction({ key: redaction.key }))).toEqual(
+      deleted === RedactionBoundingBoxType.manual ? [autoBox] : [manualBox]
+    );
+  });
+
+  it('throws a 404 ApplicationError for an unknown box', async () => {
+    const { redaction } = await makeMixedRedactedRedaction();
+
+    await expect(
+      mutateRedactionBoundingBoxes({
+        key: redaction.key,
+        mutations: [
+          {
+            op: RedactionBoundingBoxMutationOp.delete,
+            page: 1,
+            box: ClientFakeData.makeBoundingBox({ minX: 0.9, maxX: 1 }),
+            type: RedactionBoundingBoxType.automatic,
+          },
+        ],
+      })
+    ).rejects.toMatchObject({ statusCode: 404 });
+  });
+
+  it('sets an automatic box enabled to false then true', async () => {
+    const { redaction, autoBox } = await makeMixedRedactedRedaction();
+
+    await mutateRedactionBoundingBoxes({
+      key: redaction.key,
+      mutations: [
+        {
+          op: RedactionBoundingBoxMutationOp.setEnabled,
+          page: autoBox.page,
+          box: autoBox.box,
+          type: RedactionBoundingBoxType.automatic,
+          enabled: false,
+        },
+      ],
+    });
+    const first = await getRedaction({ key: redaction.key });
+    await mutateRedactionBoundingBoxes({
+      key: redaction.key,
+      mutations: [
+        {
+          op: RedactionBoundingBoxMutationOp.setEnabled,
+          page: autoBox.page,
+          box: autoBox.box,
+          type: RedactionBoundingBoxType.automatic,
+          enabled: true,
+        },
+      ],
+    });
+    const second = await getRedaction({ key: redaction.key });
+
+    expect(enabledOf(first, autoBox)).toBe(false);
+    expect(enabledOf(second, autoBox)).toBe(true);
+  });
+
+  it('applies add, delete, and setEnabled in one save', async () => {
+    const { redaction, autoBox, manualBox } =
+      await makeMixedRedactedRedaction();
+
+    await mutateRedactionBoundingBoxes({
+      key: redaction.key,
+      mutations: [
+        { op: RedactionBoundingBoxMutationOp.add, page: 2, box },
+        {
+          op: RedactionBoundingBoxMutationOp.delete,
+          page: manualBox.page,
+          box: manualBox.box,
+          type: RedactionBoundingBoxType.manual,
+        },
+        {
+          op: RedactionBoundingBoxMutationOp.setEnabled,
+          page: autoBox.page,
+          box: autoBox.box,
+          type: RedactionBoundingBoxType.automatic,
+          enabled: false,
+        },
+      ],
+    });
+
+    expect(redactedBoxes(await getRedaction({ key: redaction.key }))).toEqual([
+      { ...autoBox, enabled: false },
+      ClientFakeData.makeManualRedactionBoundingBox({ page: 2, box }),
+    ]);
+  });
+
+  it('does not save if a later mutation fails', async () => {
+    const { redaction, autoBox, manualBox } =
+      await makeMixedRedactedRedaction();
+
+    await expect(
+      mutateRedactionBoundingBoxes({
+        key: redaction.key,
+        mutations: [
+          { op: RedactionBoundingBoxMutationOp.add, page: 2, box },
+          {
+            op: RedactionBoundingBoxMutationOp.delete,
+            page: 1,
+            box: ClientFakeData.makeBoundingBox({ minX: 0.9, maxX: 1 }),
+            type: RedactionBoundingBoxType.automatic,
+          },
+        ],
+      })
+    ).rejects.toMatchObject({ statusCode: 404 });
+
+    const after = await getRedaction({ key: redaction.key });
+    expect(redactedBoxes(after)).toEqual([autoBox, manualBox]);
+  });
+
+  const box: BoundingBox = ClientFakeData.makeBoundingBox();
+});
+
+async function makeMixedRedactedRedaction(): Promise<{
+  redaction: RedactionInstance;
+  autoBox: Extract<
+    RedactionBoundingBox,
+    { type: RedactionBoundingBoxType.automatic }
+  >;
+  manualBox: Extract<
+    RedactionBoundingBox,
+    { type: RedactionBoundingBoxType.manual }
+  >;
+}> {
+  const autoBox = ClientFakeData.makeAutoRedactionBoundingBox({ page: 1 });
+  const manualBox = ClientFakeData.makeManualRedactionBoundingBox({ page: 2 });
+  const redaction = await FakeData.makeDBRedaction({
+    pageCount: 2,
+    status: RedactionStatus.redacted,
+    redactionBoundingBoxes: [autoBox, manualBox],
+  });
+  return { redaction, autoBox, manualBox };
+}
+
+function redactedBoxes(result: GetRedactionResponse): RedactionBoundingBox[] {
+  if (result.status !== RedactionStatus.redacted) {
+    throw new Error('Expected a redacted response');
+  }
+  return result.redactionBoundingBoxes;
+}
+
+function enabledOf(
+  result: GetRedactionResponse,
+  box: RedactionBoundingBox
+): boolean | undefined {
+  if (result.status !== RedactionStatus.redacted) {
+    throw new Error('Expected a redacted response');
+  }
+  return result.redactionBoundingBoxes.find((existing) =>
+    isSameRedactionBoundingBox(existing, box)
+  )?.enabled;
+}

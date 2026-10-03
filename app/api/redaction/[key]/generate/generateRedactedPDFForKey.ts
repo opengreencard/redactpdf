@@ -1,13 +1,10 @@
-import { ApplicationError } from '../../../../../lib/errors/applicationError';
-import { RawResponse } from '../../../../../lib/api/apiRouteCommon';
-import { PartialInstance } from '../../../../../lib/db/types';
-import Redaction, {
-  RedactionAttributes,
-} from '../../../../../lib/models/Redaction';
-import { RedactionStatus } from '../../../../../lib/models/redactionTypes';
+import { RawResponse } from '../../../../../lib/api/makeAPIRoute';
+import {
+  assertIsRedactedOrThrowApplicationError,
+  findRedactionByKeyOrError,
+} from '../../lib/findRedactionByKeyOrError';
 import { generateRedactedPDF } from '../../../../../lib/pdf/generateRedactedPDF';
 import { getRedactionFile } from '../../../../../lib/storage/storageFunctions/redactionFile';
-import { getUnreachableError } from '../../../../../lib/typescript/getUnreachableError';
 
 /** Parameters for generating a PDF for one redaction document. */
 export interface GenerateRedactedPDFForKeyRequest {
@@ -25,34 +22,11 @@ export interface GenerateRedactedPDFForKeyRequest {
 export async function generateRedactedPDFForKey({
   key,
 }: GenerateRedactedPDFForKeyRequest): Promise<RawResponse> {
-  const redaction = (await Redaction.findOne({
-    where: { key },
+  const redaction = await findRedactionByKeyOrError({
+    key,
     attributes: ['status', 'redactionBoundingBoxes'],
-  })) as PartialInstance<
-    RedactionAttributes,
-    'status' | 'redactionBoundingBoxes'
-  > | null;
-
-  if (!redaction) {
-    throw new ApplicationError('We could not find this redaction.', 404);
-  }
-
-  switch (redaction.status) {
-    case RedactionStatus.redacting:
-      throw new ApplicationError(
-        'This redaction is still being processed. Please try again later.',
-        409
-      );
-    case RedactionStatus.error:
-      throw new ApplicationError(
-        'This redaction encountered an error and is not ready for download.',
-        409
-      );
-    case RedactionStatus.redacted:
-      break;
-    default:
-      throw getUnreachableError(redaction.status);
-  }
+  });
+  assertIsRedactedOrThrowApplicationError(redaction);
 
   const pdf = await getRedactionFile(key);
   const response = await generateRedactedPDF({

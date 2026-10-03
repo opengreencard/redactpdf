@@ -5,16 +5,16 @@ import axios, {
 } from 'axios';
 import { ApplicationError } from '../../../lib/errors/applicationError';
 
-/** Return type for POST route data transformation functions */
-export interface POSTRouteData<RequestBodyT> {
+/** URL, query, and body for a client request that sends a payload. */
+export interface ClientAPIRouteWithBodyData<RequestBodyT> {
   url: string;
   queryParams?: Record<string, string | number | boolean | undefined | null>;
   /** Note: this might be a FormData type if we're uploading a file */
   body?: RequestBodyT | FormData;
 }
 
-/** Return type for GET route data transformation functions */
-export interface GETRouteData {
+/** URL and query for a client request with no body. */
+export interface ClientAPIRouteWithoutBodyData {
   url: string;
   queryParams?: Record<string, string | number | boolean | undefined | null>;
 }
@@ -25,40 +25,44 @@ interface ClientRouteOptions {
   responseType?: AxiosRequestConfig['responseType'];
 }
 
-/** Options for POST route client functions. */
-export interface ClientPOSTRouteOptions {
+/** Extra options for body routes that upload files. */
+interface ClientAPIRouteWithBodyCallOptions {
   /** Called with upload progress as a value between 0 and 1. */
   onUploadProgress?: (progress: number) => void;
 }
 
 /**
- * Make a client function that would make a POST request.
+ * Make a client function for POST, DELETE, or PATCH.
  *
- * The returned function accepts an optional `options` object so callers that
- * need upload progress (e.g., file uploads) can provide `onUploadProgress`.
+ * Axios still sends a JSON body on DELETE via `data`. That's useful when
+ * the request needs a nested object instead of query params.
  */
-export function makeClientPOSTRoute<
+export function makeClientAPIRouteWithBody<
   RequestBodyT,
   RequestPathAndQueryParamsT,
   ResponseT,
->(
+>({
+  method,
+  dataToUrlQueryStringAndBody,
+  responseType,
+}: {
+  method: 'POST' | 'DELETE' | 'PATCH';
   dataToUrlQueryStringAndBody: (
     data: RequestBodyT & RequestPathAndQueryParamsT
-  ) => POSTRouteData<RequestBodyT>,
-  { responseType }: ClientRouteOptions = {}
-): (
+  ) => ClientAPIRouteWithBodyData<RequestBodyT>;
+} & ClientRouteOptions): (
   data: RequestBodyT & RequestPathAndQueryParamsT,
-  options?: ClientPOSTRouteOptions
+  options?: ClientAPIRouteWithBodyCallOptions
 ) => Promise<ResponseT> {
   return async (
     data: RequestBodyT & RequestPathAndQueryParamsT,
-    options: ClientPOSTRouteOptions = {}
+    options: ClientAPIRouteWithBodyCallOptions = {}
   ): Promise<ResponseT> => {
     const { url, queryParams, body } = dataToUrlQueryStringAndBody(data);
     const { onUploadProgress } = options;
     return makeRequestAndHandleErrors(() =>
       axios({
-        method: 'POST',
+        method,
         url,
         params: queryParams,
         data: body,
@@ -78,18 +82,23 @@ export function makeClientPOSTRoute<
   };
 }
 
-/** Make a client function that would make a GET request */
-export function makeClientGETRoute<RequestT, ResponseT>({
+/**
+ * Make a client GET function. GET has no body, so we only turn the request
+ * into a URL and query string.
+ */
+export function makeClientAPIRouteWithoutBody<RequestT, ResponseT>({
+  method,
   dataToUrlAndQueryString,
   responseType,
 }: {
-  dataToUrlAndQueryString: (data: RequestT) => GETRouteData;
+  method: 'GET';
+  dataToUrlAndQueryString: (data: RequestT) => ClientAPIRouteWithoutBodyData;
 } & ClientRouteOptions): (data: RequestT) => Promise<ResponseT> {
   return async (data: RequestT): Promise<ResponseT> => {
     const { url, queryParams } = dataToUrlAndQueryString(data);
     return makeRequestAndHandleErrors(() =>
       axios({
-        method: 'GET',
+        method,
         url,
         params: queryParams,
         responseType,
@@ -99,9 +108,8 @@ export function makeClientGETRoute<RequestT, ResponseT>({
 }
 
 /**
- * Call a function that processes an API request.
- * Handles ApplicationErrors and makes sure we send a response with the
- * right status codes and JSON.
+ * Run an Axios call and turn a failed JSON envelope into an
+ * ApplicationError so UI code can show the server's message.
  */
 async function makeRequestAndHandleErrors<ResponseT>(
   request: () => Promise<AxiosResponse<ResponseT>>

@@ -1,16 +1,22 @@
 import {
   AutoRedactionBoundingBox,
   BoundingBox,
-  GenericGetRedactionResponse,
   ManualRedactionBoundingBox,
-  PageSize,
   RedactedDataType,
-  RedactedGetRedactionResponse,
+  RedactionBoundingBoxType,
   RedactionStatus,
-} from '../models/redactionTypes';
+} from '../redaction/redactionTypes';
+import type {
+  GenericGetRedactionResponse,
+  RedactedGetRedactionResponse,
+} from '../../app/api/redaction/[key]/getRedaction';
+import type { PageSize } from '../pdf/pdfTypes';
 import type { OpenAICompatibleCompletionResult } from '../ai/createOpenAICompatibleCompletion';
 
-/** Browser-safe fixture builders for redaction types used in tests and stories. */
+/**
+ * Browser-safe fixture builders for redaction types used in tests and
+ * stories.
+ */
 // Keep the builder collection inferred so its public keys stay synchronized
 // with the builders defined in this module.
 // eslint-disable-next-line no-restricted-syntax
@@ -55,7 +61,7 @@ function makeAutoRedactionBoundingBox(
   options: Partial<Omit<AutoRedactionBoundingBox, 'type'>> = {}
 ): AutoRedactionBoundingBox {
   return {
-    type: 'automatic',
+    type: RedactionBoundingBoxType.automatic,
     dataType: options.dataType ?? RedactedDataType.personName,
     text: options.text ?? 'Jane Doe',
     box: options.box ?? makeBoundingBox(),
@@ -68,7 +74,7 @@ function makeManualRedactionBoundingBox(
   options: Partial<Omit<ManualRedactionBoundingBox, 'type'>> = {}
 ): ManualRedactionBoundingBox {
   return {
-    type: 'manual',
+    type: RedactionBoundingBoxType.manual,
     box: options.box ?? makeBoundingBox(),
     page: options.page ?? 1,
     enabled: options.enabled ?? true,

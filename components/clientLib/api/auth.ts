@@ -1,15 +1,23 @@
-import { makeClientPOSTRoute, POSTRouteData } from './common';
+import {
+  ClientAPIRouteWithBodyData,
+  makeClientAPIRouteWithBody,
+} from './common';
 import {
   SignUpRequestBody,
   SignUpResponse,
 } from '../../../app/api/auth/signUp/signUp';
 
 /** Sign up for a new account using email/password */
-export const signUpClient = makeClientPOSTRoute<
+export const signUpClient = makeClientAPIRouteWithBody<
   SignUpRequestBody, // RequestBodyT
   {}, // RequestPathAndQueryParamsT
   SignUpResponse // ResponseT
->((body): POSTRouteData<SignUpRequestBody> => ({
-  url: '/api/auth/signUp',
-  body,
-}));
+>({
+  method: 'POST',
+  dataToUrlQueryStringAndBody: (
+    body
+  ): ClientAPIRouteWithBodyData<SignUpRequestBody> => ({
+    url: '/api/auth/signUp',
+    body,
+  }),
+});

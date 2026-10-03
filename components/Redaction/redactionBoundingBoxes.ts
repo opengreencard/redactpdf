@@ -1,12 +1,16 @@
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
-import type {
-  BoundingBox,
-  ManualRedactionBoundingBox,
-  RedactedGetRedactionResponse,
-  RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+import {
+  RedactionBoundingBoxType,
+  type ManualRedactionBoundingBox,
+  type RedactionBoundingBox,
+} from '../../lib/redaction/redactionTypes';
+import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
+import { isSameRedactionBoundingBox } from '../../lib/redaction/redactionBoundingBoxIdentity';
 
-/** Append newly drawn boxes to the current GET payload. */
+/**
+ * Optimistic GET payload after the user draws a box, so the preview
+ * updates before the POST returns.
+ */
 export function addBoundingBoxesToResponse(
   current: RedactedGetRedactionResponse,
   boxes: ManualRedactionBoundingBox[]
@@ -33,21 +37,30 @@ export function removeBoundingBoxesFromArray(
 }
 
 /**
- * Flip `enabled` on matching boxes in an array.
- * For example, toggling `[boxB]` in `[boxA, boxB]` changes only `boxB`.
+ * Write `enabled` on matching boxes in an array.
+ * For example, disabling `[boxB]` in `[boxA, boxB]` changes only `boxB`.
  */
-export function toggleBoundingBoxesInArray(
-  current: RedactionBoundingBox[],
-  boxes: RedactionBoundingBox[]
+interface SetBoundingBoxesEnabledInArrayParams {
+  current: RedactionBoundingBox[];
+  boxes: RedactionBoundingBox[];
+  enabled: boolean;
+}
+
+export function setBoundingBoxesEnabledInArray(
+  params: SetBoundingBoxesEnabledInArrayParams
 ): RedactionBoundingBox[] {
+  const { current, boxes, enabled } = params;
   return current.map((existing): RedactionBoundingBox =>
     boxes.some((box) => isSameRedactionBoundingBox(existing, box))
-      ? { ...existing, enabled: !existing.enabled }
+      ? { ...existing, enabled }
       : existing
   );
 }
 
-/** Drop matching boxes from the current GET payload. */
+/**
+ * Optimistic GET payload after a delete, so the list and preview drop
+ * the box before the POST returns.
+ */
 export function removeBoundingBoxesFromResponse(
   current: RedactedGetRedactionResponse,
   boxes: RedactionBoundingBox[]
@@ -62,17 +75,27 @@ export function removeBoundingBoxesFromResponse(
   return next;
 }
 
-/** Flip `enabled` on matching boxes in the current GET payload. */
-export function toggleBoundingBoxesInResponse(
-  current: RedactedGetRedactionResponse,
-  boxes: RedactionBoundingBox[]
+/**
+ * Optimistic GET payload after a hide/show, so the overlay updates
+ * before the POST returns.
+ */
+interface SetBoundingBoxesEnabledInResponseParams {
+  current: RedactedGetRedactionResponse;
+  boxes: RedactionBoundingBox[];
+  enabled: boolean;
+}
+
+export function setBoundingBoxesEnabledInResponse(
+  params: SetBoundingBoxesEnabledInResponseParams
 ): RedactedGetRedactionResponse {
+  const { current, boxes, enabled } = params;
   const next: RedactedGetRedactionResponse = {
     ...current,
-    redactionBoundingBoxes: toggleBoundingBoxesInArray(
-      current.redactionBoundingBoxes,
-      boxes
-    ),
+    redactionBoundingBoxes: setBoundingBoxesEnabledInArray({
+      current: current.redactionBoundingBoxes,
+      boxes,
+      enabled,
+    }),
   };
   return next;
 }
@@ -80,31 +103,11 @@ export function toggleBoundingBoxesInResponse(
 /** User-visible label for a suggestion row or preview highlight. */
 export function getRedactionBoxLabel(box: RedactionBoundingBox): string {
   switch (box.type) {
-    case 'automatic':
+    case RedactionBoundingBoxType.automatic:
       return box.text;
-    case 'manual':
+    case RedactionBoundingBoxType.manual:
       return 'Drawn region';
     default:
       throw getUnreachableError(box);
   }
-}
-
-function isSameRedactionBoundingBox(
-  left: RedactionBoundingBox,
-  right: RedactionBoundingBox
-): boolean {
-  return (
-    left.type === right.type &&
-    left.page === right.page &&
-    areBoundingBoxesEqual(left.box, right.box)
-  );
-}
-
-function areBoundingBoxesEqual(left: BoundingBox, right: BoundingBox): boolean {
-  return (
-    left.minX === right.minX &&
-    left.minY === right.minY &&
-    left.maxX === right.maxX &&
-    left.maxY === right.maxY
-  );
 }

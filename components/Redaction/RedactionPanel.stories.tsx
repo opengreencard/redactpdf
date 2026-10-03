@@ -3,15 +3,15 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { Stack } from '@mantine/core';
 import {
   RedactedDataType,
-  type RedactedGetRedactionResponse,
   type RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+} from '../../lib/redaction/redactionTypes';
+import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import { makeFakeHandler } from '../../lib/storybook';
 import {
   removeBoundingBoxesFromResponse,
-  toggleBoundingBoxesInResponse,
+  setBoundingBoxesEnabledInResponse,
 } from './redactionBoundingBoxes';
 import RedactionPanel, { RedactionPanelProps } from './RedactionPanel';
 
@@ -92,10 +92,10 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       },
       []
     );
-    const handleToggle = useMemoizedCallback(
-      (boxes: RedactionBoundingBox[]) => {
+    const handleBoundingBoxesEnabledChange = useMemoizedCallback(
+      (boxes: RedactionBoundingBox[], enabled: boolean) => {
         setRedaction((current) =>
-          toggleBoundingBoxesInResponse(current, boxes)
+          setBoundingBoxesEnabledInResponse({ current, boxes, enabled })
         );
       },
       []
@@ -105,7 +105,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       redaction,
       onRedactionClick,
       onDeleteBoundingBoxes: handleDelete,
-      onToggleBoundingBoxes: handleToggle,
+      onEnabledChange: handleBoundingBoxesEnabledChange,
     };
 
     // Keep the story focused on the rail while preserving readable values.

@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles } from '../ai/createOpenAICompatibleCompletion.mock.delete';
-import { RedactedDataType } from '../models/redactionTypes';
+import { RedactedDataType } from './redactionTypes';
 import {
   annotateJPEGWithRedactionBoxes,
   type RedactionBoxToAnnotate,

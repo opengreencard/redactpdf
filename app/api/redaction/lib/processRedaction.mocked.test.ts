@@ -9,7 +9,7 @@ import Redaction, {
   generateRedactionKey,
 } from '../../../../lib/models/Redaction';
 import { PartialInstance } from '../../../../lib/db/types';
-import { RedactionStatus } from '../../../../lib/models/redactionTypes';
+import { RedactionStatus } from '../../../../lib/redaction/redactionTypes';
 import { processRedaction } from './processRedaction';
 // Disable the warning not to mock OpenAI: here we want to simulate rare
 // outage paths which wouldn't be possible with regular code.

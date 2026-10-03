@@ -1,20 +1,17 @@
-import {
-  RedactedDataType,
-  type RedactedGetRedactionResponse,
-  type RedactionBoundingBox,
-} from '../../lib/models/redactionTypes';
+import { type RedactionBoundingBox } from '../../lib/redaction/redactionTypes';
+import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import {
   addBoundingBoxesToResponse,
   removeBoundingBoxesFromResponse,
-  toggleBoundingBoxesInResponse,
+  setBoundingBoxesEnabledInResponse,
 } from './redactionBoundingBoxes';
 
 describe(addBoundingBoxesToResponse, () => {
   it('adds multiple manual boxes at once', () => {
     const current = makeResponse([]);
     const boxes = [
-      ClientFakeData.makeManualRedactionBoundingBox({ page: 1 }),
+      ClientFakeData.makeManualRedactionBoundingBox(),
       ClientFakeData.makeManualRedactionBoundingBox({
         page: 2,
         box: ClientFakeData.makeBoundingBox({ minX: 0.5, maxX: 0.8 }),
@@ -29,13 +26,6 @@ describe(addBoundingBoxesToResponse, () => {
 
 describe(removeBoundingBoxesFromResponse, () => {
   it('removes every requested box at once', () => {
-    const boxes: RedactionBoundingBox[] = [
-      ClientFakeData.makeAutoRedactionBoundingBox({
-        dataType: RedactedDataType.email,
-      }),
-      ClientFakeData.makeManualRedactionBoundingBox({ page: 2 }),
-    ];
-
     expect(
       removeBoundingBoxesFromResponse(makeResponse(boxes), boxes)
         .redactionBoundingBoxes
@@ -43,22 +33,22 @@ describe(removeBoundingBoxesFromResponse, () => {
   });
 });
 
-describe(toggleBoundingBoxesInResponse, () => {
-  it('toggles every requested box at once', () => {
-    const boxes: RedactionBoundingBox[] = [
-      ClientFakeData.makeAutoRedactionBoundingBox({
-        dataType: RedactedDataType.email,
-      }),
-      ClientFakeData.makeManualRedactionBoundingBox({ page: 2 }),
-    ];
-    const toggled = toggleBoundingBoxesInResponse(
-      makeResponse(boxes),
-      boxes
-    ).redactionBoundingBoxes;
+describe(setBoundingBoxesEnabledInResponse, () => {
+  it('sets every requested box to the given enabled flag', () => {
+    const disabled = setBoundingBoxesEnabledInResponse({
+      current: makeResponse(boxes),
+      boxes,
+      enabled: false,
+    }).redactionBoundingBoxes;
 
-    expect(toggled.every((box) => !box.enabled)).toBe(true);
+    expect(disabled.every((box) => !box.enabled)).toBe(true);
   });
 });
+
+const boxes: RedactionBoundingBox[] = [
+  ClientFakeData.makeAutoRedactionBoundingBox(),
+  ClientFakeData.makeManualRedactionBoundingBox({ page: 2 }),
+];
 
 function makeResponse(
   redactionBoundingBoxes: RedactionBoundingBox[]

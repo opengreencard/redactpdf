@@ -8,15 +8,25 @@ For API changes, keep this shape:
 
 1. Put business logic in a server function.
 2. Keep `route.ts` thin (parse/validate/auth/call function).
-3. Test the server function (`*.test.ts`) for behavior + auth + errors.
-4. Do **not** add `route.test.ts` unless explicitly requested.
+3. Keep request and response types next to that server function.
+4. Test the server function (`*.test.ts`) for behavior + auth + errors.
+5. Do **not** add `route.test.ts` unless explicitly requested.
+
+Client code should `import type` those types from the server function file.
+Type-only imports are erased, so they do not pull server code into the
+client bundle.
+
+```ts
+// Prefer — types live with getRedaction(), clients import the types only
+import type { GetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
+
+// Avoid — a shared lib/...API.ts that only exists to re-export those types
+```
 
 ## Testing
 
 - Test the server function (e.g. `getRedaction.ts`), not `route.ts`, for business
   logic, auth, and error handling.
-- Add `route.test.ts` only when you need to assert HTTP-level wiring such as response
-  headers or status codes.
 
 ## Polling GET endpoints
 

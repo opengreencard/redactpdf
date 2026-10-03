@@ -4,7 +4,7 @@ import ClientFakeData from '../../../../lib/testUtilities/ClientFakeData';
 import {
   AutoRedactionBoundingBox,
   RedactionStatus,
-} from '../../../../lib/models/redactionTypes';
+} from '../../../../lib/redaction/redactionTypes';
 import { getRedaction } from './getRedaction';
 import { GET } from './route';
 

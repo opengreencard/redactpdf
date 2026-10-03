@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Progress, Stack, Text, Title } from '@mantine/core';
-import type { GetRedactionResponse } from '../../lib/models/redactionTypes';
+import type { GetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 import { estimatedMsPerPage } from '../../lib/redaction/estimatedMsPerPage';
 import Card from '../designSystem/Card';
 import { centeredAlertOrCardMaxWidth } from './redactionLayout';

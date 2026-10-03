@@ -18,6 +18,8 @@ import { getLegacyTestFilePrefix, getTestFilePrefix } from './testState';
  * @param testFilename Pass in `__filename` from within the .test.ts file
  * @param deleteFilename Pass in `__filename` from the `.mock.delete.ts` helper
  */
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 export async function maybeDeleteUnusedCacheFiles(
   logPrefix: string,
   module: Record<string, unknown>,
@@ -84,6 +86,8 @@ export async function maybeDeleteUnusedCacheFiles(
   );
 }
 
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 async function getCacheFilesMatchingCurrentTest(
   functionName: string,
   filePrefix: string,

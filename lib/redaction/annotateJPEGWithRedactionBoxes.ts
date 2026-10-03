@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import type { AutoRedactionBoundingBox } from '../models/redactionTypes';
+import type { AutoRedactionBoundingBox } from './redactionTypes';
 
 /** Automatic box plus the numeric ID shown in inspection annotations. */
 export interface RedactionBoxToAnnotate extends Omit<

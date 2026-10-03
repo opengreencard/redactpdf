@@ -1,18 +1,32 @@
-import { APIRouteBodyFormat } from '../../../lib/api/apiRouteCommon';
-import { makePOSTAPIRoute } from '../../../lib/api/makePOSTAPIRoute';
+import { APIRouteBodyFormat } from '../../../lib/api/makeAPIRoute';
+import {
+  makeAPIRouteWithBody,
+  MakeAPIRouteWithBodyTypes,
+} from '../../../lib/api/makeAPIRouteWithBody';
 import { ApplicationError } from '../../../lib/errors/applicationError';
 import {
   UploadFileForRedactionRequest,
-  UploadFileForRedactionResponse,
   uploadFileForRedaction,
 } from './uploadFileForRedaction';
+import type { UploadFileForRedactionResponse } from './uploadFileForRedaction';
 
-/** Accept one uploaded PDF and start its redaction job. */
-export const POST = makePOSTAPIRoute<
-  { body: FormData },
+interface UploadFileForRedactionRouteBody {
+  body: FormData;
+}
+
+type UploadFileForRedactionRoute = MakeAPIRouteWithBodyTypes<
+  UploadFileForRedactionRouteBody,
   {},
   UploadFileForRedactionResponse
+>;
+
+/** Accept one uploaded PDF and start its redaction job. */
+export const POST = makeAPIRouteWithBody<
+  UploadFileForRedactionRoute['requestBody'],
+  UploadFileForRedactionRoute['queryAndPathParams'],
+  UploadFileForRedactionRoute['response']
 >({
+  method: 'POST',
   bodyFormat: APIRouteBodyFormat.formData,
   apiFunc: async (request): Promise<UploadFileForRedactionResponse> => {
     const file = request.body.get('file');

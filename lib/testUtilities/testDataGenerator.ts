@@ -13,7 +13,8 @@ import { describeTestDataGeneratorTest } from './testTypes';
  */
 // This exported helper defines Jest tests by design; it is a reusable test
 // utility rather than a test file.
-// eslint-disable-next-line jest/no-export
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line jest/no-export, max-params
 export function makeTestDataGeneratorTest(
   outputFile: string,
   outputDataGenerator: () => Promise<unknown>,

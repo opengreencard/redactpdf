@@ -1,22 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
-  AppRouteHandlerFn,
-  AppRouteHandlerFnContext,
   APIRouteBodyFormat,
   APIRouteResponseFormat,
+  AppRouteHandlerFn,
+  AppRouteHandlerFnContext,
   makeRequestParamsFromRequest,
   MakeRequestParamsFromRequestOptions,
   RawResponse,
   RedirectResponse,
   runFunctionAndHandleErrors,
-} from './apiRouteCommon';
+} from './makeAPIRoute';
 import { getUnreachableError } from '../typescript/getUnreachableError';
+import { FailureResponse } from '../types/response';
 
-type MakePOSTAPIRouteAuthQueryPathOptions<
+/**
+ * Named slots for `makeAPIRouteWithBody` type parameters so call sites can
+ * write `Route['requestBody']` instead of remembering the generic order.
+ *
+ * Without this helper:
+ * `makeAPIRouteWithBody<Body, Params, Response, Auth, Path>(...)`
+ *
+ * With it:
+ * `makeAPIRouteWithBody<Route['requestBody'], Route['queryAndPathParams'],`
+ * `Route['response'], Route['authParams'], Route['pathParams']>(...)`
+ */
+export interface MakeAPIRouteWithBodyTypes<
+  RequestBodyT,
+  QueryAndPathParamsT,
+  ResponseT,
+  AuthParamsT = {},
+  PathParamsT extends {} = {},
+> {
+  requestBody: RequestBodyT;
+  queryAndPathParams: QueryAndPathParamsT;
+  response: ResponseT;
+  authParams: AuthParamsT;
+  pathParams: PathParamsT;
+}
+
+type MakeAPIRouteWithBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT extends {} = {},
-> = Partial<
+> = {
+  /**
+   * Next.js still routes from the export name (`POST` / `DELETE` / `PATCH`).
+   * We take `method` so the call site documents the verb next to that export.
+   */
+  method: 'POST' | 'DELETE' | 'PATCH';
+} & Partial<
   Pick<
     MakeRequestParamsFromRequestOptions<
       TransformedQueryAndPathParamsT,
@@ -28,26 +60,20 @@ type MakePOSTAPIRouteAuthQueryPathOptions<
 >;
 
 /**
- * Wrap an API function so that it takes requests from Next.js and responds
- * according to the chosen body and response formats.
+ * Wrap an API function that reads a JSON or FormData body.
  *
- * We use function overloads because TypeScript cannot express the constraints
- * we need in a single generic signature:
+ * Overloads exist because TypeScript cannot express the constraints we need
+ * in a single generic signature:
  *
  * - When `bodyFormat` is `formData`, the request body type must contain a
  *   `body: FormData` field so callers can access `request.body.get(...)`.
- * - When `responseFormat` is `raw`, the response type must extend `RawResponse`.
+ * - When `responseFormat` is `raw`, the response type must extend
+ *   `RawResponse`.
  * - When `responseFormat` is `redirect`, the response type must extend
  *   `RedirectResponse`.
- *
- * Each overload below represents one valid (bodyFormat, responseFormat)
- * combination. The implementation signature that follows accepts the union of
- * all of them and delegates to the runtime handler.
  */
 
-// Start overloads
-
-export function makePOSTAPIRoute<
+export function makeAPIRouteWithBody<
   RequestBodyT,
   TransformedQueryAndPathParamsT,
   ResponseT,
@@ -66,13 +92,13 @@ export function makePOSTAPIRoute<
   apiFunc: (
     request: RequestBodyT & TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
-} & MakePOSTAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
 
-export function makePOSTAPIRoute<
+export function makeAPIRouteWithBody<
   RequestBodyT,
   TransformedQueryAndPathParamsT,
   ResponseT extends RawResponse,
@@ -91,13 +117,13 @@ export function makePOSTAPIRoute<
   apiFunc: (
     request: RequestBodyT & TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
-} & MakePOSTAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
 
-export function makePOSTAPIRoute<
+export function makeAPIRouteWithBody<
   RequestBodyT,
   TransformedQueryAndPathParamsT,
   ResponseT extends RedirectResponse,
@@ -116,13 +142,13 @@ export function makePOSTAPIRoute<
   apiFunc: (
     request: RequestBodyT & TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
-} & MakePOSTAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
 
-export function makePOSTAPIRoute<
+export function makeAPIRouteWithBody<
   RequestBodyT extends { body: FormData },
   TransformedQueryAndPathParamsT,
   ResponseT,
@@ -141,13 +167,13 @@ export function makePOSTAPIRoute<
   apiFunc: (
     request: RequestBodyT & TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
-} & MakePOSTAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
 
-export function makePOSTAPIRoute<
+export function makeAPIRouteWithBody<
   RequestBodyT extends { body: FormData },
   TransformedQueryAndPathParamsT,
   ResponseT extends RawResponse,
@@ -166,13 +192,13 @@ export function makePOSTAPIRoute<
   apiFunc: (
     request: RequestBodyT & TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
-} & MakePOSTAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
 
-export function makePOSTAPIRoute<
+export function makeAPIRouteWithBody<
   RequestBodyT extends { body: FormData },
   TransformedQueryAndPathParamsT,
   ResponseT extends RedirectResponse,
@@ -191,15 +217,13 @@ export function makePOSTAPIRoute<
   apiFunc: (
     request: RequestBodyT & TransformedQueryAndPathParamsT & AuthParamsT
   ) => Promise<ResponseT>;
-} & MakePOSTAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
 
-// End overloads
-
-export function makePOSTAPIRoute<
+export function makeAPIRouteWithBody<
   RequestBodyT,
   TransformedQueryAndPathParamsT,
   ResponseT,
@@ -216,7 +240,7 @@ export function makePOSTAPIRoute<
   apiFunc: (request: any) => Promise<ResponseT>;
   bodyFormat?: APIRouteBodyFormat;
   responseFormat?: APIRouteResponseFormat;
-} & MakePOSTAPIRouteAuthQueryPathOptions<
+} & MakeAPIRouteWithBodyAuthQueryPathOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT,
   PathParamsT
@@ -251,10 +275,14 @@ export function makePOSTAPIRoute<
         apiFunc(requestArg)
       );
     } catch (error) {
+      // Log the parse failure; the client only gets "Invalid request body".
       // eslint-disable-next-line no-console
       console.error(error);
       return NextResponse.json(
-        { success: false, message: 'Invalid request body' },
+        {
+          success: false,
+          message: 'Invalid request body',
+        } satisfies FailureResponse,
         { status: 400 }
       );
     }

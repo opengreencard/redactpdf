@@ -1,0 +1,38 @@
+import {
+  makeAPIRouteWithBody,
+  MakeAPIRouteWithBodyTypes,
+} from '../../../../../lib/api/makeAPIRouteWithBody';
+import { mutateRedactionBoundingBoxes } from './mutateRedactionBoundingBoxes';
+import type {
+  MutateRedactionBoundingBoxesBody,
+  MutateRedactionBoundingBoxesPathParams,
+} from './mutateRedactionBoundingBoxes';
+
+type MutateRedactionBoundingBoxesRoute = MakeAPIRouteWithBodyTypes<
+  MutateRedactionBoundingBoxesBody,
+  MutateRedactionBoundingBoxesPathParams,
+  void,
+  {},
+  MutateRedactionBoundingBoxesPathParams
+>;
+
+/**
+ * Apply add / delete / setEnabled in one save so mutations in one request
+ * cannot clobber each other. Concurrent requests for the same redaction are
+ * last-write-wins; the page assumes a redaction is edited in one tab at a time.
+ */
+export const POST = makeAPIRouteWithBody<
+  MutateRedactionBoundingBoxesRoute['requestBody'],
+  MutateRedactionBoundingBoxesRoute['queryAndPathParams'],
+  MutateRedactionBoundingBoxesRoute['response'],
+  MutateRedactionBoundingBoxesRoute['authParams'],
+  MutateRedactionBoundingBoxesRoute['pathParams']
+>({
+  method: 'POST',
+  apiFunc: mutateRedactionBoundingBoxes,
+  makeQueryAndPathParams: ({
+    pathParams,
+  }): MutateRedactionBoundingBoxesPathParams => ({
+    key: pathParams.key,
+  }),
+});

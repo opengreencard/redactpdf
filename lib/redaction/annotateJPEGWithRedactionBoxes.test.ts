@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import { RedactedDataType } from '../models/redactionTypes';
+import { RedactedDataType, RedactionBoundingBoxType } from './redactionTypes';
 import {
   annotateJPEGWithRedactionBoxes,
   type RedactionBoxToAnnotate,
@@ -20,7 +20,7 @@ describe(annotateJPEGWithRedactionBoxes, () => {
     const boxes: RedactionBoxToAnnotate[] = [
       {
         id: 1,
-        type: 'automatic',
+        type: RedactionBoundingBoxType.automatic,
         dataType: RedactedDataType.email,
         text: 'person@example.com',
         box: { minX: 0.1, minY: 0.2, maxX: 0.4, maxY: 0.5 },

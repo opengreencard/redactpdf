@@ -3,10 +3,10 @@ import type { Meta, StoryFn } from '@storybook/react';
 import { Stack } from '@mantine/core';
 import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
-import type { RedactionBoundingBox } from '../../lib/models/redactionTypes';
+import type { RedactionBoundingBox } from '../../lib/redaction/redactionTypes';
 import {
   removeBoundingBoxesFromArray,
-  toggleBoundingBoxesInArray,
+  setBoundingBoxesEnabledInArray,
 } from './redactionBoundingBoxes';
 import RedactionPreview, { RedactionPreviewProps } from './RedactionPreview';
 import {
@@ -15,13 +15,13 @@ import {
   storybookPreviewRedactionBoundingBoxes,
 } from './redactionPreviewStorybookCommon';
 
-interface StoryProps {
+interface StoryWrapperProps {
   redactionKey: string;
   initialBoxes: RedactionBoundingBox[];
   initialIsRedactingForTesting?: boolean;
 }
 
-const defaultProps: StoryProps = {
+const defaultProps: StoryWrapperProps = {
   redactionKey: 'storybook-key',
   initialBoxes: storybookPreviewRedactionBoundingBoxes,
   initialIsRedactingForTesting: false,
@@ -34,8 +34,8 @@ const metadata: Meta = {
 };
 export default metadata;
 
-const StoryWrapper: React.FunctionComponent<StoryProps> = React.memo(
-  function StoryWrapper(props: StoryProps) {
+const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
+  function StoryWrapper(props: StoryWrapperProps) {
     const { redactionKey, initialBoxes, initialIsRedactingForTesting } = props;
     const [boxes, setBoxes] = useState(initialBoxes);
     const handleAdd = useMemoizedCallback((box: RedactionBoundingBox): void => {
@@ -49,24 +49,33 @@ const StoryWrapper: React.FunctionComponent<StoryProps> = React.memo(
       },
       []
     );
-    const handleToggle = useMemoizedCallback(
-      (boxesToToggle: RedactionBoundingBox[]): void => {
+    const handleEnabledChange = useMemoizedCallback(
+      (boxesToChange: RedactionBoundingBox[], enabled: boolean): void => {
         setBoxes((current) =>
-          toggleBoundingBoxesInArray(current, boxesToToggle)
+          setBoundingBoxesEnabledInArray({
+            current,
+            boxes: boxesToChange,
+            enabled,
+          })
         );
       },
       []
     );
-    const onDeleteBoundingBox = useConvertSingleArgumentToArray(handleDelete);
-    const onToggleBoundingBox = useConvertSingleArgumentToArray(handleToggle);
+    const handleDeleteBoundingBoxForSingleBox =
+      useConvertSingleArgumentToArray(handleDelete);
+    const handleEnabledChangeForSingleBox = useMemoizedCallback(
+      (box: RedactionBoundingBox, enabled: boolean): unknown =>
+        handleEnabledChange([box], enabled),
+      [handleEnabledChange]
+    );
     const previewProps: RedactionPreviewProps = {
       redactionKey,
       redactionResponse: makeStorybookRedactedResponse({
         redactionBoundingBoxes: boxes,
       }),
       onAddBoundingBox: handleAdd,
-      onDeleteBoundingBox,
-      onToggleBoundingBox,
+      onDeleteBoundingBox: handleDeleteBoundingBoxForSingleBox,
+      onEnabledChange: handleEnabledChangeForSingleBox,
       getUrlForRedactionImageForTesting: getStorybookRedactionImageUrl,
       initialIsRedactingForTesting,
     };
@@ -74,13 +83,13 @@ const StoryWrapper: React.FunctionComponent<StoryProps> = React.memo(
   }
 );
 
-const Template: StoryFn<StoryProps> = (args) => (
+const Template: StoryFn<StoryWrapperProps> = (args) => (
   <Stack h="80vh">
     <StoryWrapper {...args} />
   </Stack>
 );
 
-export const Default: StoryFn<StoryProps> = Template.bind({});
+export const Default: StoryFn<StoryWrapperProps> = Template.bind({});
 
-export const DrawModeOn: StoryFn<StoryProps> = Template.bind({});
+export const DrawModeOn: StoryFn<StoryWrapperProps> = Template.bind({});
 DrawModeOn.args = { initialIsRedactingForTesting: true };
