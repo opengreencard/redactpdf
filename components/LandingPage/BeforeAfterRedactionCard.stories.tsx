@@ -4,7 +4,7 @@ import BeforeAfterRedactionCard, {
   BeforeAfterSide,
   BeforeAfterRedactionCardProps,
 } from './BeforeAfterRedactionCard';
-import { dutchPassportSample, irs1040Sample } from './landingRedactionSamples';
+import { dutchPassportSample } from './landingRedactionSamples';
 
 const defaultProps: BeforeAfterRedactionCardProps = dutchPassportSample;
 
@@ -22,11 +22,6 @@ const Template: StoryFn<BeforeAfterRedactionCardProps> = (args) => (
 export const Default: StoryFn<BeforeAfterRedactionCardProps> = Template.bind(
   {}
 );
-
-export const IRS1040: StoryFn<BeforeAfterRedactionCardProps> = Template.bind(
-  {}
-);
-IRS1040.args = irs1040Sample;
 
 export const FrozenAfter: StoryFn<BeforeAfterRedactionCardProps> =
   Template.bind({});

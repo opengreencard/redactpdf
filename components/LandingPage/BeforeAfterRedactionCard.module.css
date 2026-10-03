@@ -1,5 +1,0 @@
-.sampleImageButton:hover,
-.sampleImageButton:focus-within {
-  outline: 2px solid var(--mantine-color-green-6);
-  outline-offset: 2px;
-}

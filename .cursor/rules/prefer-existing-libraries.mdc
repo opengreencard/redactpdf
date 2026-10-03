@@ -1,0 +1,15 @@
+---
+description: Prefer a maintained library over a custom reimplementation.
+globs: '**/*.{ts,tsx}'
+alwaysApply: false
+---
+
+# Prefer existing libraries
+
+Before writing a custom component for a common UI pattern (lightbox,
+carousel, date picker, notifications), look at Mantine and other packages
+we already use.
+
+- Check https://mantine.dev for a maintained component
+- Add the matching `@mantine/*` package rather than rebuilding it
+  (for example `@mantine/lightbox` instead of a `Modal` plus an `Image`)

@@ -1,0 +1,11 @@
+.imageButton {
+  display: block;
+  opacity: 1;
+  transition: opacity 150ms ease;
+}
+
+.imageButton:hover,
+.imageButton:focus-within {
+  /* A light dim is enough to show the still is clickable. */
+  opacity: 0.8;
+}

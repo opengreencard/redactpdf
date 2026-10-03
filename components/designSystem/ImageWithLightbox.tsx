@@ -1,0 +1,73 @@
+'use client';
+
+import React, { useState } from 'react';
+import { Lightbox, type LightboxSlideData } from '@mantine/lightbox';
+import { useSetState } from '../../lib/hookUtilities/useSetState';
+import ButtonDiv from './ButtonDiv';
+import Image from './Image';
+import classes from './ImageWithLightbox.module.css';
+
+export interface ImageWithLightboxProps {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  /** Caption under the fullscreen slide, or null when the slide has none. */
+  caption: string | null;
+  /** Test id on the thumbnail, or null when this still is not queried. */
+  imageTestId: string | null;
+}
+
+/**
+ * Thumbnail that opens its own Mantine lightbox.
+ *
+ * Click or keyboard-activate the image to view it fullscreen. The lightbox
+ * owns zoom and close; we only keep `opened` here.
+ *
+ * @see https://mantine.dev/x/lightbox/
+ */
+const ImageWithLightbox: React.FunctionComponent<ImageWithLightboxProps> =
+  React.memo(function ImageWithLightbox(props) {
+    const { src, alt, width, height, caption, imageTestId } = props;
+    const [opened, setOpened] = useState(false);
+    const openLightbox = useSetState(setOpened, true);
+    const closeLightbox = useSetState(setOpened, false);
+
+    const slide: LightboxSlideData =
+      caption === null ? { src, alt } : { src, alt, caption };
+    const slides: LightboxSlideData[] = [slide];
+
+    return (
+      <>
+        <ButtonDiv
+          className={classes.imageButton}
+          onClick={openLightbox}
+          aria-label={`Open ${caption ?? alt} fullscreen`}
+        >
+          <Image
+            src={src}
+            alt={alt}
+            width={width}
+            height={height}
+            w="100%"
+            // Card stills share a height cap so the passport and 1040 line up.
+            mah={360}
+            fit="contain"
+            radius="sm"
+            data-testid={imageTestId ?? undefined}
+          />
+        </ButtonDiv>
+        <Lightbox
+          opened={opened}
+          onClose={closeLightbox}
+          slides={slides}
+          // One still: arrows would only loop back to the same image.
+          withNavigation={false}
+          withZoom
+          closeOnClickOutside
+        />
+      </>
+    );
+  });
+
+export default ImageWithLightbox;

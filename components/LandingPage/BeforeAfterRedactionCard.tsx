@@ -1,15 +1,15 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Group, Modal, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useReducedMotion } from '@mantine/hooks';
 import Button from '../designSystem/Button/Button';
-import ButtonDiv from '../designSystem/ButtonDiv';
 import Card from '../designSystem/Card';
 import Fade from '../designSystem/Fade';
-import Image from '../designSystem/Image';
-import { useSetState } from '../../lib/hookUtilities/useSetState';
-import classes from './BeforeAfterRedactionCard.module.css';
+import ImageWithLightbox, {
+  type ImageWithLightboxProps,
+} from '../designSystem/ImageWithLightbox';
+import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 
 /** Which still the mobile card is showing or freezing. */
 export enum BeforeAfterSide {
@@ -22,22 +22,41 @@ export const _mobileSampleImageTestId = 'before-after-mobile-image';
 /** After button so tests can freeze the flip. */
 export const _freezeAfterButtonTestId = 'before-after-freeze-after';
 
-enum SampleImageSize {
-  card = 'card',
-  fullscreen = 'fullscreen',
-}
-
 export interface BeforeAfterRedactionCardProps {
+  /**
+   * Unredacted sample. Desktop shows it in the left column. Mobile fades
+   * it with `afterSrc` until Before or After is frozen.
+   */
   beforeSrc: string;
+  /**
+   * Sample with black boxes burned in. Desktop shows it in the right
+   * column. Mobile stacks it on top of `beforeSrc` and fades it in.
+   */
   afterSrc: string;
+  /** Alt text for the unredacted still and its lightbox slide. */
   beforeAlt: string;
+  /** Alt text for the redacted still and its lightbox slide. */
   afterAlt: string;
+  /** Heading at the top of the card, e.g. "Dutch passport". */
   title: string;
+  /**
+   * Intrinsic pixel width of both stills. Next/Image uses this to reserve
+   * space; the card then scales the image to the column width.
+   */
   width: number;
+  /**
+   * Intrinsic pixel height of both stills. Same reservation as `width`.
+   */
   height: number;
-  /** Auto-advance delay while neither side is frozen. */
+  /**
+   * How long the mobile card shows one side before fading to the other,
+   * while nobody has frozen Before or After.
+   */
   intervalMs?: number;
-  /** Storybook / tests only — start frozen on one side. */
+  /**
+   * Storybook / tests only. Start already frozen on this side so we can
+   * screenshot After without waiting for the timer.
+   */
   initialFrozenSideForTesting?: BeforeAfterSide | null;
 }
 
@@ -62,51 +81,42 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
       initialFrozenSideForTesting = null,
     } = props;
     const prefersReducedMotion = useReducedMotion();
-    const [autoSide, setAutoSide] = useState<BeforeAfterSide>(
-      BeforeAfterSide.before
+    const [side, setSide] = useState<BeforeAfterSide>(
+      initialFrozenSideForTesting ?? BeforeAfterSide.before
     );
-    /** Once set, the mobile still stays on this side. */
-    const [frozenSide, setFrozenSide] = useState<BeforeAfterSide | null>(
-      initialFrozenSideForTesting
+    const [isFrozen, setIsFrozen] = useState(
+      initialFrozenSideForTesting !== null
     );
-    const [lightboxSide, setLightboxSide] = useState<BeforeAfterSide | null>(
-      null
-    );
-    const visibleSide = frozenSide ?? autoSide;
 
     // Flip every interval until the visitor freezes a side. Reduced-motion
     // visitors keep the first still instead of watching it animate.
     useEffect(() => {
-      if (frozenSide !== null || prefersReducedMotion) {
+      if (isFrozen || prefersReducedMotion) {
         return undefined;
       }
       const intervalId = window.setInterval(() => {
-        setAutoSide((side) =>
-          side === BeforeAfterSide.before
+        setSide((currentSide) =>
+          currentSide === BeforeAfterSide.before
             ? BeforeAfterSide.after
             : BeforeAfterSide.before
         );
       }, intervalMs);
       return () => window.clearInterval(intervalId);
-    }, [frozenSide, intervalMs, prefersReducedMotion]);
+    }, [isFrozen, intervalMs, prefersReducedMotion]);
 
-    const handleFreezeBefore = useSetState(
-      setFrozenSide,
-      BeforeAfterSide.before
-    );
-    const handleFreezeAfter = useSetState(setFrozenSide, BeforeAfterSide.after);
-    const openBeforeLightbox = useSetState(
-      setLightboxSide,
-      BeforeAfterSide.before
-    );
-    const openAfterLightbox = useSetState(
-      setLightboxSide,
-      BeforeAfterSide.after
-    );
-    const closeLightbox = useSetState(setLightboxSide, null);
-    const openVisibleLightbox = useSetState(setLightboxSide, visibleSide);
+    const freezeBefore = useMemoizedCallback(() => {
+      setSide(BeforeAfterSide.before);
+      setIsFrozen(true);
+    }, []);
+    const freezeAfter = useMemoizedCallback(() => {
+      setSide(BeforeAfterSide.after);
+      setIsFrozen(true);
+    }, []);
 
-    const lightboxIsAfter = lightboxSide === BeforeAfterSide.after;
+    const commonImageProps: Pick<ImageWithLightboxProps, 'width' | 'height'> = {
+      width,
+      height,
+    };
 
     return (
       <Card>
@@ -114,70 +124,64 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
           <Text fw="bold">{title}</Text>
           <Box visibleFrom="sm">
             <SimpleGrid cols={2} spacing="sm">
-              <SampleStill
-                src={beforeSrc}
-                alt={beforeAlt}
-                width={width}
-                height={height}
-                label="Before"
-                size={SampleImageSize.card}
-                onOpen={openBeforeLightbox}
-                imageTestId={null}
-              />
-              <SampleStill
-                src={afterSrc}
-                alt={afterAlt}
-                width={width}
-                height={height}
-                label="After"
-                size={SampleImageSize.card}
-                onOpen={openAfterLightbox}
-                imageTestId={null}
-              />
+              <Stack gap={4}>
+                <Text size="sm" c="dimmed">
+                  Before
+                </Text>
+                <ImageWithLightbox
+                  {...commonImageProps}
+                  src={beforeSrc}
+                  alt={beforeAlt}
+                  caption="Before"
+                  imageTestId={null}
+                />
+              </Stack>
+              <Stack gap={4}>
+                <Text size="sm" c="dimmed">
+                  After
+                </Text>
+                <ImageWithLightbox
+                  {...commonImageProps}
+                  src={afterSrc}
+                  alt={afterAlt}
+                  caption="After"
+                  imageTestId={null}
+                />
+              </Stack>
             </SimpleGrid>
           </Box>
           <Box hiddenFrom="sm">
             <Stack gap="sm">
               <Stack gap={4}>
                 <Text size="sm" c="dimmed">
-                  {visibleSide === BeforeAfterSide.before ? 'Before' : 'After'}
+                  {side === BeforeAfterSide.before ? 'Before' : 'After'}
                 </Text>
-                <ButtonDiv
-                  className={classes.sampleImageButton}
-                  onClick={openVisibleLightbox}
-                  aria-label={`Open ${
-                    visibleSide === BeforeAfterSide.before ? 'before' : 'after'
-                  } sample fullscreen`}
+                <Box
+                  pos="relative"
+                  data-testid={_mobileSampleImageTestId}
+                  data-side={side}
                 >
-                  <Box
-                    pos="relative"
-                    data-testid={_mobileSampleImageTestId}
-                    data-side={visibleSide}
-                  >
-                    <Fade visible={visibleSide === BeforeAfterSide.before}>
-                      <SampleImage
-                        src={beforeSrc}
-                        alt={beforeAlt}
-                        width={width}
-                        height={height}
-                        size={SampleImageSize.card}
-                        testId={null}
+                  <Fade visible={side === BeforeAfterSide.before}>
+                    <ImageWithLightbox
+                      {...commonImageProps}
+                      src={beforeSrc}
+                      alt={beforeAlt}
+                      caption="Before"
+                      imageTestId={null}
+                    />
+                  </Fade>
+                  <Box pos="absolute" inset={0}>
+                    <Fade visible={side === BeforeAfterSide.after}>
+                      <ImageWithLightbox
+                        {...commonImageProps}
+                        src={afterSrc}
+                        alt={afterAlt}
+                        caption="After"
+                        imageTestId={null}
                       />
                     </Fade>
-                    <Box pos="absolute" inset={0}>
-                      <Fade visible={visibleSide === BeforeAfterSide.after}>
-                        <SampleImage
-                          src={afterSrc}
-                          alt={afterAlt}
-                          width={width}
-                          height={height}
-                          size={SampleImageSize.card}
-                          testId={null}
-                        />
-                      </Fade>
-                    </Box>
                   </Box>
-                </ButtonDiv>
+                </Box>
               </Stack>
               <Group grow>
                 {
@@ -187,20 +191,24 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                 <Button
                   size="sm"
                   variant={
-                    frozenSide === BeforeAfterSide.before ? 'filled' : 'default'
+                    isFrozen && side === BeforeAfterSide.before
+                      ? 'filled'
+                      : 'default'
                   }
                   keyboardShortcut={null}
-                  onClick={handleFreezeBefore}
+                  onClick={freezeBefore}
                 >
                   Before
                 </Button>
                 <Button
                   size="sm"
                   variant={
-                    frozenSide === BeforeAfterSide.after ? 'filled' : 'default'
+                    isFrozen && side === BeforeAfterSide.after
+                      ? 'filled'
+                      : 'default'
                   }
                   keyboardShortcut={null}
-                  onClick={handleFreezeAfter}
+                  onClick={freezeAfter}
                   data-testid={_freezeAfterButtonTestId}
                 >
                   After
@@ -209,110 +217,8 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
             </Stack>
           </Box>
         </Stack>
-        <Modal
-          opened={lightboxSide !== null}
-          onClose={closeLightbox}
-          fullScreen
-          title={`${title} · ${lightboxIsAfter ? 'After' : 'Before'}`}
-        >
-          {lightboxSide !== null ? (
-            <SampleStill
-              src={lightboxIsAfter ? afterSrc : beforeSrc}
-              alt={lightboxIsAfter ? afterAlt : beforeAlt}
-              width={width}
-              height={height}
-              label={lightboxIsAfter ? 'After' : 'Before'}
-              size={SampleImageSize.fullscreen}
-              onOpen={null}
-              imageTestId={null}
-            />
-          ) : null}
-        </Modal>
       </Card>
     );
   });
 
 export default BeforeAfterRedactionCard;
-
-interface SampleStillProps {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-  label: string;
-  size: SampleImageSize;
-  /** Pass a handler to make the still open that image in the lightbox. */
-  onOpen: (() => unknown) | null;
-  /** Test id on the image, or null when this still is not queried. */
-  imageTestId: string | null;
-}
-
-/** One labeled still. Pass `onOpen` to make the image open the lightbox. */
-const SampleStill: React.FunctionComponent<SampleStillProps> = React.memo(
-  function SampleStill(props) {
-    const { src, alt, width, height, label, size, onOpen, imageTestId } = props;
-
-    return (
-      <Stack gap={4}>
-        <Text size="sm" c="dimmed">
-          {label}
-        </Text>
-        {onOpen ? (
-          <ButtonDiv
-            className={classes.sampleImageButton}
-            onClick={onOpen}
-            aria-label={`Open ${label.toLowerCase()} sample fullscreen`}
-          >
-            <SampleImage
-              src={src}
-              alt={alt}
-              width={width}
-              height={height}
-              size={size}
-              testId={imageTestId}
-            />
-          </ButtonDiv>
-        ) : (
-          <SampleImage
-            src={src}
-            alt={alt}
-            width={width}
-            height={height}
-            size={size}
-            testId={imageTestId}
-          />
-        )}
-      </Stack>
-    );
-  }
-);
-
-interface SampleImageProps {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
-  size: SampleImageSize;
-  testId: string | null;
-}
-
-/** Shared still sizing so the passport and 1040 crop occupy the same slot. */
-const SampleImage: React.FunctionComponent<SampleImageProps> = React.memo(
-  function SampleImage(props) {
-    const { src, alt, width, height, size, testId } = props;
-    return (
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        w="100%"
-        // Card stills share a height cap; the lightbox can use the viewport.
-        mah={size === SampleImageSize.card ? 360 : '90dvh'}
-        fit="contain"
-        radius="sm"
-        data-testid={testId ?? undefined}
-      />
-    );
-  }
-);

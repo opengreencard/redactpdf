@@ -35,8 +35,8 @@ const defaultProps: BeforeAfterRedactionCardProps = {
   beforeAlt: 'Dutch passport specimen before redaction',
   afterAlt:
     'Dutch passport specimen after names, dates, and photos are blacked out',
-  width: 1920,
-  height: 2778,
+  width: 885,
+  height: 1280,
   intervalMs: 1000,
 };
 
@@ -59,18 +59,23 @@ describe('BeforeAfterRedactionCard', () => {
 
     const mobileStack = (): HTMLElement =>
       screen.getByTestId(_mobileSampleImageTestId);
+
+    // Mobile starts on the unredacted still.
     expect(mobileStack().getAttribute('data-side')).toBe('before');
 
+    // One interval later the card fades to the burned-in still.
     act(() => {
       jest.advanceTimersByTime(1000);
     });
     expect(mobileStack().getAttribute('data-side')).toBe('after');
 
+    // Pressing After freezes the flip on that side.
     await user.click(screen.getByTestId(_freezeAfterButtonTestId));
+
+    // Another two intervals must not return to Before.
     act(() => {
       jest.advanceTimersByTime(2000);
     });
-    // Frozen on After: another interval must not flip back to Before.
     expect(mobileStack().getAttribute('data-side')).toBe('after');
   });
 });
