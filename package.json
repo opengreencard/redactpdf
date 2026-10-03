@@ -33,7 +33,8 @@
     "@mantine/dropzone": "Keep every @mantine/* package on the same version. @mantine/lightbox peers require an exact match.",
     "@mantine/hooks": "Keep every @mantine/* package on the same version. @mantine/lightbox peers require an exact match.",
     "@mantine/lightbox": "Keep every @mantine/* package on the same version. @mantine/lightbox peers require an exact match.",
-    "@mantine/notifications": "Keep every @mantine/* package on the same version. @mantine/lightbox peers require an exact match."
+    "@mantine/notifications": "Keep every @mantine/* package on the same version. @mantine/lightbox peers require an exact match.",
+    "react-dropzone": "Keep in sync with @mantine/dropzone's react-dropzone so FileWithPath and ErrorCode come from one version."
   },
   "dependencies": {
     "@auth/sequelize-adapter": "^2.11.3",
@@ -67,7 +68,7 @@
     "randomstring": "^1.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "react-dropzone": "^15.0.0",
+    "react-dropzone": "20.1.1",
     "sequelize": "^6.37.8",
     "sharp": "^0.35.3",
     "yargs": "^18.1.0",
