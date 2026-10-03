@@ -8,7 +8,7 @@ import { RedactionBoundingBoxType } from '../../../../../lib/models/redactionTyp
 import {
   RedactionBoundingBoxMutation,
   RedactionBoundingBoxMutationOp,
-} from '../../../../../lib/models/redactionBoundingBoxMutation';
+} from '../../../../../lib/redaction/redactionBoundingBoxMutation';
 import { isSameRedactionBoundingBox } from '../../../../../lib/models/redactionBoundingBoxIdentity';
 import { getUnreachableError } from '../../../../../lib/typescript/getUnreachableError';
 import {

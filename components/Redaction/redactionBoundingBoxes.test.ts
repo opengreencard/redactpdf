@@ -37,11 +37,11 @@ describe(removeBoundingBoxesFromResponse, () => {
 
 describe(setBoundingBoxesEnabledInResponse, () => {
   it('sets every requested box to the given enabled flag', () => {
-    const disabled = setBoundingBoxesEnabledInResponse(
-      makeResponse(boxes),
+    const disabled = setBoundingBoxesEnabledInResponse({
+      current: makeResponse(boxes),
       boxes,
-      false
-    ).redactionBoundingBoxes;
+      enabled: false,
+    }).redactionBoundingBoxes;
 
     expect(disabled.every((box) => !box.enabled)).toBe(true);
   });

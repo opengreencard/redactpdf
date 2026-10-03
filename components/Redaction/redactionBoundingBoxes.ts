@@ -40,11 +40,16 @@ export function removeBoundingBoxesFromArray(
  * Write `enabled` on matching boxes in an array.
  * For example, disabling `[boxB]` in `[boxA, boxB]` changes only `boxB`.
  */
+interface SetBoundingBoxesEnabledInArrayParams {
+  current: RedactionBoundingBox[];
+  boxes: RedactionBoundingBox[];
+  enabled: boolean;
+}
+
 export function setBoundingBoxesEnabledInArray(
-  current: RedactionBoundingBox[],
-  boxes: RedactionBoundingBox[],
-  enabled: boolean
+  params: SetBoundingBoxesEnabledInArrayParams
 ): RedactionBoundingBox[] {
+  const { current, boxes, enabled } = params;
   return current.map((existing): RedactionBoundingBox =>
     boxes.some((box) => isSameRedactionBoundingBox(existing, box))
       ? { ...existing, enabled }
@@ -74,18 +79,23 @@ export function removeBoundingBoxesFromResponse(
  * Optimistic GET payload after a hide/show, so the overlay updates
  * before the POST returns.
  */
+interface SetBoundingBoxesEnabledInResponseParams {
+  current: RedactedGetRedactionResponse;
+  boxes: RedactionBoundingBox[];
+  enabled: boolean;
+}
+
 export function setBoundingBoxesEnabledInResponse(
-  current: RedactedGetRedactionResponse,
-  boxes: RedactionBoundingBox[],
-  enabled: boolean
+  params: SetBoundingBoxesEnabledInResponseParams
 ): RedactedGetRedactionResponse {
+  const { current, boxes, enabled } = params;
   const next: RedactedGetRedactionResponse = {
     ...current,
-    redactionBoundingBoxes: setBoundingBoxesEnabledInArray(
-      current.redactionBoundingBoxes,
+    redactionBoundingBoxes: setBoundingBoxesEnabledInArray({
+      current: current.redactionBoundingBoxes,
       boxes,
-      enabled
-    ),
+      enabled,
+    }),
   };
   return next;
 }

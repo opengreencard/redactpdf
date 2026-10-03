@@ -12,7 +12,7 @@ import {
 import {
   RedactionBoundingBoxMutation,
   RedactionBoundingBoxMutationOp,
-} from '../../lib/models/redactionBoundingBoxMutation';
+} from '../../lib/redaction/redactionBoundingBoxMutation';
 import { APICallState } from '../../lib/typescript/apiCallState';
 import {
   GetRedactionResponse,
@@ -140,7 +140,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       async (boxes: RedactionBoundingBox[], enabled: boolean) => {
         await persistBoxMutation(
           (current) =>
-            setBoundingBoxesEnabledInResponse(current, boxes, enabled),
+            setBoundingBoxesEnabledInResponse({ current, boxes, enabled }),
           boxes.map((box): RedactionBoundingBoxMutation => ({
             op: RedactionBoundingBoxMutationOp.setEnabled,
             page: box.page,

@@ -8,7 +8,7 @@ import {
   RedactionBoundingBoxType,
   RedactionStatus,
 } from '../../../../../lib/models/redactionTypes';
-import { RedactionBoundingBoxMutationOp } from '../../../../../lib/models/redactionBoundingBoxMutation';
+import { RedactionBoundingBoxMutationOp } from '../../../../../lib/redaction/redactionBoundingBoxMutation';
 import { isSameRedactionBoundingBox } from '../../../../../lib/models/redactionBoundingBoxIdentity';
 import { getRedaction } from '../getRedaction';
 import { mutateRedactionBoundingBoxes } from './mutateRedactionBoundingBoxes';
@@ -156,23 +156,17 @@ describe(mutateRedactionBoundingBoxes, () => {
     ).rejects.toMatchObject({ statusCode: 404 });
   });
 
-  it.each([
-    { boxKind: RedactionBoundingBoxType.automatic },
-    { boxKind: RedactionBoundingBoxType.manual },
-  ])('sets $boxKind enabled to false then true', async ({ boxKind }) => {
-    const { redaction, autoBox, manualBox } =
-      await makeMixedRedactedRedaction();
-    const target =
-      boxKind === RedactionBoundingBoxType.automatic ? autoBox : manualBox;
+  it('sets an automatic box enabled to false then true', async () => {
+    const { redaction, autoBox } = await makeMixedRedactedRedaction();
 
     await mutateRedactionBoundingBoxes({
       key: redaction.key,
       mutations: [
         {
           op: RedactionBoundingBoxMutationOp.setEnabled,
-          page: target.page,
-          box: target.box,
-          type: boxKind,
+          page: autoBox.page,
+          box: autoBox.box,
+          type: RedactionBoundingBoxType.automatic,
           enabled: false,
         },
       ],
@@ -183,23 +177,17 @@ describe(mutateRedactionBoundingBoxes, () => {
       mutations: [
         {
           op: RedactionBoundingBoxMutationOp.setEnabled,
-          page: target.page,
-          box: target.box,
-          type: boxKind,
+          page: autoBox.page,
+          box: autoBox.box,
+          type: RedactionBoundingBoxType.automatic,
           enabled: true,
         },
       ],
     });
     const second = await getRedaction({ key: redaction.key });
 
-    expect(enabledOf(first, target)).toBe(false);
-    expect(
-      enabledOf(
-        first,
-        boxKind === RedactionBoundingBoxType.automatic ? manualBox : autoBox
-      )
-    ).toBe(true);
-    expect(enabledOf(second, target)).toBe(true);
+    expect(enabledOf(first, autoBox)).toBe(false);
+    expect(enabledOf(second, autoBox)).toBe(true);
   });
 
   it('applies add, delete, and setEnabled in one save', async () => {

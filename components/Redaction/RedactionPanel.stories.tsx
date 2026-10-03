@@ -95,7 +95,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
     const handleBoundingBoxesEnabledChange = useMemoizedCallback(
       (boxes: RedactionBoundingBox[], enabled: boolean) => {
         setRedaction((current) =>
-          setBoundingBoxesEnabledInResponse(current, boxes, enabled)
+          setBoundingBoxesEnabledInResponse({ current, boxes, enabled })
         );
       },
       []
