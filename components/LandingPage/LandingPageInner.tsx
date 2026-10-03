@@ -23,12 +23,12 @@ import {
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
   faCheck,
-  faClock,
   faCode,
   faDownload,
   faEye,
   faListCheck,
   faSquare,
+  faTrashCan,
   faWandMagicSparkles,
 } from '@fortawesome/free-solid-svg-icons';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
@@ -82,17 +82,17 @@ const LandingPageHero: React.FunctionComponent = React.memo(
               <Stack gap="lg">
                 <Title order={1}>
                   <Text span inherit c="green">
-                    Automatically
+                    Redact sensitive information
                   </Text>{' '}
-                  redact all sensitive info from PDFs{' '}
+                  from PDFs{' '}
                   <Text span inherit c="green">
                     in seconds
                   </Text>
                 </Title>
                 <Text size="lg" c="dimmed">
-                  You don&apos;t have to hunt through the page and black out
-                  each name, address, or SSN by hand. Upload a PDF, review AI
-                  suggestions, and download a permanently redacted file.
+                  Upload a PDF and we&apos;ll flag details that may need to be
+                  hidden. Check every suggestion before you download the
+                  redacted file.
                 </Text>
                 <Group>
                   <LandingPageUploadCTA fullWidth={false} />
@@ -138,8 +138,8 @@ const LandingPageExampleDocuments: React.FunctionComponent = React.memo(
             <BeforeAfterRedactionCard {...irs1040Sample} />
           </SimpleGrid>
           <Text ta="center" c="dimmed">
-            AI finds names, addresses, emails, SSNs, and more — you review
-            before download.
+            See each suggestion on the page and change it if needed. You make
+            the final call.
           </Text>
         </Stack>
       </Container>
@@ -158,7 +158,8 @@ const LandingPageHowItWorks: React.FunctionComponent = React.memo(
                 How to redact a PDF
               </Title>
               <Text ta="center" c="dimmed">
-                Three free steps — no manual hunt through every page.
+                It usually takes a few minutes, and you decide what gets
+                redacted.
               </Text>
             </Stack>
             <SimpleGrid cols={{ base: 1, sm: 3 }}>
@@ -210,30 +211,63 @@ const LandingPageDetectList: React.FunctionComponent = React.memo(
 const LandingPagePrivacy: React.FunctionComponent = React.memo(
   function LandingPagePrivacy() {
     return (
-      <Box bg="gray.0" py="xl">
+      <Box bg="dark.9" py="xl">
         <Container size={siteContainerSize}>
-          <Stack gap="lg">
-            <Title order={2} ta="center">
-              Privacy and open source
-            </Title>
+          <Stack gap="xl">
+            <Stack gap="sm" maw={680}>
+              <Group gap="sm">
+                <Box w={24} h={2} bg="blue.4" />
+                <Text c="blue.3" fw="bold" size="xs" tt="uppercase" lts={2}>
+                  Privacy and open source
+                </Text>
+              </Group>
+              <Title order={2} c="white">
+                What happens to your PDF
+              </Title>
+              <Text c="dark.2" size="lg">
+                See how we handle your file and what each redaction removes. You
+                can check the source code yourself.
+              </Text>
+            </Stack>
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
               {privacyCards.map((card) => (
-                <Card key={card.title}>
+                <Card
+                  key={card.title}
+                  bg="dark.8"
+                  p="lg"
+                  h="100%"
+                  withBorder
+                  style={{ borderColor: 'var(--mantine-color-dark-5)' }}
+                >
                   <Stack gap="sm">
-                    <ThemeIcon variant="light" radius="md" size="lg">
-                      <FontAwesomeIcon icon={card.icon} />
-                    </ThemeIcon>
-                    <Title order={3}>{card.title}</Title>
-                    <Text c="dimmed" size="sm">
+                    <Group gap="md" wrap="nowrap">
+                      <ThemeIcon
+                        variant="transparent"
+                        radius="md"
+                        size="xl"
+                        color="blue"
+                      >
+                        <FontAwesomeIcon icon={card.icon} />
+                      </ThemeIcon>
+                      <Stack gap={0}>
+                        <Title order={3} c="white">
+                          {card.title}
+                        </Title>
+                        <Text c="dark.2" size="sm">
+                          {card.subtitle}
+                        </Text>
+                      </Stack>
+                    </Group>
+                    <Text c="dark.1" size="sm">
                       {card.description}
                     </Text>
                   </Stack>
                 </Card>
               ))}
             </SimpleGrid>
-            <Text ta="center" c="dimmed" size="sm">
-              Files are processed with a cloud vision model in the United
-              States, then deleted within one hour.
+            <Text c="dark.2" size="sm">
+              To find likely sensitive information, we send page images to
+              Gemini 3.8 Flash on Google Cloud in the United States.
             </Text>
           </Stack>
         </Container>
@@ -347,21 +381,20 @@ const LandingPageWhyFree: React.FunctionComponent = React.memo(
               <Anchor href={openGreenCardUrl} target="_blank" rel="noreferrer">
                 OpenGreenCard
               </Anchor>
-              . We want to make it easier for people to share their past
-              successful applications so they can help others in the community.
-              This tool is meant to make that easier and provide that service to
-              the community.
+              . We built it to help people share successful applications without
+              exposing the personal details inside them. The same problem comes
+              up in plenty of other PDFs, so anyone can use it.
             </Text>
             <Text>
-              It is made by the same people as{' '}
+              The team also makes{' '}
               <Anchor href={wanderlogUrl} target="_blank" rel="noreferrer">
                 Wanderlog
-              </Anchor>{' '}
-              and other services used by millions of people. Sign up for a free
-              account to get unlimited uploads.
+              </Anchor>
+              , which millions of travelers use. A free account removes the
+              five-upload limit.
             </Text>
             <Text>
-              We welcome contributors who want to help improve the code.{' '}
+              Want to inspect the code or contribute a change?{' '}
               <Anchor href={githubRepoUrl} target="_blank" rel="noreferrer">
                 View the source on GitHub
               </Anchor>
@@ -405,21 +438,21 @@ interface HowItWorksStep {
 
 const howItWorksSteps: HowItWorksStep[] = [
   {
-    title: 'AI identifies PII',
+    title: 'Find likely sensitive details',
     description:
-      'The model finds names, addresses, SSNs, and other sensitive content and marks it for redaction.',
+      'We scan the PDF and mark text that may need redaction, such as a name or Social Security number.',
     icon: faWandMagicSparkles,
   },
   {
-    title: 'You review',
+    title: 'Check the suggestions',
     description:
-      'Adjust suggestions and add extra boxes. Nothing is burned in until you download.',
+      'Keep, move, resize, or remove any box. You can also draw your own redactions.',
     icon: faListCheck,
   },
   {
-    title: 'Download',
+    title: 'Save the redacted PDF',
     description:
-      'Download a permanently redacted PDF. You can edit and download again.',
+      'When everything looks right, download a new PDF with the selected content removed.',
     icon: faDownload,
   },
 ];
@@ -435,31 +468,38 @@ const detectedDataTypes: string[] = [
 
 interface PrivacyCard {
   title: string;
+  subtitle: string;
   description: string;
   icon: IconDefinition;
 }
 
 const privacyCards: PrivacyCard[] = [
   {
-    title: `Deleted ${_deleteOldRedactionHoursText}`,
-    description: 'Originals, page images, and working files are removed.',
-    icon: faClock,
+    title: 'Automatic deletion',
+    subtitle: _deleteOldRedactionHoursText,
+    description:
+      'We remove the original PDF, page images, and working files from our servers.',
+    icon: faTrashCan,
   },
   {
     title: 'Open source',
+    subtitle: 'Public on GitHub',
     description:
-      'Public GitHub repository so you can audit the logic that is used and help make it better.',
+      'Read the code, report a problem, or contribute a change to the project.',
     icon: faCode,
   },
   {
-    title: 'You stay in control',
-    description: 'Every suggestion is reviewable before you download.',
+    title: 'Review first',
+    subtitle: 'You make the final call',
+    description:
+      'We suggest what to hide. Nothing is permanently redacted until you review and download.',
     icon: faEye,
   },
   {
-    title: 'Permanent redaction',
+    title: 'Content removed',
+    subtitle: 'Visible and selectable text',
     description:
-      'Visual text and the selectable text layer are removed from the file.',
+      'Each redaction removes both from the finished PDF instead of adding an overlay.',
     icon: faSquare,
   },
 ];
@@ -502,12 +542,12 @@ const faqItems: FaqItem[] = [
   {
     question: 'How do I redact a PDF?',
     answer:
-      'Upload your PDF, review the AI suggestions, adjust anything you want, and download a permanently redacted file. You can redact a PDF free without an account for the first five uploads.',
+      'Upload your PDF and check the areas we mark. Add, remove, move, or resize any redaction, then download the finished file. Your first five uploads do not require an account.',
   },
   {
     question: 'Is redaction permanent?',
     answer:
-      'Yes. We remove both the visual text and the underlying selectable text layer. Recipients cannot copy or recover the redacted content.',
+      'Yes. We remove the selected page content and its selectable text layer instead of covering it with a black rectangle.',
   },
   {
     question: 'What happens to my PDF?',
@@ -515,11 +555,11 @@ const faqItems: FaqItem[] = [
   },
   {
     question: 'Do you send files to a cloud AI model?',
-    answer: `Yes. A cloud vision model in the United States identifies likely sensitive content. We do not claim client-side encryption or EU-only hosting. Files are then deleted ${_deleteOldRedactionHoursText}.`,
+    answer: `Yes. We send page images to Gemini 3.8 Flash on Google Cloud so it can suggest redactions. We delete our original PDF, page images, and working files ${_deleteOldRedactionHoursText}.`,
   },
   {
     question: 'Is this open source?',
     answer:
-      'Yes. The code is public on GitHub so you can audit the logic that is used and help make it better.',
+      'Yes. You can read the code, report a problem, or contribute on GitHub.',
   },
 ];
