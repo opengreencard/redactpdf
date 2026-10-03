@@ -57,8 +57,8 @@ items:
                   - &commonAppMode
                     name: APP_MODE
                     value: production
-                # Sensitive values (DB_PASS, AUTH_SECRET, Google OAuth, S3 keys,
-                # and DEEPINFRA_API_KEY) are injected from the redaction-env Secret.
+                # Secrets stay out of this template. They're injected from the
+                # redaction-env Secret.
                 envFrom:
                   - secretRef:
                       name: redaction-env

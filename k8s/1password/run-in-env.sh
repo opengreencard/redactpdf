@@ -84,11 +84,6 @@ export APP_MODE="$ENVIRONMENT"
 if [ "$ENVIRONMENT" = 'production' ]; then
   # Local production-db development still needs local OAuth redirects.
   export NEXTAUTH_URL=http://localhost:3000
-
-  # Before running, whitelist the developer's IP on the DB Cloud Firewall.
-  if command -v doctl > /dev/null 2>&1 && doctl account get > /dev/null 2>&1; then
-    bash "$DIR/../../dev/add-db-firewall-ip.sh" 2>/dev/null || true
-  fi
 fi
 
 exec op run --env-file="$opSecretsFile" -- "$@"

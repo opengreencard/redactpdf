@@ -1,0 +1,26 @@
+---
+description: When writing skills, commands, rules, or other agent-facing prose
+alwaysApply: true
+---
+
+## Start small
+
+Write the smallest version that could work:
+
+- **Commands:** inputs, then numbered steps
+- **Skills:** one reusable workflow or reference that two or more commands share
+- **Rules:** don't need to say too much; write the rule, and maybe a succinct
+  example
+
+Add detail only when the short version fails in practice.
+
+## Plain language
+
+Use bullets and readable sentences.
+
+## Shared logic → skills
+
+If two or more commands need the same MCP usage, formatting, or workflow, put
+it in `.agents/skills/` and reference it from the command
+(`@.agents/skills/…/SKILL.md`). Commands are meant to be manually-run
+step-by-step recipes, while skills have broader instructions.

@@ -22,8 +22,8 @@ Optional (override k8s/variables.sh defaults; mostly useful for testing
 
 All options except --revision default to the values in k8s/variables.sh.
 The script replaces %VARIABLE% placeholders in templates/ and writes results
-to config/. The secret template is skipped — use k8s/fill-secrets-template.sh
-for that.
+to config/. The secret template is skipped — use
+k8s/1password/fill-secrets-template.sh for that.
 
 Example:
   bash fill-templates.sh --revision $(git rev-parse HEAD)
@@ -82,7 +82,8 @@ s/%ACME_EMAIL%/$ACME_EMAIL/g;
 s/%REVISION%/$REVISION/g;
 "
 
-# Skip secret.template.yml — it is filled by k8s/fill-secrets-template.sh instead
+# Skip secret.template.yml — it is filled by
+# k8s/1password/fill-secrets-template.sh instead
 for filename in $(find "$templateDir" -type f -not -name 'secret.template.yml' \
   | sed "s@$templateDir/@@"); do
   newFilename="${filename/\.template/}"

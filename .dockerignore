@@ -29,7 +29,6 @@ node_modules
 
 # Infrastructure files: only needed for cluster management, not at runtime
 k8s/
-sysadmin/
 
 # Storybook: development-only UI catalog
 storybook

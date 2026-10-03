@@ -8,20 +8,25 @@ import { ApplicationError } from '../errors/applicationError';
 /**
  * Providers backed by OpenAI-compatible chat-completions APIs.
  *
+ * You don't need keys for every provider:
+ * - `gemini`: required for production redaction. The cluster Secret only
+ *   injects `GEMINI_API_KEY`.
+ * - `deepInfra`: optional. Local or production-env model comparisons.
+ * - `openAI`: optional. Local or production-env model comparisons.
+ * Keep the optional keys in local `.env.*` files, not in the Kubernetes
+ * Secret.
+ *
  * To add a provider:
  * 1. Add a member here and a `PROVIDER_API_KEY` entry to each `.env.*.example`
  *    file.
  * 2. Add an entry to `providerConfigurations` with
  *    `process.env.PROVIDER_API_KEY` and the provider's OpenAI-compatible
  *    base URL.
- *
- * Production redaction uses `gemini`; other providers are for testing and
- * model comparisons.
  */
 export enum OpenAICompatibleProvider {
+  gemini = 'gemini',
   deepInfra = 'deepInfra',
   openAI = 'openAI',
-  gemini = 'gemini',
 }
 
 /** Options for one streaming OpenAI-compatible completion. */
@@ -115,6 +120,10 @@ const providerConfigurations: Record<
   OpenAICompatibleProvider,
   ProviderConfiguration
 > = {
+  [OpenAICompatibleProvider.gemini]: {
+    apiKey: process.env.GEMINI_API_KEY,
+    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+  },
   [OpenAICompatibleProvider.deepInfra]: {
     apiKey: process.env.DEEPINFRA_API_KEY,
     baseURL: 'https://api.deepinfra.com/v1/openai',
@@ -122,10 +131,6 @@ const providerConfigurations: Record<
   [OpenAICompatibleProvider.openAI]: {
     apiKey: process.env.OPENAI_API_KEY,
     baseURL: 'https://api.openai.com/v1',
-  },
-  [OpenAICompatibleProvider.gemini]: {
-    apiKey: process.env.GEMINI_API_KEY,
-    baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
   },
 };
 
