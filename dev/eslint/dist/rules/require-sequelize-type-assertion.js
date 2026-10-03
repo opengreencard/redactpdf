@@ -59,6 +59,8 @@ exports.default = (0, util_1.createRule)({
         };
     },
 });
+// TODO: Use a keyed parameter object now that max-params is 2.
+// eslint-disable-next-line max-params
 function buildFixes(context, fixer, node, attributesProperty) {
     if (node.callee.type !== utils_1.AST_NODE_TYPES.MemberExpression ||
         node.callee.object.type !== utils_1.AST_NODE_TYPES.Identifier ||

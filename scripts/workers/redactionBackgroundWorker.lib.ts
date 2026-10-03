@@ -7,15 +7,26 @@ const cleanupCronExpression = '*/15 * * * *';
 
 /**
  * Run redaction cleanup every 15 minutes until the worker is asked to stop.
+ *
+ * Pass `runImmediately` so the same cleanup function also runs once on
+ * startup. That is useful when we want to try a delete without waiting
+ * for the next cron tick.
  */
 export async function runRedactionBackgroundWorker({
   signal,
+  runImmediately,
 }: {
   signal: AbortSignal;
+  runImmediately: boolean;
 }): Promise<void> {
-  const job = new Cron(cleanupCronExpression, async () => {
+  const runCleanup = async (): Promise<void> => {
     await deleteOldRedactions();
-  });
+  };
+
+  const job = new Cron(cleanupCronExpression, runCleanup);
+  if (runImmediately) {
+    await runCleanup();
+  }
 
   await new Promise<void>((resolve) => {
     const stop = (): void => {

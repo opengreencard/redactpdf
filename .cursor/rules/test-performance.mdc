@@ -48,7 +48,32 @@ beforeAll(async () => { /* ... */ }, 30000);
 it('handles slow work', () => { /* ... */ }, 15000);
 ```
 
-## Parallel Fixture Creation
+## Independent promises
 
-When creating multiple independent test fixtures, use `Promise.all` instead of
-sequential `await`. This is already covered in `.cursor/rules/use-fakedata.mdc`.
+When a test starts several independent promises — fixtures, reads, or
+assertions — use `Promise.all` instead of awaiting them one by one.
+
+```ts
+// Avoid
+const stale = await FakeData.makeDBRedaction({ openedAt: hoursAgo(2) });
+const fresh = await FakeData.makeDBRedaction({ openedAt: hoursAgo(0) });
+await expect(getRedactionFile(stale.key)).rejects.toMatchObject({
+  name: 'NotFound',
+});
+await expect(getRedactionFile(fresh.key)).resolves.toBeInstanceOf(Buffer);
+
+// Prefer
+const [stale, fresh] = await Promise.all([
+  FakeData.makeDBRedaction({ openedAt: hoursAgo(2) }),
+  FakeData.makeDBRedaction({ openedAt: hoursAgo(0) }),
+]);
+await Promise.all([
+  expect(getRedactionFile(stale.key)).rejects.toMatchObject({
+    name: 'NotFound',
+  }),
+  expect(getRedactionFile(fresh.key)).resolves.toBeInstanceOf(Buffer),
+]);
+```
+
+Creating multiple independent fixtures with `Promise.all` is also covered
+in `.cursor/rules/use-fakedata.mdc`.

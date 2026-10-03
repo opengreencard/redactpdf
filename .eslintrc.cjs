@@ -1002,6 +1002,7 @@ module.exports = {
     'redaction/enum-member-name-matches-value': 'error',
     'redaction/no-import-reexport': 'error',
     'redaction/no-unexported-underscore-functions': 'error',
+    'redaction/prefer-inline-export': 'error',
     // We use _ to indicate methods exported for testing only
     'no-underscore-dangle': 'off',
 

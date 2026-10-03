@@ -15,3 +15,22 @@ it('deletes a manual box', ...);
 // Prefer — one variant covers the shared lookup
 it('deletes a box by page, type, and coordinates', ...);
 ```
+
+Don't write a test whose only job is to prove an npm library works. Trust
+croner, yargs, and the like.
+
+Don't assert the same fact two ways. If `findAll` by IDs already shows the
+row is gone, do not also `.reload()` that instance. Add a second check only
+when it is a different fact, such as Spaces objects vs database rows.
+
+Comment what each assertion group is checking, next to those expects:
+
+```ts
+// Expect the idle rows to be gone; only the fresh ID should come back.
+expect(remaining.map((row) => row.id)).toEqual([fresh.id]);
+
+// Expect the idle PDF and page images to be gone from Spaces.
+await expect(getRedactionFile(stale.key)).rejects.toMatchObject({
+  name: 'NotFound',
+});
+```
