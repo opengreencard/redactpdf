@@ -192,6 +192,16 @@ const commonNoRestrictedSyntaxRules = [
       'Avoid casting with `as Error`; when using `catch (err)`, err is already typed as Error due to our Typescript settings.',
   },
   {
+    // Bad: catch (error: unknown) { ... }
+    // Bad: function handle(error: unknown) { ... }
+    // Good: catch (error) { ... }
+    // Good: function handle(error: Error) { ... }
+    selector:
+      'Identifier[name=/^(error|err)$/][typeAnnotation.typeAnnotation.type="TSUnknownKeyword"]',
+    message:
+      'Type caught values as Error, not unknown. useUnknownInCatchVariables is false, so catch (error) is already Error.',
+  },
+  {
     // Bad: <Card.Section>...</Card.Section>
     // Good: import { CardSection } from '@mantine/core'; <CardSection>...</CardSection>
     // This pattern is not supported well in React Server Components. In Next,

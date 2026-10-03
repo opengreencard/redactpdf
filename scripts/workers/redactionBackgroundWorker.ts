@@ -10,7 +10,7 @@ async function main(): Promise<void> {
     process.once('SIGINT', () => controller.abort());
 
     await runRedactionBackgroundWorker({ signal: controller.signal });
-  } catch (error: unknown) {
+  } catch (error) {
     // Worker failures need operational diagnostics.
     // eslint-disable-next-line no-console
     console.error(error);

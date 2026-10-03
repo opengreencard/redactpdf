@@ -51,9 +51,7 @@ export const touchRedactionOpenedAtClient = makeClientAPIRouteWithBody<
   Record<string, never>
 >({
   method: 'POST',
-  dataToUrlQueryStringAndBody: ({
-    key,
-  }): ClientAPIRouteWithBodyData<{}> => ({
+  dataToUrlQueryStringAndBody: ({ key }): ClientAPIRouteWithBodyData<{}> => ({
     url: `/api/redaction/${key}/open`,
     body: {},
   }),
