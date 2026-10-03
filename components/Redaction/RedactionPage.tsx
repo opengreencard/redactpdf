@@ -9,7 +9,10 @@ import {
   getRedactionClient,
   mutateRedactionBoundingBoxesClient,
 } from '../clientLib/api/redaction';
-import type { RedactionBoundingBoxMutation } from '../../app/api/redaction/[key]/redacted/mutateRedactionBoundingBoxes';
+import {
+  RedactionBoundingBoxMutation,
+  RedactionBoundingBoxMutationOp,
+} from '../../lib/models/redactionBoundingBoxMutation';
 import { APICallState } from '../../lib/typescript/apiCallState';
 import {
   GetRedactionResponse,
@@ -21,7 +24,7 @@ import {
 import {
   addBoundingBoxesToResponse,
   removeBoundingBoxesFromResponse,
-  toggleBoundingBoxesInResponse,
+  setBoundingBoxesEnabledInResponse,
 } from './redactionBoundingBoxes';
 import RedactionPageInner from './RedactionPageInner';
 
@@ -81,12 +84,12 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         setStateResult(optimistic);
 
         try {
-          setStateResult(
-            await mutateRedactionBoundingBoxesClient({
-              key: redactionKey,
-              mutations,
-            })
-          );
+          // Success has nothing new to show — we already applied the same
+          // edits locally.
+          await mutateRedactionBoundingBoxesClient({
+            key: redactionKey,
+            mutations,
+          });
         } catch (err) {
           // One POST applies the whole batch or none of it, so we can roll
           // back to the pre-click boxes.
@@ -105,9 +108,14 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
 
     const handleAddBoundingBox = useMemoizedCallback(
       async (box: ManualRedactionBoundingBox) => {
+        const mutation: RedactionBoundingBoxMutation = {
+          op: RedactionBoundingBoxMutationOp.add,
+          page: box.page,
+          box: box.box,
+        };
         await persistBoxMutation(
           (current) => addBoundingBoxesToResponse(current, [box]),
-          [{ op: 'add', page: box.page, box: box.box }]
+          [mutation]
         );
       },
       [persistBoxMutation]
@@ -118,7 +126,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         await persistBoxMutation(
           (current) => removeBoundingBoxesFromResponse(current, boxes),
           boxes.map((box): RedactionBoundingBoxMutation => ({
-            op: 'delete',
+            op: RedactionBoundingBoxMutationOp.delete,
             page: box.page,
             box: box.box,
             type: box.type,
@@ -129,17 +137,16 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
     );
 
     const handleBoundingBoxesEnabledChange = useMemoizedCallback(
-      async (boxes: RedactionBoundingBox[]) => {
+      async (boxes: RedactionBoundingBox[], enabled: boolean) => {
         await persistBoxMutation(
-          (current) => toggleBoundingBoxesInResponse(current, boxes),
+          (current) =>
+            setBoundingBoxesEnabledInResponse(current, boxes, enabled),
           boxes.map((box): RedactionBoundingBoxMutation => ({
-            // Send the intended flag so a missed request cannot invert
-            // the next click.
-            op: 'setEnabled',
+            op: RedactionBoundingBoxMutationOp.setEnabled,
             page: box.page,
             box: box.box,
             type: box.type,
-            enabled: !box.enabled,
+            enabled,
           }))
         );
       },

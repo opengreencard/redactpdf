@@ -7,6 +7,7 @@ import {
 import {
   type SinglePageRedactionBoundingBox,
   RedactedDataType,
+  RedactionBoundingBoxType,
   redactedDataTypeSchema,
   redactedDataTypeToDescription,
 } from '../models/redactionTypes';
@@ -164,7 +165,7 @@ function mapRedactionBoxToBoundingBox(
   rawBox: RedactionBoxContent
 ): SinglePageRedactionBoundingBox {
   const boundingBox: SinglePageRedactionBoundingBox = {
-    type: 'automatic',
+    type: RedactionBoundingBoxType.automatic,
     dataType: rawBox.dataType,
     text: rawBox.text,
     box: {

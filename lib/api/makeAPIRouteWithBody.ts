@@ -13,27 +13,6 @@ import {
 import { getUnreachableError } from '../typescript/getUnreachableError';
 import { FailureResponse } from '../types/response';
 
-type MakeAPIRouteWithBodyAuthQueryPathOptions<
-  TransformedQueryAndPathParamsT,
-  AuthParamsT,
-  PathParamsT extends {} = {},
-> = {
-  /**
-   * Next.js still routes from the export name (`POST` / `DELETE` / `PATCH`).
-   * We take `method` so the call site documents the verb next to that export.
-   */
-  method: 'POST' | 'DELETE' | 'PATCH';
-} & Partial<
-  Pick<
-    MakeRequestParamsFromRequestOptions<
-      TransformedQueryAndPathParamsT,
-      AuthParamsT,
-      PathParamsT
-    >,
-    'makeQueryAndPathParams' | 'makeAuthParams' | 'makeRequiredAuthParams'
-  >
->;
-
 /**
  * Named slots for `makeAPIRouteWithBody` type parameters so call sites can
  * write `Route['requestBody']` instead of remembering the generic order.
@@ -58,6 +37,27 @@ export interface MakeAPIRouteWithBodyTypes<
   authParams: AuthParamsT;
   pathParams: PathParamsT;
 }
+
+type MakeAPIRouteWithBodyAuthQueryPathOptions<
+  TransformedQueryAndPathParamsT,
+  AuthParamsT,
+  PathParamsT extends {} = {},
+> = {
+  /**
+   * Next.js still routes from the export name (`POST` / `DELETE` / `PATCH`).
+   * We take `method` so the call site documents the verb next to that export.
+   */
+  method: 'POST' | 'DELETE' | 'PATCH';
+} & Partial<
+  Pick<
+    MakeRequestParamsFromRequestOptions<
+      TransformedQueryAndPathParamsT,
+      AuthParamsT,
+      PathParamsT
+    >,
+    'makeQueryAndPathParams' | 'makeAuthParams' | 'makeRequiredAuthParams'
+  >
+>;
 
 /**
  * Wrap an API function that reads a JSON or FormData body.
@@ -275,6 +275,7 @@ export function makeAPIRouteWithBody<
         apiFunc(requestArg)
       );
     } catch (error) {
+      // Log the parse failure; the client only gets "Invalid request body".
       // eslint-disable-next-line no-console
       console.error(error);
       return NextResponse.json(

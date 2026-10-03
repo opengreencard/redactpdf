@@ -10,27 +10,6 @@ import {
   runFunctionAndHandleErrors,
 } from './makeAPIRoute';
 
-type MakeAPIRouteWithoutBodyAuthQueryPathOptions<
-  TransformedQueryAndPathParamsT,
-  AuthParamsT,
-  PathParamsT extends {} = {},
-> = {
-  /**
-   * Next.js still routes from the export name (`GET`). We take `method` so the
-   * call site documents the verb next to that export.
-   */
-  method: 'GET';
-} & Partial<
-  Pick<
-    MakeRequestParamsFromRequestOptions<
-      TransformedQueryAndPathParamsT,
-      AuthParamsT,
-      PathParamsT
-    >,
-    'makeQueryAndPathParams' | 'makeAuthParams' | 'makeRequiredAuthParams'
-  >
->;
-
 /**
  * Named slots for `makeAPIRouteWithoutBody` type parameters so call sites can
  * write `Route['queryAndPathParams']` instead of remembering the generic
@@ -54,6 +33,27 @@ export interface MakeAPIRouteWithoutBodyTypes<
   authParams: AuthParamsT;
   pathParams: PathParamsT;
 }
+
+type MakeAPIRouteWithoutBodyAuthQueryPathOptions<
+  TransformedQueryAndPathParamsT,
+  AuthParamsT,
+  PathParamsT extends {} = {},
+> = {
+  /**
+   * Next.js still routes from the export name (`GET`). We take `method` so the
+   * call site documents the verb next to that export.
+   */
+  method: 'GET';
+} & Partial<
+  Pick<
+    MakeRequestParamsFromRequestOptions<
+      TransformedQueryAndPathParamsT,
+      AuthParamsT,
+      PathParamsT
+    >,
+    'makeQueryAndPathParams' | 'makeAuthParams' | 'makeRequiredAuthParams'
+  >
+>;
 
 /**
  * Wrap an API function that has no request body (query and path params only).

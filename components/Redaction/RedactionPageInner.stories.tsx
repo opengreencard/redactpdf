@@ -18,7 +18,7 @@ import RedactionPageInner from './RedactionPageInner';
 import {
   addBoundingBoxesToResponse,
   removeBoundingBoxesFromResponse,
-  toggleBoundingBoxesInResponse,
+  setBoundingBoxesEnabledInResponse,
 } from './redactionBoundingBoxes';
 import {
   getStorybookRedactionImageUrl,
@@ -99,9 +99,9 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       [updateRedaction]
     );
     const handleBoundingBoxesEnabledChange = useMemoizedCallback(
-      (boxes: RedactionBoundingBox[]) => {
+      (boxes: RedactionBoundingBox[], enabled: boolean) => {
         updateRedaction((current) =>
-          toggleBoundingBoxesInResponse(current, boxes)
+          setBoundingBoxesEnabledInResponse(current, boxes, enabled)
         );
       },
       [updateRedaction]

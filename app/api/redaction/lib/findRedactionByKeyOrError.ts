@@ -7,8 +7,8 @@ import { RedactionStatus } from '../../../../lib/models/redactionTypes';
 import { getUnreachableError } from '../../../../lib/typescript/getUnreachableError';
 
 /**
- * Props so `attributes` is the source of the returned `PartialInstance`
- * keys.
+ * Lookup options. `attributes` lists the columns we select so TypeScript
+ * knows which fields the returned instance has.
  */
 interface FindRedactionByKeyOrErrorProps<
   Attrs extends keyof RedactionAttributes,

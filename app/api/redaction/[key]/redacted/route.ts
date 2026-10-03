@@ -7,12 +7,11 @@ import {
   MutateRedactionBoundingBoxesPathParams,
   mutateRedactionBoundingBoxes,
 } from './mutateRedactionBoundingBoxes';
-import type { GetRedactionResponse } from '../../../../../lib/models/redactionTypes';
 
 type MutateRedactionBoundingBoxesRoute = MakeAPIRouteWithBodyTypes<
   MutateRedactionBoundingBoxesBody,
   MutateRedactionBoundingBoxesPathParams,
-  GetRedactionResponse,
+  void,
   {},
   MutateRedactionBoundingBoxesPathParams
 >;

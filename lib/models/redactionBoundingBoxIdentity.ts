@@ -2,7 +2,10 @@ import type { BoundingBox, RedactionBoundingBox } from './redactionTypes';
 
 /**
  * Match by type, page, and exact coordinates — not `enabled` or automatic
- * text.
+ * text. Toggling a box should still find the same one.
+ *
+ * Keep in sync with `LocateRedactionBoundingBoxRequest` in
+ * `redactionBoundingBoxMutation.ts`.
  */
 export function isSameRedactionBoundingBox(
   left: Pick<RedactionBoundingBox, 'type' | 'page' | 'box'>,

@@ -11,6 +11,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import {
   RedactedDataType,
+  RedactionBoundingBoxType,
   type RedactionBoundingBox,
 } from '../../lib/models/redactionTypes';
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
@@ -26,7 +27,7 @@ export interface RedactionBoundingBoxListProps {
   redactionBoundingBoxes: RedactionBoundingBox[];
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[], enabled: boolean) => unknown;
 }
 
 /**
@@ -101,7 +102,7 @@ interface RedactionTypeGroupProps {
   group: RedactionBoxOccurrenceGroup;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[], enabled: boolean) => unknown;
 }
 
 /** Renders a type header and its matched-value groups. */
@@ -115,7 +116,7 @@ const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
       [RedactionBoundingBox[]]
     >(onDeleteBoundingBoxes);
     const onEnabledChangeWithPrefix =
-      useCallbackWithPrefix<[RedactionBoundingBox[]]>(onEnabledChange);
+      useCallbackWithPrefix<[RedactionBoundingBox[], boolean]>(onEnabledChange);
 
     return (
       <Stack gap={0}>
@@ -128,7 +129,10 @@ const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
           testIdSuffix={_makeTypeTestIdSuffix(group.dataType)}
           onRedactionClick={null}
           onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix(boxes)}
-          onEnabledChange={onEnabledChangeWithPrefix(getBoxesToToggle(boxes))}
+          onEnabledChange={onEnabledChangeWithPrefix(
+            getBoxesToToggle(boxes),
+            getNextEnabled(boxes)
+          )}
         />
         {group.values.map((valueGroup) => (
           <RedactionValueGroup
@@ -149,7 +153,7 @@ interface RedactionValueGroupProps {
   groupDataType: RedactionListDataType;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[], enabled: boolean) => unknown;
 }
 
 /** Renders a matched value and its page-level occurrences. */
@@ -173,7 +177,7 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
       [RedactionBoundingBox[]]
     >(onDeleteBoundingBoxes);
     const onEnabledChangeWithPrefix =
-      useCallbackWithPrefix<[RedactionBoundingBox[]]>(onEnabledChange);
+      useCallbackWithPrefix<[RedactionBoundingBox[], boolean]>(onEnabledChange);
 
     return (
       <Stack gap={0}>
@@ -188,7 +192,8 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
             valueGroup.occurrences
           )}
           onEnabledChange={onEnabledChangeWithPrefix(
-            getBoxesToToggle(valueGroup.occurrences)
+            getBoxesToToggle(valueGroup.occurrences),
+            getNextEnabled(valueGroup.occurrences)
           )}
         />
         {Object.values(occurrencesByPage).flatMap((pageOccurrences) =>
@@ -204,7 +209,7 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
               )}
               onRedactionClick={onRedactionClickWithPrefix(box)}
               onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix([box])}
-              onEnabledChange={onEnabledChangeWithPrefix([box])}
+              onEnabledChange={onEnabledChangeWithPrefix([box], !box.enabled)}
             />
           ))
         )}
@@ -373,6 +378,8 @@ function areAllBoxesDisabled(boxes: RedactionBoundingBox[]): boolean {
   return boxes.every((box) => !box.enabled);
 }
 
+// Send only the off boxes when turning a mixed group on, so already-on
+// boxes stay untouched.
 function getBoxesToToggle(
   boxes: RedactionBoundingBox[]
 ): RedactionBoundingBox[] {
@@ -381,9 +388,26 @@ function getBoxesToToggle(
     : boxes.filter((box) => !box.enabled);
 }
 
+/**
+ * Group clicks enable every off box, or disable the whole group when every
+ * box is already on.
+ */
+function getNextEnabled(boxes: RedactionBoundingBox[]): boolean {
+  return !boxes.every((box) => box.enabled);
+}
+
 function getRedactionBoxKey(box: RedactionBoundingBox): string {
-  const details =
-    box.type === 'automatic' ? [box.dataType, box.text] : ['manual'];
+  let details: string[];
+  switch (box.type) {
+    case RedactionBoundingBoxType.automatic:
+      details = [box.dataType, box.text];
+      break;
+    case RedactionBoundingBoxType.manual:
+      details = ['manual'];
+      break;
+    default:
+      throw getUnreachableError(box);
+  }
   return [
     ...details,
     box.page,
@@ -469,9 +493,9 @@ function getRedactionListDataType(
   box: RedactionBoundingBox
 ): RedactionListDataType {
   switch (box.type) {
-    case 'automatic':
+    case RedactionBoundingBoxType.automatic:
       return box.dataType;
-    case 'manual':
+    case RedactionBoundingBoxType.manual:
       return 'manual';
     default:
       throw getUnreachableError(box);

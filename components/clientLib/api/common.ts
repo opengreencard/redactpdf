@@ -34,8 +34,8 @@ interface ClientAPIRouteWithBodyCallOptions {
 /**
  * Make a client function for POST, DELETE, or PATCH.
  *
- * DELETE still sends a JSON body via Axios `data`. Query params aren't a
- * good fit for a nested identity object.
+ * Axios still sends a JSON body on DELETE via `data`. That's useful when
+ * the request needs a nested object instead of query params.
  */
 export function makeClientAPIRouteWithBody<
   RequestBodyT,
@@ -108,9 +108,8 @@ export function makeClientAPIRouteWithoutBody<RequestT, ResponseT>({
 }
 
 /**
- * Call a function that processes an API request.
- * Handles ApplicationErrors and makes sure we send a response with the
- * right status codes and JSON.
+ * Run an Axios call and turn a failed JSON envelope into an
+ * ApplicationError so UI code can show the server's message.
  */
 async function makeRequestAndHandleErrors<ResponseT>(
   request: () => Promise<AxiosResponse<ResponseT>>

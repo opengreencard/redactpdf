@@ -11,7 +11,6 @@ import {
   makeClientAPIRouteWithoutBody,
 } from './common';
 
-/** Client input for uploading one PDF for redaction. */
 interface UploadFileForRedactionClientRequest {
   file: File;
 }
@@ -32,7 +31,7 @@ export const uploadFileForRedactionClient = makeClientAPIRouteWithBody<
   },
 });
 
-/** Fetch the current state of one redaction document. */
+/** Poll one document until processing finishes or fails. */
 export const getRedactionClient = makeClientAPIRouteWithoutBody<
   { key: string },
   GetRedactionResponse
@@ -43,7 +42,7 @@ export const getRedactionClient = makeClientAPIRouteWithoutBody<
   }),
 });
 
-/** Client input for downloading the finished redacted PDF. */
+/** Public key for the generate route. The server loads boxes itself. */
 export interface GenerateRedactedPDFClientRequest {
   key: string;
 }
@@ -61,13 +60,13 @@ export const generateRedactedPDFClient = makeClientAPIRouteWithoutBody<
 });
 
 /**
- * POST add / delete / setEnabled in one body. `key` is the path; the rest
- * is JSON so we can send a list of mutations.
+ * Persist a batch of box edits in one POST. A later failure can then roll
+ * the optimistic UI back to the last saved boxes.
  */
 export const mutateRedactionBoundingBoxesClient = makeClientAPIRouteWithBody<
   MutateRedactionBoundingBoxesBody,
   MutateRedactionBoundingBoxesPathParams,
-  GetRedactionResponse
+  void
 >({
   method: 'POST',
   dataToUrlQueryStringAndBody: ({

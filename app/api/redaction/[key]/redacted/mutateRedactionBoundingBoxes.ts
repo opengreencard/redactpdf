@@ -1,87 +1,46 @@
 import { ApplicationError } from '../../../../../lib/errors/applicationError';
-import { PartialInstance } from '../../../../../lib/db/types';
-import type { RedactionAttributes } from '../../../../../lib/models/Redaction';
 import type {
   BoundingBox,
-  GetRedactionResponse,
   ManualRedactionBoundingBox,
   RedactionBoundingBox,
 } from '../../../../../lib/models/redactionTypes';
+import { RedactionBoundingBoxType } from '../../../../../lib/models/redactionTypes';
+import {
+  RedactionBoundingBoxMutation,
+  RedactionBoundingBoxMutationOp,
+} from '../../../../../lib/models/redactionBoundingBoxMutation';
 import { isSameRedactionBoundingBox } from '../../../../../lib/models/redactionBoundingBoxIdentity';
 import { getUnreachableError } from '../../../../../lib/typescript/getUnreachableError';
-import { getRedaction } from '../getRedaction';
 import {
   assertIsRedactedOrThrowApplicationError,
   findRedactionByKeyOrError,
 } from '../../lib/findRedactionByKeyOrError';
 
-/**
- * Identity of an existing box. Delete and setEnabled look up this way.
- */
-export interface LocateRedactionBoundingBoxRequest {
-  page: number;
-  box: BoundingBox;
-  type: RedactionBoundingBox['type'];
-}
-
-/**
- * Draw a new box. Callers don't send `type` — we always create `manual`.
- */
-export interface AddRedactionBoundingBoxMutation {
-  op: 'add';
-  page: number;
-  box: BoundingBox;
-}
-
-/** Remove one automatic or manual box. */
-export interface DeleteRedactionBoundingBoxMutation extends LocateRedactionBoundingBoxRequest {
-  op: 'delete';
-}
-
-/**
- * Write `enabled` to a specific value so a missed request cannot invert the
- * next click.
- */
-export interface SetRedactionBoundingBoxEnabledMutation extends LocateRedactionBoundingBoxRequest {
-  op: 'setEnabled';
-  enabled: boolean;
-}
-
-/** One add, delete, or enabled-state change in a redaction update. */
-export type RedactionBoundingBoxMutation =
-  | AddRedactionBoundingBoxMutation
-  | DeleteRedactionBoundingBoxMutation
-  | SetRedactionBoundingBoxEnabledMutation;
-
-/**
- * Path `key` plus the JSON body. The client sends this whole object; the
- * route splits `key` into the URL.
- */
-export interface MutateRedactionBoundingBoxesRequest {
+/** Public URL key. The route reads this from the path, not the JSON body. */
+export interface MutateRedactionBoundingBoxesPathParams {
   key: string;
+}
+
+/**
+ * Box edits to apply in order. Kept off the path so we can send a list,
+ * not one query param per field.
+ */
+export interface MutateRedactionBoundingBoxesBody {
   mutations: RedactionBoundingBoxMutation[];
 }
-
-/** Path parameters extracted from the redaction URL. */
-export type MutateRedactionBoundingBoxesPathParams = Pick<
-  MutateRedactionBoundingBoxesRequest,
-  'key'
->;
-
-/** JSON body containing the mutations to apply. */
-export type MutateRedactionBoundingBoxesBody = Omit<
-  MutateRedactionBoundingBoxesRequest,
-  'key'
->;
 
 /**
  * Apply every mutation in order, then save once. A throw before save leaves
  * the JSON column unchanged, so the client can roll back optimistic edits.
+ *
+ * We don't return the saved document — the client already applied the same
+ * edits locally.
  */
 export async function mutateRedactionBoundingBoxes({
   key,
   mutations,
-}: MutateRedactionBoundingBoxesRequest): Promise<GetRedactionResponse> {
+}: MutateRedactionBoundingBoxesPathParams &
+  MutateRedactionBoundingBoxesBody): Promise<void> {
   const redaction = await findRedactionByKeyOrError({
     key,
     attributes: [...mutationAttributes],
@@ -89,7 +48,7 @@ export async function mutateRedactionBoundingBoxes({
   assertIsRedactedOrThrowApplicationError(redaction);
 
   if (mutations.length === 0) {
-    return getRedaction({ key });
+    return;
   }
 
   let { redactionBoundingBoxes } = redaction;
@@ -101,11 +60,12 @@ export async function mutateRedactionBoundingBoxes({
     });
   }
 
-  return saveRedactionBoundingBoxes({
-    key,
-    redaction,
-    redactionBoundingBoxes,
-  });
+  // Persist boxes by assigning a new array. The JSON TEXT setter only runs
+  // on `set`; in-place `push` / `enabled =` would silently no-op.
+  // We have to assign on this instance; a copy wouldn't save the same row.
+  // eslint-disable-next-line no-param-reassign
+  redaction.redactionBoundingBoxes = redactionBoundingBoxes;
+  await redaction.save();
 }
 
 // `id` is required so Sequelize can UPDATE instead of attempting a global save.
@@ -116,11 +76,10 @@ const mutationAttributes = [
   'redactionBoundingBoxes',
 ] as const;
 
-type MutationRedaction = PartialInstance<
-  RedactionAttributes,
-  (typeof mutationAttributes)[number]
->;
-
+/**
+ * Apply one mutation to an in-memory list. We validate here so a later
+ * item in the batch can fail before we write the JSON column.
+ */
 function applyRedactionBoundingBoxMutation({
   boxes,
   mutation,
@@ -131,21 +90,21 @@ function applyRedactionBoundingBoxMutation({
   pageCount: number;
 }): RedactionBoundingBox[] {
   switch (mutation.op) {
-    case 'add': {
+    case RedactionBoundingBoxMutationOp.add: {
       assertValidPageAndBoxOrThrowApplicationError({
         page: mutation.page,
         box: mutation.box,
         pageCount,
       });
       const manualBox: ManualRedactionBoundingBox = {
-        type: 'manual',
+        type: RedactionBoundingBoxType.manual,
         page: mutation.page,
         box: mutation.box,
         enabled: true,
       };
       return [...boxes, manualBox];
     }
-    case 'delete': {
+    case RedactionBoundingBoxMutationOp.delete: {
       assertValidPageAndBoxOrThrowApplicationError({
         page: mutation.page,
         box: mutation.box,
@@ -159,7 +118,7 @@ function applyRedactionBoundingBoxMutation({
         (_existing, existingIndex) => existingIndex !== index
       );
     }
-    case 'setEnabled': {
+    case RedactionBoundingBoxMutationOp.setEnabled: {
       assertValidPageAndBoxOrThrowApplicationError({
         page: mutation.page,
         box: mutation.box,
@@ -181,27 +140,7 @@ function applyRedactionBoundingBoxMutation({
 }
 
 /**
- * Persist boxes by assigning a new array. The JSON TEXT setter only runs on
- * `set`; in-place `push` / `enabled =` would silently no-op.
- */
-async function saveRedactionBoundingBoxes({
-  key,
-  redaction,
-  redactionBoundingBoxes,
-}: {
-  key: string;
-  redaction: MutationRedaction;
-  redactionBoundingBoxes: RedactionBoundingBox[];
-}): Promise<GetRedactionResponse> {
-  // We have to assign on this instance; a copy wouldn't save the same row.
-  // eslint-disable-next-line no-param-reassign
-  redaction.redactionBoundingBoxes = redactionBoundingBoxes;
-  await redaction.save();
-  return getRedaction({ key });
-}
-
-/**
- * Boxes don't have ids — we match type, page, and coordinates. If two
+ * Boxes don't have IDs, so we use `isSameRedactionBoundingBox`. If two
  * boxes share that identity, we update the first one.
  */
 function findRedactionBoundingBoxIndexOrThrowApplicationError({
@@ -209,7 +148,7 @@ function findRedactionBoundingBoxIndexOrThrowApplicationError({
   locate,
 }: {
   boxes: RedactionBoundingBox[];
-  locate: LocateRedactionBoundingBoxRequest;
+  locate: Pick<RedactionBoundingBox, 'type' | 'page' | 'box'>;
 }): number {
   const index = boxes.findIndex((existing) =>
     isSameRedactionBoundingBox(existing, locate)

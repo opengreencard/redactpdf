@@ -31,11 +31,12 @@ import ActionIcon from '../designSystem/ActionIcon';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import classes from './RedactionPreviewPages.module.css';
 import { redactionPreviewPagesPadding } from './redactionLayout';
-import type {
-  BoundingBox,
-  ManualRedactionBoundingBox,
-  RedactedGetRedactionResponse,
-  RedactionBoundingBox,
+import {
+  RedactionBoundingBoxType,
+  type BoundingBox,
+  type ManualRedactionBoundingBox,
+  type RedactedGetRedactionResponse,
+  type RedactionBoundingBox,
 } from '../../lib/models/redactionTypes';
 
 export interface RedactionPreviewPagesProps {
@@ -50,7 +51,7 @@ export interface RedactionPreviewPagesProps {
    */
   onRedact: ((box: ManualRedactionBoundingBox) => unknown) | null;
   onDeleteBoundingBox: (box: RedactionBoundingBox) => unknown;
-  onEnabledChange: (box: RedactionBoundingBox) => unknown;
+  onEnabledChange: (box: RedactionBoundingBox, enabled: boolean) => unknown;
   /** Storybook / tests only — same shape as `getRedactionImageUrl`. */
   getUrlForRedactionImageForTesting?: typeof getRedactionImageUrl;
 }
@@ -371,7 +372,7 @@ const RedactionPreviewPages = forwardRef<
           return;
         }
         const manualBox: ManualRedactionBoundingBox = {
-          type: 'manual',
+          type: RedactionBoundingBoxType.manual,
           page,
           box,
           enabled: true,
@@ -415,7 +416,7 @@ const RedactionPreviewPages = forwardRef<
           (candidate) => makeBoundingBoxKey(candidate) === boxKey
         );
         if (box) {
-          onEnabledChange(box);
+          onEnabledChange(box, !box.enabled);
         }
       },
       [onEnabledChange, redactionBoundingBoxes]

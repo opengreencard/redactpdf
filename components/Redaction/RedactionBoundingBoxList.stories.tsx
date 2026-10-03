@@ -11,7 +11,7 @@ import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback
 import { makeFakeHandler } from '../../lib/storybook';
 import {
   removeBoundingBoxesFromArray,
-  toggleBoundingBoxesInArray,
+  setBoundingBoxesEnabledInArray,
 } from './redactionBoundingBoxes';
 import RedactionBoundingBoxList, {
   RedactionBoundingBoxListProps,
@@ -61,9 +61,9 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       []
     );
     const handleBoundingBoxesEnabledChange = useMemoizedCallback(
-      (boxesToToggle: RedactionBoundingBox[]) => {
+      (boxesToChange: RedactionBoundingBox[], enabled: boolean) => {
         setBoxes((current) =>
-          toggleBoundingBoxesInArray(current, boxesToToggle)
+          setBoundingBoxesEnabledInArray(current, boxesToChange, enabled)
         );
       },
       []

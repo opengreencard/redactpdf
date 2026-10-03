@@ -43,7 +43,7 @@ export interface RedactionPageInnerProps extends RedactionPreviewPagesPassThroug
   isLoggedIn: boolean;
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[], enabled: boolean) => unknown;
 }
 
 /**
@@ -118,7 +118,7 @@ interface RedactionPageViewBodyProps {
   redactionState: APICallState<GetRedactionResponse> | null;
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[], enabled: boolean) => unknown;
   getUrlForRedactionImageForTesting: typeof getRedactionImageUrl | undefined;
 }
 
@@ -139,8 +139,8 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
     );
 
     /**
-     * Handle a click on a redaction on the left side. Scroll to the box in
-     * the document pane.
+     * Scroll the document pane to this box. On a phone we switch to the
+     * document tab first so the overlay is measurable.
      */
     const handleRedactionClick = useMemoizedCallback(
       async (box: RedactionBoundingBox): Promise<void> => {
@@ -152,11 +152,15 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
       },
       []
     );
-    const onDeleteBoundingBox = useConvertSingleArgumentToArray(
+    const handleDeleteBoundingBoxForSingleBox = useConvertSingleArgumentToArray(
       onDeleteBoundingBoxes
     );
-    const onEnabledChangeForBox =
-      useConvertSingleArgumentToArray(onEnabledChange);
+    // The preview edits one box; the list and persist APIs take a batch.
+    const handleEnabledChangeForSingleBox = useMemoizedCallback(
+      (box: RedactionBoundingBox, enabled: boolean): unknown =>
+        onEnabledChange([box], enabled),
+      [onEnabledChange]
+    );
 
     switch (view) {
       case RedactionPageView.loading: {
@@ -235,8 +239,8 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                   redactionKey={redactionKey}
                   redactionResponse={redaction}
                   onAddBoundingBox={onAddBoundingBox}
-                  onDeleteBoundingBox={onDeleteBoundingBox}
-                  onEnabledChange={onEnabledChangeForBox}
+                  onDeleteBoundingBox={handleDeleteBoundingBoxForSingleBox}
+                  onEnabledChange={handleEnabledChangeForSingleBox}
                   redactionPreviewPagesRef={redactionPreviewPagesRef}
                   getUrlForRedactionImageForTesting={
                     getUrlForRedactionImageForTesting

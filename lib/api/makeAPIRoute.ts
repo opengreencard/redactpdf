@@ -14,35 +14,14 @@ export interface AppRouteHandlerFnContext {
   params: Promise<Record<string, string | string[] | undefined>>;
 }
 
+/**
+ * Next.js App Router handler. The factories return this so we can
+ * `export const GET = ...` / `POST = ...`.
+ */
 export type AppRouteHandlerFn = (
   request: NextRequest,
   context: AppRouteHandlerFnContext
 ) => Promise<Response>;
-
-/**
- * Run a function that powers an API, and return its response as JSON or
- * an error if it fails.
- */
-async function runFunctionAndHandleErrorsJSON<ResponseT>(
-  func: () => Promise<ResponseT>,
-  // Polling endpoints can use this to prevent stale status or edited data from
-  // being served by a browser or intermediary cache.
-  additionalHeaders: Record<string, string> = {}
-): Promise<NextResponse> {
-  const result = await runFunctionAndHandleErrorsBase(func);
-
-  if (result.success) {
-    // We can't serialize undefined, so we return null instead
-    return NextResponse.json(result.data ?? null, {
-      headers: additionalHeaders,
-    });
-  } else {
-    return NextResponse.json(
-      { success: false, message: result.message } satisfies FailureResponse,
-      { headers: additionalHeaders, status: result.statusCode }
-    );
-  }
-}
 
 /**
  * A response that can be returned from an API route that will be sent as-is
@@ -55,66 +34,12 @@ export interface RawResponse {
 }
 
 /**
- * Run a function that powers an API, and return its raw response or an
- * error if it fails. The response is sent as-is, without JSON
- * serialization.
- */
-async function runFunctionAndHandleErrorsRaw<ResponseT extends RawResponse>(
-  func: () => Promise<ResponseT>
-): Promise<NextResponse> {
-  const result = await runFunctionAndHandleErrorsBase(func);
-
-  if (result.success) {
-    const responseBody =
-      typeof result.data.response === 'string'
-        ? result.data.response
-        : new Uint8Array(result.data.response);
-    return new NextResponse(responseBody, {
-      headers: {
-        'Content-Type': result.data.contentType,
-        // Merge order: primary Content-Type first, then additionalHeaders may
-        // override any key (including Content-Type)
-        // eslint-disable-next-line no-restricted-syntax
-        ...result.data.additionalHeaders,
-      },
-    });
-  } else {
-    return NextResponse.json(
-      { success: false, message: result.message } satisfies FailureResponse,
-      { status: result.statusCode }
-    );
-  }
-}
-
-/**
  * A response that can be returned from an API route that will redirect
  * the user to another URL.
  */
 export interface RedirectResponse {
-  redirectUrl: string;
+  redirectURL: string;
   statusCode?: number;
-}
-
-/**
- * Run a function that powers an API, and return a redirect response or an error
- * if it fails. The response will redirect the user to the specified URL.
- */
-async function runFunctionAndHandleErrorsRedirect<
-  ResponseT extends RedirectResponse,
->(func: () => Promise<ResponseT>): Promise<NextResponse> {
-  const result = await runFunctionAndHandleErrorsBase(func);
-
-  if (result.success) {
-    return NextResponse.redirect(
-      result.data.redirectUrl,
-      result.data.statusCode
-    );
-  } else {
-    return NextResponse.json(
-      { success: false, message: result.message } satisfies FailureResponse,
-      { status: result.statusCode }
-    );
-  }
 }
 
 /**
@@ -134,69 +59,18 @@ export enum APIRouteResponseFormat {
   redirect = 'redirect',
 }
 
-/**
- * Run a function that powers an API and serialize its response according to
- * the requested response format.
- */
-export async function runFunctionAndHandleErrors<ResponseT>(
-  responseFormat: APIRouteResponseFormat,
-  func: () => Promise<ResponseT>,
-  additionalHeaders: Record<string, string> = {}
-): Promise<NextResponse> {
-  switch (responseFormat) {
-    case APIRouteResponseFormat.raw:
-      return runFunctionAndHandleErrorsRaw(func as () => Promise<RawResponse>);
-    case APIRouteResponseFormat.redirect:
-      return runFunctionAndHandleErrorsRedirect(
-        func as () => Promise<RedirectResponse>
-      );
-    case APIRouteResponseFormat.json:
-      return runFunctionAndHandleErrorsJSON(func, additionalHeaders);
-    default:
-      throw getUnreachableError(responseFormat);
-  }
-}
-
-type ResponseResult<T> =
-  | {
-      success: true;
-      data: T;
-    }
-  | {
-      success: false;
-      message: string;
-      statusCode: number;
-    };
+type MakeQueryAndPathParamsFunction<
+  TransformedQueryAndPathParamsT,
+  PathParamsT extends {} = {},
+> = (options: {
+  queryParams: Record<string, string>;
+  pathParams: PathParamsT;
+}) => TransformedQueryAndPathParamsT;
 
 /**
- * Run `func` and catch errors so callers can serialize success or failure
- * the same way.
+ * How we turn a Next.js request into the args an API function expects:
+ * path/query params plus optional auth.
  */
-async function runFunctionAndHandleErrorsBase<ResponseT>(
-  func: () => Promise<ResponseT>
-): Promise<ResponseResult<ResponseT>> {
-  try {
-    const result = await func();
-    return { success: true, data: result };
-  } catch (error) {
-    if (error instanceof ApplicationError) {
-      return {
-        success: false,
-        message: error.message,
-        statusCode: error.statusCode,
-      };
-    } else {
-      // eslint-disable-next-line no-console
-      console.error(error);
-      return {
-        success: false,
-        message: 'We ran into an unexpected error: please try again later',
-        statusCode: 500,
-      };
-    }
-  }
-}
-
 export interface MakeRequestParamsFromRequestOptions<
   TransformedQueryAndPathParamsT,
   AuthParamsT = {},
@@ -223,6 +97,29 @@ export interface MakeRequestParamsFromRequestOptions<
    * throw an ApplicationError if the user is not logged in
    */
   makeRequiredAuthParams: ((user: UserAttributes) => AuthParamsT) | undefined;
+}
+
+/**
+ * Run a function that powers an API and serialize its response according to
+ * the requested response format.
+ */
+export async function runFunctionAndHandleErrors<ResponseT>(
+  responseFormat: APIRouteResponseFormat,
+  func: () => Promise<ResponseT>,
+  additionalHeaders: Record<string, string> = {}
+): Promise<NextResponse> {
+  switch (responseFormat) {
+    case APIRouteResponseFormat.raw:
+      return runFunctionAndHandleErrorsRaw(func as () => Promise<RawResponse>);
+    case APIRouteResponseFormat.redirect:
+      return runFunctionAndHandleErrorsRedirect(
+        func as () => Promise<RedirectResponse>
+      );
+    case APIRouteResponseFormat.json:
+      return runFunctionAndHandleErrorsJSON(func, additionalHeaders);
+    default:
+      throw getUnreachableError(responseFormat);
+  }
 }
 
 /**
@@ -266,10 +163,131 @@ export async function makeRequestParamsFromRequest<
 }
 
 /**
+ * Run a function that powers an API, and return its response as JSON or
+ * an error if it fails.
+ */
+async function runFunctionAndHandleErrorsJSON<ResponseT>(
+  func: () => Promise<ResponseT>,
+  // Polling endpoints can use this to prevent stale status or edited data from
+  // being served by a browser or intermediary cache.
+  additionalHeaders: Record<string, string> = {}
+): Promise<NextResponse> {
+  const result = await runFunctionAndHandleErrorsBase(func);
+
+  if (result.success) {
+    // We can't serialize undefined, so we return null instead
+    return NextResponse.json(result.data ?? null, {
+      headers: additionalHeaders,
+    });
+  } else {
+    return NextResponse.json(
+      { success: false, message: result.message } satisfies FailureResponse,
+      { headers: additionalHeaders, status: result.statusCode }
+    );
+  }
+}
+
+/**
+ * Run a function that powers an API, and return its raw response or an
+ * error if it fails. The response is sent as-is, without JSON
+ * serialization.
+ */
+async function runFunctionAndHandleErrorsRaw<ResponseT extends RawResponse>(
+  func: () => Promise<ResponseT>
+): Promise<NextResponse> {
+  const result = await runFunctionAndHandleErrorsBase(func);
+
+  if (result.success) {
+    const responseBody =
+      typeof result.data.response === 'string'
+        ? result.data.response
+        : new Uint8Array(result.data.response);
+    return new NextResponse(responseBody, {
+      headers: {
+        'Content-Type': result.data.contentType,
+        // Merge order: primary Content-Type first, then additionalHeaders may
+        // override any key (including Content-Type)
+        // eslint-disable-next-line no-restricted-syntax
+        ...result.data.additionalHeaders,
+      },
+    });
+  } else {
+    return NextResponse.json(
+      { success: false, message: result.message } satisfies FailureResponse,
+      { status: result.statusCode }
+    );
+  }
+}
+
+/**
+ * Run a function that powers an API, and return a redirect response or an error
+ * if it fails. The response will redirect the user to the specified URL.
+ */
+async function runFunctionAndHandleErrorsRedirect<
+  ResponseT extends RedirectResponse,
+>(func: () => Promise<ResponseT>): Promise<NextResponse> {
+  const result = await runFunctionAndHandleErrorsBase(func);
+
+  if (result.success) {
+    return NextResponse.redirect(
+      result.data.redirectURL,
+      result.data.statusCode
+    );
+  } else {
+    return NextResponse.json(
+      { success: false, message: result.message } satisfies FailureResponse,
+      { status: result.statusCode }
+    );
+  }
+}
+
+type ResponseResult<T> =
+  | {
+      success: true;
+      data: T;
+    }
+  | {
+      success: false;
+      message: string;
+      statusCode: number;
+    };
+
+/**
+ * Run `func` and catch errors so callers can serialize success or failure
+ * the same way.
+ */
+async function runFunctionAndHandleErrorsBase<ResponseT>(
+  func: () => Promise<ResponseT>
+): Promise<ResponseResult<ResponseT>> {
+  try {
+    const result = await func();
+    return { success: true, data: result };
+  } catch (error) {
+    if (error instanceof ApplicationError) {
+      return {
+        success: false,
+        message: error.message,
+        statusCode: error.statusCode,
+      };
+    } else {
+      // Unexpected errors still need a server log; the client only gets a
+      // generic 500.
+      // eslint-disable-next-line no-console
+      console.error(error);
+      return {
+        success: false,
+        message: 'We ran into an unexpected error: please try again later',
+        statusCode: 500,
+      };
+    }
+  }
+}
+
+/**
  * Get the current session's logged-in user, or throw an error if not logged
  * in
  */
-export async function getLoggedInUserOrError(): Promise<UserAttributes> {
+async function getLoggedInUserOrError(): Promise<UserAttributes> {
   const authState = await getAuthState();
   if (!authState || !authState.user) {
     throw new ApplicationError(
@@ -279,11 +297,3 @@ export async function getLoggedInUserOrError(): Promise<UserAttributes> {
   }
   return authState.user;
 }
-
-type MakeQueryAndPathParamsFunction<
-  TransformedQueryAndPathParamsT,
-  PathParamsT extends {} = {},
-> = (options: {
-  queryParams: Record<string, string>;
-  pathParams: PathParamsT;
-}) => TransformedQueryAndPathParamsT;

@@ -1,12 +1,16 @@
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
-import type {
-  ManualRedactionBoundingBox,
-  RedactedGetRedactionResponse,
-  RedactionBoundingBox,
+import {
+  RedactionBoundingBoxType,
+  type ManualRedactionBoundingBox,
+  type RedactedGetRedactionResponse,
+  type RedactionBoundingBox,
 } from '../../lib/models/redactionTypes';
 import { isSameRedactionBoundingBox } from '../../lib/models/redactionBoundingBoxIdentity';
 
-/** Append newly drawn boxes to the current GET payload. */
+/**
+ * Optimistic GET payload after the user draws a box, so the preview
+ * updates before the POST returns.
+ */
 export function addBoundingBoxesToResponse(
   current: RedactedGetRedactionResponse,
   boxes: ManualRedactionBoundingBox[]
@@ -33,21 +37,25 @@ export function removeBoundingBoxesFromArray(
 }
 
 /**
- * Flip `enabled` on matching boxes in an array.
- * For example, toggling `[boxB]` in `[boxA, boxB]` changes only `boxB`.
+ * Write `enabled` on matching boxes in an array.
+ * For example, disabling `[boxB]` in `[boxA, boxB]` changes only `boxB`.
  */
-export function toggleBoundingBoxesInArray(
+export function setBoundingBoxesEnabledInArray(
   current: RedactionBoundingBox[],
-  boxes: RedactionBoundingBox[]
+  boxes: RedactionBoundingBox[],
+  enabled: boolean
 ): RedactionBoundingBox[] {
   return current.map((existing): RedactionBoundingBox =>
     boxes.some((box) => isSameRedactionBoundingBox(existing, box))
-      ? { ...existing, enabled: !existing.enabled }
+      ? { ...existing, enabled }
       : existing
   );
 }
 
-/** Drop matching boxes from the current GET payload. */
+/**
+ * Optimistic GET payload after a delete, so the list and preview drop
+ * the box before the POST returns.
+ */
 export function removeBoundingBoxesFromResponse(
   current: RedactedGetRedactionResponse,
   boxes: RedactionBoundingBox[]
@@ -62,16 +70,21 @@ export function removeBoundingBoxesFromResponse(
   return next;
 }
 
-/** Flip `enabled` on matching boxes in the current GET payload. */
-export function toggleBoundingBoxesInResponse(
+/**
+ * Optimistic GET payload after a hide/show, so the overlay updates
+ * before the POST returns.
+ */
+export function setBoundingBoxesEnabledInResponse(
   current: RedactedGetRedactionResponse,
-  boxes: RedactionBoundingBox[]
+  boxes: RedactionBoundingBox[],
+  enabled: boolean
 ): RedactedGetRedactionResponse {
   const next: RedactedGetRedactionResponse = {
     ...current,
-    redactionBoundingBoxes: toggleBoundingBoxesInArray(
+    redactionBoundingBoxes: setBoundingBoxesEnabledInArray(
       current.redactionBoundingBoxes,
-      boxes
+      boxes,
+      enabled
     ),
   };
   return next;
@@ -80,9 +93,9 @@ export function toggleBoundingBoxesInResponse(
 /** User-visible label for a suggestion row or preview highlight. */
 export function getRedactionBoxLabel(box: RedactionBoundingBox): string {
   switch (box.type) {
-    case 'automatic':
+    case RedactionBoundingBoxType.automatic:
       return box.text;
-    case 'manual':
+    case RedactionBoundingBoxType.manual:
       return 'Drawn region';
     default:
       throw getUnreachableError(box);
