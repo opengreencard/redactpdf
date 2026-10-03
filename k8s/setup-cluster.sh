@@ -81,7 +81,7 @@ function check_installs {
   fi
 }
 
-function checkDbFirewallExists {
+function checkDBFirewallExists {
   firewallID=$(doctl compute firewall list --output json \
     | jq -r --arg name "$DB_FIREWALL_NAME" \
       '.[] | select(.name == $name) | .id')
@@ -132,7 +132,7 @@ fi
 image="opengreencard/redactpdf:$REVISION"
 
 check_installs kubectl doctl docker jq helm
-checkDbFirewallExists
+checkDBFirewallExists
 
 cat <<END
 Creating DigitalOcean Kubernetes cluster:
