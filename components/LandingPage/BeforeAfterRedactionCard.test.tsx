@@ -57,20 +57,20 @@ describe('BeforeAfterRedactionCard', () => {
       </MantineProvider>
     );
 
-    const mobileImage = (): HTMLElement =>
+    const mobileStack = (): HTMLElement =>
       screen.getByTestId(_mobileSampleImageTestId);
-    expect(mobileImage().getAttribute('alt')).toBe(defaultProps.beforeAlt);
+    expect(mobileStack().getAttribute('data-side')).toBe('before');
 
     act(() => {
       jest.advanceTimersByTime(1000);
     });
-    expect(mobileImage().getAttribute('alt')).toBe(defaultProps.afterAlt);
+    expect(mobileStack().getAttribute('data-side')).toBe('after');
 
     await user.click(screen.getByTestId(_freezeAfterButtonTestId));
     act(() => {
       jest.advanceTimersByTime(2000);
     });
     // Frozen on After: another interval must not flip back to Before.
-    expect(mobileImage().getAttribute('alt')).toBe(defaultProps.afterAlt);
+    expect(mobileStack().getAttribute('data-side')).toBe('after');
   });
 });
