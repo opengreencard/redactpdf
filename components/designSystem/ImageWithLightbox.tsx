@@ -50,6 +50,10 @@ const ImageWithLightbox: React.FunctionComponent<ImageWithLightboxProps> =
             width={width}
             height={height}
             w="100%"
+            // Next needs height:auto when CSS changes width, or the still
+            // stays at the intrinsic height and mah clips the top.
+            // https://nextjs.org/docs/app/api-reference/components/image#to-maintain-aspect-ratio
+            h="auto"
             // Card stills share a height cap so the passport and 1040 line up.
             mah={360}
             fit="contain"
