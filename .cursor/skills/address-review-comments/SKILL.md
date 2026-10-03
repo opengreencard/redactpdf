@@ -33,11 +33,16 @@ Can you help address review comments for a pull request?
    IMPORTANT: Read the entire command output. Do not buffer or skip parts to save
    tokens - you need all the comments, file contents, and discussion thread IDs.
 
-2. For each discussion thread ID, create a TODO titled "Maybe create 3 TODOs for
+2. When listing threads (especially in a plan), for each thread include:
+   - A markdown link to the reviewed file, plus the GitHub `discussion_r…` URL
+   - A short quote of the current code the comment is about — not only the
+     reviewer's prose
+
+3. For each discussion thread ID, create a TODO titled "Maybe create 3 TODOs for
    discussion_thread_id <id>". Don't go straight to executing the TODOs.
    Instead, create them first.
 
-3. Then, go through each of the TODOs:
+4. Then, go through each of the TODOs:
 
    If the discussion thread's comments are:
 
@@ -53,7 +58,7 @@ Can you help address review comments for a pull request?
 
    IMPORTANT: you'll have lots of TODOs, but that's fine.
 
-4. Then, execute the TODOs to address/commit/push/reply:
+5. Then, execute the TODOs to address/commit/push/reply:
 
    - Address X comment
 

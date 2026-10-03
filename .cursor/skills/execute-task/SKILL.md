@@ -72,8 +72,9 @@ bullet in the spec already)
 - Ensure integration with existing systems
 - Follow the IOIT framework (Inputs, Outputs, Integration, Testing) from the
   task spec
-- After finishing the task, run `yarn tsc` to look for typecheck errors and
-  fix them
+- After finishing the task, run `yarn typecheck` (or
+  `yarn typecheck:files -- <changed files>` when only some files changed)
+  and fix any errors
 
 ## What the user passed in:
 
