@@ -17,7 +17,7 @@ interface LandingRedactionSample extends Pick<
  *
  * Rerun `yarn manual-jest
  * components/LandingPage/generateLandingRedactionSamples.manual.test.ts`
- * and copy the printed width/height here.
+ * and if the JPEG sizes change, update `width` and `height` here.
  */
 export const dutchPassportSample: LandingRedactionSample = {
   title: 'Dutch passport',
@@ -39,7 +39,7 @@ export const dutchPassportSample: LandingRedactionSample = {
  *
  * Rerun `yarn manual-jest
  * components/LandingPage/generateLandingRedactionSamples.manual.test.ts`
- * and copy the printed width/height here.
+ * and if the JPEG sizes change, update `width` and `height` here.
  */
 export const irs1040Sample: LandingRedactionSample = {
   title: 'IRS Form 1040',

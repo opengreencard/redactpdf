@@ -187,7 +187,12 @@ const targetDPI = 72;
 /** JPEG quality setting (0-100, lower = smaller file size) */
 const jpegQuality = 85;
 
-/** Keep rasterized buffers bounded before downstream processing releases them. */
+/**
+ * Keep rasterized buffers bounded before downstream processing releases
+ * them.
+ *
+ * Keep in sync with `flattenedPageConcurrency` in `generateRedactedPDF.ts`.
+ */
 const pdfPageBatchSize = 4;
 
 /** Keep enough pages queued for the workers without retaining the whole PDF. */

@@ -10,7 +10,8 @@ import { dutchPassportSample, irs1040Sample } from './landingRedactionSamples';
 describeManualTest(() => {
   /**
    * Regenerates `public/samples` and checks the stills. Run with:
-   * `yarn manual-jest components/LandingPage/generateLandingRedactionSamples.manual.test.ts`
+   * `yarn manual-jest
+   * components/LandingPage/generateLandingRedactionSamples.manual.test.ts`
    */
   it('writes cropped IRS samples and full Dutch passport JPEGs', async () => {
     const workspaceRoot = path.join(__dirname, '../..');
@@ -19,6 +20,7 @@ describeManualTest(() => {
       fixturesDirectory: path.join(workspaceRoot, 'lib/redaction/__testData__'),
     });
 
+    // These are the four public stills the landing cards load.
     expect(generated.map((sample) => sample.fileName)).toEqual([
       'dutch-passport-before.jpg',
       'dutch-passport-after.jpg',
@@ -48,6 +50,7 @@ describeManualTest(() => {
     expect(Math.max(dutchBefore.width, dutchBefore.height)).toBeLessThanOrEqual(
       maxLandingSampleEdgePx
     );
+    // Generated JPEG sizes must match the card constants we ship.
     expect(dutchBefore.width).toBe(dutchPassportSample.width);
     expect(dutchBefore.height).toBe(dutchPassportSample.height);
     expect(irsBefore.width).toBe(irs1040Sample.width);
@@ -101,7 +104,8 @@ interface GeneratedLandingSample {
  * - `dutchPassportSample` in `landingRedactionSamples.ts`
  * - `irs1040Sample` in `landingRedactionSamples.ts`
  *
- * After we write new files, copy the printed width/height into those objects.
+ * If the written JPEGs change size, update `width` and `height` on those
+ * objects.
  *
  * @see https://github.com/ImageOptim/ImageOptim
  */
@@ -111,28 +115,31 @@ async function generateLandingRedactionSamples({
 }: GenerateLandingRedactionSamplesOptions): Promise<GeneratedLandingSample[]> {
   await fs.mkdir(outputDirectory, { recursive: true });
 
-  const dutchSource = await fs.readFile(
-    path.join(fixturesDirectory, 'dutchPassportSpecimen.jpg')
-  );
-  const dutchAfter = await burnRedactionBoxesOnImage(
-    dutchSource,
-    TestRedactionBoundingBoxes.dutchPassportSpecimen.map((box) => box.box)
-  );
-  const irsSource = await fs.readFile(
-    path.join(fixturesDirectory, 'irs1040Scenario2.jpg')
-  );
-  const irsAfterFull = await burnRedactionBoxesOnImage(
-    irsSource,
-    TestRedactionBoundingBoxes.irs1040Scenario2.map((box) => box.box)
-  );
-  const dutchMetadata = await sharp(dutchSource).metadata();
+  // Dutch and IRS only meet when we crop the 1040 to the passport ratio.
+  const [dutchSource, irsSource] = await Promise.all([
+    fs.readFile(path.join(fixturesDirectory, 'dutchPassportSpecimen.jpg')),
+    fs.readFile(path.join(fixturesDirectory, 'irs1040Scenario2.jpg')),
+  ]);
+  const [dutchAfter, irsAfterFull, dutchMetadata] = await Promise.all([
+    burnRedactionBoxesOnImage(
+      dutchSource,
+      TestRedactionBoundingBoxes.dutchPassportSpecimen.map((box) => box.box)
+    ),
+    burnRedactionBoxesOnImage(
+      irsSource,
+      TestRedactionBoundingBoxes.irs1040Scenario2.map((box) => box.box)
+    ),
+    sharp(dutchSource).metadata(),
+  ]);
   if (!dutchMetadata.width || !dutchMetadata.height) {
     throw new Error('The Dutch passport sample is missing image dimensions.');
   }
   // Same width/height ratio as the passport so the two cards line up.
   const passportAspect = dutchMetadata.width / dutchMetadata.height;
-  const irsBefore = await cropToAspect(irsSource, passportAspect);
-  const irsAfter = await cropToAspect(irsAfterFull, passportAspect);
+  const [irsBefore, irsAfter] = await Promise.all([
+    cropToAspect(irsSource, passportAspect),
+    cropToAspect(irsAfterFull, passportAspect),
+  ]);
 
   const files: { fileName: string; bytes: Uint8Array }[] = [
     { fileName: 'dutch-passport-before.jpg', bytes: dutchSource },
@@ -160,7 +167,8 @@ async function generateLandingRedactionSamples({
 }
 
 /**
- * Fit inside `maxLandingSampleEdgePx`, then encode JPEG 85 with mozjpeg.
+ * Shrink the still so the public JPEG stays small. We encode it the same
+ * way ImageOptim's "JPEG 85%" does.
  */
 async function resizeAndCompressLandingSample(image: Uint8Array): Promise<{
   bytes: Uint8Array;
