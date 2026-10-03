@@ -40,10 +40,12 @@ import {
 } from '../../lib/config/brand';
 import { _deleteOldRedactionHoursText } from '../../lib/redaction/deleteOldRedactionHours';
 import { siteContainerSize } from '../SiteChrome/SiteChrome';
+import BeforeAfterRedactionCard from './BeforeAfterRedactionCard';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
 import LandingPageHeroDropzone from './LandingPageHeroDropzone';
 import LandingPageUploadCTA from './LandingPageUploadCTA';
 import LandingPageUploadModalProvider from './LandingPageUploadModalProvider';
+import { dutchPassportSample, irs1040Sample } from './landingRedactionSamples';
 
 export interface LandingPageInnerProps {}
 
@@ -127,9 +129,13 @@ const LandingPageBeforeAfter: React.FunctionComponent = React.memo(
           <Title order={2} ta="center">
             Before / after
           </Title>
+          {
+            // Dutch passport plus the cropped 1040 header. Desktop cards show
+            // both stills; mobile flips until the visitor freezes a side.
+          }
           <SimpleGrid cols={{ base: 1, sm: 2 }}>
-            <BeforeAfterPlaceholder title="Before" />
-            <BeforeAfterPlaceholder title="After" />
+            <BeforeAfterRedactionCard {...dutchPassportSample} />
+            <BeforeAfterRedactionCard {...irs1040Sample} />
           </SimpleGrid>
           <Text ta="center" c="dimmed">
             AI finds names, addresses, emails, SSNs, and more — you review
@@ -140,29 +146,6 @@ const LandingPageBeforeAfter: React.FunctionComponent = React.memo(
     );
   }
 );
-
-interface BeforeAfterPlaceholderProps {
-  title: string;
-}
-
-const BeforeAfterPlaceholder: React.FunctionComponent<BeforeAfterPlaceholderProps> =
-  React.memo(function BeforeAfterPlaceholder(
-    props: BeforeAfterPlaceholderProps
-  ) {
-    const { title } = props;
-
-    return (
-      <Card>
-        <Stack gap="sm">
-          <Text fw="bold">{title}</Text>
-          <Box bg="gray.1" bdrs="sm" h={220} />
-          <Text size="sm" c="dimmed">
-            Sample coming soon
-          </Text>
-        </Stack>
-      </Card>
-    );
-  });
 
 const LandingPageHowItWorks: React.FunctionComponent = React.memo(
   function LandingPageHowItWorks() {
