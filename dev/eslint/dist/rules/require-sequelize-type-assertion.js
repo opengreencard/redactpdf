@@ -6,8 +6,9 @@ const util_1 = require("../util");
  * Requires typed results when Sequelize queries select a subset of columns.
  *
  * A query with `attributes` can no longer safely be treated as a complete model
- * instance. The fixer expresses that subset with `PartialInstance` and keeps
- * Sequelize's nullable result for `findOne` and `findByPk`.
+ * instance. The fixer expresses that subset with `PartialInstance`, keeps
+ * Sequelize's nullable result for `findOne` and `findByPk`, and preserves the
+ * promise when the query is not awaited.
  */
 exports.default = (0, util_1.createRule)({
     name: 'require-sequelize-type-assertion',
@@ -41,9 +42,10 @@ exports.default = (0, util_1.createRule)({
                 if (!attributesProperty && !hasIdentifierSpread)
                     return;
                 const { parent } = node;
+                const isAwaited = parent.type === utils_1.AST_NODE_TYPES.AwaitExpression;
                 const isAsserted = parent.type === utils_1.AST_NODE_TYPES.TSAsExpression ||
                     parent.type === utils_1.AST_NODE_TYPES.TSTypeAssertion ||
-                    (parent.type === utils_1.AST_NODE_TYPES.AwaitExpression &&
+                    (isAwaited &&
                         (parent.parent?.type === utils_1.AST_NODE_TYPES.TSAsExpression ||
                             parent.parent?.type === utils_1.AST_NODE_TYPES.TSTypeAssertion));
                 if (isAsserted)
@@ -52,16 +54,20 @@ exports.default = (0, util_1.createRule)({
                     node,
                     messageId: 'requireSequelizeTypeAssertion',
                     fix: attributesProperty
-                        ? (fixer) => buildFixes(context, fixer, node, attributesProperty)
+                        ? (fixer) => buildFixes({
+                            context,
+                            fixer,
+                            node,
+                            attributesProperty,
+                            isAwaited,
+                        })
                         : undefined,
                 });
             },
         };
     },
 });
-// TODO: Use a keyed parameter object now that max-params is 2.
-// eslint-disable-next-line max-params
-function buildFixes(context, fixer, node, attributesProperty) {
+function buildFixes({ context, fixer, node, attributesProperty, isAwaited, }) {
     if (node.callee.type !== utils_1.AST_NODE_TYPES.MemberExpression ||
         node.callee.object.type !== utils_1.AST_NODE_TYPES.Identifier ||
         node.callee.property.type !== utils_1.AST_NODE_TYPES.Identifier) {
@@ -93,11 +99,14 @@ function buildFixes(context, fixer, node, attributesProperty) {
     if (!hasPartialInstanceImport && modelIndex !== -1) {
         fixes.push(fixer.insertTextBefore(modelImport, `import { PartialInstance } from '${importPath.slice(0, modelIndex)}/db/types';\n`));
     }
-    const assertion = `PartialInstance<${attributesName}, ${attributeNames.join(' | ')}>`;
+    const partialInstance = `PartialInstance<${attributesName}, ${attributeNames.join(' | ')}>`;
     const nullable = ['findOne', 'findByPk'].includes(node.callee.property.name)
         ? ` | null`
         : '[]';
-    fixes.push(fixer.insertTextAfter(node, ` as ${assertion}${nullable}`));
+    const assertion = isAwaited
+        ? `${partialInstance}${nullable}`
+        : `Promise<${partialInstance}${nullable}>`;
+    fixes.push(fixer.insertTextAfter(node, ` as ${assertion}`));
     return fixes;
 }
 function getAttributeNames(value) {

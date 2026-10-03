@@ -7,7 +7,9 @@ ruleTester.run('require-sequelize-type-assertion', rule, {
       code: `
         import User, { UserAttributes } from '@/lib/models/User';
         import { PartialInstance } from '@/lib/db/types';
-        User.findAll({ attributes: ['id'] }) as PartialInstance<UserAttributes, 'id'>[];
+        User.findAll({ attributes: ['id'] }) as Promise<
+          PartialInstance<UserAttributes, 'id'>[]
+        >;
       `,
     },
   ],
@@ -16,7 +18,13 @@ ruleTester.run('require-sequelize-type-assertion', rule, {
       code: "import User from '@/lib/models/User';\nUser.findAll({ attributes: ['id', 'email'] });",
       errors: [{ messageId: 'requireSequelizeTypeAssertion' }],
       output:
-        "import { UserAttributes } from '@/lib/models/User';\nimport { PartialInstance } from '@/lib/db/types';\nimport User from '@/lib/models/User';\nUser.findAll({ attributes: ['id', 'email'] }) as PartialInstance<UserAttributes, 'id' | 'email'>[];",
+        "import { UserAttributes } from '@/lib/models/User';\nimport { PartialInstance } from '@/lib/db/types';\nimport User from '@/lib/models/User';\nUser.findAll({ attributes: ['id', 'email'] }) as Promise<PartialInstance<UserAttributes, 'id' | 'email'>[]>;",
+    },
+    {
+      code: "import User from '@/lib/models/User';\nconst userPromise = User.findByPk(1, { attributes: ['id'] });",
+      errors: [{ messageId: 'requireSequelizeTypeAssertion' }],
+      output:
+        "import { UserAttributes } from '@/lib/models/User';\nimport { PartialInstance } from '@/lib/db/types';\nimport User from '@/lib/models/User';\nconst userPromise = User.findByPk(1, { attributes: ['id'] }) as Promise<PartialInstance<UserAttributes, 'id'> | null>;",
     },
     {
       code: `

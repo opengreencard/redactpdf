@@ -113,7 +113,7 @@ describe(deleteOldRedactions, () => {
     await expect(
       Redaction.findByPk(redaction.id, {
         attributes: ['id'],
-      }) as PartialInstance<RedactionAttributes, 'id'> | null
+      }) as Promise<PartialInstance<RedactionAttributes, 'id'> | null>
     ).resolves.toMatchObject({ id: redaction.id });
   });
 });
