@@ -19,6 +19,7 @@ describeManualTest(() => {
         ),
       });
 
+      // One before/after pair for each landing card, JPEG or PNG.
       expect(generated.map((sample) => sample.fileName)).toEqual([
         expect.stringMatching(/^dutch-passport-before\.(jpg|png)$/),
         expect.stringMatching(/^dutch-passport-after\.(jpg|png)$/),
@@ -40,6 +41,7 @@ describeManualTest(() => {
         dutchBefore.width / dutchBefore.height,
         3
       );
+      // Both cards must fit inside the 1280px public-still budget.
       expect(Math.max(irsBefore.width, irsBefore.height)).toBeLessThanOrEqual(
         1280
       );

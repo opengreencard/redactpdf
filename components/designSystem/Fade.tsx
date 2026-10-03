@@ -8,7 +8,7 @@ export interface FadeProps {
   /** When false, the child stays mounted at opacity 0. */
   visible: boolean;
   children: React.ReactNode;
-  /** Skip the animation when the OS asks for reduced motion. */
+  /** Fade length in ms. We ignore this when the OS wants less motion. */
   durationMs?: number;
 }
 

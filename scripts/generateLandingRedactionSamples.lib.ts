@@ -26,12 +26,15 @@ interface GeneratedLandingSample {
  * the Dutch passport's width/height ratio so the two cards match. The 1040
  * is a bit wider, so we keep the full height and trim the sides.
  *
- * Each still is then fit inside 1280×1280 and encoded as both JPEG 85
- * (mozjpeg) and PNG; we keep whichever file is smaller.
+ * Each still is then fit inside `maxLandingSampleEdgePx` and encoded as
+ * both JPEG 85 (mozjpeg) and PNG; we keep whichever file is smaller.
  *
- * Keep in sync with `dutchPassportSample` and `irs1040Sample` in
- * `landingRedactionSamples.ts`. After we write new files, copy the printed
- * width/height and file names into those objects.
+ * Keep in sync with:
+ * - `dutchPassportSample` in `landingRedactionSamples.ts`
+ * - `irs1040Sample` in `landingRedactionSamples.ts`
+ *
+ * After we write new files, copy the printed width/height and file names
+ * into those objects.
  */
 export async function generateLandingRedactionSamples({
   outputDirectory,
@@ -95,7 +98,8 @@ export async function generateLandingRedactionSamples({
 }
 
 /**
- * Fit inside 1280×1280, then pick the smaller of JPEG 85 and PNG.
+ * Fit inside `maxLandingSampleEdgePx`, then pick the smaller of JPEG 85
+ * and PNG.
  *
  * Photos usually win as JPEG. A sparse form can win as PNG, so we encode
  * both and keep the smaller file. mozjpeg is the same encoder ImageOptim

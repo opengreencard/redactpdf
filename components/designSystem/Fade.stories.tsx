@@ -6,7 +6,7 @@ import Button from './Button/Button';
 import Fade from './Fade';
 
 interface StoryWrapperProps {
-  /** Start faded in so we can click Hide and watch the opacity drop. */
+  /** Seed the toggle. True starts faded in so we can click Fade out. */
   initialVisible: boolean;
 }
 

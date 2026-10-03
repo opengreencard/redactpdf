@@ -14,7 +14,7 @@ export interface ImageWithLightboxProps {
   height: number;
   /** Caption under the fullscreen slide, or null when the slide has none. */
   caption: string | null;
-  /** Test id on the thumbnail, or null when this still is not queried. */
+  /** Test ID on the thumbnail, or null when this still is not queried. */
   imageTestId: string | null;
 }
 
@@ -41,6 +41,10 @@ const ImageWithLightbox: React.FunctionComponent<ImageWithLightboxProps> =
       <>
         <ButtonDiv
           className={classes.imageButton}
+          // Block so the thumbnail fills the column. ButtonDiv omits
+          // `style`, so we use the Mantine display prop instead of the
+          // hover CSS module.
+          display="block"
           onClick={openLightbox}
           aria-label={`Open ${caption ?? alt} fullscreen`}
         >
@@ -54,7 +58,8 @@ const ImageWithLightbox: React.FunctionComponent<ImageWithLightboxProps> =
             // stays at the intrinsic height and mah clips the top.
             // https://nextjs.org/docs/app/api-reference/components/image#to-maintain-aspect-ratio
             h="auto"
-            // Card stills share a height cap so the passport and 1040 line up.
+            // Cap thumbnail height so cards in a row line up even when
+            // the stills have different pixel sizes.
             mah={360}
             fit="contain"
             radius="sm"

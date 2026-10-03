@@ -1,4 +1,3 @@
-import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import sharp from 'sharp';
 import { promiseAllThrottled } from '../../lib/utilities/promiseAllThrottled';
@@ -11,6 +10,10 @@ describe('landing redaction samples', () => {
   it.each([dutchPassportSample, irs1040Sample])(
     'keeps $title stills inside 1280px and matching the card size',
     async (sample) => {
+      // The card's published size must stay inside the public still budget.
+      expect(sample.width).toBeLessThanOrEqual(maxLandingSampleEdgePx);
+      expect(sample.height).toBeLessThanOrEqual(maxLandingSampleEdgePx);
+
       const stills = [sample.beforeSrc, sample.afterSrc];
       await promiseAllThrottled(
         stills.map((src) => async () => {
@@ -19,12 +22,10 @@ describe('landing redaction samples', () => {
             '../../public',
             src.replace(/^\//, '')
           );
-          await fs.access(imagePath);
           const metadata = await sharp(imagePath).metadata();
+          // Each still must exist at the card's published size.
           expect(metadata.width).toBe(sample.width);
           expect(metadata.height).toBe(sample.height);
-          expect(metadata.width).toBeLessThanOrEqual(maxLandingSampleEdgePx);
-          expect(metadata.height).toBeLessThanOrEqual(maxLandingSampleEdgePx);
         }),
         2
       );

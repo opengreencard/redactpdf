@@ -20,17 +20,20 @@ describe(generateRedactedPDF, () => {
     );
   }, 30000);
 
+  // One enabled page and one skipped page cover flatten-vs-copy. Extra
+  // boxes or real IRS coordinates do not change that path: any enabled
+  // box rasterizes the whole page.
   it('returns a PDF that keeps page count and skips disabled boxes', async () => {
     const result = await generateRedactedPDF({
       pdf: sourcePDF,
       redactionBoundingBoxes: [
-        // Any enabled box flattens the page, so default coordinates are
-        // enough. We only care that page 1 is enabled and page 2 is not.
+        // Default coordinates are enough. We only care that page 1 is
+        // enabled and page 2 is not.
         ClientFakeData.makeAutoRedactionBoundingBox({
           page: 1,
           enabled: true,
         }),
-        ClientFakeData.makeManualRedactionBoundingBox({
+        ClientFakeData.makeAutoRedactionBoundingBox({
           page: 2,
           enabled: false,
         }),
@@ -49,6 +52,8 @@ describe(generateRedactedPDF, () => {
     expect(pageTexts[1]).toContain('Form 1040');
   }, 30000);
 
+  // Flatten-vs-copy is covered above. This case burns the recorded 1040
+  // boxes so we know the real SSN and address strings are gone.
   it('removes selectable text on pages with enabled boxes', async () => {
     const result = await generateRedactedPDF({
       pdf: sourcePDF,

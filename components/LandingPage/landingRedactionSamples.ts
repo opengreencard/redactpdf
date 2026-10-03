@@ -11,9 +11,12 @@ interface LandingRedactionSample extends Pick<
 /**
  * Dutch passport stills for the landing before/after card.
  *
- * Keep in sync with `generateLandingRedactionSamples`: rerun
- * `yarn swc-node scripts/generateLandingRedactionSamples.ts` and copy the
- * printed width/height and file names here.
+ * Keep in sync with:
+ * - `irs1040Sample` in this file
+ * - `generateLandingRedactionSamples`
+ *
+ * Rerun `yarn swc-node scripts/generateLandingRedactionSamples.ts` and
+ * copy the printed width/height and file names here.
  */
 export const dutchPassportSample: LandingRedactionSample = {
   title: 'Dutch passport',
@@ -29,8 +32,12 @@ export const dutchPassportSample: LandingRedactionSample = {
 /**
  * IRS 1040 stills cropped to the Dutch passport aspect ratio.
  *
- * Keep in sync with `generateLandingRedactionSamples` (same as
- * `dutchPassportSample`).
+ * Keep in sync with:
+ * - `dutchPassportSample` in this file
+ * - `generateLandingRedactionSamples`
+ *
+ * Rerun `yarn swc-node scripts/generateLandingRedactionSamples.ts` and
+ * copy the printed width/height and file names here.
  */
 export const irs1040Sample: LandingRedactionSample = {
   title: 'IRS Form 1040',

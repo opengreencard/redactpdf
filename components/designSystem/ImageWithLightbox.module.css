@@ -1,6 +1,4 @@
 .imageButton {
-  display: block;
-  opacity: 1;
   transition: opacity 150ms ease;
 }
 
