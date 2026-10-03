@@ -462,10 +462,9 @@ const RedactionPreviewPages = forwardRef<
         ref={containerRef}
         flex={1}
         mih={0}
-        // Sit the first page flush against the toolbar and the left pane.
-        // Extra canvas padding was reading as leftover chrome around the
-        // document.
-        p={0}
+        // Keep this padding inside the scrollable canvas so it moves away
+        // with the pages instead of becoming fixed viewer chrome.
+        p="xs"
         bg="gray.2"
         style={{ overflow: 'auto' }}
       >
