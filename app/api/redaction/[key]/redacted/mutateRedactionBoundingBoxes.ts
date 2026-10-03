@@ -47,6 +47,7 @@ export interface SetRedactionBoundingBoxEnabledMutation extends LocateRedactionB
   enabled: boolean;
 }
 
+/** One add, delete, or enabled-state change in a redaction update. */
 export type RedactionBoundingBoxMutation =
   | AddRedactionBoundingBoxMutation
   | DeleteRedactionBoundingBoxMutation
@@ -61,11 +62,13 @@ export interface MutateRedactionBoundingBoxesRequest {
   mutations: RedactionBoundingBoxMutation[];
 }
 
+/** Path parameters extracted from the redaction URL. */
 export type MutateRedactionBoundingBoxesPathParams = Pick<
   MutateRedactionBoundingBoxesRequest,
   'key'
 >;
 
+/** JSON body containing the mutations to apply. */
 export type MutateRedactionBoundingBoxesBody = Omit<
   MutateRedactionBoundingBoxesRequest,
   'key'

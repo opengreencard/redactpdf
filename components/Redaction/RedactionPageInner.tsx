@@ -43,7 +43,7 @@ export interface RedactionPageInnerProps extends RedactionPreviewPagesPassThroug
   isLoggedIn: boolean;
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
 }
 
 /**
@@ -59,7 +59,7 @@ const RedactionPageInner: React.FunctionComponent<RedactionPageInnerProps> =
       isLoggedIn,
       onAddBoundingBox,
       onDeleteBoundingBoxes,
-      onToggleBoundingBoxes,
+      onEnabledChange,
       getUrlForRedactionImageForTesting,
     } = props;
     const view = getRedactionPageView(redactionState);
@@ -84,7 +84,7 @@ const RedactionPageInner: React.FunctionComponent<RedactionPageInnerProps> =
             redactionState={redactionState}
             onAddBoundingBox={onAddBoundingBox}
             onDeleteBoundingBoxes={onDeleteBoundingBoxes}
-            onToggleBoundingBoxes={onToggleBoundingBoxes}
+            onEnabledChange={onEnabledChange}
             getUrlForRedactionImageForTesting={
               getUrlForRedactionImageForTesting
             }
@@ -118,7 +118,7 @@ interface RedactionPageViewBodyProps {
   redactionState: APICallState<GetRedactionResponse> | null;
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
   getUrlForRedactionImageForTesting: typeof getRedactionImageUrl | undefined;
 }
 
@@ -130,7 +130,7 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
       redactionState,
       onAddBoundingBox,
       onDeleteBoundingBoxes,
-      onToggleBoundingBoxes,
+      onEnabledChange,
       getUrlForRedactionImageForTesting,
     } = props;
     const redactionPreviewPagesRef = useRef<RedactionPreviewPagesRef>(null);
@@ -155,9 +155,8 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
     const onDeleteBoundingBox = useConvertSingleArgumentToArray(
       onDeleteBoundingBoxes
     );
-    const onToggleBoundingBox = useConvertSingleArgumentToArray(
-      onToggleBoundingBoxes
-    );
+    const onEnabledChangeForBox =
+      useConvertSingleArgumentToArray(onEnabledChange);
 
     switch (view) {
       case RedactionPageView.loading: {
@@ -214,7 +213,7 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                     redaction={redaction}
                     onRedactionClick={handleRedactionClick}
                     onDeleteBoundingBoxes={onDeleteBoundingBoxes}
-                    onToggleBoundingBoxes={onToggleBoundingBoxes}
+                    onEnabledChange={onEnabledChange}
                   />
                 </Box>
               </GridCol>
@@ -237,7 +236,7 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                   redactionResponse={redaction}
                   onAddBoundingBox={onAddBoundingBox}
                   onDeleteBoundingBox={onDeleteBoundingBox}
-                  onToggleBoundingBox={onToggleBoundingBox}
+                  onEnabledChange={onEnabledChangeForBox}
                   redactionPreviewPagesRef={redactionPreviewPagesRef}
                   getUrlForRedactionImageForTesting={
                     getUrlForRedactionImageForTesting

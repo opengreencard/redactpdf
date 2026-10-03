@@ -26,7 +26,7 @@ export interface RedactionBoundingBoxListProps {
   redactionBoundingBoxes: RedactionBoundingBox[];
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
 }
 
 /**
@@ -41,7 +41,7 @@ const RedactionBoundingBoxList: React.FunctionComponent<RedactionBoundingBoxList
       redactionBoundingBoxes,
       onRedactionClick,
       onDeleteBoundingBoxes,
-      onToggleBoundingBoxes,
+      onEnabledChange,
     } = props;
     const groups = _groupRedactionBoundingBoxes(redactionBoundingBoxes);
 
@@ -53,7 +53,7 @@ const RedactionBoundingBoxList: React.FunctionComponent<RedactionBoundingBoxList
             group={group}
             onRedactionClick={onRedactionClick}
             onDeleteBoundingBoxes={onDeleteBoundingBoxes}
-            onToggleBoundingBoxes={onToggleBoundingBoxes}
+            onEnabledChange={onEnabledChange}
           />
         ))}
       </Stack>
@@ -101,26 +101,21 @@ interface RedactionTypeGroupProps {
   group: RedactionBoxOccurrenceGroup;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
 }
 
 /** Renders a type header and its matched-value groups. */
 const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
   React.memo(function RedactionTypeGroup(props: RedactionTypeGroupProps) {
-    const {
-      group,
-      onRedactionClick,
-      onDeleteBoundingBoxes,
-      onToggleBoundingBoxes,
-    } = props;
+    const { group, onRedactionClick, onDeleteBoundingBoxes, onEnabledChange } =
+      props;
     const boxes = getGroupBoxes(group);
     const areAllDisabled = areAllBoxesDisabled(boxes);
     const onDeleteBoundingBoxesWithPrefix = useCallbackWithPrefix<
       [RedactionBoundingBox[]]
     >(onDeleteBoundingBoxes);
-    const onToggleBoundingBoxesWithPrefix = useCallbackWithPrefix<
-      [RedactionBoundingBox[]]
-    >(onToggleBoundingBoxes);
+    const onEnabledChangeWithPrefix =
+      useCallbackWithPrefix<[RedactionBoundingBox[]]>(onEnabledChange);
 
     return (
       <Stack gap={0}>
@@ -133,9 +128,7 @@ const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
           testIdSuffix={_makeTypeTestIdSuffix(group.dataType)}
           onRedactionClick={null}
           onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix(boxes)}
-          onToggleBoundingBox={onToggleBoundingBoxesWithPrefix(
-            getBoxesToToggle(boxes)
-          )}
+          onEnabledChange={onEnabledChangeWithPrefix(getBoxesToToggle(boxes))}
         />
         {group.values.map((valueGroup) => (
           <RedactionValueGroup
@@ -144,7 +137,7 @@ const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
             groupDataType={group.dataType}
             onRedactionClick={onRedactionClick}
             onDeleteBoundingBoxes={onDeleteBoundingBoxes}
-            onToggleBoundingBoxes={onToggleBoundingBoxes}
+            onEnabledChange={onEnabledChange}
           />
         ))}
       </Stack>
@@ -156,7 +149,7 @@ interface RedactionValueGroupProps {
   groupDataType: RedactionListDataType;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
-  onToggleBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
+  onEnabledChange: (boxes: RedactionBoundingBox[]) => unknown;
 }
 
 /** Renders a matched value and its page-level occurrences. */
@@ -167,7 +160,7 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
       groupDataType,
       onRedactionClick,
       onDeleteBoundingBoxes,
-      onToggleBoundingBoxes,
+      onEnabledChange,
     } = props;
     const areAllDisabled = areAllBoxesDisabled(valueGroup.occurrences);
     const occurrencesByPage = _.groupBy(
@@ -179,9 +172,8 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
     const onDeleteBoundingBoxesWithPrefix = useCallbackWithPrefix<
       [RedactionBoundingBox[]]
     >(onDeleteBoundingBoxes);
-    const onToggleBoundingBoxesWithPrefix = useCallbackWithPrefix<
-      [RedactionBoundingBox[]]
-    >(onToggleBoundingBoxes);
+    const onEnabledChangeWithPrefix =
+      useCallbackWithPrefix<[RedactionBoundingBox[]]>(onEnabledChange);
 
     return (
       <Stack gap={0}>
@@ -195,7 +187,7 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
           onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix(
             valueGroup.occurrences
           )}
-          onToggleBoundingBox={onToggleBoundingBoxesWithPrefix(
+          onEnabledChange={onEnabledChangeWithPrefix(
             getBoxesToToggle(valueGroup.occurrences)
           )}
         />
@@ -212,7 +204,7 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
               )}
               onRedactionClick={onRedactionClickWithPrefix(box)}
               onDeleteBoundingBox={onDeleteBoundingBoxesWithPrefix([box])}
-              onToggleBoundingBox={onToggleBoundingBoxesWithPrefix([box])}
+              onEnabledChange={onEnabledChangeWithPrefix([box])}
             />
           ))
         )}
@@ -229,7 +221,7 @@ interface RedactionRowProps {
   testIdSuffix: string;
   onRedactionClick: (() => unknown) | null;
   onDeleteBoundingBox: () => unknown;
-  onToggleBoundingBox: () => unknown;
+  onEnabledChange: () => unknown;
 }
 
 type RedactionRowIndent = 0 | 1 | 2;
@@ -246,7 +238,7 @@ const RedactionRow: React.FunctionComponent<RedactionRowProps> = React.memo(
       testIdSuffix,
       onRedactionClick,
       onDeleteBoundingBox,
-      onToggleBoundingBox,
+      onEnabledChange,
     } = props;
     const rowContent = (
       <Group
@@ -286,7 +278,7 @@ const RedactionRow: React.FunctionComponent<RedactionRowProps> = React.memo(
           isEnabled={isEnabled}
           onViewRedactionClick={onRedactionClick}
           onDelete={onDeleteBoundingBox}
-          onToggle={onToggleBoundingBox}
+          onEnabledChange={onEnabledChange}
         />
       </Group>
     );
@@ -307,7 +299,7 @@ interface RedactionBoxActionsProps {
   isEnabled: boolean;
   onViewRedactionClick: (() => unknown) | null;
   onDelete: () => unknown;
-  onToggle: () => unknown;
+  onEnabledChange: () => unknown;
 }
 
 /** Renders bulk-aware view, toggle, and delete controls. */
@@ -318,10 +310,10 @@ const RedactionBoxActions: React.FunctionComponent<RedactionBoxActionsProps> =
       isEnabled,
       onViewRedactionClick,
       onDelete,
-      onToggle,
+      onEnabledChange,
     } = props;
     const handleView = useStopPropagation(onViewRedactionClick);
-    const handleToggle = useStopPropagation(onToggle);
+    const handleEnabledChange = useStopPropagation(onEnabledChange);
     const handleDelete = useStopPropagation(onDelete);
 
     return (
@@ -339,7 +331,7 @@ const RedactionBoxActions: React.FunctionComponent<RedactionBoxActionsProps> =
         <ActionIcon
           tooltip="Toggle on/off"
           variant="subtle"
-          onClick={handleToggle}
+          onClick={handleEnabledChange}
           data-testid={_makeRedactionPanelToggleTestId(testIdSuffix)}
         >
           <FontAwesomeIcon icon={isEnabled ? faEye : faEyeSlash} />

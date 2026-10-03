@@ -35,6 +35,13 @@ type MakeAPIRouteWithoutBodyAuthQueryPathOptions<
  * Named slots for `makeAPIRouteWithoutBody` type parameters so call sites can
  * write `Route['queryAndPathParams']` instead of remembering the generic
  * order.
+ *
+ * Without this helper:
+ * `makeAPIRouteWithoutBody<Params, Response, Auth, Path>(...)`
+ *
+ * With it:
+ * `makeAPIRouteWithoutBody<Route['queryAndPathParams'], Route['response'],`
+ * `Route['authParams'], Route['pathParams']>(...)`
  */
 export interface MakeAPIRouteWithoutBodyTypes<
   QueryAndPathParamsT,
@@ -67,8 +74,6 @@ export interface MakeAPIRouteWithoutBodyTypes<
  * });
  * ```
  */
-
-// Start overloads
 
 export function makeAPIRouteWithoutBody<
   TransformedQueryAndPathParamsT,
@@ -138,8 +143,6 @@ export function makeAPIRouteWithoutBody<
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
-
-// End overloads
 
 export function makeAPIRouteWithoutBody<
   TransformedQueryAndPathParamsT,

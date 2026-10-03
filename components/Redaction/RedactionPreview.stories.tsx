@@ -49,7 +49,7 @@ const StoryWrapper: React.FunctionComponent<StoryProps> = React.memo(
       },
       []
     );
-    const handleToggle = useMemoizedCallback(
+    const handleEnabledChange = useMemoizedCallback(
       (boxesToToggle: RedactionBoundingBox[]): void => {
         setBoxes((current) =>
           toggleBoundingBoxesInArray(current, boxesToToggle)
@@ -58,7 +58,8 @@ const StoryWrapper: React.FunctionComponent<StoryProps> = React.memo(
       []
     );
     const onDeleteBoundingBox = useConvertSingleArgumentToArray(handleDelete);
-    const onToggleBoundingBox = useConvertSingleArgumentToArray(handleToggle);
+    const onEnabledChangeForBox =
+      useConvertSingleArgumentToArray(handleEnabledChange);
     const previewProps: RedactionPreviewProps = {
       redactionKey,
       redactionResponse: makeStorybookRedactedResponse({
@@ -66,7 +67,7 @@ const StoryWrapper: React.FunctionComponent<StoryProps> = React.memo(
       }),
       onAddBoundingBox: handleAdd,
       onDeleteBoundingBox,
-      onToggleBoundingBox,
+      onEnabledChange: onEnabledChangeForBox,
       getUrlForRedactionImageForTesting: getStorybookRedactionImageUrl,
       initialIsRedactingForTesting,
     };

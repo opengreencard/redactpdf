@@ -92,7 +92,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       },
       []
     );
-    const handleToggle = useMemoizedCallback(
+    const handleBoundingBoxesEnabledChange = useMemoizedCallback(
       (boxes: RedactionBoundingBox[]) => {
         setRedaction((current) =>
           toggleBoundingBoxesInResponse(current, boxes)
@@ -105,7 +105,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       redaction,
       onRedactionClick,
       onDeleteBoundingBoxes: handleDelete,
-      onToggleBoundingBoxes: handleToggle,
+      onEnabledChange: handleBoundingBoxesEnabledChange,
     };
 
     // Keep the story focused on the rail while preserving readable values.

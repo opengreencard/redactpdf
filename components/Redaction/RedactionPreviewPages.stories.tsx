@@ -32,7 +32,7 @@ const defaultProps: RedactionPreviewPagesProps = {
   zoomPercent: 42,
   onRedact: null,
   onDeleteBoundingBox: makeFakeHandler('onDeleteBoundingBox'),
-  onToggleBoundingBox: makeFakeHandler('onToggleBoundingBox'),
+  onEnabledChange: makeFakeHandler('onEnabledChange'),
   getUrlForRedactionImageForTesting: getStorybookRedactionImageUrl,
 };
 
@@ -73,14 +73,15 @@ const DrawModeTemplate: StoryFn<DrawModeStoryProps> = (args) => {
     },
     []
   );
-  const handleToggle = useMemoizedCallback(
+  const handleEnabledChange = useMemoizedCallback(
     (boxesToToggle: RedactionBoundingBox[]): void => {
       setBoxes((current) => toggleBoundingBoxesInArray(current, boxesToToggle));
     },
     []
   );
   const onDeleteBoundingBox = useConvertSingleArgumentToArray(handleDelete);
-  const onToggleBoundingBox = useConvertSingleArgumentToArray(handleToggle);
+  const onEnabledChangeForBox =
+    useConvertSingleArgumentToArray(handleEnabledChange);
   return (
     <Stack h="80vh">
       <Text>Draw a rectangle on a page to add a manual redaction.</Text>
@@ -94,7 +95,7 @@ const DrawModeTemplate: StoryFn<DrawModeStoryProps> = (args) => {
         zoomPercent={zoomPercent}
         onRedact={handleRedact}
         onDeleteBoundingBox={onDeleteBoundingBox}
-        onToggleBoundingBox={onToggleBoundingBox}
+        onEnabledChange={onEnabledChangeForBox}
         getUrlForRedactionImageForTesting={getStorybookRedactionImageUrl}
       />
     </Stack>

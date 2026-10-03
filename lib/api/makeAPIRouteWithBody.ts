@@ -37,6 +37,13 @@ type MakeAPIRouteWithBodyAuthQueryPathOptions<
 /**
  * Named slots for `makeAPIRouteWithBody` type parameters so call sites can
  * write `Route['requestBody']` instead of remembering the generic order.
+ *
+ * Without this helper:
+ * `makeAPIRouteWithBody<Body, Params, Response, Auth, Path>(...)`
+ *
+ * With it:
+ * `makeAPIRouteWithBody<Route['requestBody'], Route['queryAndPathParams'],`
+ * `Route['response'], Route['authParams'], Route['pathParams']>(...)`
  */
 export interface MakeAPIRouteWithBodyTypes<
   RequestBodyT,
@@ -66,8 +73,6 @@ export interface MakeAPIRouteWithBodyTypes<
  *   `RedirectResponse`.
  */
 
-// Start overloads
-
 export function makeAPIRouteWithBody<
   RequestBodyT,
   TransformedQueryAndPathParamsT,
@@ -217,8 +222,6 @@ export function makeAPIRouteWithBody<
   AuthParamsT,
   PathParamsT
 >): AppRouteHandlerFn;
-
-// End overloads
 
 export function makeAPIRouteWithBody<
   RequestBodyT,

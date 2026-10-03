@@ -60,7 +60,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       },
       []
     );
-    const handleToggle = useMemoizedCallback(
+    const handleBoundingBoxesEnabledChange = useMemoizedCallback(
       (boxesToToggle: RedactionBoundingBox[]) => {
         setBoxes((current) =>
           toggleBoundingBoxesInArray(current, boxesToToggle)
@@ -72,7 +72,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       redactionBoundingBoxes: boxes,
       onRedactionClick,
       onDeleteBoundingBoxes: handleDelete,
-      onToggleBoundingBoxes: handleToggle,
+      onEnabledChange: handleBoundingBoxesEnabledChange,
     };
 
     return (

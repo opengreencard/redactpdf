@@ -30,16 +30,9 @@ export const POST = makeAPIRouteWithBody<
 >({
   method: 'POST',
   apiFunc: mutateRedactionBoundingBoxes,
-  makeQueryAndPathParams: keyFromPath,
-});
-
-function keyFromPath({
-  pathParams,
-}: {
-  pathParams: MutateRedactionBoundingBoxesPathParams;
-}): MutateRedactionBoundingBoxesPathParams {
-  const params: MutateRedactionBoundingBoxesPathParams = {
+  makeQueryAndPathParams: ({
+    pathParams,
+  }): MutateRedactionBoundingBoxesPathParams => ({
     key: pathParams.key,
-  };
-  return params;
-}
+  }),
+});

@@ -14,7 +14,6 @@ import {
 } from '../../lib/models/redactionTypes';
 import ClientFakeData from '../../lib/testUtilities/ClientFakeData';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
-import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import RedactionPageInner from './RedactionPageInner';
 import {
   addBoundingBoxesToResponse,
@@ -83,16 +82,13 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       []
     );
 
-    const handleAddBoundingBoxes = useMemoizedCallback(
-      (boxes: ManualRedactionBoundingBox[]) => {
+    const handleAddBoundingBox = useMemoizedCallback(
+      (box: ManualRedactionBoundingBox) => {
         updateRedaction((current) =>
-          addBoundingBoxesToResponse(current, boxes)
+          addBoundingBoxesToResponse(current, [box])
         );
       },
       [updateRedaction]
-    );
-    const handleAddBoundingBox = useConvertSingleArgumentToArray(
-      handleAddBoundingBoxes
     );
     const handleDeleteBoundingBoxes = useMemoizedCallback(
       (boxes: RedactionBoundingBox[]) => {
@@ -102,7 +98,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       },
       [updateRedaction]
     );
-    const handleToggleBoundingBoxes = useMemoizedCallback(
+    const handleBoundingBoxesEnabledChange = useMemoizedCallback(
       (boxes: RedactionBoundingBox[]) => {
         updateRedaction((current) =>
           toggleBoundingBoxesInResponse(current, boxes)
@@ -117,7 +113,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
         isLoggedIn={false}
         onAddBoundingBox={handleAddBoundingBox}
         onDeleteBoundingBoxes={handleDeleteBoundingBoxes}
-        onToggleBoundingBoxes={handleToggleBoundingBoxes}
+        onEnabledChange={handleBoundingBoxesEnabledChange}
         getUrlForRedactionImageForTesting={getStorybookRedactionImageUrl}
       />
     );

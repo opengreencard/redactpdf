@@ -3,7 +3,6 @@ import type { GetRedactionResponse } from '../../../lib/models/redactionTypes';
 import type {
   MutateRedactionBoundingBoxesBody,
   MutateRedactionBoundingBoxesPathParams,
-  MutateRedactionBoundingBoxesRequest,
 } from '../../../app/api/redaction/[key]/redacted/mutateRedactionBoundingBoxes';
 import {
   ClientAPIRouteWithBodyData,
@@ -60,9 +59,6 @@ export const generateRedactedPDFClient = makeClientAPIRouteWithoutBody<
   }),
   responseType: 'arraybuffer',
 });
-
-export type MutateRedactionBoundingBoxesClientRequest =
-  MutateRedactionBoundingBoxesRequest;
 
 /**
  * POST add / delete / setEnabled in one body. `key` is the path; the rest

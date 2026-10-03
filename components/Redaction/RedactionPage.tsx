@@ -4,7 +4,6 @@ import React, { useEffect, useRef } from 'react';
 import type { NotificationData } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
-import { useConvertSingleArgumentToArray } from '../../lib/hookUtilities/useConvertSingleArgumentToArray';
 import { useAPICall } from '../../lib/hookUtilities/useAPICall';
 import {
   getRedactionClient,
@@ -104,22 +103,14 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       [redactionKey, redactionState, setStateResult]
     );
 
-    const handleAddBoundingBoxes = useMemoizedCallback(
-      async (boxes: ManualRedactionBoundingBox[]) => {
+    const handleAddBoundingBox = useMemoizedCallback(
+      async (box: ManualRedactionBoundingBox) => {
         await persistBoxMutation(
-          (current) => addBoundingBoxesToResponse(current, boxes),
-          boxes.map((box): RedactionBoundingBoxMutation => ({
-            op: 'add',
-            page: box.page,
-            box: box.box,
-          }))
+          (current) => addBoundingBoxesToResponse(current, [box]),
+          [{ op: 'add', page: box.page, box: box.box }]
         );
       },
       [persistBoxMutation]
-    );
-
-    const handleAddBoundingBox = useConvertSingleArgumentToArray(
-      handleAddBoundingBoxes
     );
 
     const handleDeleteBoundingBoxes = useMemoizedCallback(
@@ -137,7 +128,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       [persistBoxMutation]
     );
 
-    const handleToggleBoundingBoxes = useMemoizedCallback(
+    const handleBoundingBoxesEnabledChange = useMemoizedCallback(
       async (boxes: RedactionBoundingBox[]) => {
         await persistBoxMutation(
           (current) => toggleBoundingBoxesInResponse(current, boxes),
@@ -162,7 +153,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
         isLoggedIn={isLoggedIn}
         onAddBoundingBox={handleAddBoundingBox}
         onDeleteBoundingBoxes={handleDeleteBoundingBoxes}
-        onToggleBoundingBoxes={handleToggleBoundingBoxes}
+        onEnabledChange={handleBoundingBoxesEnabledChange}
       />
     );
   }

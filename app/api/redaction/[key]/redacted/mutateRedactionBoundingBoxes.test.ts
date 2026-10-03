@@ -10,7 +10,6 @@ import {
 import { isSameRedactionBoundingBox } from '../../../../../lib/models/redactionBoundingBoxIdentity';
 import { getRedaction } from '../getRedaction';
 import { mutateRedactionBoundingBoxes } from './mutateRedactionBoundingBoxes';
-import { _makeMixedRedactedRedaction } from './mutateRedactionBoundingBoxesTestCommon';
 
 describe(mutateRedactionBoundingBoxes, () => {
   it('appends a manual box', async () => {
@@ -109,7 +108,7 @@ describe(mutateRedactionBoundingBoxes, () => {
     { label: 'automatic', deleted: 'automatic' as const },
   ])('removes a $label box and leaves the other', async ({ deleted }) => {
     const { redaction, autoBox, manualBox } =
-      await _makeMixedRedactedRedaction();
+      await makeMixedRedactedRedaction();
     const target = deleted === 'manual' ? manualBox : autoBox;
 
     const result = await mutateRedactionBoundingBoxes({
@@ -130,7 +129,7 @@ describe(mutateRedactionBoundingBoxes, () => {
   });
 
   it('throws a 404 ApplicationError for an unknown box', async () => {
-    const { redaction } = await _makeMixedRedactedRedaction();
+    const { redaction } = await makeMixedRedactedRedaction();
 
     await expect(
       mutateRedactionBoundingBoxes({
@@ -151,7 +150,7 @@ describe(mutateRedactionBoundingBoxes, () => {
     'sets $boxKind enabled to false then true',
     async ({ boxKind }) => {
       const { redaction, autoBox, manualBox } =
-        await _makeMixedRedactedRedaction();
+        await makeMixedRedactedRedaction();
       const target = boxKind === 'automatic' ? autoBox : manualBox;
 
       const first = await mutateRedactionBoundingBoxes({
@@ -189,7 +188,7 @@ describe(mutateRedactionBoundingBoxes, () => {
 
   it('applies add, delete, and setEnabled in one save', async () => {
     const { redaction, autoBox, manualBox } =
-      await _makeMixedRedactedRedaction();
+      await makeMixedRedactedRedaction();
 
     const result = await mutateRedactionBoundingBoxes({
       key: redaction.key,
@@ -219,7 +218,7 @@ describe(mutateRedactionBoundingBoxes, () => {
 
   it('does not save if a later mutation fails', async () => {
     const { redaction, autoBox, manualBox } =
-      await _makeMixedRedactedRedaction();
+      await makeMixedRedactedRedaction();
 
     await expect(
       mutateRedactionBoundingBoxes({
@@ -242,6 +241,21 @@ describe(mutateRedactionBoundingBoxes, () => {
 
   const box: BoundingBox = ClientFakeData.makeBoundingBox();
 });
+
+async function makeMixedRedactedRedaction(): Promise<{
+  redaction: RedactionInstance;
+  autoBox: Extract<RedactionBoundingBox, { type: 'automatic' }>;
+  manualBox: Extract<RedactionBoundingBox, { type: 'manual' }>;
+}> {
+  const autoBox = ClientFakeData.makeAutoRedactionBoundingBox({ page: 1 });
+  const manualBox = ClientFakeData.makeManualRedactionBoundingBox({ page: 2 });
+  const redaction = await FakeData.makeDBRedaction({
+    pageCount: 2,
+    status: RedactionStatus.redacted,
+    redactionBoundingBoxes: [autoBox, manualBox],
+  });
+  return { redaction, autoBox, manualBox };
+}
 
 function redactedBoxes(result: GetRedactionResponse): RedactionBoundingBox[] {
   if (result.status !== RedactionStatus.redacted) {
