@@ -13,10 +13,11 @@ interface LandingRedactionSample extends Pick<
  *
  * Keep in sync with:
  * - `irs1040Sample` in this file
- * - `generateLandingRedactionSamples`
+ * - `generateLandingRedactionSamples.manual.test.ts`
  *
- * Rerun `yarn swc-node scripts/generateLandingRedactionSamples.ts` and
- * copy the printed width/height and file names here.
+ * Rerun `yarn manual-jest
+ * components/LandingPage/generateLandingRedactionSamples.manual.test.ts`
+ * and copy the printed width/height here.
  */
 export const dutchPassportSample: LandingRedactionSample = {
   title: 'Dutch passport',
@@ -34,10 +35,11 @@ export const dutchPassportSample: LandingRedactionSample = {
  *
  * Keep in sync with:
  * - `dutchPassportSample` in this file
- * - `generateLandingRedactionSamples`
+ * - `generateLandingRedactionSamples.manual.test.ts`
  *
- * Rerun `yarn swc-node scripts/generateLandingRedactionSamples.ts` and
- * copy the printed width/height and file names here.
+ * Rerun `yarn manual-jest
+ * components/LandingPage/generateLandingRedactionSamples.manual.test.ts`
+ * and copy the printed width/height here.
  */
 export const irs1040Sample: LandingRedactionSample = {
   title: 'IRS Form 1040',

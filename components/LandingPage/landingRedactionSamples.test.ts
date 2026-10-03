@@ -3,7 +3,7 @@ import sharp from 'sharp';
 import { promiseAllThrottled } from '../../lib/utilities/promiseAllThrottled';
 import { dutchPassportSample, irs1040Sample } from './landingRedactionSamples';
 
-// Keep in sync with `generateLandingRedactionSamples.lib.ts`.
+// Keep in sync with `generateLandingRedactionSamples.manual.test.ts`.
 const maxLandingSampleEdgePx = 1280;
 
 describe('landing redaction samples', () => {

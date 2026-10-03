@@ -6,7 +6,7 @@
 - Attribution: Internal Revenue Service
 - Retrieved: 2026-08-26
 - Generated from: `lib/redaction/__testData__/irs1040Scenario2.jpg`
-- Generator: `yarn swc-node scripts/generateLandingRedactionSamples.ts`
+- Generator: `yarn manual-jest components/LandingPage/generateLandingRedactionSamples.manual.test.ts`
 - Conversion: Cropped to the Dutch passport's width/height ratio, keeping
   the full form height and trimming the sides.
 - Use: Official e-file test scenario with synthetic taxpayer data; it is
