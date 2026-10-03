@@ -641,6 +641,10 @@ const commonNoRestrictedSyntaxRules = [
   },
   ...forbiddenMockRules,
   {
+    // Bad: jest.useFakeTimers()
+    // Bad: jest.useFakeTimers({ doNotFake: ['setTimeout'] })
+    // Good: jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] })
+    //
     // mysql2 uses process.nextTick to deliver query results. Faking it makes
     // Sequelize operations hang unless these two APIs remain real.
     selector:

@@ -135,6 +135,13 @@ const TermsOfUsePage: React.FunctionComponent = React.memo(
 
           <Stack gap="sm">
             <Title order={2}>8. Deletion of Uploaded Files</Title>
+            {
+              // Keep in sync with the idle-deletion "about an hour" copy:
+              // - `_deleteOldRedactionHours` in deleteOldRedactions.lib.ts
+              // - LandingPageInner FAQ
+              // - PrivacyPolicyPage
+              // - TermsOfUsePage
+            }
             <Text>
               Our design is to delete original PDFs, page images, and working
               redaction artifacts about an hour after you last had the review

@@ -33,7 +33,7 @@ import {
 import RedactionPageInner from './RedactionPageInner';
 
 export interface RedactionPageProps {
-  /** Which redaction this page is reviewing. */
+  /** Identifies this upload. We send it on each openedAt ping. */
   redactionKey: string;
   isLoggedIn: boolean;
 }

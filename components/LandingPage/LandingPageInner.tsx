@@ -527,11 +527,21 @@ const faqItems: FaqItem[] = [
   },
   {
     question: 'What happens to my PDF?',
+    // Keep in sync with the idle-deletion "about an hour" copy:
+    // - `_deleteOldRedactionHours` in deleteOldRedactions.lib.ts
+    // - LandingPageInner FAQ
+    // - PrivacyPolicyPage
+    // - TermsOfUsePage
     answer:
       'Your original file, page images, and working files are deleted about an hour after you last had the review page open, or about an hour after upload if you never open it.',
   },
   {
     question: 'Do you send files to a cloud AI model?',
+    // Keep in sync with the idle-deletion "about an hour" copy:
+    // - `_deleteOldRedactionHours` in deleteOldRedactions.lib.ts
+    // - LandingPageInner FAQ
+    // - PrivacyPolicyPage
+    // - TermsOfUsePage
     answer:
       'Yes. A cloud vision model in the United States identifies likely sensitive content. We do not claim client-side encryption or EU-only hosting. Files are then deleted about an hour after you last had the review page open.',
   },

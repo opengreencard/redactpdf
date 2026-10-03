@@ -18,6 +18,7 @@ export async function runRedactionBackgroundWorker({
   intervalMs = defaultIntervalMs,
 }: {
   signal: AbortSignal;
+  /** Override in tests so we don't wait a real hour. */
   intervalMs?: number;
 }): Promise<void> {
   while (!signal.aborted) {
@@ -25,11 +26,17 @@ export async function runRedactionBackgroundWorker({
     // eslint-disable-next-line no-await-in-loop
     await deleteOldRedactions({ olderThanMs, makeChanges: true });
     if (signal.aborted) return;
+    // Wait here so the loop doesn't spin and start another cleanup.
     // eslint-disable-next-line no-await-in-loop
     await waitForNextRun(signal, intervalMs);
   }
 }
 
+/**
+ * Sleep until the next tick, or until shutdown asks us to stop.
+ *
+ * Abort and the timer can fire at the same time, so we resolve only once.
+ */
 function waitForNextRun(
   signal: AbortSignal,
   intervalMs: number
@@ -39,6 +46,7 @@ function waitForNextRun(
     let timeoutId: ReturnType<typeof setTimeout>;
 
     const finish = (): void => {
+      // Timeout and SIGTERM can race; only resolve the waiter once.
       if (settled) return;
       settled = true;
       clearTimeout(timeoutId);
@@ -47,6 +55,8 @@ function waitForNextRun(
     };
 
     timeoutId = setTimeout(finish, intervalMs);
+    // Abort can arrive between the while-check and now. Finish immediately
+    // so we don't wait the full interval after shutdown.
     if (signal.aborted) {
       finish();
     } else {

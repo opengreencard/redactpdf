@@ -8,7 +8,12 @@ import { bulkDeleteRedactionFile } from '../../lib/storage/storageFunctions/reda
 /**
  * How long a document can sit with no open review tab before we delete it.
  * Upload counts as the first "open", so files nobody ever reviews still
- * expire. FAQ, privacy, and terms say "about an hour" to match this.
+ * expire.
+ *
+ * Keep in sync with the "about an hour" copy in:
+ * - LandingPageInner FAQ
+ * - PrivacyPolicyPage
+ * - TermsOfUsePage
  */
 export const _deleteOldRedactionHours = 1;
 
@@ -62,6 +67,7 @@ export async function deleteOldRedactions({
         // leaves the row available for the next hourly retry.
         // eslint-disable-next-line no-await-in-loop
         await deleteStorageForRedactions(rows);
+        // Destroy only after Spaces cleanup succeeded.
         // eslint-disable-next-line no-await-in-loop
         await Redaction.destroy({ where: { id: rows.map((row) => row.id) } });
         counts.deleted += rows.length;
@@ -147,6 +153,8 @@ async function fetchStaleRedactionBatch({
   })) as StaleRedaction[];
 }
 
+// Page images aren't listed on the row. We rebuild those Spaces keys
+// from pageCount so a stale 3-page upload still loses all three JPEGs.
 async function deleteStorageForRedactions(
   rows: StaleRedaction[]
 ): Promise<void> {

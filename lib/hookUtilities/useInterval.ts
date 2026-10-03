@@ -12,6 +12,9 @@ import { useEffect, useRef } from 'react';
  *
  * A background tab still ticks. We want that: an open-but-unfocused tab
  * should keep its interval running.
+ *
+ * The first tick waits a full delay. Call the callback yourself if you
+ * need something to happen on mount.
  */
 export function useInterval(
   callback: () => unknown,
@@ -20,6 +23,7 @@ export function useInterval(
 ): void {
   const savedCallback = useRef<(() => unknown) | null>(null);
 
+  // Separate effect so a new callback doesn't reset the interval.
   useEffect(() => {
     savedCallback.current = callback;
   }, [callback]);

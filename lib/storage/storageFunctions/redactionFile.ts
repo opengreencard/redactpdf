@@ -5,7 +5,7 @@ import { makeStorageFunctions } from '../storageFunctions';
  * Spaces path for the original PDF. Upload and cleanup share this so we
  * delete the same object we wrote.
  */
-export function getStorageKeyForRedactionFile(key: string): string {
+function getStorageKeyForRedactionFile(key: string): string {
   return `redactions/${key}/original.pdf`;
 }
 
