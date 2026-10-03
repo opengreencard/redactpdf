@@ -1,3 +1,4 @@
+import { sortBy } from 'lodash';
 import { fromBuffer } from 'pdf2pic';
 import sharp from 'sharp';
 import type { PageSize } from './pdfTypes';
@@ -97,6 +98,56 @@ export async function pdfToPNGs(pdf: Uint8Array): Promise<PDFPagePNG[]> {
     results[page - 1] = { png, pageSize };
   });
   return results;
+}
+
+/**
+ * Rasterize only the requested 1-indexed pages.
+ *
+ * Download uses this so we do not render every page when a few have
+ * redaction boxes. `dpi` defaults to the vision pipeline's 72 DPI.
+ */
+export async function rasterizePDFPages(
+  pdf: Uint8Array,
+  options: { pageNumbers: number[]; dpi?: number }
+): Promise<Map<number, PDFPagePNG>> {
+  const { pageNumbers } = options;
+  const rasters = new Map<number, PDFPagePNG>();
+  const uniquePageNumbers = sortBy([...new Set(pageNumbers)]);
+  if (uniquePageNumbers.length === 0) {
+    return rasters;
+  }
+
+  const dpi = options.dpi ?? targetDPI;
+  const pageSizes = await getPDFPageSizes(pdf);
+  const converter = fromBuffer(Buffer.from(pdf), {
+    preserveAspectRatio: true,
+    width: rasterSize,
+    height: rasterSize,
+    format: 'png',
+    density: dpi,
+  });
+  const results = await converter.bulk(uniquePageNumbers, {
+    responseType: 'buffer',
+  });
+
+  await promiseAllThrottled(
+    results.map((result, resultIndex) => async (): Promise<void> => {
+      const pageNumber = uniquePageNumbers[resultIndex];
+      const pageSizeInPoints = pageSizes[pageNumber - 1];
+      const pageSize: PageSize = {
+        width: Math.round((pageSizeInPoints.width * dpi) / 72),
+        height: Math.round((pageSizeInPoints.height * dpi) / 72),
+      };
+      const png = await sharp(result.buffer)
+        .resize(pageSize.width, pageSize.height, { fit: 'fill' })
+        .png()
+        .toBuffer();
+      rasters.set(pageNumber, { png, pageSize });
+    }),
+    pdfPageBatchSize
+  );
+
+  return rasters;
 }
 
 /** Compress a rasterized page PNG into a JPEG for storage and vision. */
