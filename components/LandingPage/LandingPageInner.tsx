@@ -70,6 +70,10 @@ const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
 
 export default LandingPageInner;
 
+/**
+ * Keeps the primary upload action beside the product promise and trust
+ * signals.
+ */
 const LandingPageHero: React.FunctionComponent = React.memo(
   function LandingPageHero() {
     return (
@@ -119,6 +123,7 @@ const LandingPageHero: React.FunctionComponent = React.memo(
   }
 );
 
+/** Shows visitors where suggested redactions will appear in the review flow. */
 const LandingPageBeforeAfter: React.FunctionComponent = React.memo(
   function LandingPageBeforeAfter() {
     return (
@@ -145,6 +150,10 @@ interface BeforeAfterPlaceholderProps {
   title: string;
 }
 
+/**
+ * Reserves the before-and-after layout until representative samples are
+ * ready.
+ */
 const BeforeAfterPlaceholder: React.FunctionComponent<BeforeAfterPlaceholderProps> =
   React.memo(function BeforeAfterPlaceholder(
     props: BeforeAfterPlaceholderProps
@@ -164,6 +173,7 @@ const BeforeAfterPlaceholder: React.FunctionComponent<BeforeAfterPlaceholderProp
     );
   });
 
+/** Explains the review-first workflow before visitors start an upload. */
 const LandingPageHowItWorks: React.FunctionComponent = React.memo(
   function LandingPageHowItWorks() {
     return (
@@ -200,6 +210,7 @@ const LandingPageHowItWorks: React.FunctionComponent = React.memo(
   }
 );
 
+/** Sets expectations about the kinds of details the model can suggest. */
 const LandingPageDetectList: React.FunctionComponent = React.memo(
   function LandingPageDetectList() {
     return (
@@ -224,6 +235,7 @@ const LandingPageDetectList: React.FunctionComponent = React.memo(
   }
 );
 
+/** Makes file handling and redaction behavior visible before an upload. */
 const LandingPagePrivacy: React.FunctionComponent = React.memo(
   function LandingPagePrivacy() {
     return (
@@ -281,6 +293,7 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
   }
 );
 
+/** Compares anonymous and registered use without presenting a paid tier. */
 const LandingPagePricing: React.FunctionComponent = React.memo(
   function LandingPagePricing() {
     return (
@@ -343,9 +356,15 @@ const LandingPagePricing: React.FunctionComponent = React.memo(
 );
 
 interface PricingCellProps {
+  /**
+   * `check` and `unlimited` select richer cells; other values render as text.
+   */
   value: string;
 }
 
+/**
+ * Renders links and checkmarks used as semantic values in the pricing table.
+ */
 const PricingCell: React.FunctionComponent<PricingCellProps> = React.memo(
   function PricingCell(props: PricingCellProps) {
     const { value } = props;
@@ -367,6 +386,7 @@ const PricingCell: React.FunctionComponent<PricingCellProps> = React.memo(
   }
 );
 
+/** Gives visitors context for why the service is free and who maintains it. */
 const LandingPageWhyFree: React.FunctionComponent = React.memo(
   function LandingPageWhyFree() {
     return (
@@ -412,6 +432,7 @@ const LandingPageWhyFree: React.FunctionComponent = React.memo(
   }
 );
 
+/** Answers privacy and redaction questions near the end of the landing page. */
 const LandingPageFaq: React.FunctionComponent = React.memo(
   function LandingPageFaq() {
     return (
