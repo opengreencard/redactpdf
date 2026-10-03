@@ -12,11 +12,13 @@ import {
   getRedactionImage,
   putRedactionImage,
 } from '../storage/storageFunctions/redactionImage';
+import { deleteObjects } from '../storage/storageAPI';
 import { _deleteOldRedactionHours } from './deleteOldRedactionHours';
 import { deleteOldRedactions } from './deleteOldRedactions';
 
 describe(deleteOldRedactions, () => {
   afterEach(async () => {
+    jest.mocked(deleteObjects).mockClear();
     await Redaction.truncate();
   });
 
@@ -85,6 +87,34 @@ describe(deleteOldRedactions, () => {
     ]);
 
     expect(remaining.map((row) => row.id)).toEqual([fresh.id]);
+  });
+
+  it('keeps rows when storage reports a failed file deletion', async () => {
+    const redaction = await FakeData.makeDBRedaction({
+      openedAt: hoursAgo(staleHours),
+      pageCount: 1,
+    });
+    jest.mocked(deleteObjects).mockResolvedValueOnce({
+      $metadata: {},
+      Errors: [
+        {
+          Key: `redactions/${redaction.key}/original.pdf`,
+          Code: 'AccessDenied',
+          Message: 'Access denied',
+        },
+      ],
+    });
+
+    await expect(deleteOldRedactions()).rejects.toThrow(
+      'Failed to delete redaction files'
+    );
+
+    // The row stays available so a later cleanup pass can retry the deletion.
+    await expect(
+      Redaction.findByPk(redaction.id, {
+        attributes: ['id'],
+      }) as PartialInstance<RedactionAttributes, 'id'> | null
+    ).resolves.toMatchObject({ id: redaction.id });
   });
 });
 

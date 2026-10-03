@@ -91,7 +91,12 @@ async function deleteStorageForRedactions(
     'id' | 'key' | 'pageCount' | 'openedAt'
   >[]
 ): Promise<void> {
-  await bulkDeleteRedactionFile(rows.map((row) => row.key));
+  const fileResult = await bulkDeleteRedactionFile(rows.map((row) => row.key));
+  // DeleteObjects treats missing unversioned keys as successful deletions, so
+  // only an explicit error means the row should be kept for a later retry.
+  if (fileResult.Errors?.length) {
+    throw new Error('Failed to delete redaction files');
+  }
 
   const imageKeys = rows.flatMap((row) =>
     Array.from(
@@ -104,6 +109,11 @@ async function deleteStorageForRedactions(
   );
   for (let i = 0; i < imageKeys.length; i += defaultPageSize) {
     // eslint-disable-next-line no-await-in-loop -- stay under the 1000-key cap
-    await bulkDeleteRedactionImage(imageKeys.slice(i, i + defaultPageSize));
+    const imageResult = await bulkDeleteRedactionImage(
+      imageKeys.slice(i, i + defaultPageSize)
+    );
+    if (imageResult.Errors?.length) {
+      throw new Error('Failed to delete redaction images');
+    }
   }
 }
