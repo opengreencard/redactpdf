@@ -93,9 +93,14 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
             mutations,
           });
         } catch (err) {
-          // One POST applies the whole batch or none of it, so we can roll
-          // back to the pre-click boxes.
+          // Roll back immediately, then reconcile with the server because a
+          // later in-flight request may have saved newer edits.
           setStateResult(previous);
+          const refreshedState = await fetchRedaction({ key: redactionKey });
+          const refreshed = getRedactedResult(refreshedState);
+          if (refreshed) {
+            setStateResult(refreshed);
+          }
           const notification: NotificationData = {
             color: 'red',
             title: 'Could not update redactions',
@@ -105,7 +110,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
           notifications.show(notification);
         }
       },
-      [redactionKey, redactionState, setStateResult]
+      [fetchRedaction, redactionKey, redactionState, setStateResult]
     );
 
     const handleAddBoundingBox = useMemoizedCallback(
