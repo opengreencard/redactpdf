@@ -174,8 +174,16 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
       case RedactionPageView.loaded: {
         const redaction = getLoadedRedaction(redactionState);
         return (
-          <Stack gap="md" flex={1} mih={0} w="100%">
-            <Box px="md" hiddenFrom="sm">
+          <Stack
+            // Desktop hides the tab control. Keep this stack gap at 0 so a
+            // hidden child cannot leave a band above the viewer. Tabs add
+            // their own bottom padding while they are on screen.
+            gap={0}
+            flex={1}
+            mih={0}
+            w="100%"
+          >
+            <Box px="md" pb="md" hiddenFrom="sm">
               <SegmentedControl
                 fullWidth
                 data={mobileRedactionViewOptions}
@@ -188,6 +196,11 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
               mih={0}
               h="100%"
               w="100%"
+              // Mantine Grid defaults to gap="md"
+              // (https://mantine.dev/core/grid/). That CSS gap shows up as a
+              // white strip between the review rail and the document because
+              // the page background is white and the preview pane is gray.
+              gap={0}
               // Mantine's columns live in an inner flex element; give that
               // element the row height so each pane can shrink and scroll.
               styles={{ inner: { height: '100%' } }}

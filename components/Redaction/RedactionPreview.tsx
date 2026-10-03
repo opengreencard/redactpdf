@@ -142,7 +142,9 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
 
     return (
       <Stack
-        gap="sm"
+        // The toolbar already has a bottom border. A stack gap here would
+        // add a gray band above the first page.
+        gap={0}
         // Fill the grid column so the page canvas, not the toolbar, scrolls.
         // mih={0} lets this flex child shrink below its intrinsic height.
         // h="100%" keeps the stack as tall as the surrounding column.

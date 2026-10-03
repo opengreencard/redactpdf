@@ -5,8 +5,5 @@
  */
 export const centeredAlertOrCardMaxWidth = '32rem';
 
-/** Shared Mantine spacing token for the preview canvas padding. */
-export const redactionPreviewPagesPadding = 'sm';
-
 /** Divider used between the review panel and document preview. */
 export const redactionPaneBorder = '1px solid var(--mantine-color-gray-3)';
