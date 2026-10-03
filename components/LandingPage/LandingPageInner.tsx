@@ -242,15 +242,11 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
       <Box bg="gray.0" py="xl">
         <Container size={siteContainerSize}>
           <Stack gap="xl">
-            <Stack gap="sm" maw={680}>
-              <Group gap="sm">
-                <Box w={24} h={2} bg="green.6" />
-                <Text c="green.7" fw="bold" size="xs" tt="uppercase" lts={2}>
-                  Privacy and open source
-                </Text>
-              </Group>
-              <Title order={2}>What happens to your PDF</Title>
-              <Text c="dimmed" size="lg">
+            <Stack gap="xs">
+              <Title order={2} ta="center">
+                Private, open source, and free
+              </Title>
+              <Text ta="center" c="dimmed">
                 See how we handle your file and what each redaction removes. You
                 can check the source code yourself.
               </Text>
@@ -282,7 +278,7 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
                 </Card>
               ))}
             </SimpleGrid>
-            <Text c="dimmed" size="sm">
+            <Text ta="center" c="dimmed" size="sm">
               To find likely sensitive information, we send page images to
               Gemini 3.8 Flash on Google Cloud in the United States.
             </Text>
