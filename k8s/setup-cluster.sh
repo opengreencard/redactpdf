@@ -81,6 +81,16 @@ function check_installs {
   fi
 }
 
+function checkDbFirewallExists {
+  firewallID=$(doctl compute firewall list --output json \
+    | jq -r --arg name "$DB_FIREWALL_NAME" \
+      '.[] | select(.name == $name) | .id')
+  if [ -z "$firewallID" ]; then
+    echo "Error: Firewall '$DB_FIREWALL_NAME' was not found."
+    exit 1
+  fi
+}
+
 # Load defaults from variables.sh
 # shellcheck source=k8s/variables.sh
 . "$DIR/variables.sh"
@@ -122,6 +132,7 @@ fi
 image="opengreencard/redactpdf:$REVISION"
 
 check_installs kubectl doctl docker jq helm
+checkDbFirewallExists
 
 cat <<END
 Creating DigitalOcean Kubernetes cluster:
@@ -156,14 +167,6 @@ fi
 # Allow this cluster's worker nodes to connect to MariaDB. The custom tag is
 # stable across cluster recreation, while the node-pool tag follows replaced
 # worker nodes automatically.
-firewallID=$(doctl compute firewall list --output json \
-  | jq -r --arg name "$DB_FIREWALL_NAME" \
-    '.[] | select(.name == $name) | .id')
-if [ -z "$firewallID" ]; then
-  echo "Error: Firewall '$DB_FIREWALL_NAME' was not found."
-  exit 1
-fi
-
 firewallJSON=$(doctl compute firewall get "$firewallID" --output json)
 # Cloud Firewall source tags must exist as DigitalOcean Compute tags first.
 doctl compute tag create "$CLUSTER_TAG" 2>/dev/null || true
