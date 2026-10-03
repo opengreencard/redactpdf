@@ -33,7 +33,7 @@ $1: The base branch. If one isn't supplied, default to `origin/main`.
 After all rule-review passes:
 
 1. Run checks only for files changed by the rule passes:
-   - `yarn typecheck`
+   - `yarn typecheck:files -- <changed files>`
    - `yarn eslint --fix <changed files>`
    - `yarn jest <touched test>` where applicable.
 2. Stage and commit a fresh commit (never amend) using:

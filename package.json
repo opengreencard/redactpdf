@@ -10,6 +10,7 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
+    "typecheck:files": "bash dev/typecheck-specific-files.sh",
     "build:eslint-plugin": "npm --prefix dev/eslint run build",
     "lint": "yarn build:eslint-plugin && npm run lint:stylelint && eslint .",
     "lint:stylelint": "stylelint '**/*.css' --cache",
