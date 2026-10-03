@@ -23,7 +23,18 @@ export async function runRedactionBackgroundWorker({
     await deleteOldRedactions();
   };
 
-  const job = new Cron(cleanupCronExpression, runCleanup);
+  const job = new Cron(
+    cleanupCronExpression,
+    {
+      catch: (error) => {
+        // Scheduled failures need an explicit handler so they don't become
+        // unhandled rejections outside the worker's startup error boundary.
+        // eslint-disable-next-line no-console -- report scheduled cleanup errors
+        console.error(error);
+      },
+    },
+    runCleanup
+  );
   if (runImmediately) {
     await runCleanup();
   }
