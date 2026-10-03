@@ -14,8 +14,9 @@ yarn init-db-dev
 yarn dev
 ```
 
-The development database uses `redaction_development`. Cloud credentials are
-only needed for the upload and redaction pipeline.
+The development database uses `redaction_development`. The placeholder
+secrets are enough to run the app. Real Google, Spaces, and model keys are
+only needed when you upload a PDF for redaction.
 
 ## Running tests locally
 

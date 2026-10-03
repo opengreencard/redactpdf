@@ -46,6 +46,21 @@ docker-compose exec -T mariadb mariadb -uroot -predaction-root \
   outage simulations in a dedicated `*.mocked.test.ts` file and suppress
   the mock restriction there.
 
+## Cursor Cloud specific instructions
+
+- `.cursor/cloud-agent-install.sh` copies `.env.development.example` and
+  `.env.test.example` when those files are missing, then runs `yarn install`.
+  The `replace-with-...` placeholders are enough to boot. It does not
+  overwrite an env file that is already there.
+- `.cursor/cloud-agent-start.sh` starts Docker, MariaDB from
+  `docker-compose.yml`, `yarn init-db-dev`, and `yarn dev` on port 3000.
+  Use that server instead of starting another one.
+- Node 26 is at `/usr/local/bin`. `bash -lc 'node -v'` should print v26.
+  The image also has Node 22 earlier on `PATH`.
+- Signup and `yarn jest` do not need real Google, Spaces, or model keys.
+  Uploading a PDF does.
+- GraphicsMagick and Ghostscript are installed for the PDF tests.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
