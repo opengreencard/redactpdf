@@ -22,6 +22,8 @@ $1: The base branch. If one isn't supplied, default to `origin/main`.
      `git diff <base> -- path` for current working-tree changes and
      `git diff <base>...HEAD -- path` for committed branch changes. Do not run
      an unfiltered diff of the whole branch.
+   - For each untracked file in the changed-file list, read the full file and
+     review it as a new addition.
    - If the changes follow the rules, return `No changes needed`.
    - Otherwise, make only the necessary edits. Other subagents may be editing
      the codebase at the same time, so re-read files before changing them.
