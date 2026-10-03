@@ -46,6 +46,24 @@ docker-compose exec -T mariadb mariadb -uroot -predaction-root \
   outage simulations in a dedicated `*.mocked.test.ts` file and suppress
   the mock restriction there.
 
+## Cursor Cloud specific instructions
+
+- The environment `start` script already starts Docker, MariaDB, `yarn
+  init-db-dev`, and `yarn dev` on port 3000. Use that server instead of
+  starting another one.
+- Node 26 is installed at `/usr/local/bin`. Login shells prepend it. Check
+  with `bash -lc 'node -v'`. The base image also has Node 22 earlier on
+  `PATH`.
+- `install` creates `.env.development` and `.env.test` from the examples
+  when they are missing. `DB_PASS` is `redaction`, which matches
+  `docker-compose.yml`. Google, Spaces, and model API values are local
+  placeholders. The landing page, email/password signup, and `yarn jest`
+  do not call those services. Uploading a PDF for redaction needs real
+  Spaces and Gemini credentials.
+- GraphicsMagick and Ghostscript are installed for the PDF tests. MariaDB
+  is the Compose service `mariadb` (`docker compose --env-file
+  .env.development`). The first volume init also creates `redaction_test`.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know
