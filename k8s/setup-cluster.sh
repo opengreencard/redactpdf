@@ -139,8 +139,12 @@ END
 if doctl kubernetes cluster get "$CLUSTER_NAME" > /dev/null 2>&1; then
   echo "Cluster $CLUSTER_NAME already exists; updating tags."
   doctl kubernetes cluster update "$CLUSTER_NAME" --tag "$CLUSTER_TAG"
-  doctl kubernetes cluster node-pool update "$CLUSTER_NAME" webservers \
-    --tag "$CLUSTER_TAG"
+  nodePoolNames=$(doctl kubernetes cluster node-pool list "$CLUSTER_NAME" \
+    --output json | jq -r '.[].name')
+  while IFS= read -r nodePoolName; do
+    doctl kubernetes cluster node-pool update "$CLUSTER_NAME" "$nodePoolName" \
+      --tag "$CLUSTER_TAG"
+  done <<< "$nodePoolNames"
 else
   doctl kubernetes cluster create "$CLUSTER_NAME" \
     --tag "$CLUSTER_TAG" \
