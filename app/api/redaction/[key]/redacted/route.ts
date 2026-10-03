@@ -17,8 +17,9 @@ type MutateRedactionBoundingBoxesRoute = MakeAPIRouteWithBodyTypes<
 >;
 
 /**
- * Apply add / delete / setEnabled in one save so two JSON writes cannot
- * clobber each other.
+ * Apply add / delete / setEnabled in one save so mutations in one request
+ * cannot clobber each other. Concurrent requests for the same redaction are
+ * last-write-wins; the page assumes a redaction is edited in one tab at a time.
  */
 export const POST = makeAPIRouteWithBody<
   MutateRedactionBoundingBoxesRoute['requestBody'],
