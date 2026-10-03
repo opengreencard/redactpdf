@@ -1,21 +1,10 @@
 import { Op } from 'sequelize';
-import { PartialInstance } from '../../lib/db/types';
-import Redaction, { RedactionAttributes } from '../../lib/models/Redaction';
-import type { RedactionImageKeyOptions } from '../../lib/storage/redactionImageKey';
-import { bulkDeleteRedactionImage } from '../../lib/storage/storageFunctions/redactionImage';
-import { bulkDeleteRedactionFile } from '../../lib/storage/storageFunctions/redactionFile';
-
-/**
- * How long a document can sit with no open review tab before we delete it.
- * Upload counts as the first "open", so files nobody ever reviews still
- * expire.
- *
- * Keep in sync with the "about an hour" copy in:
- * - LandingPageInner FAQ
- * - PrivacyPolicyPage
- * - TermsOfUsePage
- */
-export const _deleteOldRedactionHours = 1;
+import { PartialInstance } from '../db/types';
+import Redaction, { RedactionAttributes } from '../models/Redaction';
+import type { RedactionImageKeyOptions } from '../storage/redactionImageKey';
+import { bulkDeleteRedactionImage } from '../storage/storageFunctions/redactionImage';
+import { bulkDeleteRedactionFile } from '../storage/storageFunctions/redactionFile';
+import { _deleteOldRedactionHours } from './deleteOldRedactionHours';
 
 // S3 DeleteObjects accepts at most 1000 keys. We also fetch this many rows
 // per page so one PDF bulk-delete covers the batch.
@@ -24,27 +13,25 @@ const defaultPageSize = 1000;
 
 /**
  * Delete originals, page images, and DB rows that nobody has had open for
- * `olderThanMs`.
+ * `_deleteOldRedactionHours`.
  *
- * We page with an `(openedAt, id)` keyset instead of OFFSET so dry-run can
- * visit every stale row once.
+ * The redaction background worker calls this every 15 minutes. This is not
+ * a standalone cron script.
+ *
+ * We page with an `(openedAt, id)` keyset instead of OFFSET so large
+ * batches stay cheap.
  */
 export async function deleteOldRedactions({
-  olderThanMs,
-  makeChanges,
   pageSizeForTesting,
 }: {
-  olderThanMs: number;
-  makeChanges: boolean;
   /** Override the 1000-row page size. Pass only from tests. */
   pageSizeForTesting?: number;
-}): Promise<{ checked: number; deleted: number }> {
-  const cutoffDate = new Date(Date.now() - olderThanMs);
+} = {}): Promise<{ deleted: number }> {
+  const cutoffDate = new Date(
+    Date.now() - _deleteOldRedactionHours * 60 * 60 * 1000
+  );
   const pageSize = pageSizeForTesting ?? defaultPageSize;
-  const counts: { checked: number; deleted: number } = {
-    checked: 0,
-    deleted: 0,
-  };
+  let deleted = 0;
   let cursor: { openedAt: Date; id: number } | null = null;
 
   // Each page advances the keyset cursor; we stop when a fetch is empty.
@@ -79,24 +66,23 @@ export async function deleteOldRedactions({
     >[];
     if (rows.length === 0) break;
 
-    counts.checked += rows.length;
-    console.info(
-      `${makeChanges ? 'Deleting' : 'Would delete'} ${rows.length} redactions`
-    );
+    console.info(`Deleting ${rows.length} redactions`);
 
-    if (makeChanges) {
-      // eslint-disable-next-line no-await-in-loop -- Spaces before DB rows
-      await deleteStorageForRedactions(rows);
-      // eslint-disable-next-line no-await-in-loop
-      await Redaction.destroy({ where: { id: rows.map((row) => row.id) } });
-      counts.deleted += rows.length;
-    }
+    // Delete Spaces objects first. If we deleted DB rows first and Spaces
+    // failed, we'd have files we no longer know about. If Spaces succeeds
+    // and destroy fails, the next pass sees the same rows and retries.
+    // Deleting a missing Spaces key is fine.
+    // eslint-disable-next-line no-await-in-loop -- Spaces before DB rows
+    await deleteStorageForRedactions(rows);
+    // eslint-disable-next-line no-await-in-loop -- keyset page must finish first
+    await Redaction.destroy({ where: { id: rows.map((row) => row.id) } });
+    deleted += rows.length;
 
     const lastRow = rows[rows.length - 1];
     cursor = { openedAt: lastRow.openedAt, id: lastRow.id };
   }
 
-  return counts;
+  return { deleted };
 }
 
 async function deleteStorageForRedactions(

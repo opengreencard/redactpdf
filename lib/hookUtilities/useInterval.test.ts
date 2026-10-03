@@ -36,6 +36,15 @@ describe(useInterval, () => {
     expect(second).toHaveBeenCalledTimes(1);
   });
 
+  it('invokes immediately when runOnMount is true', () => {
+    const callback = jest.fn();
+    renderHook(() => useInterval(callback, 1000, { runOnMount: true }));
+
+    expect(callback).toHaveBeenCalledTimes(1);
+    jest.advanceTimersByTime(1000);
+    expect(callback).toHaveBeenCalledTimes(2);
+  });
+
   it('stops when delayMs is null', () => {
     const callback = jest.fn();
     const { rerender } = renderHook<

@@ -74,20 +74,14 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
     }, [fetchRedaction, redactionKey]);
 
     // Keep the document out of idle cleanup while this tab is open.
-    // useInterval does not fire on mount, so ping once immediately.
-    useEffect(() => {
+    // Once a minute is often enough vs the idle TTL, and cheap.
+    // Keep in sync with the "once a minute" note on `touchRedactionOpenedAt`.
+    const pingOpenedAt = useMemoizedCallback(() => {
       // Fire-and-forget: a failed ping is retried on the next interval tick.
       // eslint-disable-next-line no-void
       void touchRedactionOpenedAtClient({ key: redactionKey });
     }, [redactionKey]);
-
-    // Once a minute is often enough vs the idle TTL, and cheap.
-    // Keep in sync with the "once a minute" note on `touchRedactionOpenedAt`.
-    useInterval(() => {
-      // Fire-and-forget: a failed ping is retried on the next interval tick.
-      // eslint-disable-next-line no-void
-      void touchRedactionOpenedAtClient({ key: redactionKey });
-    }, 60 * 1000);
+    useInterval(pingOpenedAt, 60 * 1000, { runOnMount: true });
 
     const persistBoxMutation = useMemoizedCallback(
       async (

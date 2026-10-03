@@ -13,20 +13,32 @@ import { useEffect, useRef } from 'react';
  * A background tab still ticks. We want that: an open-but-unfocused tab
  * should keep its interval running.
  *
- * The first tick waits a full delay. Call the callback yourself if you
- * need something to happen on mount.
+ * Pass `{ runOnMount: true }` to also invoke once immediately. That is
+ * handy when the first tick should not wait a full delay, such as pinging
+ * `openedAt` as soon as a review tab opens.
  */
 export function useInterval(
   callback: () => unknown,
   /** Ms between ticks. Pass `null` to pause without unmounting. */
-  delayMs: number | null
+  delayMs: number | null,
+  options: {
+    /** Invoke once as soon as the hook mounts, then on each delay. */
+    runOnMount?: boolean;
+  } = {}
 ): void {
+  const { runOnMount = false } = options;
   const savedCallback = useRef<(() => unknown) | null>(null);
 
   // Separate effect so a new callback doesn't reset the interval.
   useEffect(() => {
     savedCallback.current = callback;
   }, [callback]);
+
+  useEffect(() => {
+    if (!runOnMount || delayMs === null) return;
+
+    if (savedCallback.current) savedCallback.current();
+  }, [callback, delayMs, runOnMount]);
 
   useEffect(() => {
     // Returning undefined skips creating an interval. The previous effect's

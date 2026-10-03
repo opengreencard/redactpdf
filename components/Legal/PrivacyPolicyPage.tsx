@@ -1,5 +1,6 @@
 import React from 'react';
 import { Anchor, List, ListItem, Stack, Text, Title } from '@mantine/core';
+import { _deleteOldRedactionHoursText } from '../../lib/redaction/deleteOldRedactionHours';
 import LegalPage from './LegalPage';
 
 /** Displays how RedactPDF.ai handles account, document, and usage data. */
@@ -163,20 +164,12 @@ const PrivacyPolicyPage: React.FunctionComponent = React.memo(
 
           <Stack gap="sm">
             <Title order={2}>6. Retention and Deletion</Title>
-            {
-              // Keep in sync with the idle-deletion "about an hour" copy:
-              // - `_deleteOldRedactionHours` in deleteOldRedactions.lib.ts
-              // - LandingPageInner FAQ
-              // - PrivacyPolicyPage
-              // - TermsOfUsePage
-            }
             <Text>
               Our design is to delete original PDFs, page images, and working
-              redaction artifacts about an hour after you last had the review
-              page open, or about an hour after upload if you never open it.
-              Account details, security logs, and limited operational records
-              may be retained longer when reasonably necessary to provide the
-              Service, prevent abuse, resolve disputes, or comply with law.
+              redaction artifacts {_deleteOldRedactionHoursText}. Account
+              details, security logs, and limited operational records may be
+              retained longer when reasonably necessary to provide the Service,
+              prevent abuse, resolve disputes, or comply with law.
             </Text>
             <Text>
               Deletion may not immediately remove copies in backups, browser

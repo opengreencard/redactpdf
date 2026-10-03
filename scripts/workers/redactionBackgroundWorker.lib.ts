@@ -1,22 +1,20 @@
 import { Cron } from 'croner';
-import {
-  _deleteOldRedactionHours,
-  deleteOldRedactions,
-} from '../cron/deleteOldRedactions.lib';
+import { deleteOldRedactions } from '../../lib/redaction/deleteOldRedactions';
 
-const hourlyCronExpression = '0 * * * *';
-const olderThanMs = _deleteOldRedactionHours * 60 * 60 * 1000;
+// Every 15 minutes so idle files are gone closer to one hour, not up to
+// two (one hour idle, then up to another hour until the next tick).
+const cleanupCronExpression = '*/15 * * * *';
 
 /**
- * Run redaction cleanup on the hour until the worker is asked to stop.
+ * Run redaction cleanup every 15 minutes until the worker is asked to stop.
  */
 export async function runRedactionBackgroundWorker({
   signal,
 }: {
   signal: AbortSignal;
 }): Promise<void> {
-  const job = new Cron(hourlyCronExpression, async () => {
-    await deleteOldRedactions({ olderThanMs, makeChanges: true });
+  const job = new Cron(cleanupCronExpression, async () => {
+    await deleteOldRedactions();
   });
 
   await new Promise<void>((resolve) => {

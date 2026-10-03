@@ -4,7 +4,7 @@ import { runRedactionBackgroundWorker } from './redactionBackgroundWorker.lib';
 async function main(): Promise<void> {
   try {
     // Kubernetes sends SIGTERM on shutdown. Abort the wait so we don't
-    // sit on the hourly timer until the pod is killed.
+    // sit on the cleanup timer until the pod is killed.
     const controller = new AbortController();
     process.once('SIGTERM', () => controller.abort());
     process.once('SIGINT', () => controller.abort());
