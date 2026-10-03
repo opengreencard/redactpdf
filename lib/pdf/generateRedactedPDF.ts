@@ -5,6 +5,7 @@ import type {
   BoundingBox,
   RedactionBoundingBox,
 } from '../redaction/redactionTypes';
+import { promiseAllThrottled } from '../utilities/promiseAllThrottled';
 import { getPDFPageSizes } from './getPDFPageSizes';
 import { rasterizePDFPages } from './pdfToImage';
 
@@ -41,28 +42,48 @@ export async function generateRedactedPDF({
     const sourcePDF = await PDFDocument.load(pdf);
     const outputPDF = await PDFDocument.create();
 
+    // Burn is the slow bit (sharp at 300 DPI). Do those pages together.
+    // embedJpg / addPage still run in page order because they mutate one
+    // PDFDocument.
+    const burnedJPEGs = await promiseAllThrottled(
+      pagesToFlatten.map((pageNumber) => async (): Promise<Uint8Array> => {
+        const raster = rasters.get(pageNumber);
+        const boxes = enabledBoxesByPage.get(pageNumber);
+        if (!raster || !boxes) {
+          throw new ApplicationError(
+            `Could not rasterize PDF page ${pageNumber} for redaction.`
+          );
+        }
+        return burnRedactionBoxesOnImage(raster.png, boxes);
+      }),
+      flattenedPageConcurrency
+    );
+    const burnedJPEGByPage = new Map<number, Uint8Array>(
+      pagesToFlatten.map((pageNumber, index) => [
+        pageNumber,
+        burnedJPEGs[index],
+      ])
+    );
+
+    const unboxedPageIndices = pageSizes.flatMap((_, pageIndex) =>
+      enabledBoxesByPage.has(pageIndex + 1) ? [] : [pageIndex]
+    );
+    const copiedUnboxedPages =
+      unboxedPageIndices.length > 0
+        ? await outputPDF.copyPages(sourcePDF, unboxedPageIndices)
+        : [];
+    let nextCopiedPage = 0;
+
     for (let pageIndex = 0; pageIndex < pageSizes.length; pageIndex++) {
       const pageNumber = pageIndex + 1;
-      const boxes = enabledBoxesByPage.get(pageNumber);
-      if (!boxes) {
-        // Pages must be appended in source order.
-        // eslint-disable-next-line no-await-in-loop
-        const [copiedPage] = await outputPDF.copyPages(sourcePDF, [pageIndex]);
-        outputPDF.addPage(copiedPage);
+      const burnedJPEG = burnedJPEGByPage.get(pageNumber);
+      if (!burnedJPEG) {
+        outputPDF.addPage(copiedUnboxedPages[nextCopiedPage]);
+        nextCopiedPage += 1;
         continue;
       }
 
-      const raster = rasters.get(pageNumber);
-      if (!raster) {
-        throw new ApplicationError(
-          `Could not rasterize PDF page ${pageNumber} for redaction.`
-        );
-      }
-
-      // Burn, then embed, then append so the page order stays stable.
-      // eslint-disable-next-line no-await-in-loop
-      const burnedJPEG = await burnRedactionBoxesOnImage(raster.png, boxes);
-      // Same sequential append so this JPEG lands on the matching page.
+      // embedJpg writes into this document, so pages stay sequential.
       // eslint-disable-next-line no-await-in-loop
       const embeddedJPEG = await outputPDF.embedJpg(burnedJPEG);
       const pageSize = pageSizes[pageIndex];
@@ -106,3 +127,6 @@ function groupEnabledBoxesByPage(
 // pipeline uses 72 DPI; that's too soft once we replace the PDF page
 // with a JPEG.
 const flattenedPageDPI = 300;
+
+// Keep in sync with `pdfPageBatchSize` in `pdfToImage.ts`.
+const flattenedPageConcurrency = 4;
