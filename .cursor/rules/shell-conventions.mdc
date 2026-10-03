@@ -6,8 +6,9 @@ alwaysApply: true
 
 ## Variable naming
 
-- **local variables**: camelCase; abbreviations and acronyms are written in
-  all-caps (`dbPass`, `itemFQN`, `tempOpEnv`, `serverIP`, `dnsIP`).
+- **local variables**: camelCase; preserve technical acronym capitalization as
+  described in [`acronym-capitalization.mdc`](acronym-capitalization.mdc)
+  (`itemFQN`, `tempOpEnv`, `serverIP`, `firewallJSON`).
 - **CLI-flag variables**: SCREAMING_CASE when derived from `--some-flag` (`NAME`,
   `OVERWRITE`, `REVISION`).
 - **exported/env variables**: SCREAMING_CASE (`OP_VAULT`, `OP_ACCOUNT`,

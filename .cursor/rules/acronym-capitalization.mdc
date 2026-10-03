@@ -1,0 +1,18 @@
+---
+description: Capitalize common technical acronyms consistently in code and agent prose.
+alwaysApply: true
+---
+
+# Technical acronym capitalization
+
+Use standard capitalization for common technical acronyms in prose and
+identifiers:
+
+- `API`, `DB`, `DNS`, `HTTP`, `ID`, `IP`, `JSON`, `PDF`, `SQL`, and `URL`.
+- Preserve acronym capitalization inside camelCase and PascalCase names:
+  `checkDBFirewallExists`, `firewallJSON`, `serverIP`, and `parsePDF`.
+- At the start of a lower-camel-case name, follow the language's normal
+  lowercase convention, such as `apiClient`.
+
+In prose, write the acronym consistently: “API key”, “DB firewall”, “HTTP
+request”, and “PDF file”.
