@@ -1,38 +1,66 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Lightbox, type LightboxSlideData } from '@mantine/lightbox';
+import {
+  Lightbox,
+  type LightboxProps,
+  type LightboxSlideData,
+} from '@mantine/lightbox';
 import { useSetState } from '../../lib/hookUtilities/useSetState';
+import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
 import ButtonDiv from './ButtonDiv';
-import Image from './Image';
+import Image, { type ImageProps } from './Image';
 import classes from './ImageWithLightbox.module.css';
 
-export interface ImageWithLightboxProps {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
+interface ImageWithLightboxOwnProps extends Pick<
+  LightboxProps,
+  'withZoom' | 'withNavigation' | 'closeOnClickOutside'
+> {
   /** Caption under the fullscreen slide, or null when the slide has none. */
   caption: string | null;
-  /** Test ID on the thumbnail, or null when this still is not queried. */
-  imageTestId: string | null;
 }
+
+interface ImageWithLightboxPassThroughProps extends Omit<
+  ImageProps,
+  'onClick'
+> {}
+
+export interface ImageWithLightboxProps
+  extends ImageWithLightboxOwnProps, ImageWithLightboxPassThroughProps {}
 
 /**
  * Thumbnail that opens its own Mantine lightbox.
  *
  * Click or keyboard-activate the image to view it fullscreen. The lightbox
- * owns zoom and close; we only keep `opened` here.
+ * owns zoom and close; we only keep `opened` here. Image sizing and most
+ * Mantine Image props pass through.
  *
  * @see https://mantine.dev/x/lightbox/
  */
 const ImageWithLightbox: React.FunctionComponent<ImageWithLightboxProps> =
   React.memo(function ImageWithLightbox(props) {
-    const { src, alt, width, height, caption, imageTestId } = props;
+    const {
+      caption,
+      withZoom = true,
+      withNavigation = false,
+      closeOnClickOutside = true,
+      ...passThroughProps
+    } = props;
+    // Keep owned lightbox fields out of the Image spread.
+    const _ownProps: RequiredWithUndefined<ImageWithLightboxOwnProps> = {
+      caption,
+      withZoom,
+      withNavigation,
+      closeOnClickOutside,
+    };
+
     const [opened, setOpened] = useState(false);
     const openLightbox = useSetState(setOpened, true);
     const closeLightbox = useSetState(setOpened, false);
 
+    const src =
+      typeof passThroughProps.src === 'string' ? passThroughProps.src : '';
+    const { alt } = passThroughProps;
     const slide: LightboxSlideData =
       caption === null ? { src, alt } : { src, alt, caption };
     const slides: LightboxSlideData[] = [slide];
@@ -49,10 +77,7 @@ const ImageWithLightbox: React.FunctionComponent<ImageWithLightboxProps> =
           aria-label={`Open ${caption ?? alt} fullscreen`}
         >
           <Image
-            src={src}
-            alt={alt}
-            width={width}
-            height={height}
+            // Defaults first so a caller can override them via pass-through.
             w="100%"
             // Next needs height:auto when CSS changes width, or the still
             // stays at the intrinsic height and mah clips the top.
@@ -63,17 +88,16 @@ const ImageWithLightbox: React.FunctionComponent<ImageWithLightboxProps> =
             mah={360}
             fit="contain"
             radius="sm"
-            data-testid={imageTestId ?? undefined}
+            {...passThroughProps}
           />
         </ButtonDiv>
         <Lightbox
           opened={opened}
           onClose={closeLightbox}
           slides={slides}
-          // One still: arrows would only loop back to the same image.
-          withNavigation={false}
-          withZoom
-          closeOnClickOutside
+          withNavigation={withNavigation}
+          withZoom={withZoom}
+          closeOnClickOutside={closeOnClickOutside}
         />
       </>
     );

@@ -26,6 +26,5 @@ export const Default: StoryFn<BeforeAfterRedactionCardProps> = Template.bind(
 export const FrozenAfter: StoryFn<BeforeAfterRedactionCardProps> =
   Template.bind({});
 FrozenAfter.args = {
-  ...dutchPassportSample,
   initialFrozenSideForTesting: BeforeAfterSide.after,
 };

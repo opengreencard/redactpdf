@@ -9,7 +9,6 @@ const defaultProps: ImageWithLightboxProps = {
   width: dutchPassportSample.width,
   height: dutchPassportSample.height,
   caption: 'Before',
-  imageTestId: null,
 };
 
 const metadata: Meta = {

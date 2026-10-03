@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
 import { useReducedMotion } from '@mantine/hooks';
 import Button from '../designSystem/Button/Button';
@@ -9,6 +9,7 @@ import Fade from '../designSystem/Fade';
 import ImageWithLightbox, {
   type ImageWithLightboxProps,
 } from '../designSystem/ImageWithLightbox';
+import { useInterval } from '../../lib/hookUtilities/useInterval';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 
 /** Which still the mobile card is showing or freezing. */
@@ -88,21 +89,17 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
       initialFrozenSideForTesting !== null
     );
 
-    // Flip every interval until the visitor freezes a side. Reduced-motion
-    // visitors keep the first still instead of watching it animate.
-    useEffect(() => {
-      if (isFrozen || prefersReducedMotion) {
-        return undefined;
-      }
-      const intervalId = window.setInterval(() => {
-        setSide((currentSide) =>
-          currentSide === BeforeAfterSide.before
-            ? BeforeAfterSide.after
-            : BeforeAfterSide.before
-        );
-      }, intervalMs);
-      return () => window.clearInterval(intervalId);
-    }, [isFrozen, intervalMs, prefersReducedMotion]);
+    const flipSide = useMemoizedCallback(() => {
+      setSide((currentSide) =>
+        currentSide === BeforeAfterSide.before
+          ? BeforeAfterSide.after
+          : BeforeAfterSide.before
+      );
+    }, []);
+    // Pause while frozen or when the OS asks us not to animate.
+    useInterval(flipSide, {
+      delayMs: isFrozen || prefersReducedMotion ? null : intervalMs,
+    });
 
     const freezeBefore = useMemoizedCallback(() => {
       setSide(BeforeAfterSide.before);
@@ -133,7 +130,6 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                   src={beforeSrc}
                   alt={beforeAlt}
                   caption="Before"
-                  imageTestId={null}
                 />
               </Stack>
               <Stack gap={4}>
@@ -145,7 +141,6 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                   src={afterSrc}
                   alt={afterAlt}
                   caption="After"
-                  imageTestId={null}
                 />
               </Stack>
             </SimpleGrid>
@@ -167,7 +162,6 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                       src={beforeSrc}
                       alt={beforeAlt}
                       caption="Before"
-                      imageTestId={null}
                     />
                   </Fade>
                   <Box pos="absolute" inset={0}>
@@ -177,7 +171,6 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                         src={afterSrc}
                         alt={afterAlt}
                         caption="After"
-                        imageTestId={null}
                       />
                     </Fade>
                   </Box>
