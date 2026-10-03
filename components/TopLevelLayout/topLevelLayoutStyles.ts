@@ -6,6 +6,7 @@ import { config } from '@fortawesome/fontawesome-svg-core';
 import '@fortawesome/fontawesome-svg-core/styles.css';
 import '@mantine/core/styles.css';
 import '@mantine/dropzone/styles.css';
+import '@mantine/lightbox/styles.css';
 import '@mantine/notifications/styles.css';
 
 // Import the CSS ourselves so Next/Storybook can place it; disable Font

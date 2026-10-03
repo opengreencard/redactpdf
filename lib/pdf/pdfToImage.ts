@@ -1,3 +1,4 @@
+import { sortBy } from 'lodash';
 import { fromBuffer } from 'pdf2pic';
 import sharp from 'sharp';
 import type { PageSize } from './pdfTypes';
@@ -99,6 +100,60 @@ export async function pdfToPNGs(pdf: Uint8Array): Promise<PDFPagePNG[]> {
   return results;
 }
 
+/**
+ * Rasterize a subset of 1-indexed pages so we skip pages that do not need
+ * a flattened image. `dpi` defaults to the vision pipeline's 72 DPI.
+ */
+export async function rasterizePDFPages(
+  pdf: Uint8Array,
+  options: { pageNumbers: number[]; dpi?: number }
+): Promise<Map<number, PDFPagePNG>> {
+  const { pageNumbers } = options;
+  const rasters = new Map<number, PDFPagePNG>();
+  const uniquePageNumbers = sortBy([...new Set(pageNumbers)]);
+  if (uniquePageNumbers.length === 0) {
+    return rasters;
+  }
+
+  const dpi = options.dpi ?? targetDPI;
+  const pageSizes = await getPDFPageSizes(pdf);
+  const requestedPageSizes = uniquePageNumbers.map(
+    (pageNumber) => pageSizes[pageNumber - 1]
+  );
+  // Flatten at 300 DPI needs a canvas larger than the vision 2048 square.
+  // Otherwise a letter page would be rasterized at 2048 and then upscaled.
+  const canvasSize = getRasterCanvasSize(requestedPageSizes, dpi);
+  const converter = fromBuffer(Buffer.from(pdf), {
+    preserveAspectRatio: true,
+    width: canvasSize,
+    height: canvasSize,
+    format: 'png',
+    density: dpi,
+  });
+  const results = await converter.bulk(uniquePageNumbers, {
+    responseType: 'buffer',
+  });
+
+  await promiseAllThrottled(
+    results.map((result, resultIndex) => async (): Promise<void> => {
+      const pageNumber = uniquePageNumbers[resultIndex];
+      const pageSizeInPoints = pageSizes[pageNumber - 1];
+      const pageSize: PageSize = {
+        width: Math.round((pageSizeInPoints.width * dpi) / 72),
+        height: Math.round((pageSizeInPoints.height * dpi) / 72),
+      };
+      const png = await sharp(result.buffer)
+        .resize(pageSize.width, pageSize.height, { fit: 'fill' })
+        .png()
+        .toBuffer();
+      rasters.set(pageNumber, { png, pageSize });
+    }),
+    pdfPageBatchSize
+  );
+
+  return rasters;
+}
+
 /** Compress a rasterized page PNG into a JPEG for storage and vision. */
 export async function compressImage(
   pngBuffer: Uint8Array
@@ -106,6 +161,21 @@ export async function compressImage(
   return sharp(pngBuffer)
     .jpeg({ quality: jpegQuality, progressive: false })
     .toBuffer();
+}
+
+/**
+ * Smallest square canvas that can hold every requested page at `dpi`
+ * without upscaling. Vision stays on 2048; flatten at 300 DPI grows this.
+ */
+function getRasterCanvasSize(pageSizes: PageSize[], dpi: number): number {
+  const maxEdge = Math.max(
+    rasterSize,
+    ...pageSizes.flatMap((pageSize) => [
+      Math.round((pageSize.width * dpi) / 72),
+      Math.round((pageSize.height * dpi) / 72),
+    ])
+  );
+  return maxEdge;
 }
 
 /** Shared pdf2pic canvas so mixed page sizes still rasterize. */
@@ -117,7 +187,12 @@ const targetDPI = 72;
 /** JPEG quality setting (0-100, lower = smaller file size) */
 const jpegQuality = 85;
 
-/** Keep rasterized buffers bounded before downstream processing releases them. */
+/**
+ * Keep rasterized buffers bounded before downstream processing releases
+ * them.
+ *
+ * Keep in sync with `flattenedPageConcurrency` in `generateRedactedPDF.ts`.
+ */
 const pdfPageBatchSize = 4;
 
 /** Keep enough pages queued for the workers without retaining the whole PDF. */

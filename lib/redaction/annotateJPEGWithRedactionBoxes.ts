@@ -16,6 +16,10 @@ export interface RedactionBoxToAnnotate extends Omit<
  * inspection, not as the final redacted document. For example, a box with
  * `{ minX: 0.1, minY: 0.2, maxX: 0.3, maxY: 0.4 }` is drawn from 10% to 30%
  * of the image width and 20% to 40% of its height.
+ *
+ * Keep in sync with `burnRedactionBoxesOnImage`: same 0–1 top-left boxes,
+ * but that helper fills black for the final redacted image instead of
+ * outlining.
  */
 export async function annotateJPEGWithRedactionBoxes(
   image: Uint8Array,

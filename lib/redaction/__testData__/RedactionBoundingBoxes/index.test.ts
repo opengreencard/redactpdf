@@ -20,6 +20,10 @@ function makeRedactionBoundingBoxesTest(
   );
 }
 
+makeRedactionBoundingBoxesTest(
+  'DutchPassportSpecimen',
+  'dutchPassportSpecimen.jpg'
+);
 makeRedactionBoundingBoxesTest('IRS1040Scenario2', 'irs1040Scenario2.jpg');
 makeRedactionBoundingBoxesTest(
   'USPassportCardSpecimen',
