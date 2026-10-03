@@ -18,7 +18,8 @@ export interface RedactionBoxToAnnotate extends Omit<
  * of the image width and 20% to 40% of its height.
  *
  * Keep in sync with `burnRedactionBoxesOnImage`: same 0–1 top-left boxes,
- * but that helper fills black for download instead of outlining.
+ * but that helper fills black for the final redacted image instead of
+ * outlining.
  */
 export async function annotateJPEGWithRedactionBoxes(
   image: Uint8Array,

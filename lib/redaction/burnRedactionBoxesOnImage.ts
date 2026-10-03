@@ -3,8 +3,8 @@ import type { BoundingBox } from './redactionTypes';
 
 /**
  * Paint filled black rectangles onto an image using the same 0–1 top-left
- * boxes we store on a redaction. Download uses this on a rasterized PDF page
- * so the covered pixels are gone, not just hidden by a PDF rectangle.
+ * boxes we store on a redaction. A rasterized page with burned pixels
+ * removes the covered bits instead of hiding them under a PDF rectangle.
  *
  * Keep in sync with `annotateJPEGWithRedactionBoxes`: same coordinate space,
  * but that helper draws red outlines for inspection instead of filling.

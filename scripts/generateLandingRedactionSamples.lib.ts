@@ -6,12 +6,12 @@ import { TestRedactionBoundingBoxes } from '../lib/redaction/__testData__/Redact
 import type { BoundingBox } from '../lib/redaction/redactionTypes';
 import { promiseAllThrottled } from '../lib/utilities/promiseAllThrottled';
 
-export interface GenerateLandingRedactionSamplesOptions {
+interface GenerateLandingRedactionSamplesOptions {
   outputDirectory: string;
   fixturesDirectory: string;
 }
 
-export interface GeneratedLandingSample {
+interface GeneratedLandingSample {
   fileName: string;
   width: number;
   height: number;
@@ -24,6 +24,10 @@ export interface GeneratedLandingSample {
  * `dutchPassportSpecimen.jpg` (0–1000 model coords, divided by 1000). IRS
  * uses `TestRedactionBoundingBoxes.irs1040Scenario2` and is cropped to the
  * identity header so the card is closer to the passport's size.
+ *
+ * Keep in sync with `dutchPassportSample` and `irs1040Sample` in
+ * `landingRedactionSamples.ts`. After we write new JPEGs, copy the printed
+ * width/height into those objects.
  */
 export async function generateLandingRedactionSamples({
   outputDirectory,

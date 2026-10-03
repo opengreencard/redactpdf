@@ -101,10 +101,8 @@ export async function pdfToPNGs(pdf: Uint8Array): Promise<PDFPagePNG[]> {
 }
 
 /**
- * Rasterize only the requested 1-indexed pages.
- *
- * Download uses this so we do not render every page when a few have
- * redaction boxes. `dpi` defaults to the vision pipeline's 72 DPI.
+ * Rasterize a subset of 1-indexed pages so we skip pages that do not need
+ * a flattened image. `dpi` defaults to the vision pipeline's 72 DPI.
  */
 export async function rasterizePDFPages(
   pdf: Uint8Array,

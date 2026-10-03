@@ -16,17 +16,14 @@ export interface GenerateRedactedPDFOptions {
 /**
  * Burn enabled redaction boxes into a copy of the source PDF.
  *
- * Pages with at least one enabled box are rasterized and replaced with a
- * JPEG that has black rectangles painted in. That removes the selectable
- * text layer and any pixels under the box, including Form XObjects and
- * photos. Pages without enabled boxes are copied as-is so their remaining
- * text stays selectable.
+ * Pages with an enabled box are rasterized and replaced with a JPEG that
+ * has black rectangles painted in. That removes the pixels under the box
+ * and the selectable text. Pages without enabled boxes are copied as-is
+ * so leftover text stays selectable.
  *
- * We flatten instead of painting a PDF rectangle or scrubbing the content
+ * We flatten instead of painting a PDF rectangle or editing the content
  * stream. Stream coordinates are easy to get wrong (`Td` after a `Tm`
- * scale is one example), and a painted box still leaves copyable text. A
- * rasterized page with burned pixels removes both the pixels and the
- * text layer.
+ * scale is one example), and a painted box still leaves copyable text.
  */
 export async function generateRedactedPDF({
   pdf,
@@ -65,6 +62,7 @@ export async function generateRedactedPDF({
       // Burn, then embed, then append so the page order stays stable.
       // eslint-disable-next-line no-await-in-loop
       const burnedJPEG = await burnRedactionBoxesOnImage(raster.png, boxes);
+      // Same sequential append so this JPEG lands on the matching page.
       // eslint-disable-next-line no-await-in-loop
       const embeddedJPEG = await outputPDF.embedJpg(burnedJPEG);
       const pageSize = pageSizes[pageIndex];

@@ -130,8 +130,8 @@ const LandingPageBeforeAfter: React.FunctionComponent = React.memo(
             Before / after
           </Title>
           {
-            // Dutch passport plus the cropped 1040 header. Desktop cards show
-            // both stills; mobile flips until the visitor freezes a side.
+            // Passport plus the cropped 1040 header so the two cards are
+            // closer in size than a full letter page would be.
           }
           <SimpleGrid cols={{ base: 1, sm: 2 }}>
             <BeforeAfterRedactionCard {...dutchPassportSample} />

@@ -1,6 +1,6 @@
 import type { BeforeAfterRedactionCardProps } from './BeforeAfterRedactionCard';
 
-export interface LandingRedactionSample extends Pick<
+interface LandingRedactionSample extends Pick<
   BeforeAfterRedactionCardProps,
   'beforeSrc' | 'afterSrc' | 'beforeAlt' | 'afterAlt' | 'title'
 > {
@@ -9,9 +9,11 @@ export interface LandingRedactionSample extends Pick<
 }
 
 /**
- * Public-sample metadata for the landing before/after cards.
- * Pixel sizes come from `yarn swc-node scripts/generateLandingRedactionSamples.ts`.
- * Last updated 2026-10-03.
+ * Dutch passport stills for the landing before/after card.
+ *
+ * Keep in sync with `generateLandingRedactionSamples`: rerun
+ * `yarn swc-node scripts/generateLandingRedactionSamples.ts` and copy the
+ * printed width/height here. Last updated 2026-10-03.
  */
 export const dutchPassportSample: LandingRedactionSample = {
   title: 'Dutch passport',
@@ -24,6 +26,12 @@ export const dutchPassportSample: LandingRedactionSample = {
   height: 2778,
 };
 
+/**
+ * Cropped 1040 identity header for the landing before/after card.
+ *
+ * Keep in sync with `generateLandingRedactionSamples` (same as
+ * `dutchPassportSample`). Last updated 2026-10-03.
+ */
 export const irs1040Sample: LandingRedactionSample = {
   title: 'IRS Form 1040',
   beforeSrc: '/samples/irs1040-before.jpg',

@@ -9,7 +9,7 @@ import {
   ImageProps as MantineImageProps,
 } from '@mantine/core';
 
-// Next Image needs width/height (or fill) so it can reserve space.
+/** Next Image needs width/height (or fill) so it can reserve space. */
 export interface ImageProps
   extends
     MantineImageProps,

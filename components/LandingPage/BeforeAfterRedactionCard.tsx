@@ -16,9 +16,9 @@ export enum BeforeAfterSide {
   after = 'after',
 }
 
-/** Mobile still image. Exported for tests. */
+/** Flipping still so tests can assert which side is showing. */
 export const _mobileSampleImageTestId = 'before-after-mobile-image';
-/** After freeze button. Exported for tests. */
+/** After button so tests can freeze the flip. */
 export const _freezeAfterButtonTestId = 'before-after-freeze-after';
 
 export interface BeforeAfterRedactionCardProps {
@@ -31,10 +31,7 @@ export interface BeforeAfterRedactionCardProps {
   height: number;
   /** Auto-advance delay while neither side is frozen. */
   intervalMs?: number;
-  /**
-   * Storybook / tests — start frozen on one side. Omit or pass null to
-   * auto-toggle.
-   */
+  /** Storybook / tests only — start frozen on one side. */
   initialFrozenSideForTesting?: BeforeAfterSide | null;
 }
 

@@ -24,10 +24,11 @@ describe(generateRedactedPDF, () => {
     const result = await generateRedactedPDF({
       pdf: sourcePDF,
       redactionBoundingBoxes: [
+        // Any enabled box flattens the page, so default coordinates are
+        // enough. We only care that page 1 is enabled and page 2 is not.
         ClientFakeData.makeAutoRedactionBoundingBox({
           page: 1,
           enabled: true,
-          box: { minX: 0.1, minY: 0.1, maxX: 0.4, maxY: 0.2 },
         }),
         ClientFakeData.makeManualRedactionBoundingBox({
           page: 2,
@@ -36,9 +37,12 @@ describe(generateRedactedPDF, () => {
       ],
     });
 
-    expect(await getPDFPageSizes(result)).toHaveLength(2);
-    expect(result.length).toBeGreaterThan(0);
-    const pageTexts = await extractPageTexts(result);
+    const [pageSizes, pageTexts] = await Promise.all([
+      getPDFPageSizes(result),
+      extractPageTexts(result),
+    ]);
+    // The output still has both source pages.
+    expect(pageSizes).toHaveLength(2);
     // Page 1 was flattened, so the cover-sheet SSN cannot be copied.
     expect(pageTexts[0]).not.toContain('400-00-1038');
     // Page 2 had only a disabled box, so its text layer stays.
@@ -57,7 +61,9 @@ describe(generateRedactedPDF, () => {
     });
 
     const pageTexts = await extractPageTexts(result);
+    // Page 1 had no enabled boxes, so its cover-sheet text stays.
     expect(pageTexts[0]).toContain('Sean John');
+    // Page 2 was flattened, so the 1040 PII cannot be copied.
     expect(pageTexts[1]).not.toContain('400 00 1038');
     expect(pageTexts[1]).not.toContain('Joan');
     expect(pageTexts[1]).not.toContain('26 Dancing Daisy');
