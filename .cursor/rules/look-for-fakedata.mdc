@@ -11,3 +11,7 @@ or `lib/testUtilities/FakeData.ts`. Examples are:
 - `FakeData.makeDBUser()`
 - `FakeData.makeDBFilledFormSet()`
 - `FakeData.makeDBUploadedFile()`
+
+For recorded or production-shaped data that FakeData cannot build, follow
+`.cursor/skills/testdata-fixtures/SKILL.md`: generate JSON with
+`makeTestDataGeneratorTest`, then import `TestXxx`.

@@ -5,6 +5,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MantineProvider } from '@mantine/core';
+import type { FileRejection, FileWithPath } from '@mantine/dropzone';
 import { ErrorCode } from 'react-dropzone';
 import { theme } from '../../theme';
 import { uploadFileForRedactionClient } from '../clientLib/api/redaction';
@@ -58,19 +59,20 @@ describe('UploadButtonAndDropzone', () => {
 
 describe(_getDropRejectionMessage, () => {
   it('names the file when the type is not a PDF', () => {
-    expect(
-      _getDropRejectionMessage([
-        {
-          file: textFile,
-          errors: [
-            {
-              code: ErrorCode.FileInvalidType,
-              message: 'File type must be pdf',
-            },
-          ],
-        },
-      ])
-    ).toBe(`${textFile.name} is not a PDF. Please upload a PDF.`);
+    const rejections: FileRejection[] = [
+      {
+        file: textFile,
+        errors: [
+          {
+            code: ErrorCode.FileInvalidType,
+            message: 'File type must be pdf',
+          },
+        ],
+      },
+    ];
+    expect(_getDropRejectionMessage(rejections)).toBe(
+      `${textFile.name} is not a PDF. Please upload a PDF.`
+    );
   });
 });
 
@@ -78,4 +80,13 @@ const uploadedRedactionKey = 'test-redaction-key';
 const pdfFile = new File(['%PDF-1.4 test'], 'document.pdf', {
   type: 'application/pdf',
 });
-const textFile = new File(['hello'], 'notes.txt', { type: 'text/plain' });
+// file-selector 5's FileWithPath requires path + relativePath. The
+// browser File constructor does not set those.
+// https://github.com/react-dropzone/file-selector/blob/v5.0.1/src/file.ts
+const textFile: FileWithPath = Object.assign(
+  new File(['hello'], 'notes.txt', { type: 'text/plain' }),
+  {
+    path: 'notes.txt',
+    relativePath: 'notes.txt',
+  }
+);

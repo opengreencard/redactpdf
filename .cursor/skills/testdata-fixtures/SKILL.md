@@ -7,8 +7,18 @@ description: >-
 
 # Test data fixtures (`__testData__`)
 
-Use generated JSON for reusable data from a live API, database, or other
-production-shaped source. Keep the generator and its generated files together:
+Use `FakeData` / `ClientFakeData` for in-memory objects you can build in
+the test. When that is not enough (recorded API output, vision boxes,
+production-shaped JSON), generate a committed fixture instead:
+
+1. Add `__testData__/<Name>/index.test.ts`.
+2. Call `makeTestDataGeneratorTest` once per JSON file.
+3. Run `yarn devdb-testdata-jest path/to/index.test.ts` (or
+   `yarn proddb-testdata-jest` when the fixture must come from production).
+4. Import the generated files from `__testData__/<Name>/index.ts` as
+   `TestXxx`.
+
+Keep the generator and its generated files together:
 
 ```text
 __testData__/<Name>/

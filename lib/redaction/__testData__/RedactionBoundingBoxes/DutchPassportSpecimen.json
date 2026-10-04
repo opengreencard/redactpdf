@@ -1,0 +1,182 @@
+[
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "SPECI2014",
+    "box": {
+      "minX": 0.877,
+      "minY": 0.098,
+      "maxX": 0.944,
+      "maxY": 0.427
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personPhoto",
+    "text": "photograph",
+    "box": {
+      "minX": 0.052,
+      "minY": 0.569,
+      "maxX": 0.31,
+      "maxY": 0.804
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "SPECI2014",
+    "box": {
+      "minX": 0.724,
+      "minY": 0.569,
+      "maxX": 0.836,
+      "maxY": 0.585
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "De Bruijn\ne/v Molenaar",
+    "box": {
+      "minX": 0.33,
+      "minY": 0.597,
+      "maxX": 0.477,
+      "maxY": 0.631
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "Willeke Liselotte",
+    "box": {
+      "minX": 0.331,
+      "minY": 0.642,
+      "maxX": 0.51,
+      "maxY": 0.657
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "dateOfBirth",
+    "text": "10 MAA/MAR 1965",
+    "box": {
+      "minX": 0.331,
+      "minY": 0.668,
+      "maxX": 0.552,
+      "maxY": 0.684
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "address",
+    "text": "Specimen",
+    "box": {
+      "minX": 0.331,
+      "minY": 0.698,
+      "maxX": 0.439,
+      "maxY": 0.715
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "sensitiveQuantity",
+    "text": "1,75 m",
+    "box": {
+      "minX": 0.749,
+      "minY": 0.725,
+      "maxX": 0.825,
+      "maxY": 0.74
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "issueDate",
+    "text": "09 MAA/MAR 2014",
+    "box": {
+      "minX": 0.331,
+      "minY": 0.753,
+      "maxX": 0.536,
+      "maxY": 0.768
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "expiryDate",
+    "text": "09 MAA/MAR 2024",
+    "box": {
+      "minX": 0.75,
+      "minY": 0.753,
+      "maxX": 0.955,
+      "maxY": 0.768
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personPhoto",
+    "text": "photograph",
+    "box": {
+      "minX": 0.621,
+      "minY": 0.663,
+      "maxX": 0.742,
+      "maxY": 0.77
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "dateOfBirth",
+    "text": "1965",
+    "box": {
+      "minX": 0.055,
+      "minY": 0.771,
+      "maxX": 0.155,
+      "maxY": 0.804
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "signature",
+    "text": "signature",
+    "box": {
+      "minX": 0.335,
+      "minY": 0.797,
+      "maxX": 0.585,
+      "maxY": 0.835
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "P<NLDDE<BRUIJN<<WILLEKE<LISELOTTE<<<<<<<<<<<",
+    "box": {
+      "minX": 0.068,
+      "minY": 0.882,
+      "maxX": 0.928,
+      "maxY": 0.898
+    },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "idNumber",
+    "text": "SPECI20142NLD6503101F2403096999999990<<<<<84",
+    "box": {
+      "minX": 0.068,
+      "minY": 0.915,
+      "maxX": 0.926,
+      "maxY": 0.932
+    },
+    "enabled": true
+  }
+]

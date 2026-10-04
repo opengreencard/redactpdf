@@ -4,6 +4,10 @@ globs: 'scripts/**/*.ts'
 alwaysApply: true
 ---
 
+Prefer a `*.manual.test.ts` when you only need a hand-run recipe (generate
+samples, rewrite fixtures). Split a script into `.lib.ts` + `.ts` when it is
+a real CLI or cron job whose core function needs automated tests.
+
 Split executable scripts into two files:
 
 - **`scriptName.lib.ts`** — the core function (exported, testable, importable).

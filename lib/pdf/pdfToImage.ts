@@ -1,3 +1,4 @@
+import { sortBy } from 'lodash';
 import { fromBuffer } from 'pdf2pic';
 import sharp from 'sharp';
 import type { PageSize } from './pdfTypes';
@@ -99,6 +100,78 @@ export async function pdfToPNGs(pdf: Uint8Array): Promise<PDFPagePNG[]> {
   return results;
 }
 
+/**
+ * Rasterize a subset of 1-indexed pages so we skip pages that do not need
+ * a flattened image. `dpi` defaults to the vision pipeline's 72 DPI.
+ */
+export async function rasterizePDFPages(
+  pdf: Uint8Array,
+  options: { pageNumbers: number[]; dpi?: number }
+): Promise<Map<number, PDFPagePNG>> {
+  const { pageNumbers } = options;
+  const rasters = new Map<number, PDFPagePNG>();
+  const uniquePageNumbers = sortBy([...new Set(pageNumbers)]);
+  if (uniquePageNumbers.length === 0) {
+    return rasters;
+  }
+
+  const dpi = options.dpi ?? targetDPI;
+  const pageSizes = await getPDFPageSizes(pdf);
+  const requestedPageSizes = uniquePageNumbers.map(
+    (pageNumber) => pageSizes[pageNumber - 1]
+  );
+  // Flatten at 300 DPI needs a canvas larger than the vision 2048 square.
+  // Otherwise a letter page would be rasterized at 2048 and then upscaled.
+  const canvasSize = getRasterCanvasSize(requestedPageSizes, dpi);
+  const converter = fromBuffer(Buffer.from(pdf), {
+    preserveAspectRatio: true,
+    width: canvasSize,
+    height: canvasSize,
+    format: 'png',
+    density: dpi,
+  });
+  for (
+    let batchStart = 0;
+    batchStart < uniquePageNumbers.length;
+    batchStart += pdf2picBulkBatchSize
+  ) {
+    const batchPageNumbers = uniquePageNumbers.slice(
+      batchStart,
+      batchStart + pdf2picBulkBatchSize
+    );
+    // pdf2pic already converts up to 10 pages concurrently inside bulk().
+    // Process one matching-sized batch at a time so completed buffers don't
+    // accumulate for every flattened page.
+    // eslint-disable-next-line no-await-in-loop -- sequential batches bound memory
+    const results = await converter.bulk(batchPageNumbers, {
+      responseType: 'buffer',
+    });
+
+    // Release each batch's raw buffers before asking pdf2pic to convert more
+    // pages. The returned rasters still retain each processed PNG, but raw
+    // pdf2pic buffers are limited to this batch.
+    // eslint-disable-next-line no-await-in-loop -- finish this batch before the next
+    await promiseAllThrottled(
+      results.map((result, resultIndex) => async (): Promise<void> => {
+        const pageNumber = batchPageNumbers[resultIndex];
+        const pageSizeInPoints = pageSizes[pageNumber - 1];
+        const pageSize: PageSize = {
+          width: Math.round((pageSizeInPoints.width * dpi) / 72),
+          height: Math.round((pageSizeInPoints.height * dpi) / 72),
+        };
+        const png = await sharp(result.buffer)
+          .resize(pageSize.width, pageSize.height, { fit: 'fill' })
+          .png()
+          .toBuffer();
+        rasters.set(pageNumber, { png, pageSize });
+      }),
+      pdfPageBatchSize
+    );
+  }
+
+  return rasters;
+}
+
 /** Compress a rasterized page PNG into a JPEG for storage and vision. */
 export async function compressImage(
   pngBuffer: Uint8Array
@@ -106,6 +179,21 @@ export async function compressImage(
   return sharp(pngBuffer)
     .jpeg({ quality: jpegQuality, progressive: false })
     .toBuffer();
+}
+
+/**
+ * Smallest square canvas that can hold every requested page at `dpi`
+ * without upscaling. Vision stays on 2048; flatten at 300 DPI grows this.
+ */
+function getRasterCanvasSize(pageSizes: PageSize[], dpi: number): number {
+  const maxEdge = Math.max(
+    rasterSize,
+    ...pageSizes.flatMap((pageSize) => [
+      Math.round((pageSize.width * dpi) / 72),
+      Math.round((pageSize.height * dpi) / 72),
+    ])
+  );
+  return maxEdge;
 }
 
 /** Shared pdf2pic canvas so mixed page sizes still rasterize. */
@@ -117,8 +205,19 @@ const targetDPI = 72;
 /** JPEG quality setting (0-100, lower = smaller file size) */
 const jpegQuality = 85;
 
-/** Keep rasterized buffers bounded before downstream processing releases them. */
+/**
+ * Keep rasterized buffers bounded before downstream processing releases
+ * them.
+ */
 const pdfPageBatchSize = 4;
 
 /** Keep enough pages queued for the workers without retaining the whole PDF. */
 const pdfPageProcessingBatchSize = 3 * pdfPageBatchSize;
+
+/**
+ * Keep each flattening call aligned with pdf2pic's internal ten-page batch.
+ *
+ * pdf2pic 3.2.0 doesn't expose its internal `batchSize` as an option:
+ * https://github.com/yakovmeister/pdf2image/blob/v3.2.0/src/pdf2picCore.ts
+ */
+const pdf2picBulkBatchSize = 10;

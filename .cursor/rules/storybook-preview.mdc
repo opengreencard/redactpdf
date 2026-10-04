@@ -31,6 +31,9 @@ export const SomethingElse: Story<YourComponentProps> = Template.bind({});
 SomethingElse.args = { someProp: 'abc' };
 ```
 
+Prefer few stories, same idea as succinct tests. Extra stories only when
+they change appearance or behavior. Story `args` are overrides only.
+
 If a story handler only needs to log and does not own local state, use
 `makeFakeHandler` from `lib/storybook.ts` instead of a no-op or
 `console.log` stub:
