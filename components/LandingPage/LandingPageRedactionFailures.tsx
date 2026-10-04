@@ -57,7 +57,7 @@ const LandingPageRedactionFailures: React.FunctionComponent = React.memo(
             </GridCol>
           </Grid>
           <Text mt={48} maw={720}>
-            All five stories come down to the same mistake. When you download
+            Every one of these comes down to the same mistake. When you download
             from {siteName}, we remove the text from the PDF instead of drawing
             over it.
           </Text>
