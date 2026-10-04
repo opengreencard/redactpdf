@@ -251,7 +251,7 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
               ))}
             </SimpleGrid>
             <Text ta="center" c="dimmed" size="sm">
-              To find likely sensitive information, we send page images to
+              To find likely sensitive information, we send page images to{' '}
               {userFacingRedactionBoundingBoxesModel} through the Gemini
               Developer API.
             </Text>
