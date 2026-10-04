@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Progress, Stack, Text, Title } from '@mantine/core';
 import type { GetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
+import { useInterval } from '../../lib/hookUtilities/useInterval';
 import { estimatedMsPerPage } from '../../lib/redaction/estimatedMsPerPage';
 import Card from '../designSystem/Card';
 import { centeredAlertOrCardMaxWidth } from './redactionLayout';
@@ -42,24 +43,17 @@ const RedactionProgress: React.FunctionComponent<RedactionProgressProps> =
     );
     const isFinishing = now >= endAtTimestamp;
 
-    useEffect(() => {
-      if (isFinishing) {
-        return undefined;
-      }
-
-      const updateNow = (): void => {
+    // Pause once the estimate is done so we don't keep ticking the bar.
+    // First paint should show "now", not wait a full 250ms.
+    useInterval(
+      () => {
         setNow(Date.now());
-      };
-      updateNow();
-      const intervalId = window.setInterval(
-        updateNow,
-        redactionProgressUpdateIntervalMs
-      );
-
-      return (): void => {
-        window.clearInterval(intervalId);
-      };
-    }, [isFinishing]);
+      },
+      {
+        delayMs: isFinishing ? null : redactionProgressUpdateIntervalMs,
+        runOnMount: true,
+      }
+    );
 
     return (
       <Card
