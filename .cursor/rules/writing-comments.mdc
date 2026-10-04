@@ -42,8 +42,9 @@ const placeBeforeSection = getPlaceBlockBeforeFirstPlaceInSection({...});
   - In `package.json`, add a `__…-comment__` string next to a script or
     dependency when it should stay aligned with related code changes. For
     dependency notes, use the `__dependencyComments__` object when appropriate.
-  - On copied numbers that go stale (ratings, list prices), add a
-    last-updated date
+    - On copied external numbers that go stale (ratings, list prices,
+      published versions), add a last-updated date. Do not date constants
+      we chose, such as DPI or JPEG quality.
 - If adding a TODO, always link to the Notion task that should later implement
   it; include a spec number too when one exists.
 - Don't restate the signature or parameters, or anything you can infer from the
