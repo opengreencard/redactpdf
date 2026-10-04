@@ -1,0 +1,25 @@
+/*
+ * A fake "redaction" that fails the same way the real ones did: the text is
+ * still there under a black background, so selecting it shows what it says.
+ */
+.leakyRedaction {
+  background-color: var(--mantine-color-black);
+  color: var(--mantine-color-black);
+  padding: 0 2px;
+}
+
+.leakyRedaction::selection {
+  background-color: var(--mantine-color-yellow-3);
+  color: var(--mantine-color-black);
+}
+
+.storyLink {
+  text-decoration: underline;
+  text-decoration-color: var(--mantine-color-dark-2);
+  text-underline-offset: 3px;
+}
+
+.storyLink:hover,
+.storyLink:focus-visible {
+  text-decoration-color: currentColor;
+}

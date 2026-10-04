@@ -44,6 +44,7 @@ import { siteContainerSize } from '../SiteChrome/SiteChrome';
 import BeforeAfterRedactionCard from './BeforeAfterRedactionCard';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
 import LandingPageHeroDropzone from './LandingPageHeroDropzone';
+import LandingPageRedactionFailures from './LandingPageRedactionFailures';
 import LandingPageUploadCTA from './LandingPageUploadCTA';
 import LandingPageUploadModalProvider from './LandingPageUploadModalProvider';
 import { dutchPassportSample, irs1040Sample } from './landingRedactionSamples';
@@ -64,6 +65,7 @@ const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
         <LandingPageHowItWorks />
         <LandingPageDetectList />
         <LandingPagePrivacy />
+        <LandingPageRedactionFailures />
         <LandingPagePricing />
         <LandingPageWhyFree />
         <LandingPageFaq />
