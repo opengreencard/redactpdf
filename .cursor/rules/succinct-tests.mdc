@@ -1,6 +1,6 @@
 ---
-description: Keep tests focused. Don't duplicate cases that exercise the same path.
-globs: '**/*.test.ts,**/*.test.tsx'
+description: Keep tests and Storybook stories focused. Don't duplicate cases that exercise the same path.
+globs: '**/*.test.ts,**/*.test.tsx,**/*.stories.tsx'
 alwaysApply: true
 ---
 
@@ -22,6 +22,22 @@ croner, yargs, and the like.
 Don't assert the same fact two ways. If `findAll` by IDs already shows the
 row is gone, do not also `.reload()` that instance. Add a second check only
 when it is a different fact, such as Spaces objects vs database rows.
+
+The same idea applies to Storybook. One Default story is enough when extra
+stories only swap data. Add another story when the UI actually looks or
+acts different. Story `args` are overrides only — do not spread the default
+sample object.
+
+```tsx
+// Avoid — same card, two documents
+export const DutchPassport = Template.bind({});
+export const IRS1040 = Template.bind({});
+
+// Prefer — Default covers the card; Loading changes appearance
+export const Default = Template.bind({});
+export const Loading = Template.bind({});
+Loading.args = { initialStatus: makeInProgressState() };
+```
 
 Comment what each assertion group is checking, next to those expects:
 
