@@ -90,22 +90,21 @@ const LandingPageHero: React.FunctionComponent = React.memo(
                   </Text>
                 </Title>
                 <Text size="lg" c="dimmed">
-                  Upload a PDF and we&apos;ll flag details that may need to be
-                  hidden. Check every suggestion before you download the
-                  redacted file.
+                  Upload a PDF and we&apos;ll suggest what to hide. Review each
+                  suggestion, then download your redacted file.
                 </Text>
                 <Group>
                   <LandingPageUploadCTA fullWidth={false} />
                 </Group>
                 <Group gap="sm">
-                  <Badge variant="outline" color="gray">
+                  <Badge variant="light" color="green">
                     Free
                   </Badge>
-                  <Badge variant="outline" color="gray">
+                  <Badge variant="light" color="green">
                     Open source
                   </Badge>
-                  <Badge variant="outline" color="gray">
-                    Deleted {_deleteOldRedactionHoursText}
+                  <Badge variant="light" color="green">
+                    Deleted within one hour
                   </Badge>
                 </Group>
               </Stack>
@@ -138,8 +137,7 @@ const LandingPageExampleDocuments: React.FunctionComponent = React.memo(
             <BeforeAfterRedactionCard {...irs1040Sample} />
           </SimpleGrid>
           <Text ta="center" c="dimmed">
-            See each suggestion on the page and change it if needed. You make
-            the final call.
+            Compare the original and redacted versions.
           </Text>
         </Stack>
       </Container>
@@ -155,10 +153,10 @@ const LandingPageHowItWorks: React.FunctionComponent = React.memo(
           <Stack gap="lg">
             <Stack gap="xs">
               <Title order={2} ta="center">
-                How to redact a PDF
+                How it works
               </Title>
               <Text ta="center" c="dimmed">
-                You decide what gets redacted before we create the finished PDF.
+                Review the suggestions, adjust them, and download the result.
               </Text>
             </Stack>
             <SimpleGrid cols={{ base: 1, sm: 3 }}>
@@ -189,7 +187,7 @@ const LandingPageDetectList: React.FunctionComponent = React.memo(
       <Container size={siteContainerSize} py="xl">
         <Stack gap="lg">
           <Title order={2} ta="center">
-            We automatically detect
+            Common details we can detect
           </Title>
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
             {detectedDataTypes.map((dataType) => (
@@ -215,11 +213,11 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
           <Stack gap="xl">
             <Stack gap="xs">
               <Title order={2} ta="center">
-                Private, open source, and free
+                Free, open source, and transparent
               </Title>
               <Text ta="center" c="dimmed">
-                See how we handle your file and what each redaction removes. You
-                can check the source code yourself.
+                See what happens to your file, what we remove, and how to
+                inspect the code.
               </Text>
             </Stack>
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
@@ -424,17 +422,17 @@ const howItWorksSteps: HowItWorksStep[] = [
   {
     title: 'Find likely sensitive details',
     description:
-      'We scan the PDF and mark text that may need redaction, such as a name or Social Security number.',
+      'We scan the PDF and mark details that may need redaction, such as names or Social Security numbers.',
     icon: faWandMagicSparkles,
   },
   {
-    title: 'Check the suggestions',
+    title: 'Edit the suggestions',
     description:
       'Keep, move, resize, or remove any box. You can also draw your own redactions.',
     icon: faListCheck,
   },
   {
-    title: 'Save the redacted PDF',
+    title: 'Download your redacted PDF',
     description:
       'When everything looks right, download a new PDF with the selected content removed.',
     icon: faDownload,
@@ -462,28 +460,27 @@ const privacyCards: PrivacyCard[] = [
     title: 'Automatic deletion',
     subtitle: _deleteOldRedactionHoursText,
     description:
-      'We remove the original PDF, page images, and working files from our servers.',
+      'We delete the original PDF, page images, and working files from our servers.',
     icon: faTrashCan,
   },
   {
     title: 'Open source',
     subtitle: 'Public on GitHub',
-    description:
-      'Read the code, report a problem, or contribute a change to the project.',
+    description: 'Read the code, report issues, or contribute to the project.',
     icon: faCode,
   },
   {
     title: 'Review first',
-    subtitle: 'You make the final call',
+    subtitle: 'You control every redaction',
     description:
-      'We suggest what to hide. Nothing is permanently redacted until you review and download.',
+      'Suggestions are only suggestions. Nothing is permanently removed until you review and download.',
     icon: faEye,
   },
   {
-    title: 'Content removed',
+    title: 'Redactions are permanent',
     subtitle: 'Visible and selectable text',
     description:
-      'Each redaction removes both from the finished PDF instead of adding an overlay.',
+      'The finished PDF removes both the visible content and its selectable text layer.',
     icon: faSquare,
   },
 ];
@@ -526,12 +523,12 @@ const faqItems: FaqItem[] = [
   {
     question: 'How do I redact a PDF?',
     answer:
-      'Upload your PDF and check the areas we mark. Add, remove, move, or resize any redaction, then download the finished file. Your first five uploads do not require an account.',
+      'Upload your PDF and review the areas we mark. Add, remove, move, or resize a redaction, then download the finished file. Your first five uploads do not require an account.',
   },
   {
     question: 'Is redaction permanent?',
     answer:
-      'Yes. We remove the selected page content and its selectable text layer instead of covering it with a black rectangle.',
+      'Yes. We remove the selected content and its selectable text layer instead of covering it with a black rectangle.',
   },
   {
     question: 'What happens to my PDF?',
@@ -539,11 +536,11 @@ const faqItems: FaqItem[] = [
   },
   {
     question: 'Do you send files to a cloud AI model?',
-    answer: `Yes. We send page images to Gemini 3.8 Flash on Google Cloud so it can suggest redactions. We delete our original PDF, page images, and working files ${_deleteOldRedactionHoursText}.`,
+    answer: `Yes. We send page images to Gemini 3.8 Flash on Google Cloud to suggest redactions. We delete the original PDF, page images, and working files ${_deleteOldRedactionHoursText}.`,
   },
   {
     question: 'Is this open source?',
     answer:
-      'Yes. You can read the code, report a problem, or contribute on GitHub.',
+      'Yes. You can read the code, report issues, or contribute on GitHub.',
   },
 ];
