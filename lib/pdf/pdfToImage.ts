@@ -148,7 +148,8 @@ export async function rasterizePDFPages(
     });
 
     // Release each batch's raw buffers before asking pdf2pic to convert more
-    // pages. This keeps rasterization memory proportional to the batch size.
+    // pages. The returned rasters still retain each processed PNG, but raw
+    // pdf2pic buffers are limited to this batch.
     // eslint-disable-next-line no-await-in-loop -- finish this batch before the next
     await promiseAllThrottled(
       results.map((result, resultIndex) => async (): Promise<void> => {
