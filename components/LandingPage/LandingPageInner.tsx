@@ -44,6 +44,7 @@ import { siteContainerSize } from '../SiteChrome/SiteChrome';
 import BeforeAfterRedactionCard from './BeforeAfterRedactionCard';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
 import LandingPageHeroDropzone from './LandingPageHeroDropzone';
+import LandingPageRedactionFailures from './LandingPageRedactionFailures';
 import LandingPageUploadCTA from './LandingPageUploadCTA';
 import LandingPageUploadModalProvider from './LandingPageUploadModalProvider';
 import { dutchPassportSample, irs1040Sample } from './landingRedactionSamples';
@@ -64,6 +65,7 @@ const LandingPageInner: React.FunctionComponent<LandingPageInnerProps> =
         <LandingPageHowItWorks />
         <LandingPageDetectList />
         <LandingPagePrivacy />
+        <LandingPageRedactionFailures />
         <LandingPagePricing />
         <LandingPageWhyFree />
         <LandingPageFaq />
@@ -249,7 +251,7 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
               ))}
             </SimpleGrid>
             <Text ta="center" c="dimmed" size="sm">
-              To find likely sensitive information, we send page images to
+              To find likely sensitive information, we send page images to{' '}
               {userFacingRedactionBoundingBoxesModel} through the Gemini
               Developer API.
             </Text>

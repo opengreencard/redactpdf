@@ -1,0 +1,11 @@
+/* ::selection can't be set with Mantine props. */
+.leakyRedaction::selection {
+  background-color: var(--mantine-color-yellow-3);
+  color: var(--mantine-color-black);
+}
+
+/* Keep in sync with the story Anchor's inline underline styles. */
+.storyLink:hover,
+.storyLink:focus-visible {
+  text-decoration-color: currentColor;
+}
