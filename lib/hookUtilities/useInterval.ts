@@ -51,6 +51,8 @@ export function useInterval(
     const tick = (): void => {
       if (savedCallback.current) savedCallback.current();
     };
+    // This file is the allowed setInterval wrapper. Callers use useInterval.
+    // eslint-disable-next-line no-restricted-syntax
     const id = setInterval(tick, delayMs);
     return () => clearInterval(id);
   }, [delayMs]);

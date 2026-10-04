@@ -694,6 +694,15 @@ const commonNoRestrictedSyntaxRulesForNonTests = [
     message:
       'Inline arrow functions in JSX event handlers create new references each render. Use useMemoizedCallback for stable handlers, or useCallbackWithPrefix for item callbacks in lists. useSetState(setXXX, "blah") and useToggle(setChecked, checked) could also be helpful for minimal event handlers. In Storybook, likely use makeFakeHandler if it\'s a no-op (or the usual if we actually care about state)',
   },
+  {
+    // Bad: setInterval(updateNow, 1000)
+    // Bad: window.setInterval(updateNow, 1000)
+    // Good: useInterval(updateNow, { delayMs: 1000 })
+    selector:
+      'CallExpression:matches([callee.name="setInterval"], [callee.object.name="window"][callee.property.name="setInterval"])',
+    message:
+      'Use useInterval(callback, { delayMs }) from lib/hookUtilities/useInterval.ts instead of setInterval so the callback sees current props and state. Pass delayMs: null to pause.',
+  },
 ];
 
 const devDependencies = [
