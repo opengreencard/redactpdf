@@ -130,26 +130,43 @@ export async function rasterizePDFPages(
     format: 'png',
     density: dpi,
   });
-  const results = await converter.bulk(uniquePageNumbers, {
-    responseType: 'buffer',
-  });
+  for (
+    let batchStart = 0;
+    batchStart < uniquePageNumbers.length;
+    batchStart += pdf2picBulkBatchSize
+  ) {
+    const batchPageNumbers = uniquePageNumbers.slice(
+      batchStart,
+      batchStart + pdf2picBulkBatchSize
+    );
+    // pdf2pic already converts up to 10 pages concurrently inside bulk().
+    // Process one matching-sized batch at a time so completed buffers don't
+    // accumulate for every flattened page.
+    // eslint-disable-next-line no-await-in-loop -- sequential batches bound memory
+    const results = await converter.bulk(batchPageNumbers, {
+      responseType: 'buffer',
+    });
 
-  await promiseAllThrottled(
-    results.map((result, resultIndex) => async (): Promise<void> => {
-      const pageNumber = uniquePageNumbers[resultIndex];
-      const pageSizeInPoints = pageSizes[pageNumber - 1];
-      const pageSize: PageSize = {
-        width: Math.round((pageSizeInPoints.width * dpi) / 72),
-        height: Math.round((pageSizeInPoints.height * dpi) / 72),
-      };
-      const png = await sharp(result.buffer)
-        .resize(pageSize.width, pageSize.height, { fit: 'fill' })
-        .png()
-        .toBuffer();
-      rasters.set(pageNumber, { png, pageSize });
-    }),
-    pdfPageBatchSize
-  );
+    // Release each batch's raw buffers before asking pdf2pic to convert more
+    // pages. This keeps rasterization memory proportional to the batch size.
+    // eslint-disable-next-line no-await-in-loop -- finish this batch before the next
+    await promiseAllThrottled(
+      results.map((result, resultIndex) => async (): Promise<void> => {
+        const pageNumber = batchPageNumbers[resultIndex];
+        const pageSizeInPoints = pageSizes[pageNumber - 1];
+        const pageSize: PageSize = {
+          width: Math.round((pageSizeInPoints.width * dpi) / 72),
+          height: Math.round((pageSizeInPoints.height * dpi) / 72),
+        };
+        const png = await sharp(result.buffer)
+          .resize(pageSize.width, pageSize.height, { fit: 'fill' })
+          .png()
+          .toBuffer();
+        rasters.set(pageNumber, { png, pageSize });
+      }),
+      pdfPageBatchSize
+    );
+  }
 
   return rasters;
 }
@@ -197,3 +214,11 @@ const pdfPageBatchSize = 4;
 
 /** Keep enough pages queued for the workers without retaining the whole PDF. */
 const pdfPageProcessingBatchSize = 3 * pdfPageBatchSize;
+
+/**
+ * Keep each flattening call aligned with pdf2pic's internal ten-page batch.
+ *
+ * pdf2pic 3.2.0 doesn't expose its internal `batchSize` as an option:
+ * https://github.com/yakovmeister/pdf2image/blob/v3.2.0/src/pdf2picCore.ts
+ */
+const pdf2picBulkBatchSize = 10;
