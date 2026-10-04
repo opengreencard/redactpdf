@@ -6,6 +6,8 @@
   background-color: var(--mantine-color-black);
   color: var(--mantine-color-black);
   padding: 0 2px;
+  /* A box split across two lines looks broken on phones. */
+  white-space: nowrap;
 }
 
 .leakyRedaction::selection {
