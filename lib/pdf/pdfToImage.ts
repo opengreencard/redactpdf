@@ -208,8 +208,6 @@ const jpegQuality = 85;
 /**
  * Keep rasterized buffers bounded before downstream processing releases
  * them.
- *
- * Keep in sync with `flattenedPageConcurrency` in `generateRedactedPDF.ts`.
  */
 const pdfPageBatchSize = 4;
 
