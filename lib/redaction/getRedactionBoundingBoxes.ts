@@ -9,6 +9,7 @@ import {
   RedactedDataType,
   RedactionBoundingBoxType,
 } from './redactionTypes';
+import { redactionBoundingBoxesModel } from './redactionBoundingBoxesModel';
 
 /** Redaction boxes and token usage returned for one page. */
 export interface GetRedactionBoundingBoxesResult {
@@ -134,7 +135,7 @@ function requestRedactionVision(
 ): ReturnType<typeof createOpenAICompatibleCompletion> {
   return createOpenAICompatibleCompletion({
     provider: OpenAICompatibleProvider.gemini,
-    model: 'gemini-3.8-flash',
+    model: redactionBoundingBoxesModel,
     reasoning_effort: 'medium',
     messages: [
       {

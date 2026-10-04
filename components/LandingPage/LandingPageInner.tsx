@@ -23,12 +23,12 @@ import {
 import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
 import {
   faCheck,
-  faClock,
   faCode,
   faDownload,
   faEye,
   faListCheck,
   faSquare,
+  faTrashCan,
   faWandMagicSparkles,
 } from '@fortawesome/free-solid-svg-icons';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
@@ -39,6 +39,7 @@ import {
   wanderlogUrl,
 } from '../../lib/config/brand';
 import { _deleteOldRedactionHoursText } from '../../lib/redaction/deleteOldRedactionHours';
+import { userFacingRedactionBoundingBoxesModel } from '../../lib/redaction/redactionBoundingBoxesModel';
 import { siteContainerSize } from '../SiteChrome/SiteChrome';
 import BeforeAfterRedactionCard from './BeforeAfterRedactionCard';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
@@ -82,30 +83,29 @@ const LandingPageHero: React.FunctionComponent = React.memo(
               <Stack gap="lg">
                 <Title order={1}>
                   <Text span inherit c="green">
-                    Automatically
+                    Redact sensitive information
                   </Text>{' '}
-                  redact all sensitive info from PDFs{' '}
+                  from PDFs{' '}
                   <Text span inherit c="green">
                     in seconds
                   </Text>
                 </Title>
                 <Text size="lg" c="dimmed">
-                  You don&apos;t have to hunt through the page and black out
-                  each name, address, or SSN by hand. Upload a PDF, review AI
-                  suggestions, and download a permanently redacted file.
+                  Upload a PDF and we&apos;ll suggest what to hide. Review each
+                  suggestion, then download your redacted file.
                 </Text>
                 <Group>
                   <LandingPageUploadCTA fullWidth={false} />
                 </Group>
                 <Group gap="sm">
-                  <Badge variant="outline" color="gray">
+                  <Badge variant="light" color="green">
                     Free
                   </Badge>
-                  <Badge variant="outline" color="gray">
+                  <Badge variant="light" color="green">
                     Open source
                   </Badge>
-                  <Badge variant="outline" color="gray">
-                    Deleted {_deleteOldRedactionHoursText}
+                  <Badge variant="light" color="green">
+                    Deleted within one hour
                   </Badge>
                 </Group>
               </Stack>
@@ -138,8 +138,7 @@ const LandingPageExampleDocuments: React.FunctionComponent = React.memo(
             <BeforeAfterRedactionCard {...irs1040Sample} />
           </SimpleGrid>
           <Text ta="center" c="dimmed">
-            AI finds names, addresses, emails, SSNs, and more — you review
-            before download.
+            Compare the original and redacted versions.
           </Text>
         </Stack>
       </Container>
@@ -155,10 +154,10 @@ const LandingPageHowItWorks: React.FunctionComponent = React.memo(
           <Stack gap="lg">
             <Stack gap="xs">
               <Title order={2} ta="center">
-                How to redact a PDF
+                How it works
               </Title>
               <Text ta="center" c="dimmed">
-                Three free steps — no manual hunt through every page.
+                Review the suggestions, adjust them, and download the result.
               </Text>
             </Stack>
             <SimpleGrid cols={{ base: 1, sm: 3 }}>
@@ -189,7 +188,7 @@ const LandingPageDetectList: React.FunctionComponent = React.memo(
       <Container size={siteContainerSize} py="xl">
         <Stack gap="lg">
           <Title order={2} ta="center">
-            We automatically detect
+            Common details we can detect
           </Title>
           <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
             {detectedDataTypes.map((dataType) => (
@@ -212,18 +211,36 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
     return (
       <Box bg="gray.0" py="xl">
         <Container size={siteContainerSize}>
-          <Stack gap="lg">
-            <Title order={2} ta="center">
-              Privacy and open source
-            </Title>
+          <Stack gap="xl">
+            <Stack gap="xs">
+              <Title order={2} ta="center">
+                Free, open source, and transparent
+              </Title>
+              <Text ta="center" c="dimmed">
+                See what happens to your file, what we remove, and how to
+                inspect the code.
+              </Text>
+            </Stack>
             <SimpleGrid cols={{ base: 1, sm: 2 }}>
               {privacyCards.map((card) => (
-                <Card key={card.title}>
+                <Card key={card.title} bg="white" p="lg" h="100%" withBorder>
                   <Stack gap="sm">
-                    <ThemeIcon variant="light" radius="md" size="lg">
-                      <FontAwesomeIcon icon={card.icon} />
-                    </ThemeIcon>
-                    <Title order={3}>{card.title}</Title>
+                    <Group gap="md" wrap="nowrap">
+                      <ThemeIcon
+                        variant="light"
+                        radius="md"
+                        size="xl"
+                        color="green"
+                      >
+                        <FontAwesomeIcon icon={card.icon} />
+                      </ThemeIcon>
+                      <Stack gap={0}>
+                        <Title order={3}>{card.title}</Title>
+                        <Text c="dimmed" size="sm">
+                          {card.subtitle}
+                        </Text>
+                      </Stack>
+                    </Group>
                     <Text c="dimmed" size="sm">
                       {card.description}
                     </Text>
@@ -232,8 +249,9 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
               ))}
             </SimpleGrid>
             <Text ta="center" c="dimmed" size="sm">
-              Files are processed with a cloud vision model in the United
-              States, then deleted within one hour.
+              To find likely sensitive information, we send page images to
+              {userFacingRedactionBoundingBoxesModel} through the Gemini
+              Developer API.
             </Text>
           </Stack>
         </Container>
@@ -347,21 +365,20 @@ const LandingPageWhyFree: React.FunctionComponent = React.memo(
               <Anchor href={openGreenCardUrl} target="_blank" rel="noreferrer">
                 OpenGreenCard
               </Anchor>
-              . We want to make it easier for people to share their past
-              successful applications so they can help others in the community.
-              This tool is meant to make that easier and provide that service to
-              the community.
+              . We built it to help people share successful applications without
+              exposing the personal details inside them. The same problem comes
+              up in plenty of other PDFs, so anyone can use it.
             </Text>
             <Text>
-              It is made by the same people as{' '}
+              The team also makes{' '}
               <Anchor href={wanderlogUrl} target="_blank" rel="noreferrer">
                 Wanderlog
-              </Anchor>{' '}
-              and other services used by millions of people. Sign up for a free
-              account to get unlimited uploads.
+              </Anchor>
+              , which millions of travelers use. A free account removes the
+              five-upload limit.
             </Text>
             <Text>
-              We welcome contributors who want to help improve the code.{' '}
+              Want to inspect the code or contribute a change?{' '}
               <Anchor href={githubRepoUrl} target="_blank" rel="noreferrer">
                 View the source on GitHub
               </Anchor>
@@ -405,21 +422,21 @@ interface HowItWorksStep {
 
 const howItWorksSteps: HowItWorksStep[] = [
   {
-    title: 'AI identifies PII',
+    title: 'Find likely sensitive details',
     description:
-      'The model finds names, addresses, SSNs, and other sensitive content and marks it for redaction.',
+      'We scan the PDF and mark details that may need redaction, such as names or Social Security numbers.',
     icon: faWandMagicSparkles,
   },
   {
-    title: 'You review',
+    title: 'Edit the suggestions',
     description:
-      'Adjust suggestions and add extra boxes. Nothing is burned in until you download.',
+      'Keep, move, resize, or remove any box. You can also draw your own redactions.',
     icon: faListCheck,
   },
   {
-    title: 'Download',
+    title: 'Download your redacted PDF',
     description:
-      'Download a permanently redacted PDF. You can edit and download again.',
+      'When everything looks right, download a new PDF with the selected content removed.',
     icon: faDownload,
   },
 ];
@@ -435,31 +452,37 @@ const detectedDataTypes: string[] = [
 
 interface PrivacyCard {
   title: string;
+  subtitle: string;
   description: string;
   icon: IconDefinition;
 }
 
 const privacyCards: PrivacyCard[] = [
   {
-    title: `Deleted ${_deleteOldRedactionHoursText}`,
-    description: 'Originals, page images, and working files are removed.',
-    icon: faClock,
+    title: 'Automatic deletion',
+    subtitle: _deleteOldRedactionHoursText,
+    description:
+      'We delete the original PDF, page images, and working files from our servers.',
+    icon: faTrashCan,
   },
   {
     title: 'Open source',
-    description:
-      'Public GitHub repository so you can audit the logic that is used and help make it better.',
+    subtitle: 'Public on GitHub',
+    description: 'Read the code, report issues, or contribute to the project.',
     icon: faCode,
   },
   {
-    title: 'You stay in control',
-    description: 'Every suggestion is reviewable before you download.',
+    title: 'Review first',
+    subtitle: 'You control every redaction',
+    description:
+      'Suggestions are only suggestions. Nothing is permanently removed until you review and download.',
     icon: faEye,
   },
   {
-    title: 'Permanent redaction',
+    title: 'Redactions are permanent',
+    subtitle: 'Visible and selectable text',
     description:
-      'Visual text and the selectable text layer are removed from the file.',
+      'The finished PDF removes both the visible content and its selectable text layer.',
     icon: faSquare,
   },
 ];
@@ -502,12 +525,12 @@ const faqItems: FaqItem[] = [
   {
     question: 'How do I redact a PDF?',
     answer:
-      'Upload your PDF, review the AI suggestions, adjust anything you want, and download a permanently redacted file. You can redact a PDF free without an account for the first five uploads.',
+      'Upload your PDF and review the areas we mark. Add, remove, move, or resize a redaction, then download the finished file. Your first five uploads do not require an account.',
   },
   {
     question: 'Is redaction permanent?',
     answer:
-      'Yes. We remove both the visual text and the underlying selectable text layer. Recipients cannot copy or recover the redacted content.',
+      'Yes. We remove the selected content and its selectable text layer instead of covering it with a black rectangle.',
   },
   {
     question: 'What happens to my PDF?',
@@ -515,11 +538,11 @@ const faqItems: FaqItem[] = [
   },
   {
     question: 'Do you send files to a cloud AI model?',
-    answer: `Yes. A cloud vision model in the United States identifies likely sensitive content. We do not claim client-side encryption or EU-only hosting. Files are then deleted ${_deleteOldRedactionHoursText}.`,
+    answer: `Yes. We send page images to ${userFacingRedactionBoundingBoxesModel} to suggest redactions. We delete the original PDF, page images, and working files ${_deleteOldRedactionHoursText}.`,
   },
   {
     question: 'Is this open source?',
     answer:
-      'Yes. The code is public on GitHub so you can audit the logic that is used and help make it better.',
+      'Yes. You can read the code, report issues, or contribute on GitHub.',
   },
 ];

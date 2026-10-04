@@ -9,7 +9,7 @@ export const siteUrl = 'https://redactpdf.ai';
  * because that is the query family the landing page targets.
  */
 export const siteDescription =
-  'Redact a PDF free in seconds. Upload, review AI suggestions, and download a permanently redacted file. Open source — files deleted within one hour.';
+  'Redact a PDF free in seconds. Check every suggested redaction before you download. The source is public, and files are deleted within one hour.';
 
 /** Document title and Open Graph title for the marketing homepage. */
 export const siteTitle = 'Free Automatic PDF Redaction | RedactPDF.ai';

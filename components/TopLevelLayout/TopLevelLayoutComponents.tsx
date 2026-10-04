@@ -3,7 +3,7 @@
 import React from 'react';
 import { MantineProvider } from '@mantine/core';
 import { Notifications } from '@mantine/notifications';
-import { theme } from '../../theme';
+import { cssVariablesResolver, theme } from '../../theme';
 
 export interface TopLevelLayoutComponentsProps {
   children: React.ReactNode;
@@ -21,7 +21,10 @@ const TopLevelLayoutComponents: React.FunctionComponent<TopLevelLayoutComponents
     const { children } = props;
 
     return (
-      <MantineProvider theme={theme}>
+      <MantineProvider
+        theme={theme}
+        cssVariablesResolver={cssVariablesResolver}
+      >
         <Notifications />
         {children}
       </MantineProvider>

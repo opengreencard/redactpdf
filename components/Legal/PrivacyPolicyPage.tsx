@@ -1,6 +1,7 @@
 import React from 'react';
 import { Anchor, List, ListItem, Stack, Text, Title } from '@mantine/core';
 import { _deleteOldRedactionHoursText } from '../../lib/redaction/deleteOldRedactionHours';
+import { userFacingRedactionBoundingBoxesModel } from '../../lib/redaction/redactionBoundingBoxesModel';
 import LegalPage from './LegalPage';
 
 /** Displays how RedactPDF.ai handles account, document, and usage data. */
@@ -148,10 +149,10 @@ const PrivacyPolicyPage: React.FunctionComponent = React.memo(
           <Stack gap="sm">
             <Title order={2}>5. Automated and Cloud AI Processing</Title>
             <Text>
-              RedactPDF.ai uses Gemini 3.8 Flash, operated by Google Cloud, to
-              identify potential personally identifiable information in uploaded
-              PDF pages. This processing is automated and can produce missed
-              detections or false positives.
+              RedactPDF.ai uses {userFacingRedactionBoundingBoxesModel}
+              to identify potential personally identifiable information in
+              uploaded PDF pages. This processing is automated and can produce
+              missed detections or false positives.
             </Text>
             <Text>
               We use submitted documents to provide the requested Service and do
