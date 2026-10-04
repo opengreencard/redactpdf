@@ -247,6 +247,12 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
                 </Card>
               ))}
             </SimpleGrid>
+            {/* Keep in sync with:
+                - `faqItems` in this file.
+                - Section 5 of `PrivacyPolicyPage`.
+                - `requestRedactionVision` in
+                  `lib/redaction/getRedactionBoundingBoxes.ts`.
+            */}
             <Text ta="center" c="dimmed" size="sm">
               To find likely sensitive information, we send page images to
               Gemini 3.8 Flash through the Gemini Developer API.
@@ -534,6 +540,11 @@ const faqItems: FaqItem[] = [
     question: 'What happens to my PDF?',
     answer: `Your original file, page images, and working files are deleted ${_deleteOldRedactionHoursText}.`,
   },
+  // Keep in sync with:
+  // - `LandingPagePrivacy` in this file.
+  // - Section 5 of `PrivacyPolicyPage`.
+  // - `requestRedactionVision` in
+  //   `lib/redaction/getRedactionBoundingBoxes.ts`.
   {
     question: 'Do you send files to a cloud AI model?',
     answer: `Yes. We send page images to Gemini 3.8 Flash through the Gemini Developer API to suggest redactions. We do not claim client-side encryption or EU-only hosting. Files are then deleted ${_deleteOldRedactionHoursText}.`,

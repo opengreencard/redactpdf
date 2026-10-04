@@ -134,6 +134,10 @@ function requestRedactionVision(
 ): ReturnType<typeof createOpenAICompatibleCompletion> {
   return createOpenAICompatibleCompletion({
     provider: OpenAICompatibleProvider.gemini,
+    // Keep in sync with:
+    // - `LandingPagePrivacy` and `faqItems` in
+    //   `components/LandingPage/LandingPageInner.tsx`.
+    // - Section 5 of `PrivacyPolicyPage`.
     model: 'gemini-3.8-flash',
     reasoning_effort: 'medium',
     messages: [
