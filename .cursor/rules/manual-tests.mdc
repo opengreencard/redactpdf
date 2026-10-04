@@ -4,6 +4,10 @@ globs: '**/*.manual.test.ts,**/*.manual.test.tsx'
 alwaysApply: false
 ---
 
+Prefer a `*.manual.test.ts` over a `scripts/*.ts` runner when the work is
+only invoked by hand. Use the script-lib split when the core function needs
+automated tests.
+
 If a manual test needs an environment variable or other caller-supplied
 parameter and it is missing, `console.warn` the usage string and `return`.
 Do not throw — throwing fails CI or a `TEST_TYPES=manual` run that includes
