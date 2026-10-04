@@ -17,6 +17,19 @@
 - Lint: `yarn lint`
 - Tests: `yarn jest`
 
+## Tests
+
+`yarn jest` is what CI runs. These other suites are skipped unless you
+opt in:
+
+- **Manual tests** (`describeManualTest` / `*.manual.test.ts`): live,
+  billed, or hand-run work. Run with
+  `yarn manual-jest path/to/file.manual.test.ts`.
+- **Test-data generator tests** (`makeTestDataGeneratorTest`): write
+  committed `__testData__` JSON. Run with
+  `yarn devdb-testdata-jest path/to/index.test.ts`, or
+  `yarn proddb-testdata-jest` when the fixture must come from production.
+
 ## Local Jest database
 
 Jest uses the separate `redaction_test` database and `redaction_test` MariaDB
