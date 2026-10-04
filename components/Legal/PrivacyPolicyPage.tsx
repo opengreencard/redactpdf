@@ -147,12 +147,13 @@ const PrivacyPolicyPage: React.FunctionComponent = React.memo(
 
           <Stack gap="sm">
             <Title order={2}>5. Automated and Cloud AI Processing</Title>
-            {/* Keep in sync with:
-                - `LandingPagePrivacy` and `faqItems` in
-                  `components/LandingPage/LandingPageInner.tsx`.
-                - `requestRedactionVision` in
-                  `lib/redaction/getRedactionBoundingBoxes.ts`.
-            */}
+            {
+              // Keep in sync with:
+              // - `LandingPagePrivacy` and `faqItems` in
+              //   `components/LandingPage/LandingPageInner.tsx`.
+              // - `requestRedactionVision` in
+              //   `lib/redaction/getRedactionBoundingBoxes.ts`.
+            }
             <Text>
               RedactPDF.ai uses Gemini 3.8 Flash, operated by Google Cloud, to
               identify potential personally identifiable information in uploaded
