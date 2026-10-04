@@ -249,7 +249,7 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
             </SimpleGrid>
             <Text ta="center" c="dimmed" size="sm">
               To find likely sensitive information, we send page images to
-              Gemini 3.8 Flash on Google Cloud in the United States.
+              Gemini 3.8 Flash through the Gemini Developer API.
             </Text>
           </Stack>
         </Container>
@@ -536,7 +536,7 @@ const faqItems: FaqItem[] = [
   },
   {
     question: 'Do you send files to a cloud AI model?',
-    answer: `Yes. We send page images to Gemini 3.8 Flash on Google Cloud to suggest redactions. We delete the original PDF, page images, and working files ${_deleteOldRedactionHoursText}.`,
+    answer: `Yes. We send page images to Gemini 3.8 Flash through the Gemini Developer API to suggest redactions. We do not claim client-side encryption or EU-only hosting. Files are then deleted ${_deleteOldRedactionHoursText}.`,
   },
   {
     question: 'Is this open source?',
