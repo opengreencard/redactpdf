@@ -23,8 +23,8 @@ import classes from './LandingPageRedactionFailures.module.css';
 const LandingPageRedactionFailures: React.FunctionComponent = React.memo(
   function LandingPageRedactionFailures() {
     return (
-      // A dark band reads like a redaction bar and also separates this from
-      // the gray privacy section above and the white pricing section below.
+      // A dark band reads like a redaction bar, so this section stands
+      // apart from the ones around it.
       <Box bg="dark.8" c="gray.0" py={64}>
         <Container size={siteContainerSize}>
           <Grid gap={48}>
@@ -69,6 +69,13 @@ const LandingPageRedactionFailures: React.FunctionComponent = React.memo(
 
 export default LandingPageRedactionFailures;
 
+// 2px is smaller than Mantine's spacing scale. Keep the box on one
+// line so it doesn't look broken when the sentence wraps.
+const leakyRedactionStyle: React.CSSProperties = {
+  padding: '0 2px',
+  whiteSpace: 'nowrap',
+};
+
 /**
  * A small mock-up of the Nebraska data center filing. The black boxes leak
  * just like the real ones, so visitors can try the copy trick themselves.
@@ -82,15 +89,33 @@ const LeakyFilingMockup: React.FunctionComponent = React.memo(
             <Text inherit fw="bold">
               Data center annual report: Agate LLC
             </Text>
+            {
+              // Real leaked figures from the 10/11 NOW article (last
+              // checked Oct 4, 2026).
+            }
             <Text inherit>
               Peak electricity demand:{' '}
-              <span className={classes.leakyRedaction}>52.65 MW</span>
+              <Text
+                span
+                bg="black"
+                c="black"
+                className={classes.leakyRedaction}
+                style={leakyRedactionStyle}
+              >
+                52.65 MW
+              </Text>
             </Text>
             <Text inherit>
               Water used last year:{' '}
-              <span className={classes.leakyRedaction}>
+              <Text
+                span
+                bg="black"
+                c="black"
+                className={classes.leakyRedaction}
+                style={leakyRedactionStyle}
+              >
                 13.299 million gallons
-              </span>
+              </Text>
             </Text>
           </Stack>
         </Box>
@@ -107,6 +132,10 @@ interface RedactionFailureStoryRowProps {
   story: RedactionFailureStory;
 }
 
+/**
+ * One news story. We put the year in a narrow column so the dates line
+ * up as you scan down the list.
+ */
 const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRowProps> =
   React.memo(function RedactionFailureStoryRow(
     props: RedactionFailureStoryRowProps
@@ -115,7 +144,13 @@ const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRow
 
     return (
       <Group gap="lg" py="lg" wrap="nowrap" align="flex-start">
-        <Text ff="monospace" c="gray.5" w={48} style={{ flexShrink: 0 }}>
+        <Text
+          ff="monospace"
+          c="gray.5"
+          // Fixed width so the years line up even when a title wraps.
+          w={48}
+          style={{ flexShrink: 0 }}
+        >
           {story.year}
         </Text>
         <Stack gap={6}>
@@ -126,8 +161,15 @@ const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRow
             c="white"
             fw="bold"
             fz="lg"
+            // Keep in sync with `.storyLink`: Mantine's underline can't
+            // do a dim line that brightens on hover.
             underline="never"
             className={classes.storyLink}
+            style={{
+              textDecoration: 'underline',
+              textDecorationColor: 'var(--mantine-color-dark-2)',
+              textUnderlineOffset: 3,
+            }}
           >
             {story.title}
           </Anchor>
@@ -143,7 +185,7 @@ const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRow
   });
 
 interface RedactionFailureStory {
-  /** Year the leak happened, shown in the left column. */
+  /** Year the leak happened. We use it as a timeline marker. */
   year: string;
   title: string;
   description: string;
