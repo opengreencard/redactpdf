@@ -1,0 +1,52 @@
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="32"
+  height="32"
+  viewBox="0 0 32 32"
+>
+  <!--
+    Adaptive favicon. Keep its geometry and light-mode colors in sync with
+    BrandMarkIcon.tsx and the PNG fallback in icon.tsx.
+  -->
+  <style>
+    .wordmark {
+      fill: #212529;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .wordmark {
+        fill: #f8f9fa;
+      }
+    }
+  </style>
+  <rect
+    x="6"
+    y="6"
+    width="15"
+    height="15"
+    rx="3"
+    fill="#2f9e44"
+  />
+  <text
+    x="13.5"
+    y="17.5"
+    fill="#fff"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="10"
+    font-weight="700"
+    text-anchor="middle"
+  >
+    R
+  </text>
+  <text
+    class="wordmark"
+    x="25"
+    y="17.5"
+    font-family="Arial, Helvetica, sans-serif"
+    font-size="10"
+    font-weight="700"
+    text-anchor="middle"
+  >
+    P
+  </text>
+</svg>
