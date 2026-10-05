@@ -1,7 +1,8 @@
 import { ImageResponse } from 'next/og';
 import { BrandMarkIcon } from '../lib/config/BrandMarkIcon';
 
-// Tab favicon canvas — 32×32 is a common default for generated app icons:
+// PNG fallback for the adaptive SVG favicon in app/icon1.svg. The 32×32 canvas
+// is a common default for generated app icons:
 // https://nextjs.org/docs/app/api-reference/file-conventions/metadata/app-icons#icon
 export const size: { width: number; height: number } = {
   width: 32,
@@ -10,7 +11,7 @@ export const size: { width: number; height: number } = {
 
 export const contentType = 'image/png';
 
-/** Tab favicon: green “R” square with “P” beside it. */
+/** PNG fallback: green “R” square with “P” beside it. */
 // Next.js requires `export default function` for app/icon.tsx.
 // eslint-disable-next-line no-restricted-syntax
 export default function Icon(): ImageResponse {

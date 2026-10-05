@@ -37,7 +37,9 @@ export function _getBrandMarkLayout(size: number): BrandMarkLayout {
   // Green square + gap + “P” ≈ 1.32× the square width at this font size.
   const squarePx = Math.round(contentWidth / 1.32);
   const fontPx = Math.round(squarePx * 0.65);
-  const gapPx = Math.max(1, Math.round(squarePx * 0.1));
+  // Keep a visible gap at 32px; the proportional value already gives enough
+  // space at the larger apple-touch icon size.
+  const gapPx = Math.max(3, Math.round(squarePx * 0.1));
 
   return { paddingPx, squarePx, fontPx, gapPx };
 }
@@ -48,6 +50,7 @@ export function _getBrandMarkLayout(size: number): BrandMarkLayout {
  *
  * Transparent PNG background — browsers and iOS supply their own tile/backdrop.
  * Inline styles only — rendered by `next/og` ImageResponse (Satori).
+ * The adaptive SVG favicon in `app/icon1.svg` mirrors this layout.
  */
 // Satori does not render this component when it is wrapped in React.memo,
 // which would make the generated favicon fully transparent.
