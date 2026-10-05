@@ -49,8 +49,11 @@ export function _getBrandMarkLayout(size: number): BrandMarkLayout {
  * Transparent PNG background — browsers and iOS supply their own tile/backdrop.
  * Inline styles only — rendered by `next/og` ImageResponse (Satori).
  */
+// Satori does not render this component when it is wrapped in React.memo,
+// which would make the generated favicon fully transparent.
 export const BrandMarkIcon: React.FunctionComponent<BrandMarkIconProps> =
-  React.memo(function BrandMarkIcon(props: BrandMarkIconProps) {
+  // eslint-disable-next-line no-restricted-syntax -- Satori needs this plain function
+  function BrandMarkIcon(props: BrandMarkIconProps) {
     const { size } = props;
     const { paddingPx, squarePx, fontPx, gapPx } = _getBrandMarkLayout(size);
 
@@ -107,4 +110,4 @@ export const BrandMarkIcon: React.FunctionComponent<BrandMarkIconProps> =
         </div>
       </div>
     );
-  });
+  };
