@@ -40,3 +40,6 @@ spec/
 # Local files
 .DS_Store
 *.log
+
+# Ignore temporary files
+/temp*
