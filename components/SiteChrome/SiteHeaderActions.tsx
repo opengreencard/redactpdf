@@ -62,7 +62,7 @@ const SiteHeaderActions: React.FunctionComponent<SiteHeaderActionsProps> =
                 <Group visibleFrom="sm" gap={4} wrap="nowrap">
                   <Button
                     {...commonButtonProps}
-                    variant="subtle"
+                    {...quietHeaderButtonProps}
                     onClick={handleOpenLogIn}
                     {...flatHeaderButtonPadding}
                   >
@@ -106,6 +106,13 @@ const SiteHeaderActions: React.FunctionComponent<SiteHeaderActionsProps> =
 
 export default SiteHeaderActions;
 
+/** Ink-colored borderless header links (GitHub, Log in) from the design. */
+const quietHeaderButtonProps = {
+  variant: 'subtle',
+  color: 'gray',
+  c: 'gray.7',
+} as const;
+
 /** Tighter horizontal inset for borderless header buttons. */
 const flatHeaderButtonPadding = { px: 'xs' } as const;
 
@@ -129,15 +136,17 @@ const viewSourceButtonProps: Pick<
   | 'target'
   | 'rel'
   | 'variant'
+  | 'color'
+  | 'c'
   | 'onClick'
   | 'keyboardShortcut'
 > & { 'aria-label': string } = {
   ...commonButtonProps,
+  ...quietHeaderButtonProps,
   component: 'a',
   href: githubRepoUrl,
   target: '_blank',
   rel: 'noreferrer',
-  variant: 'subtle',
   onClick: null,
   'aria-label': 'View the source on GitHub',
 };

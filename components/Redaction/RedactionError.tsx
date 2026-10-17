@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, Anchor, Stack, Text } from '@mantine/core';
+import { Alert, Anchor, Box, Stack, Text } from '@mantine/core';
 import { centeredAlertOrCardMaxWidth } from './redactionLayout';
 
 export interface RedactionErrorProps {
@@ -14,20 +14,23 @@ const RedactionError: React.FunctionComponent<RedactionErrorProps> = React.memo(
     const { message } = props;
 
     return (
-      <Alert
-        maw={centeredAlertOrCardMaxWidth}
-        mx="auto"
-        color="red"
-        title="Redaction failed"
-        data-testid={_redactionErrorTestId}
-      >
-        <Stack gap="sm">
-          <Text data-testid={_redactionErrorMessageTestId}>
-            {message ?? 'We could not analyze this PDF. Please try again.'}
-          </Text>
-          <Anchor href="/">Back to home</Anchor>
-        </Stack>
-      </Alert>
+      // Side gutter keeps the alert off the screen edges on phones.
+      <Box px="md" mt="xl">
+        <Alert
+          maw={centeredAlertOrCardMaxWidth}
+          mx="auto"
+          color="red"
+          title="Redaction failed"
+          data-testid={_redactionErrorTestId}
+        >
+          <Stack gap="sm">
+            <Text data-testid={_redactionErrorMessageTestId}>
+              {message ?? 'We could not analyze this PDF. Please try again.'}
+            </Text>
+            <Anchor href="/">Back to home</Anchor>
+          </Stack>
+        </Alert>
+      </Box>
     );
   }
 );

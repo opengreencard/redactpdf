@@ -58,6 +58,8 @@ export interface RedactionPreviewProps
       | 'redactionResponse'
       | 'onDeleteBoundingBox'
       | 'onEnabledChange'
+      | 'selectedBoxKey'
+      | 'onSelectedBoxKeyChange'
     >,
     RedactionPreviewToolbarPassThroughProps,
     RedactionPreviewPagesPassThroughProps {}
@@ -71,6 +73,8 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
       onAddBoundingBox,
       onDeleteBoundingBox,
       onEnabledChange,
+      selectedBoxKey,
+      onSelectedBoxKeyChange,
       redactionPreviewPagesRef,
       initialIsRedactingForTesting = false,
       ...passThroughProps
@@ -160,8 +164,8 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
         <Box
           bg="white"
           w="100%"
-          py="xs"
-          px={{ base: 'xs', xs: 0 }}
+          py="sm"
+          px={{ base: 'xs', xs: 'md' }}
           style={{ borderBottom: redactionPaneBorder }}
         >
           <RedactionPreviewToolbar
@@ -185,6 +189,8 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
           onRedact={isRedacting ? onAddBoundingBox : null}
           onDeleteBoundingBox={onDeleteBoundingBox}
           onEnabledChange={onEnabledChange}
+          selectedBoxKey={selectedBoxKey}
+          onSelectedBoxKeyChange={onSelectedBoxKeyChange}
           getUrlForRedactionImageForTesting={getUrlForRedactionImageForTesting}
         />
       </Stack>

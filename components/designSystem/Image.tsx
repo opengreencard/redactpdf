@@ -13,7 +13,7 @@ import {
 export interface ImageProps
   extends
     MantineImageProps,
-    Pick<NextImageProps, 'alt' | 'fill' | 'width' | 'height'> {
+    Pick<NextImageProps, 'alt' | 'fill' | 'width' | 'height' | 'preload'> {
   alt: string;
 }
 

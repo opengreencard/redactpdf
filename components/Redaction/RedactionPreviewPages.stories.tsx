@@ -33,6 +33,8 @@ const defaultProps: RedactionPreviewPagesProps = {
   onRedact: null,
   onDeleteBoundingBox: makeFakeHandler('onDeleteBoundingBox'),
   onEnabledChange: makeFakeHandler('onEnabledChange'),
+  selectedBoxKey: null,
+  onSelectedBoxKeyChange: makeFakeHandler('onSelectedBoxKeyChange'),
   getUrlForRedactionImageForTesting: getStorybookRedactionImageUrl,
 };
 
@@ -45,9 +47,33 @@ export default metadata;
 
 const Template: StoryFn<RedactionPreviewPagesProps> = (args) => (
   <Stack h="80vh">
-    <RedactionPreviewPages {...args} />
+    <SelectionStoryWrapper {...args} />
   </Stack>
 );
+
+/** Owns the selected box key so clicking an overlay opens its actions. */
+const SelectionStoryWrapper: React.FunctionComponent<RedactionPreviewPagesProps> =
+  React.memo(function SelectionStoryWrapper(props: RedactionPreviewPagesProps) {
+    const { selectedBoxKey: initialSelectedBoxKey, onSelectedBoxKeyChange } =
+      props;
+    const [selectedBoxKey, setSelectedBoxKey] = useState<string | null>(
+      initialSelectedBoxKey
+    );
+    const handleSelectedBoxKeyChange = useMemoizedCallback(
+      (boxKey: string | null): void => {
+        setSelectedBoxKey(boxKey);
+        onSelectedBoxKeyChange(boxKey);
+      },
+      [onSelectedBoxKeyChange]
+    );
+    return (
+      <RedactionPreviewPages
+        {...props}
+        selectedBoxKey={selectedBoxKey}
+        onSelectedBoxKeyChange={handleSelectedBoxKeyChange}
+      />
+    );
+  });
 
 export const Default: StoryFn<RedactionPreviewPagesProps> = Template.bind({});
 
@@ -64,6 +90,7 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
   function StoryWrapper(props: StoryWrapperProps) {
     const { initialBoxes, zoomPercent } = props;
     const [boxes, setBoxes] = useState(initialBoxes);
+    const [selectedBoxKey, setSelectedBoxKey] = useState<string | null>(null);
     const handleRedact = useMemoizedCallback(
       (box: ManualRedactionBoundingBox): void => {
         setBoxes((current) => [...current, box]);
@@ -111,6 +138,8 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
           onRedact={handleRedact}
           onDeleteBoundingBox={handleDeleteBoundingBoxForSingleBox}
           onEnabledChange={handleEnabledChangeForSingleBox}
+          selectedBoxKey={selectedBoxKey}
+          onSelectedBoxKeyChange={setSelectedBoxKey}
           getUrlForRedactionImageForTesting={getStorybookRedactionImageUrl}
         />
       </Stack>

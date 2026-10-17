@@ -81,7 +81,7 @@ const LoginForm: React.FunctionComponent<LoginFormProps> = React.memo(
               : 'Sign up with Google'}
           </Button>
 
-          <Group justify="center" c="gray">
+          <Group justify="center" c="dimmed" fz="sm">
             or
           </Group>
 

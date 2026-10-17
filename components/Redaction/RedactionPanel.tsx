@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { faDownload } from '@fortawesome/free-solid-svg-icons';
 import { Alert, Anchor, ScrollArea, Stack, Text, Title } from '@mantine/core';
 import type { NotificationData } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
@@ -14,6 +15,8 @@ import {
 import { downloadArrayBufferAsFile } from '../clientLib/downloadArrayBufferAsFile';
 import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
+import type { ButtonSection } from '../designSystem/Button/ButtonLeftOrRightSection';
+import classes from './RedactionPanel.module.css';
 import RedactionBoundingBoxList, {
   RedactionBoundingBoxListProps,
 } from './RedactionBoundingBoxList';
@@ -74,22 +77,32 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
     }, [redactionKey, startDownload]);
 
     return (
-      <Stack gap="md" mih={0} h="100%" data-testid={_redactionPanelTestId}>
-        <Stack gap="md" px="md" pt="md">
-          <Title order={2}>Redacted information</Title>
+      <Stack gap={0} mih={0} h="100%" data-testid={_redactionPanelTestId}>
+        {
+          // One-sided rule under the header: see RedactionPanel.module.css.
+        }
+        <Stack gap={18} px={20} pt="lg" pb={20} className={classes.header}>
+          <Title order={2} size="h3">
+            Redacted information
+          </Title>
           <Button
             keyboardShortcut={null}
             onClick={handleDownload}
             loading={isDownloadPending}
+            // w="100%" rather than fullWidth: fullWidth pins the icon to the
+            // left edge, while the design keeps it beside the centered label.
+            w="100%"
+            size="md"
+            leftSection={downloadIconSection}
             data-testid={_downloadButtonTestId}
           >
             Download
           </Button>
         </Stack>
         <ScrollArea flex={1} mih={0} type="auto">
-          <Stack gap="md" px="md" pb="md">
+          <Stack gap="sm" px={12} pt={18} pb="lg">
             {redaction.redactionBoundingBoxes.length === 0 ? (
-              <Alert color="blue" title="No automatic redactions found">
+              <Alert color="gray" title="No automatic redactions found">
                 We could not find any automatic parts to redact. Please redact
                 the document manually. You can also email us at{' '}
                 <Anchor href="mailto:support@redactpdf.ai" inherit>
@@ -99,7 +112,7 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
               </Alert>
             ) : (
               <>
-                <Text>
+                <Text size="sm" c="gray.7" px="sm">
                   Review suggestions and hide or remove any you do not need.
                 </Text>
                 <RedactionBoundingBoxList
@@ -116,6 +129,8 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
 );
 
 export default RedactionPanel;
+
+const downloadIconSection: ButtonSection = { type: 'icon', icon: faDownload };
 
 /** Test ID for the Download button. Exported for tests. */
 export const _downloadButtonTestId = 'redaction-download-button';

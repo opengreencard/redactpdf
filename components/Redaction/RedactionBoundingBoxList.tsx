@@ -2,7 +2,7 @@
 
 import React from 'react';
 import _ from 'lodash';
-import { Badge, Group, Stack, Text } from '@mantine/core';
+import { Badge, Box, Group, Stack, Text, type TextProps } from '@mantine/core';
 import {
   faArrowRight,
   faEye,
@@ -17,14 +17,22 @@ import {
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import { useCallbackWithPrefix } from '../../lib/hookUtilities/useCallbackWithPrefix';
 import { useStopPropagation } from '../../lib/hookUtilities/useStopPropagation';
-import ActionIcon from '../designSystem/ActionIcon';
+import ActionIcon, { ActionIconProps } from '../designSystem/ActionIcon';
 import ButtonDiv from '../designSystem/ButtonDiv';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
-import { getRedactionBoxLabel } from './redactionBoundingBoxes';
+import {
+  getRedactionBoxLabel,
+  makeBoundingBoxKey,
+} from './redactionBoundingBoxes';
 import classes from './RedactionBoundingBoxList.module.css';
 
 export interface RedactionBoundingBoxListProps {
   redactionBoundingBoxes: RedactionBoundingBox[];
+  /**
+   * `makeBoundingBoxKey` of the box whose preview overlay is open; its
+   * occurrence row is highlighted.
+   */
+  selectedBoxKey: string | null;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
   onEnabledChange: (boxes: RedactionBoundingBox[], enabled: boolean) => unknown;
@@ -40,6 +48,7 @@ const RedactionBoundingBoxList: React.FunctionComponent<RedactionBoundingBoxList
   ) {
     const {
       redactionBoundingBoxes,
+      selectedBoxKey,
       onRedactionClick,
       onDeleteBoundingBoxes,
       onEnabledChange,
@@ -47,11 +56,12 @@ const RedactionBoundingBoxList: React.FunctionComponent<RedactionBoundingBoxList
     const groups = _groupRedactionBoundingBoxes(redactionBoundingBoxes);
 
     return (
-      <Stack gap="sm" data-testid={_redactionBoundingBoxListTestId}>
+      <Stack gap={0} data-testid={_redactionBoundingBoxListTestId}>
         {groups.map((group) => (
           <RedactionTypeGroup
             key={group.dataType}
             group={group}
+            selectedBoxKey={selectedBoxKey}
             onRedactionClick={onRedactionClick}
             onDeleteBoundingBoxes={onDeleteBoundingBoxes}
             onEnabledChange={onEnabledChange}
@@ -100,6 +110,7 @@ type RedactionListDataType = RedactedDataType | 'manual';
 
 interface RedactionTypeGroupProps {
   group: RedactionBoxOccurrenceGroup;
+  selectedBoxKey: string | null;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
   onEnabledChange: (boxes: RedactionBoundingBox[], enabled: boolean) => unknown;
@@ -108,8 +119,13 @@ interface RedactionTypeGroupProps {
 /** Renders a type header and its matched-value groups. */
 const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
   React.memo(function RedactionTypeGroup(props: RedactionTypeGroupProps) {
-    const { group, onRedactionClick, onDeleteBoundingBoxes, onEnabledChange } =
-      props;
+    const {
+      group,
+      selectedBoxKey,
+      onRedactionClick,
+      onDeleteBoundingBoxes,
+      onEnabledChange,
+    } = props;
     const boxes = getGroupBoxes(group);
     const areAllDisabled = areAllBoxesDisabled(boxes);
     const onDeleteBoundingBoxesWithPrefix = useCallbackWithPrefix<
@@ -119,12 +135,14 @@ const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
       useCallbackWithPrefix<[RedactionBoundingBox[], boolean]>(onEnabledChange);
 
     return (
-      <Stack gap={0}>
+      // Groups after the first get a top rule: see the CSS module.
+      <Stack gap={0} pt={6} pb={10} className={classes.typeGroup}>
         <RedactionRow
-          text={`${getDataTypeText(group.dataType)} (${boxes.length})`}
+          text={getDataTypeText(group.dataType)}
+          count={boxes.length}
           badge={null}
-          textStyle="bold"
           indent={0}
+          isSelected={false}
           isEnabled={!areAllDisabled}
           testIdSuffix={_makeTypeTestIdSuffix(group.dataType)}
           onRedactionClick={null}
@@ -139,6 +157,7 @@ const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
             key={valueGroup.valueLabel}
             valueGroup={valueGroup}
             groupDataType={group.dataType}
+            selectedBoxKey={selectedBoxKey}
             onRedactionClick={onRedactionClick}
             onDeleteBoundingBoxes={onDeleteBoundingBoxes}
             onEnabledChange={onEnabledChange}
@@ -151,6 +170,7 @@ const RedactionTypeGroup: React.FunctionComponent<RedactionTypeGroupProps> =
 interface RedactionValueGroupProps {
   valueGroup: RedactionBoxValueGroup;
   groupDataType: RedactionListDataType;
+  selectedBoxKey: string | null;
   onRedactionClick: (box: RedactionBoundingBox) => unknown;
   onDeleteBoundingBoxes: (boxes: RedactionBoundingBox[]) => unknown;
   onEnabledChange: (boxes: RedactionBoundingBox[], enabled: boolean) => unknown;
@@ -162,6 +182,7 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
     const {
       valueGroup,
       groupDataType,
+      selectedBoxKey,
       onRedactionClick,
       onDeleteBoundingBoxes,
       onEnabledChange,
@@ -182,9 +203,11 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
     return (
       <Stack gap={0}>
         <RedactionRow
-          text={`${valueGroup.valueLabel} (${valueGroup.occurrences.length})`}
+          text={valueGroup.valueLabel}
+          count={valueGroup.occurrences.length}
           badge={null}
           indent={1}
+          isSelected={false}
           isEnabled={!areAllDisabled}
           testIdSuffix={_makeGroupTestIdSuffix(groupDataType, valueGroup)}
           onRedactionClick={null}
@@ -201,8 +224,10 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
             <RedactionRow
               key={getRedactionBoxKey(box)}
               text={`Page ${box.page}`}
+              count={null}
               badge={pageOccurrences.length > 1 ? index + 1 : null}
               indent={2}
+              isSelected={makeBoundingBoxKey(box) === selectedBoxKey}
               isEnabled={box.enabled}
               testIdSuffix={_makeOccurrenceTestIdSuffix(
                 getRedactionBoxKey(box)
@@ -219,10 +244,12 @@ const RedactionValueGroup: React.FunctionComponent<RedactionValueGroupProps> =
 
 interface RedactionRowProps {
   text: string;
+  /** Number of boxes under a type or value row, shown after the label. */
+  count: number | null;
   badge: number | null;
-  textStyle?: 'bold' | 'normal';
   indent: RedactionRowIndent;
   isEnabled: boolean;
+  isSelected: boolean;
   testIdSuffix: string;
   onRedactionClick: (() => unknown) | null;
   onDeleteBoundingBox: () => unknown;
@@ -236,44 +263,90 @@ const RedactionRow: React.FunctionComponent<RedactionRowProps> = React.memo(
   function RedactionRow(props: RedactionRowProps) {
     const {
       text,
+      count,
       badge,
-      textStyle = 'normal',
       indent,
       isEnabled,
+      isSelected,
       testIdSuffix,
       onRedactionClick,
       onDeleteBoundingBox,
       onEnabledChange,
     } = props;
+    const rowStyle = redactionRowStyles[indent];
+    // The label is a flex row so only the value truncates and a long label
+    // keeps its count visible: "Very long na… (2)". Flex layout drops the
+    // whitespace text node, so the count's margin draws the gap while the
+    // space keeps the text content readable as "Name (2)".
+    const labelProps: Pick<
+      TextProps,
+      'size' | 'td' | 'c' | 'display' | 'miw' | 'style'
+    > = {
+      size: rowStyle.fontSize,
+      td: isEnabled ? undefined : 'line-through',
+      c: getRowTextColor({ indent, isEnabled, isSelected }),
+      display: 'flex',
+      miw: 0,
+      style: { alignItems: 'baseline' },
+    };
+    const labelContent = (
+      <>
+        <Text span inherit truncate miw={0}>
+          {text}
+        </Text>
+        {count !== null ? (
+          <>
+            {' '}
+            <Text
+              span
+              ff="monospace"
+              size="xs"
+              fw="normal"
+              lts={0}
+              c="gray.6"
+              ml={6}
+              style={{ flexShrink: 0 }}
+            >
+              ({count})
+            </Text>
+          </>
+        ) : null}
+      </>
+    );
     const rowContent = (
       <Group
-        pl={getRedactionRowPadding(indent)}
+        pl={rowStyle.paddingLeft}
+        pr={4}
+        mih={rowStyle.minHeight}
         gap="xs"
         justify="space-between"
         wrap="nowrap"
         bdrs="sm"
+        bg={isSelected ? 'green.0' : undefined}
+        c={isSelected ? 'green.9' : undefined}
         data-testid={_makeRedactionPanelRowTestId(testIdSuffix)}
       >
-        <Group gap="xs" wrap="nowrap">
-          {textStyle === 'bold' ? (
-            <Text
-              fw="bold"
-              td={isEnabled ? undefined : 'line-through'}
-              c={isEnabled ? undefined : 'dimmed'}
-            >
-              {text}
+        <Group gap="sm" wrap="nowrap" miw={0}>
+          {indent === 2 ? (
+            <OccurrenceMarker isEnabled={isEnabled} isSelected={isSelected} />
+          ) : null}
+          {indent === 0 ? (
+            <Text {...labelProps} fw="bold" tt="uppercase" lts="0.03em">
+              {labelContent}
             </Text>
           ) : (
-            <Text
-              fw="normal"
-              td={isEnabled ? undefined : 'line-through'}
-              c={isEnabled ? undefined : 'dimmed'}
-            >
-              {text}
+            <Text {...labelProps} fw="normal">
+              {labelContent}
             </Text>
           )}
           {badge !== null ? (
-            <Badge size="sm" variant="light" style={{ flexShrink: 0 }}>
+            <Badge
+              size="sm"
+              radius="xs"
+              color={isSelected ? 'white' : 'gray.2'}
+              c={isSelected ? 'green.9' : 'gray.7'}
+              style={{ flexShrink: 0 }}
+            >
               {badge}
             </Badge>
           ) : null}
@@ -281,6 +354,7 @@ const RedactionRow: React.FunctionComponent<RedactionRowProps> = React.memo(
         <RedactionBoxActions
           testIdSuffix={testIdSuffix}
           isEnabled={isEnabled}
+          isSelected={isSelected}
           onViewRedactionClick={onRedactionClick}
           onDelete={onDeleteBoundingBox}
           onEnabledChange={onEnabledChange}
@@ -292,16 +366,83 @@ const RedactionRow: React.FunctionComponent<RedactionRowProps> = React.memo(
     }
 
     return (
-      <ButtonDiv onClick={onRedactionClick} className={classes.occurrenceRow}>
+      <ButtonDiv
+        onClick={onRedactionClick}
+        className={classes.occurrenceRow}
+        // Marks the row whose overlay is open in the document preview.
+        aria-current={isSelected ? 'true' : undefined}
+      >
         {rowContent}
       </ButtonDiv>
     );
   }
 );
 
+/** Per-level row metrics from the design: type, value, and page rows. */
+const redactionRowStyles: Record<
+  RedactionRowIndent,
+  {
+    paddingLeft: number;
+    minHeight: number;
+    fontSize: 'xs' | 'sm';
+  }
+> = {
+  0: { paddingLeft: 8, minHeight: 36, fontSize: 'xs' },
+  1: { paddingLeft: 20, minHeight: 34, fontSize: 'sm' },
+  2: { paddingLeft: 36, minHeight: 34, fontSize: 'sm' },
+};
+
+function getRowTextColor({
+  indent,
+  isEnabled,
+  isSelected,
+}: {
+  indent: RedactionRowIndent;
+  isEnabled: boolean;
+  isSelected: boolean;
+}): string | undefined {
+  if (!isEnabled) {
+    return 'gray.6';
+  }
+  if (isSelected) {
+    return 'green.9';
+  }
+  return indent === 1 ? undefined : 'gray.7';
+}
+
+interface OccurrenceMarkerProps {
+  isEnabled: boolean;
+  isSelected: boolean;
+}
+
+/**
+ * Small square echoing the red overlay on the page: outlined normally,
+ * filled while selected, dashed gray when the redaction is off.
+ */
+const OccurrenceMarker: React.FunctionComponent<OccurrenceMarkerProps> =
+  React.memo(function OccurrenceMarker(props: OccurrenceMarkerProps) {
+    const { isEnabled, isSelected } = props;
+    return (
+      <Box
+        component="span"
+        w={7}
+        h={7}
+        bdrs={1}
+        bd={
+          isEnabled
+            ? '1.5px solid var(--mantine-color-red-6)'
+            : '1.5px dashed var(--mantine-color-gray-6)'
+        }
+        bg={isSelected && isEnabled ? 'red.6' : undefined}
+        style={{ flexShrink: 0 }}
+      />
+    );
+  });
+
 interface RedactionBoxActionsProps {
   testIdSuffix: string;
   isEnabled: boolean;
+  isSelected: boolean;
   onViewRedactionClick: (() => unknown) | null;
   onDelete: () => unknown;
   onEnabledChange: () => unknown;
@@ -313,60 +454,52 @@ const RedactionBoxActions: React.FunctionComponent<RedactionBoxActionsProps> =
     const {
       testIdSuffix,
       isEnabled,
+      isSelected,
       onViewRedactionClick,
       onDelete,
       onEnabledChange,
     } = props;
+    const actionIconProps: Pick<ActionIconProps, 'variant' | 'color' | 'size'> =
+      {
+        variant: 'subtle',
+        color: isSelected ? 'green.9' : 'gray.6',
+        size: 'md',
+      };
     const handleView = useStopPropagation(onViewRedactionClick);
     const handleEnabledChange = useStopPropagation(onEnabledChange);
     const handleDelete = useStopPropagation(onDelete);
 
     return (
-      <Group gap="xs" wrap="nowrap">
+      <Group gap={0} wrap="nowrap">
         {onViewRedactionClick ? (
           <ActionIcon
             tooltip="View redaction"
-            variant="subtle"
+            {...actionIconProps}
             onClick={handleView}
             data-testid={_makeRedactionPanelViewTestId(testIdSuffix)}
           >
-            <FontAwesomeIcon icon={faArrowRight} />
+            <FontAwesomeIcon icon={faArrowRight} size="sm" />
           </ActionIcon>
         ) : null}
         <ActionIcon
           tooltip="Toggle on/off"
-          variant="subtle"
+          {...actionIconProps}
           onClick={handleEnabledChange}
           data-testid={_makeRedactionPanelToggleTestId(testIdSuffix)}
         >
-          <FontAwesomeIcon icon={isEnabled ? faEye : faEyeSlash} />
+          <FontAwesomeIcon icon={isEnabled ? faEye : faEyeSlash} size="sm" />
         </ActionIcon>
         <ActionIcon
           tooltip="Delete"
-          variant="subtle"
+          {...actionIconProps}
           onClick={handleDelete}
           data-testid={_makeRedactionPanelDeleteTestId(testIdSuffix)}
         >
-          <FontAwesomeIcon icon={faXmark} />
+          <FontAwesomeIcon icon={faXmark} size="sm" />
         </ActionIcon>
       </Group>
     );
   });
-
-function getRedactionRowPadding(
-  indent: RedactionRowIndent
-): 'md' | 'xl' | undefined {
-  switch (indent) {
-    case 0:
-      return undefined;
-    case 1:
-      return 'md';
-    case 2:
-      return 'xl';
-    default:
-      throw getUnreachableError(indent);
-  }
-}
 
 function getGroupBoxes(
   group: RedactionBoxOccurrenceGroup

@@ -1,17 +1,18 @@
 import '../components/TopLevelLayout/topLevelLayoutStyles';
 import React from 'react';
 import type { Decorator, StoryFn } from '@storybook/react';
-import { outfit } from '../lib/config/fonts';
+import { fontClassNames } from '../lib/config/fonts';
 import TopLevelLayoutComponents from '../components/TopLevelLayout/TopLevelLayoutComponents';
+
+// Apply the same font classes as app/layout.tsx. Keep in sync. They go on
+// <html> because Mantine resolves `--mantine-font-family` on `:root`.
+document.documentElement.classList.add(...fontClassNames.split(' '));
 
 export const decorators: Decorator[] = [
   (Story: StoryFn) => (
-    // Apply same font as in layout.tsx. Keep in sync
-    <div className={outfit.variable}>
-      <TopLevelLayoutComponents>
-        <Story />
-      </TopLevelLayoutComponents>
-    </div>
+    <TopLevelLayoutComponents>
+      <Story />
+    </TopLevelLayoutComponents>
   ),
 ];
 

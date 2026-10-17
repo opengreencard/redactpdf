@@ -12,6 +12,7 @@ import { makeFakeHandler } from '../../lib/storybook';
 import {
   removeBoundingBoxesFromResponse,
   setBoundingBoxesEnabledInResponse,
+  makeBoundingBoxKey,
 } from './redactionBoundingBoxes';
 import RedactionPanel, { RedactionPanelProps } from './RedactionPanel';
 
@@ -84,6 +85,16 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
     const [redaction, setRedaction] =
       useState<RedactedGetRedactionResponse>(initialRedaction);
 
+    // Mirror the review page, where a row click opens that box's overlay.
+    const [selectedBoxKey, setSelectedBoxKey] = useState<string | null>(null);
+    const handleRedactionClick = useMemoizedCallback(
+      (box: RedactionBoundingBox) => {
+        setSelectedBoxKey(makeBoundingBoxKey(box));
+        onRedactionClick(box);
+      },
+      [onRedactionClick]
+    );
+
     const handleDelete = useMemoizedCallback(
       (boxes: RedactionBoundingBox[]) => {
         setRedaction((current) =>
@@ -103,7 +114,8 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
     const panelProps: RedactionPanelProps = {
       redactionKey,
       redaction,
-      onRedactionClick,
+      selectedBoxKey,
+      onRedactionClick: handleRedactionClick,
       onDeleteBoundingBoxes: handleDelete,
       onEnabledChange: handleBoundingBoxesEnabledChange,
     };

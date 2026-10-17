@@ -10,6 +10,7 @@ import {
   faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import {
+  Divider,
   Group,
   Menu,
   MenuDivider,
@@ -25,6 +26,7 @@ import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback
 import { useSetState } from '../../lib/hookUtilities/useSetState';
 import ActionIcon, { ActionIconProps } from '../designSystem/ActionIcon';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
+import classes from './RedactionPreviewToolbar.module.css';
 
 export type RedactionPreviewZoom =
   | { type: 'percent'; percent: number }
@@ -141,8 +143,8 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
     const handleFitToWidth = useSetState(onZoomChange, fitToWidthZoom);
 
     return (
-      <Group gap="xs" align="center" wrap="nowrap" w="100%">
-        <Group gap="xs" wrap="nowrap">
+      <Group gap="md" align="center" wrap="nowrap" w="100%">
+        <Group gap={4} wrap="nowrap">
           <ActionIcon
             {...pageActionIconCommonProps}
             tooltip="Previous page"
@@ -151,7 +153,7 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
           >
             <FontAwesomeIcon icon={faChevronUp} />
           </ActionIcon>
-          <Group gap="xs" wrap="nowrap">
+          <Group gap={4} wrap="nowrap">
             <NumberInput
               aria-label="Current page"
               value={page}
@@ -162,9 +164,12 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
               allowNegative={false}
               hideControls
               w={40}
+              classNames={{ input: classes.pageInput }}
               onChange={handlePageInputChange}
             />
-            <Text c="dimmed">/ {pageCount}</Text>
+            <Text size="sm" c="gray.6" mr={4}>
+              / {pageCount}
+            </Text>
           </Group>
           <ActionIcon
             {...pageActionIconCommonProps}
@@ -203,11 +208,7 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
             suffix="%"
             w={64}
             variant="unstyled"
-            styles={{
-              input: {
-                paddingInline: 'var(--mantine-spacing-xs)',
-              },
-            }}
+            classNames={{ input: classes.zoomPercentInput }}
             onChange={handleZoomPercentChange}
           />
           <Menu withinPortal position="bottom-start">
@@ -240,9 +241,11 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
             <FontAwesomeIcon icon={faPlus} />
           </ActionIcon>
         </Group>
+        <Divider orientation="vertical" h={22} my="auto" visibleFrom="xs" />
         <Switch
           visibleFrom="xs"
           label="Draw redaction"
+          classNames={{ label: classes.switchLabel }}
           checked={isRedacting}
           onChange={handleDrawRedactionChange}
         />
@@ -281,9 +284,11 @@ function getAdjacentZoomPercent(
 const fitToPageZoom: RedactionPreviewZoom = { type: 'fitToPage' };
 const fitToWidthZoom: RedactionPreviewZoom = { type: 'fitToWidth' };
 
-const toolbarActionIconCommonProps: Pick<ActionIconProps, 'variant'> = {
-  variant: 'transparent',
-};
+const toolbarActionIconCommonProps: Pick<ActionIconProps, 'variant' | 'color'> =
+  {
+    variant: 'transparent',
+    color: 'gray.7',
+  };
 
 // Keep disabled page navigation transparent so an unavailable direction does
 // not add a gray background to the toolbar.

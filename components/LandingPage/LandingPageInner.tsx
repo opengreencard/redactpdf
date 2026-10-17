@@ -1,9 +1,8 @@
 import React from 'react';
+import _ from 'lodash';
 import {
   Anchor,
-  Badge,
   Box,
-  Card,
   Container,
   Grid,
   GridCol,
@@ -31,6 +30,7 @@ import {
   faTrashCan,
   faWandMagicSparkles,
 } from '@fortawesome/free-solid-svg-icons';
+import Card from '../designSystem/Card';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import {
   githubRepoUrl,
@@ -45,9 +45,15 @@ import BeforeAfterRedactionCard from './BeforeAfterRedactionCard';
 import LandingPageHeroIllustration from './LandingPageHeroIllustration';
 import LandingPageHeroDropzone from './LandingPageHeroDropzone';
 import LandingPageRedactionFailures from './LandingPageRedactionFailures';
+import LandingPageSection, {
+  LandingPageSectionBackgroundVariant,
+  LandingPageSectionLayout,
+} from './LandingPageSection';
+import LandingPageTag from './LandingPageTag';
 import LandingPageUploadCTA from './LandingPageUploadCTA';
 import LandingPageUploadModalProvider from './LandingPageUploadModalProvider';
 import { dutchPassportSample, irs1040Sample } from './landingRedactionSamples';
+import classes from './LandingPageInner.module.css';
 
 export interface LandingPageInnerProps {}
 
@@ -78,37 +84,38 @@ export default LandingPageInner;
 const LandingPageHero: React.FunctionComponent = React.memo(
   function LandingPageHero() {
     return (
-      <Container size={siteContainerSize} py="xl">
-        <Stack gap="xl">
-          <Grid gap="xl" align="center">
+      <Container
+        size={siteContainerSize}
+        pt={{ base: 40, sm: 72 }}
+        pb={{ base: 48, sm: 64 }}
+      >
+        <Stack gap={0}>
+          <Grid rowGap={40} columnGap={64} align="center">
             <GridCol span={{ base: 12, md: 6 }}>
-              <Stack gap="lg">
+              <Stack gap={0} align="flex-start">
                 <Title order={1}>
-                  <Text span inherit c="green">
-                    Redact sensitive information
-                  </Text>{' '}
-                  from PDFs{' '}
-                  <Text span inherit c="green">
+                  Redact sensitive information from PDFs{' '}
+                  <Text component="em" inherit c="green.7">
                     in seconds
                   </Text>
                 </Title>
-                <Text size="lg" c="dimmed">
+                <Text size="lg" c="gray.7" maw={500} mt={22} mb={30}>
                   Upload a PDF and we&apos;ll suggest what to hide. Review each
                   suggestion, then download your redacted file.
                 </Text>
-                <Group>
+                {
+                  // Full width on phones (see the CSS module), intrinsic
+                  // width beside the illustration.
+                }
+                <Box w="100%" className={classes.heroCta}>
                   <LandingPageUploadCTA fullWidth={false} />
-                </Group>
-                <Group gap="sm">
-                  <Badge variant="light" color="green">
-                    Free
-                  </Badge>
-                  <Badge variant="light" color="green">
-                    Open source
-                  </Badge>
-                  <Badge variant="light" color="green">
+                </Box>
+                <Group gap="sm" mt={26}>
+                  <LandingPageTag withCheck>Free</LandingPageTag>
+                  <LandingPageTag withCheck>Open source</LandingPageTag>
+                  <LandingPageTag withCheck>
                     Deleted within one hour
-                  </Badge>
+                  </LandingPageTag>
                 </Group>
               </Stack>
             </GridCol>
@@ -116,7 +123,9 @@ const LandingPageHero: React.FunctionComponent = React.memo(
               <LandingPageHeroIllustration />
             </GridCol>
           </Grid>
-          <LandingPageHeroDropzone />
+          <Box mt={{ base: 48, sm: 64 }}>
+            <LandingPageHeroDropzone />
+          </Box>
         </Stack>
       </Container>
     );
@@ -126,24 +135,19 @@ const LandingPageHero: React.FunctionComponent = React.memo(
 const LandingPageExampleDocuments: React.FunctionComponent = React.memo(
   function LandingPageExampleDocuments() {
     return (
-      <Container size={siteContainerSize} py="xl">
-        <Stack gap="lg">
-          <Title order={2} ta="center">
-            Example redacted documents
-          </Title>
-          {
-            // Passport plus a 1040 cropped to the same aspect ratio so the
-            // two cards occupy the same slot.
-          }
-          <SimpleGrid cols={{ base: 1, sm: 2 }}>
-            <BeforeAfterRedactionCard {...dutchPassportSample} />
-            <BeforeAfterRedactionCard {...irs1040Sample} />
-          </SimpleGrid>
-          <Text ta="center" c="dimmed">
-            Compare the original and redacted versions.
-          </Text>
-        </Stack>
-      </Container>
+      <LandingPageSection
+        title="Example redacted documents"
+        description="Compare the original and redacted versions."
+      >
+        {
+          // Passport plus a 1040 cropped to the same aspect ratio so the
+          // two cards occupy the same slot.
+        }
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing={20}>
+          <BeforeAfterRedactionCard {...dutchPassportSample} />
+          <BeforeAfterRedactionCard {...irs1040Sample} />
+        </SimpleGrid>
+      </LandingPageSection>
     );
   }
 );
@@ -151,35 +155,31 @@ const LandingPageExampleDocuments: React.FunctionComponent = React.memo(
 const LandingPageHowItWorks: React.FunctionComponent = React.memo(
   function LandingPageHowItWorks() {
     return (
-      <Box bg="gray.0" py="xl">
-        <Container size={siteContainerSize}>
-          <Stack gap="lg">
-            <Stack gap="xs">
-              <Title order={2} ta="center">
-                How it works
-              </Title>
-              <Text ta="center" c="dimmed">
-                Review the suggestions, adjust them, and download the result.
-              </Text>
-            </Stack>
-            <SimpleGrid cols={{ base: 1, sm: 3 }}>
-              {howItWorksSteps.map((step) => (
-                <Card key={step.title}>
-                  <Stack gap="sm">
-                    <ThemeIcon size="lg" variant="light" radius="md">
-                      <FontAwesomeIcon icon={step.icon} />
-                    </ThemeIcon>
-                    <Title order={3}>{step.title}</Title>
-                    <Text c="dimmed" size="sm">
-                      {step.description}
-                    </Text>
-                  </Stack>
-                </Card>
-              ))}
-            </SimpleGrid>
-          </Stack>
-        </Container>
-      </Box>
+      <LandingPageSection
+        title="How it works"
+        description="Review the suggestions, adjust them, and download the result."
+        backgroundVariant={LandingPageSectionBackgroundVariant.surface}
+      >
+        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={20}>
+          {howItWorksSteps.map((step, index) => (
+            // Paper cards stand out on the white section.
+            <Card key={step.title} bg="gray.1" h="100%">
+              <Stack gap="sm">
+                <Group justify="space-between" mb="sm">
+                  <ThemeIcon size="lg" variant="light">
+                    <FontAwesomeIcon icon={step.icon} />
+                  </ThemeIcon>
+                  <Text size="sm" ff="monospace" c="green.7">
+                    {String(index + 1).padStart(2, '0')}
+                  </Text>
+                </Group>
+                <Title order={3}>{step.title}</Title>
+                <Text c="gray.7">{step.description}</Text>
+              </Stack>
+            </Card>
+          ))}
+        </SimpleGrid>
+      </LandingPageSection>
     );
   }
 );
@@ -187,23 +187,32 @@ const LandingPageHowItWorks: React.FunctionComponent = React.memo(
 const LandingPageDetectList: React.FunctionComponent = React.memo(
   function LandingPageDetectList() {
     return (
-      <Container size={siteContainerSize} py="xl">
-        <Stack gap="lg">
-          <Title order={2} ta="center">
-            Common details we can detect
-          </Title>
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 3 }}>
-            {detectedDataTypes.map((dataType) => (
-              <Group key={dataType} gap="sm">
-                <ThemeIcon variant="light" radius="xl" size="md">
-                  <FontAwesomeIcon icon={faCheck} />
-                </ThemeIcon>
-                <Text>{dataType}</Text>
-              </Group>
-            ))}
-          </SimpleGrid>
-        </Stack>
-      </Container>
+      <LandingPageSection
+        title="Common details we can detect"
+        layout={LandingPageSectionLayout.split}
+      >
+        <SimpleGrid
+          cols={{ base: 2, sm: 3 }}
+          spacing={0}
+          verticalSpacing={0}
+          className={classes.detectList}
+        >
+          {detectedDataTypes.map((dataType) => (
+            <Group
+              key={dataType}
+              gap="sm"
+              py={18}
+              wrap="nowrap"
+              className={classes.detectItem}
+            >
+              <ThemeIcon variant="light" radius="xl" size="md">
+                <FontAwesomeIcon icon={faCheck} size="xs" />
+              </ThemeIcon>
+              <Text>{dataType}</Text>
+            </Group>
+          ))}
+        </SimpleGrid>
+      </LandingPageSection>
     );
   }
 );
@@ -211,53 +220,39 @@ const LandingPageDetectList: React.FunctionComponent = React.memo(
 const LandingPagePrivacy: React.FunctionComponent = React.memo(
   function LandingPagePrivacy() {
     return (
-      <Box bg="gray.0" py="xl">
-        <Container size={siteContainerSize}>
-          <Stack gap="xl">
-            <Stack gap="xs">
-              <Title order={2} ta="center">
-                Free, open source, and transparent
-              </Title>
-              <Text ta="center" c="dimmed">
-                See what happens to your file, what we remove, and how to
-                inspect the code.
-              </Text>
-            </Stack>
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
-              {privacyCards.map((card) => (
-                <Card key={card.title} bg="white" p="lg" h="100%" withBorder>
-                  <Stack gap="sm">
-                    <Group gap="md" wrap="nowrap">
-                      <ThemeIcon
-                        variant="light"
-                        radius="md"
-                        size="xl"
-                        color="green"
-                      >
-                        <FontAwesomeIcon icon={card.icon} />
-                      </ThemeIcon>
-                      <Stack gap={0}>
-                        <Title order={3}>{card.title}</Title>
-                        <Text c="dimmed" size="sm">
-                          {card.subtitle}
-                        </Text>
-                      </Stack>
-                    </Group>
-                    <Text c="dimmed" size="sm">
-                      {card.description}
-                    </Text>
+      <LandingPageSection
+        title="Free, open source, and transparent"
+        description="See what happens to your file, what we remove, and how to inspect the code."
+        backgroundVariant={LandingPageSectionBackgroundVariant.surface}
+      >
+        <Stack gap={28}>
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing={20}>
+            {privacyCards.map((card) => (
+              <Card key={card.title} bg="gray.1" h="100%">
+                <Group gap="md" wrap="nowrap" align="flex-start">
+                  <ThemeIcon size="lg" variant="light">
+                    <FontAwesomeIcon icon={card.icon} />
+                  </ThemeIcon>
+                  <Stack gap={6}>
+                    <Stack gap={2}>
+                      <Title order={3}>{card.title}</Title>
+                      <Text size="sm" c="green.9">
+                        {_.upperFirst(card.subtitle)}
+                      </Text>
+                    </Stack>
+                    <Text c="gray.7">{card.description}</Text>
                   </Stack>
-                </Card>
-              ))}
-            </SimpleGrid>
-            <Text ta="center" c="dimmed" size="sm">
-              To find likely sensitive information, we send page images to{' '}
-              {userFacingRedactionBoundingBoxesModel} through the Gemini
-              Developer API.
-            </Text>
-          </Stack>
-        </Container>
-      </Box>
+                </Group>
+              </Card>
+            ))}
+          </SimpleGrid>
+          <Text size="sm" c="gray.6">
+            To find likely sensitive information, we send page images to{' '}
+            {userFacingRedactionBoundingBoxesModel} through the Gemini Developer
+            API.
+          </Text>
+        </Stack>
+      </LandingPageSection>
     );
   }
 );
@@ -265,60 +260,59 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
 const LandingPagePricing: React.FunctionComponent = React.memo(
   function LandingPagePricing() {
     return (
-      <Container size={siteContainerSize} py="xl">
-        <Stack gap="lg">
-          <Title order={2} ta="center">
-            Pricing
-          </Title>
-          <Box maw={480} w="100%" mx="auto" bdrs="lg" bg="gray.0" p="sm">
-            <Table
-              layout="fixed"
-              withRowBorders
-              verticalSpacing="md"
-              horizontalSpacing="lg"
-            >
-              <TableThead>
-                <TableTr>
-                  <TableTh w="34%" />
-                  <TableTh w="28%" ta="center" bg="white" bdrs="md" py="sm">
-                    <Text fw="bold" size="sm">
-                      Free
-                    </Text>
-                  </TableTh>
-                  <TableTh w="38%" ta="center" bg="green.0" bdrs="md" py="sm">
-                    <Stack gap={0} align="center">
-                      <Text fw="bold" size="sm" c="green.8">
-                        Registered
-                      </Text>
-                      <Text size="xs" c="green.6" fw="normal">
-                        (still free!)
-                      </Text>
-                    </Stack>
-                  </TableTh>
+      <LandingPageSection
+        title="Pricing"
+        layout={LandingPageSectionLayout.split}
+        action={<LandingPageUploadCTA fullWidth={false} />}
+      >
+        {
+          // The table supplies its own row rules; the card clips the
+          // Registered column's tint to the rounded corners.
+        }
+        <Card padding={0} style={{ overflow: 'hidden' }}>
+          <Table
+            layout="fixed"
+            verticalSpacing="md"
+            horizontalSpacing="lg"
+            className={classes.pricingTable}
+          >
+            <TableThead>
+              <TableTr>
+                <TableTh w="40%" />
+                <TableTh ta="center" pt={22} className={classes.pricingHeader}>
+                  Free
+                </TableTh>
+                <TableTh
+                  ta="center"
+                  pt={22}
+                  bg="green.0"
+                  className={classes.pricingHeader}
+                >
+                  <Text inherit c="green.9">
+                    Registered
+                  </Text>
+                  <Text size="xs" c="green.7" fw="normal">
+                    (still free!)
+                  </Text>
+                </TableTh>
+              </TableTr>
+            </TableThead>
+            <TableTbody>
+              {pricingRows.map((row) => (
+                <TableTr key={row.feature}>
+                  <TableTd c="gray.7">{row.feature}</TableTd>
+                  <TableTd ta="center">
+                    <PricingCell value={row.free} />
+                  </TableTd>
+                  <TableTd ta="center" bg="green.0">
+                    <PricingCell value={row.registered} />
+                  </TableTd>
                 </TableTr>
-              </TableThead>
-              <TableTbody>
-                {pricingRows.map((row) => (
-                  <TableTr key={row.feature}>
-                    <TableTd>
-                      <Text size="sm">{row.feature}</Text>
-                    </TableTd>
-                    <TableTd ta="center" bg="white">
-                      <PricingCell value={row.free} />
-                    </TableTd>
-                    <TableTd ta="center" bg="green.0">
-                      <PricingCell value={row.registered} />
-                    </TableTd>
-                  </TableTr>
-                ))}
-              </TableTbody>
-            </Table>
-          </Box>
-          <Group justify="center">
-            <LandingPageUploadCTA fullWidth={false} />
-          </Group>
-        </Stack>
-      </Container>
+              ))}
+            </TableTbody>
+          </Table>
+        </Card>
+      </LandingPageSection>
     );
   }
 );
@@ -333,62 +327,80 @@ const PricingCell: React.FunctionComponent<PricingCellProps> = React.memo(
 
     if (value === 'check') {
       return (
-        <FontAwesomeIcon
-          icon={faCheck}
-          color="var(--mantine-primary-color-6)"
-        />
+        <Text span c="green.7">
+          <FontAwesomeIcon icon={faCheck} />
+        </Text>
       );
     }
 
     if (value === unlimitedUploadsValue) {
-      return <Anchor href={`#${whyThisIsFreeSectionId}`}>Unlimited</Anchor>;
+      return (
+        <Anchor href={`#${whyThisIsFreeSectionId}`} underline="always" inherit>
+          Unlimited
+        </Anchor>
+      );
     }
 
-    return <Text>{value}</Text>;
+    return <Text inherit>{value}</Text>;
   }
 );
 
 const LandingPageWhyFree: React.FunctionComponent = React.memo(
   function LandingPageWhyFree() {
     return (
-      <Box
-        bg="gray.0"
-        py="xl"
+      <LandingPageSection
+        title="Why is this free?"
+        layout={LandingPageSectionLayout.split}
+        backgroundVariant={LandingPageSectionBackgroundVariant.surface}
         id={whyThisIsFreeSectionId}
-        style={{ scrollMarginTop: 72 }}
       >
-        <Container size={siteContainerSize}>
-          <Stack gap="md">
-            <Title order={2} ta="center">
-              Why is this free?
-            </Title>
-            <Text>
-              {siteName} is a companion project to{' '}
-              <Anchor href={openGreenCardUrl} target="_blank" rel="noreferrer">
-                OpenGreenCard
-              </Anchor>
-              . We built it to help people share successful applications without
-              exposing the personal details inside them. The same problem comes
-              up in plenty of other PDFs, so anyone can use it.
-            </Text>
-            <Text>
-              The team also makes{' '}
-              <Anchor href={wanderlogUrl} target="_blank" rel="noreferrer">
-                Wanderlog
-              </Anchor>
-              , which millions of travelers use. A free account removes the
-              five-upload limit.
-            </Text>
-            <Text>
-              Want to inspect the code or contribute a change?{' '}
-              <Anchor href={githubRepoUrl} target="_blank" rel="noreferrer">
-                View the source on GitHub
-              </Anchor>
-              .
-            </Text>
-          </Stack>
-        </Container>
-      </Box>
+        <Stack gap="md" maw={680}>
+          <Text size="lg" c="gray.7">
+            {siteName} is a companion project to{' '}
+            <ProseAnchor href={openGreenCardUrl}>OpenGreenCard</ProseAnchor>. We
+            built it to help people share successful applications without
+            exposing the personal details inside them. The same problem comes up
+            in plenty of other PDFs, so anyone can use it.
+          </Text>
+          <Text size="lg" c="gray.7">
+            The team also makes{' '}
+            <ProseAnchor href={wanderlogUrl}>Wanderlog</ProseAnchor>, which
+            millions of travelers use. A free account removes the five-upload
+            limit.
+          </Text>
+          <Text size="lg" c="gray.7">
+            Want to inspect the code or contribute a change?{' '}
+            <ProseAnchor href={githubRepoUrl}>
+              View the source on GitHub
+            </ProseAnchor>
+            .
+          </Text>
+        </Stack>
+      </LandingPageSection>
+    );
+  }
+);
+
+interface ProseAnchorProps {
+  href: string;
+  children: React.ReactNode;
+}
+
+/** Underlined external link inside a paragraph of landing page prose. */
+const ProseAnchor: React.FunctionComponent<ProseAnchorProps> = React.memo(
+  function ProseAnchor(props: ProseAnchorProps) {
+    const { href, children } = props;
+
+    return (
+      <Anchor
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        underline="always"
+        inherit
+      >
+        {children}
+      </Anchor>
     );
   }
 );
@@ -396,19 +408,23 @@ const LandingPageWhyFree: React.FunctionComponent = React.memo(
 const LandingPageFaq: React.FunctionComponent = React.memo(
   function LandingPageFaq() {
     return (
-      <Container size={siteContainerSize} py="xl">
-        <Stack gap="xl">
-          <Title order={2} ta="center">
-            FAQ
-          </Title>
+      <LandingPageSection title="FAQ" layout={LandingPageSectionLayout.split}>
+        <Stack gap={0}>
           {faqItems.map((item) => (
-            <Stack key={item.question} gap="xs">
-              <Title order={3}>{item.question}</Title>
-              <Text c="dimmed">{item.answer}</Text>
+            <Stack
+              key={item.question}
+              gap={6}
+              py={22}
+              className={classes.faqItem}
+            >
+              <Title order={3} ff="text" fz="lg" lts={0}>
+                {item.question}
+              </Title>
+              <Text c="gray.7">{item.answer}</Text>
             </Stack>
           ))}
         </Stack>
-      </Container>
+      </LandingPageSection>
     );
   }
 );
@@ -520,7 +536,7 @@ const pricingRows: PricingRow[] = [
 
 interface FaqItem {
   question: string;
-  answer: string;
+  answer: React.ReactNode;
 }
 
 const faqItems: FaqItem[] = [
@@ -544,7 +560,11 @@ const faqItems: FaqItem[] = [
   },
   {
     question: 'Is this open source?',
-    answer:
-      'Yes. You can read the code, report issues, or contribute on GitHub.',
+    answer: (
+      <>
+        Yes. You can read the code, report issues, or contribute on{' '}
+        <ProseAnchor href={githubRepoUrl}>GitHub</ProseAnchor>.
+      </>
+    ),
   },
 ];

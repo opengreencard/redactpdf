@@ -149,10 +149,10 @@ const PrivacyPolicyPage: React.FunctionComponent = React.memo(
           <Stack gap="sm">
             <Title order={2}>5. Automated and Cloud AI Processing</Title>
             <Text>
-              RedactPDF.ai uses {userFacingRedactionBoundingBoxesModel}
-              to identify potential personally identifiable information in
-              uploaded PDF pages. This processing is automated and can produce
-              missed detections or false positives.
+              RedactPDF.ai uses {userFacingRedactionBoundingBoxesModel} to
+              identify potential personally identifiable information in uploaded
+              PDF pages. This processing is automated and can produce missed
+              detections or false positives.
             </Text>
             <Text>
               We use submitted documents to provide the requested Service and do

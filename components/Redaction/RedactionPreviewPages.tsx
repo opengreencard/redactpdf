@@ -37,6 +37,7 @@ import {
   type RedactionBoundingBox,
 } from '../../lib/redaction/redactionTypes';
 import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
+import { makeBoundingBoxKey } from './redactionBoundingBoxes';
 
 export interface RedactionPreviewPagesProps {
   redactionKey: string;
@@ -51,6 +52,12 @@ export interface RedactionPreviewPagesProps {
   onRedact: ((box: ManualRedactionBoundingBox) => unknown) | null;
   onDeleteBoundingBox: (box: RedactionBoundingBox) => unknown;
   onEnabledChange: (box: RedactionBoundingBox, enabled: boolean) => unknown;
+  /**
+   * `makeBoundingBoxKey` of the box whose overlay actions are open, or null.
+   * The parent owns it so the review list can highlight the matching row.
+   */
+  selectedBoxKey: string | null;
+  onSelectedBoxKeyChange: (boxKey: string | null) => unknown;
   /** Storybook / tests only — same shape as `getRedactionImageUrl`. */
   getUrlForRedactionImageForTesting?: typeof getRedactionImageUrl;
 }
@@ -96,6 +103,8 @@ const RedactionPreviewPages = forwardRef<
       onRedact,
       onDeleteBoundingBox,
       onEnabledChange,
+      selectedBoxKey,
+      onSelectedBoxKeyChange,
       getUrlForRedactionImageForTesting,
     } = props;
     const { pageSizes, redactionBoundingBoxes } = redactionResponse;
@@ -112,7 +121,6 @@ const RedactionPreviewPages = forwardRef<
     const resizeObserverRef = useRef<ResizeObserver | null>(null);
     const hasCenteredRef = useRef(false);
     const [isContainerReady, setIsContainerReady] = useState(false);
-    const [selectedBoxKey, setSelectedBoxKey] = useState<string | null>(null);
 
     /**
      * Notify the parent once the canvas has a measurable width so initial
@@ -204,7 +212,7 @@ const RedactionPreviewPages = forwardRef<
           return;
         }
         currentPageRef.current = _.clamp(box.page, 1, pageSizes.length || 1);
-        setSelectedBoxKey(boxKey);
+        onSelectedBoxKeyChange(boxKey);
         boxElement.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
@@ -212,7 +220,7 @@ const RedactionPreviewPages = forwardRef<
         });
         notifyPageChange(currentPageRef.current);
       },
-      [notifyPageChange, pageSizes.length]
+      [notifyPageChange, onSelectedBoxKeyChange, pageSizes.length]
     );
 
     /**
@@ -313,7 +321,7 @@ const RedactionPreviewPages = forwardRef<
         }
         const point = getPointerPoint(event);
         event.currentTarget.setPointerCapture(event.pointerId);
-        setSelectedBoxKey(null);
+        onSelectedBoxKeyChange(null);
         setDrawingState({
           page,
           pointerId: event.pointerId,
@@ -321,7 +329,7 @@ const RedactionPreviewPages = forwardRef<
           current: point,
         });
       },
-      [onRedact]
+      [onRedact, onSelectedBoxKeyChange]
     );
 
     const handlePointerMove = useMemoizedCallback(
@@ -437,9 +445,9 @@ const RedactionPreviewPages = forwardRef<
 
     const setSelectedBoxOpened = useMemoizedCallback(
       (boxKey: string, opened: boolean): void => {
-        setSelectedBoxKey(opened ? boxKey : null);
+        onSelectedBoxKeyChange(opened ? boxKey : null);
       },
-      []
+      [onSelectedBoxKeyChange]
     );
     const handleSelectedChange = useCallbackWithPrefix<[string], [boolean]>(
       setSelectedBoxOpened
@@ -464,7 +472,7 @@ const RedactionPreviewPages = forwardRef<
         mih={0}
         // Keep this padding inside the scrollable canvas so it moves away
         // with the pages instead of becoming fixed viewer chrome.
-        p="xs"
+        p={{ base: 'xs', sm: 'lg' }}
         bg="gray.2"
         style={{ overflow: 'auto' }}
       >
@@ -502,9 +510,8 @@ const RedactionPreviewPages = forwardRef<
                 w={width}
                 h={height}
                 bg="white"
-                bd="1px solid var(--mantine-color-gray-5)"
                 flex="0 0 auto"
-                style={{ boxShadow: 'var(--mantine-shadow-sm)' }}
+                style={{ boxShadow: 'var(--mantine-shadow-xs)' }}
               >
                 <Box
                   pos="relative"
@@ -663,6 +670,7 @@ const RedactionBoxOverlay: React.FunctionComponent<RedactionBoxOverlayProps> =
             <ActionIcon
               tooltip="Toggle redaction on/off"
               variant="subtle"
+              color="gray"
               onClick={handleEnabledChange}
             >
               <FontAwesomeIcon
@@ -672,6 +680,7 @@ const RedactionBoxOverlay: React.FunctionComponent<RedactionBoxOverlayProps> =
             <ActionIcon
               tooltip="Delete redaction"
               variant="subtle"
+              color="red"
               onClick={handleDelete}
             >
               <FontAwesomeIcon icon={faXmark} />
@@ -710,16 +719,6 @@ const DrawingOverlay: React.FunctionComponent<DrawingOverlayProps> = React.memo(
 
 function getPointerPoint(event: PointerEvent<HTMLDivElement>): Point {
   return { clientX: event.clientX, clientY: event.clientY };
-}
-
-function makeBoundingBoxKey({
-  page,
-  box,
-}: {
-  page: number;
-  box: BoundingBox;
-}): string {
-  return [page, box.minX, box.minY, box.maxX, box.maxY].join(':');
 }
 
 function getMostVisiblePage(

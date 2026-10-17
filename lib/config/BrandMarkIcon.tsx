@@ -5,7 +5,7 @@ import {
 } from './mantineTheme';
 
 // ImageResponse (Satori) uses inline `style` objects, so we need resolved hex
-// strings here — Mantine props like `bg="green.6"` only work on Mantine
+// strings here — Mantine props like `bg="green.7"` only work on Mantine
 // components inside MantineProvider.
 const brandMarkFill = resolvePrimaryThemeColor();
 const brandMarkText = resolveMantineThemeColor('gray.9');

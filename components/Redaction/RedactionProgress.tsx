@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Progress, Stack, Text, Title } from '@mantine/core';
+import { Box, Progress, Stack, Text, Title } from '@mantine/core';
 import type { GetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 import { useInterval } from '../../lib/hookUtilities/useInterval';
 import { estimatedMsPerPage } from '../../lib/redaction/estimatedMsPerPage';
@@ -56,29 +56,32 @@ const RedactionProgress: React.FunctionComponent<RedactionProgressProps> =
     );
 
     return (
-      <Card
-        maw={centeredAlertOrCardMaxWidth}
-        mx="auto"
-        data-testid={_redactionProgressTestId}
-        aria-label={`Analyzing ${pageCount} ${pageLabel}, started ${createdAt}`}
-      >
-        <Stack gap="md">
-          <Title order={2}>
-            Detecting sensitive information in your document.
-          </Title>
-          <Progress
-            value={percent}
-            aria-label="Redaction progress"
-            transitionDuration={redactionProgressUpdateIntervalMs * 2}
-          />
-          <Text>
-            {isFinishing
-              ? 'Finishing up…'
-              : `About ${remainingSeconds} seconds left`}
-          </Text>
-          <Text c="dimmed">Large documents can take longer to analyze.</Text>
-        </Stack>
-      </Card>
+      // Side gutter keeps the card off the screen edges on phones.
+      <Box px="md" mt="xl">
+        <Card
+          maw={centeredAlertOrCardMaxWidth}
+          mx="auto"
+          data-testid={_redactionProgressTestId}
+          aria-label={`Analyzing ${pageCount} ${pageLabel}, started ${createdAt}`}
+        >
+          <Stack gap="md">
+            <Title order={2} size="h3">
+              Detecting sensitive information in your document.
+            </Title>
+            <Progress
+              value={percent}
+              aria-label="Redaction progress"
+              transitionDuration={redactionProgressUpdateIntervalMs * 2}
+            />
+            <Text>
+              {isFinishing
+                ? 'Finishing up…'
+                : `About ${remainingSeconds} seconds left`}
+            </Text>
+            <Text c="dimmed">Large documents can take longer to analyze.</Text>
+          </Stack>
+        </Card>
+      </Box>
     );
   });
 

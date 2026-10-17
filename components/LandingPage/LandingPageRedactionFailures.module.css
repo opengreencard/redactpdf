@@ -9,3 +9,8 @@
 .storyLink:focus-visible {
   text-decoration-color: currentColor;
 }
+
+/* One-sided rule above the closing line; `bd` only sets all four sides. */
+.closer {
+  border-top: 1px solid var(--mantine-color-gray-7);
+}

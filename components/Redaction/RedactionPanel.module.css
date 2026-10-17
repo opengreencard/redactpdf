@@ -1,0 +1,5 @@
+/* Mantine `bd` only takes the full border shorthand, so the one-sided rule
+   between the rail header and the list lives here. */
+.header {
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+}
