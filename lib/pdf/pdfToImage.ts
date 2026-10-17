@@ -12,6 +12,8 @@ import { renderPDFPages } from './pdfRenderer';
 export interface PDFPageImage {
   page: number;
   png: Uint8Array;
+  /** Pixel size of `png`: the page size in points times `previewDPI` / 72. */
+  previewSize: PageSize;
   pageSize: PageSize;
 }
 
@@ -61,6 +63,10 @@ export async function processPDFPagesInBatches(
         await onPage({
           page: pageNumber,
           png,
+          previewSize: {
+            width: Math.round((width * previewDPI) / 72),
+            height: Math.round((height * previewDPI) / 72),
+          },
           pageSize: { width: Math.round(width), height: Math.round(height) },
         });
       }),
@@ -107,23 +113,22 @@ export async function rasterizePDFPages(
 export interface CompressImageOptions {
   /** A PNG from a page render. */
   pngBuffer: Uint8Array;
-  /** Downscale to this size, or `null` to keep the PNG's size. */
-  size: PageSize | null;
+  /** Pixel size of the JPEG. The PNG is resized to fit it. */
+  size: PageSize;
 }
 
 /**
- * Compress a rasterized page PNG into a JPEG for storage and vision. Pass a
- * `size` to downscale first, for example to send vision a smaller image than
- * the stored preview. Pass `null` to keep the PNG's size.
+ * Compress a rasterized page PNG into a JPEG at `size`. The stored preview and
+ * the vision input are different sizes, so each call names its own.
  */
 export async function compressImage({
   pngBuffer,
   size,
 }: CompressImageOptions): Promise<Uint8Array> {
-  const image = size
-    ? sharp(pngBuffer).resize(size.width, size.height, { fit: 'fill' })
-    : sharp(pngBuffer);
-  return image.jpeg({ quality: jpegQuality, progressive: false }).toBuffer();
+  return sharp(pngBuffer)
+    .resize(size.width, size.height, { fit: 'fill' })
+    .jpeg({ quality: jpegQuality, progressive: false })
+    .toBuffer();
 }
 
 /**

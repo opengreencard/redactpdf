@@ -18,15 +18,17 @@ import { putRedactionImage } from '../../../../lib/storage/storageFunctions/reda
  *
  * Gemini doesn't publish a concurrency limit for these calls. What applies:
  *
- * - Requests per minute for the project. AI Studio shows it:
- *   https://aistudio.google.com/rate-limit
- * - Spend per 10 minutes, $10 on Tier 1:
- *   https://ai.google.dev/gemini-api/docs/rate-limits
+ * - Requests per minute for the project, 20,000 (AI Studio shows it:
+ *   https://aistudio.google.com/rate-limit)
+ * - Tokens per minute for the project, 20 million (same page)
  *
  * One pod sends about `concurrency × 60 / seconds per request` requests a
- * minute. Check that total against the RPM before raising this.
+ * minute. At 32 in flight and roughly 15 seconds per request, a pod sends
+ * about 130 requests a minute, and each request is a few thousand tokens. With
+ * two pods that stays well under both limits. Check that total against the
+ * limits before raising this.
  */
-const visionQueue = new PQueue({ concurrency: 8 });
+const visionQueue = new PQueue({ concurrency: 32 });
 
 /** Timing and success information for one page's vision request. */
 export interface ProcessRedactionPageTiming {
@@ -59,17 +61,17 @@ export async function processRedaction(
     const pageRequests: Promise<ProcessImageResult>[] = [];
     const { rasterizationTimeMs } = await processPDFPagesInBatches(
       buffer,
-      async ({ page, png, pageSize }) => {
+      async ({ page, png, previewSize, pageSize }) => {
         pageSizes[page - 1] = pageSize;
         // Encode before queueing so waiting requests hold small JPEGs, not
-        // raw page PNGs.
-        const previewJPEG = await compressImage({ pngBuffer: png, size: null });
-        const visionJPEG = await compressImage({
-          pngBuffer: png,
-          size: pageSize,
-        });
+        // raw page PNGs. The two encodes read the same PNG, so run them
+        // together.
+        const [previewJPEG, visionJPEG] = await Promise.all([
+          compressImage({ pngBuffer: png, size: previewSize }),
+          compressImage({ pngBuffer: png, size: pageSize }),
+        ]);
         // Don't await the request: rasterization moves on to the next pages
-        // while up to 8 vision requests run.
+        // while the queue runs vision requests.
         pageRequests[page - 1] = visionQueue.add(() =>
           processImage({
             previewJPEG,
