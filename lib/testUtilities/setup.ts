@@ -1,4 +1,6 @@
+import config from '../config';
 import db from '../db';
+import '../allDatabaseModels';
 
 //
 // This file includes mocks for modules that are mocked by default
@@ -29,6 +31,15 @@ jest.mock('../ai/createOpenAICompatibleCompletion');
 // real client use jest.unmock().
 // eslint-disable-next-line no-restricted-syntax
 jest.mock('../pdf/pdfRenderer');
+
+// Each Jest worker has its own empty database, created in globalSetup. Create
+// any missing tables once per file; files in one worker run one at a time. The
+// test-data generator tests run against real databases, so they skip this.
+beforeAll(async () => {
+  if (config.isTest) {
+    await db.sync();
+  }
+});
 
 afterAll(async () => {
   await db.close();

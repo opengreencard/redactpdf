@@ -50,7 +50,15 @@ interface Config {
 
 const dbHost = process.env.DB_HOST ?? '127.0.0.1';
 const dbPort = Number(process.env.DB_PORT ?? '3306');
-const dbDatabase = process.env.DB_DATABASE ?? 'redaction_development';
+const baseDbDatabase = process.env.DB_DATABASE ?? 'redaction_development';
+// Jest runs test files in parallel workers. In tests, each worker gets its own
+// database (redaction_test1, redaction_test2, ...) so suites cannot see each
+// other's rows. lib/testUtilities/setupDatabases.ts creates them.
+const dbDatabase =
+  ((environment as string) === 'test' || (environment as string) === 'ci') &&
+  process.env.JEST_WORKER_ID
+    ? `${baseDbDatabase}${process.env.JEST_WORKER_ID}`
+    : baseDbDatabase;
 
 const config: Config = {
   isTest:
