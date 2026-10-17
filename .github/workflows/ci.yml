@@ -62,12 +62,15 @@ jobs:
       APP_MODE: test
       DB_HOST: 127.0.0.1
       DB_DATABASE: redaction_test
-      DB_USER: redaction_test
-      DB_PASS: redaction
+      # Each Jest worker uses its own database (redaction_test1, ...), which
+      # globalSetup creates. The service's root user may create them; the
+      # redaction_test user it provisions can only use redaction_test.
+      DB_USER: root
+      DB_PASS: redaction-root
       AUTH_SECRET: ci-only-secret
-      # Jest globalSetup only recreates tables when this is set. The MariaDB
-      # service starts empty, so CI tests fail with table-not-found errors
-      # without it.
+      # Jest globalSetup only recreates the worker databases when this is set.
+      # The MariaDB service starts empty, so CI tests fail with table-not-found
+      # errors without it.
       SETUP_TEST_DB: 'true'
     steps:
       - uses: actions/checkout@v7

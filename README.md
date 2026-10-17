@@ -58,6 +58,11 @@ docker-compose exec -T mariadb mariadb -uroot -predaction-root \
   < docker/mariadb/10-create-test-database.sql
 ```
 
+Each Jest worker uses its own database (`redaction_test1`, `redaction_test2`,
+and so on), so the test user needs rights on every `redaction_test*` database.
+Run this script again after pulling a change to it, even if your volume
+already has the test user.
+
 ## Checks
 
 ```bash

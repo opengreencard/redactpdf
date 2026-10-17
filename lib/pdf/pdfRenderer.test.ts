@@ -3,6 +3,10 @@ import type { AddressInfo } from 'node:net';
 import config from '../config';
 import { RenderPDFPagesOptions, renderPDFPages } from './pdfRenderer';
 
+// This file tests the real client against a stub renderer server, not the
+// recorded renders that setup.ts mocks in by default.
+jest.unmock('./pdfRenderer');
+
 describe(renderPDFPages, () => {
   let server: http.Server;
   let originalRendererURL: string | undefined;
