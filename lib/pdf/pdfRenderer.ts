@@ -75,8 +75,16 @@ async function postToRenderer(
   }
 
   if (!response.ok) {
-    const { error } = (await response.json()) as { error: string };
-    throw new Error(`PDF renderer failed: ${error}`);
+    // The body is not always JSON. A proxy error page or a body-parser failure
+    // can return HTML, so parse defensively and keep the status in the error.
+    const text = await response.text();
+    let message = text.slice(0, 500);
+    try {
+      message = (JSON.parse(text) as { error: string }).error ?? message;
+    } catch {
+      // Keep the raw text.
+    }
+    throw new Error(`PDF renderer failed (${response.status}): ${message}`);
   }
   return response;
 }
