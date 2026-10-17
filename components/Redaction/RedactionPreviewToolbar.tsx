@@ -257,6 +257,9 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
           hiddenFrom="xs"
           tooltip="Toggle draw redaction"
           variant={isRedacting ? 'light' : 'transparent'}
+          // A shaded color like gray.7 makes the light variant a solid fill.
+          // Use the brand color's tint so the selected state matches the theme.
+          color={isRedacting ? 'green' : 'gray.7'}
           aria-pressed={isRedacting}
           onClick={handleDrawRedactionToggle}
         >
