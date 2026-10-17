@@ -26,6 +26,7 @@ import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback
 import { useSetState } from '../../lib/hookUtilities/useSetState';
 import ActionIcon, { ActionIconProps } from '../designSystem/ActionIcon';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
+import rules from '../designSystem/Rule.module.css';
 import classes from './RedactionPreviewToolbar.module.css';
 
 export type RedactionPreviewZoom =
@@ -144,7 +145,7 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
 
     return (
       <Group gap="md" align="center" wrap="nowrap" w="100%">
-        <Group gap={4} wrap="nowrap">
+        <Group gap="xs" wrap="nowrap">
           <ActionIcon
             {...pageActionIconCommonProps}
             tooltip="Previous page"
@@ -153,7 +154,7 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
           >
             <FontAwesomeIcon icon={faChevronUp} />
           </ActionIcon>
-          <Group gap={4} wrap="nowrap">
+          <Group gap="xs" wrap="nowrap">
             <NumberInput
               aria-label="Current page"
               value={page}
@@ -167,7 +168,7 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
               classNames={{ input: classes.pageInput }}
               onChange={handlePageInputChange}
             />
-            <Text size="sm" c="gray.6" mr={4}>
+            <Text size="sm" c="gray.6" mr="xs">
               / {pageCount}
             </Text>
           </Group>
@@ -208,7 +209,9 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
             suffix="%"
             w={64}
             variant="unstyled"
-            classNames={{ input: classes.zoomPercentInput }}
+            classNames={{
+              input: `${classes.zoomPercentInput} ${rules.left} ${rules.right}`,
+            }}
             onChange={handleZoomPercentChange}
           />
           <Menu withinPortal position="bottom-start">

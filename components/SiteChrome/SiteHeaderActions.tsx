@@ -41,7 +41,7 @@ const SiteHeaderActions: React.FunctionComponent<SiteHeaderActionsProps> =
     return (
       <>
         <Box ml="auto">
-          <Group gap={4} wrap="nowrap">
+          <Group gap="xs" wrap="nowrap">
             <Button
               {...viewSourceButtonProps}
               visibleFrom="sm"
@@ -59,7 +59,7 @@ const SiteHeaderActions: React.FunctionComponent<SiteHeaderActionsProps> =
             </Button>
             {!isLoggedIn ? (
               <>
-                <Group visibleFrom="sm" gap={4} wrap="nowrap">
+                <Group visibleFrom="sm" gap="xs" wrap="nowrap">
                   <Button
                     {...commonButtonProps}
                     {...quietHeaderButtonProps}
@@ -106,7 +106,7 @@ const SiteHeaderActions: React.FunctionComponent<SiteHeaderActionsProps> =
 
 export default SiteHeaderActions;
 
-/** Ink-colored borderless header links (GitHub, Log in) from the design. */
+/** Ink-colored borderless header links (GitHub, Log in). */
 const quietHeaderButtonProps = {
   variant: 'subtle',
   color: 'gray',

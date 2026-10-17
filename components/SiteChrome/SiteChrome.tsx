@@ -1,6 +1,7 @@
 import React from 'react';
 import { Anchor, Box, Container, Group, Stack, Text } from '@mantine/core';
 import { githubRepoUrl } from '../../lib/config/brand';
+import rules from '../designSystem/Rule.module.css';
 import SiteHeaderActions from './SiteHeaderActions';
 import classes from './SiteChrome.module.css';
 
@@ -9,6 +10,13 @@ import classes from './SiteChrome.module.css';
 export type ContainerSize = 'lg' | 'none';
 
 export const siteContainerSize: ContainerSize = 'lg';
+
+/**
+ * Header bar height. Tuned by eye; no spec.
+ * It's a minimum so the actions can wrap under the wordmark on very narrow
+ * phones instead of overflowing.
+ */
+export const headerHeight = 64;
 
 export interface SiteChromeProps {
   isLoggedIn: boolean;
@@ -71,10 +79,9 @@ const SiteHeader: React.FunctionComponent<SiteHeaderProps> = React.memo(
     const { isLoggedIn, containerSize } = props;
 
     return (
-      // One-sided border and z-index: see SiteChrome.module.css.
       <Box
         component="header"
-        className={classes.header}
+        className={`${classes.header} ${rules.bottom}`}
         bg="gray.1"
         pos="sticky"
         top={0}
@@ -123,8 +130,7 @@ const SiteFooter: React.FunctionComponent<SiteFooterProps> = React.memo(
     const content = <SiteFooterContent />;
 
     return (
-      // One-sided border: see SiteChrome.module.css.
-      <Box component="footer" className={classes.footer} pt={28} pb={40}>
+      <Box component="footer" className={rules.top} pt="lg" pb="xl">
         {containerSize === 'none' ? (
           <Box px="lg">{content}</Box>
         ) : (
@@ -140,7 +146,7 @@ const SiteFooterContent: React.FunctionComponent = React.memo(
     return (
       <Group justify="space-between" align="center" gap="md">
         <SiteWordmark size="sm" />
-        <Group gap={22} fz="xs">
+        <Group gap="lg" fz="xs">
           <Anchor href="/terms-of-use" c="dimmed">
             Terms of Use
           </Anchor>
@@ -161,11 +167,36 @@ const SiteFooterContent: React.FunctionComponent = React.memo(
   }
 );
 
-/**
- * Header bar height from the design. A minimum so the actions can wrap
- * under the wordmark on very narrow phones instead of overflowing.
- */
-const headerHeight = 64;
+/** "redact" in a green chip followed by "pdf.ai" in ink. */
+const SiteWordmark: React.FunctionComponent<SiteWordmarkProps> = React.memo(
+  function SiteWordmark(props: SiteWordmarkProps) {
+    const { size } = props;
+    const metrics = wordmarkSizes[size];
+
+    return (
+      <Anchor href="/" underline="never" c="gray.9" fw="bold" lts="-0.01em">
+        <Group gap="sm" wrap="nowrap" align="center">
+          <Box
+            component="span"
+            bg="green.7"
+            c="white"
+            bdrs="xs"
+            px={metrics.chipPaddingX}
+            pt={metrics.chipPaddingTop}
+            pb={metrics.chipPaddingBottom}
+            fz={metrics.chipFontSize}
+            lh={1.2}
+          >
+            redact
+          </Box>
+          <Text component="span" inherit fz={metrics.labelFontSize}>
+            pdf.ai
+          </Text>
+        </Group>
+      </Anchor>
+    );
+  }
+);
 
 // eslint-disable-next-line no-restricted-syntax
 type SiteWordmarkSize = 'sm' | 'md';
@@ -175,7 +206,7 @@ interface SiteWordmarkProps {
   size: SiteWordmarkSize;
 }
 
-/** Chip and label metrics per wordmark size, from the design. */
+/** Chip and label metrics per wordmark size. Tuned by eye; no spec. */
 const wordmarkSizes: Record<
   SiteWordmarkSize,
   {
@@ -201,34 +232,3 @@ const wordmarkSizes: Record<
     chipPaddingBottom: 3,
   },
 };
-
-/** "redact" in a green chip followed by "pdf.ai" in ink. */
-const SiteWordmark: React.FunctionComponent<SiteWordmarkProps> = React.memo(
-  function SiteWordmark(props: SiteWordmarkProps) {
-    const { size } = props;
-    const metrics = wordmarkSizes[size];
-
-    return (
-      <Anchor href="/" underline="never" c="gray.9" fw="bold" lts="-0.01em">
-        <Group gap={7} wrap="nowrap" align="center">
-          <Box
-            component="span"
-            bg="green.7"
-            c="white"
-            bdrs="xs"
-            px={metrics.chipPaddingX}
-            pt={metrics.chipPaddingTop}
-            pb={metrics.chipPaddingBottom}
-            fz={metrics.chipFontSize}
-            lh={1.2}
-          >
-            redact
-          </Box>
-          <Text component="span" inherit fz={metrics.labelFontSize}>
-            pdf.ai
-          </Text>
-        </Group>
-      </Anchor>
-    );
-  }
-);

@@ -1,16 +1,3 @@
-/* One-sided rules can't be set with Mantine's `bd` prop. */
-.detectList {
-  border-top: 1px solid var(--mantine-color-gray-3);
-}
-
-.detectItem {
-  border-bottom: 1px solid var(--mantine-color-gray-3);
-}
-
-.faqItem {
-  border-bottom: 1px solid var(--mantine-color-gray-3);
-}
-
 /* Line the first question up with the section heading. */
 .faqItem:first-child {
   padding-top: 0;

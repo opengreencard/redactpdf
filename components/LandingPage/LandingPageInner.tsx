@@ -53,6 +53,8 @@ import LandingPageTag from './LandingPageTag';
 import LandingPageUploadCTA from './LandingPageUploadCTA';
 import LandingPageUploadModalProvider from './LandingPageUploadModalProvider';
 import { dutchPassportSample, irs1040Sample } from './landingRedactionSamples';
+import rules from '../designSystem/Rule.module.css';
+import { landingSpacing } from './landingLayout';
 import classes from './LandingPageInner.module.css';
 
 export interface LandingPageInnerProps {}
@@ -86,11 +88,15 @@ const LandingPageHero: React.FunctionComponent = React.memo(
     return (
       <Container
         size={siteContainerSize}
-        pt={{ base: 40, sm: 72 }}
-        pb={{ base: 48, sm: 64 }}
+        pt={landingSpacing.heroPaddingTop}
+        pb={landingSpacing.blockGap}
       >
         <Stack gap={0}>
-          <Grid rowGap={40} columnGap={64} align="center">
+          <Grid
+            rowGap="xl"
+            columnGap={landingSpacing.heroColumnGap}
+            align="center"
+          >
             <GridCol span={{ base: 12, md: 6 }}>
               <Stack gap={0} align="flex-start">
                 <Title order={1}>
@@ -99,7 +105,7 @@ const LandingPageHero: React.FunctionComponent = React.memo(
                     in seconds
                   </Text>
                 </Title>
-                <Text size="lg" c="gray.7" maw={500} mt={22} mb={30}>
+                <Text size="lg" c="gray.7" maw={500} mt="md" mb="xl">
                   Upload a PDF and we&apos;ll suggest what to hide. Review each
                   suggestion, then download your redacted file.
                 </Text>
@@ -110,7 +116,7 @@ const LandingPageHero: React.FunctionComponent = React.memo(
                 <Box w="100%" className={classes.heroCta}>
                   <LandingPageUploadCTA fullWidth={false} />
                 </Box>
-                <Group gap="sm" mt={26}>
+                <Group gap="sm" mt="lg">
                   <LandingPageTag withCheck>Free</LandingPageTag>
                   <LandingPageTag withCheck>Open source</LandingPageTag>
                   <LandingPageTag withCheck>
@@ -123,7 +129,7 @@ const LandingPageHero: React.FunctionComponent = React.memo(
               <LandingPageHeroIllustration />
             </GridCol>
           </Grid>
-          <Box mt={{ base: 48, sm: 64 }}>
+          <Box mt={landingSpacing.blockGap}>
             <LandingPageHeroDropzone />
           </Box>
         </Stack>
@@ -143,7 +149,7 @@ const LandingPageExampleDocuments: React.FunctionComponent = React.memo(
           // Passport plus a 1040 cropped to the same aspect ratio so the
           // two cards occupy the same slot.
         }
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing={20}>
+        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
           <BeforeAfterRedactionCard {...dutchPassportSample} />
           <BeforeAfterRedactionCard {...irs1040Sample} />
         </SimpleGrid>
@@ -160,7 +166,7 @@ const LandingPageHowItWorks: React.FunctionComponent = React.memo(
         description="Review the suggestions, adjust them, and download the result."
         backgroundVariant={LandingPageSectionBackgroundVariant.surface}
       >
-        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing={20}>
+        <SimpleGrid cols={{ base: 1, sm: 3 }} spacing="md">
           {howItWorksSteps.map((step, index) => (
             // Paper cards stand out on the white section.
             <Card key={step.title} bg="gray.1" h="100%">
@@ -195,15 +201,15 @@ const LandingPageDetectList: React.FunctionComponent = React.memo(
           cols={{ base: 2, sm: 3 }}
           spacing={0}
           verticalSpacing={0}
-          className={classes.detectList}
+          className={rules.top}
         >
           {detectedDataTypes.map((dataType) => (
             <Group
               key={dataType}
               gap="sm"
-              py={18}
+              py="md"
               wrap="nowrap"
-              className={classes.detectItem}
+              className={rules.bottom}
             >
               <ThemeIcon variant="light" radius="xl" size="md">
                 <FontAwesomeIcon icon={faCheck} size="xs" />
@@ -225,16 +231,16 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
         description="See what happens to your file, what we remove, and how to inspect the code."
         backgroundVariant={LandingPageSectionBackgroundVariant.surface}
       >
-        <Stack gap={28}>
-          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing={20}>
+        <Stack gap="lg">
+          <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
             {privacyCards.map((card) => (
               <Card key={card.title} bg="gray.1" h="100%">
                 <Group gap="md" wrap="nowrap" align="flex-start">
                   <ThemeIcon size="lg" variant="light">
                     <FontAwesomeIcon icon={card.icon} />
                   </ThemeIcon>
-                  <Stack gap={6}>
-                    <Stack gap={2}>
+                  <Stack gap="xs">
+                    <Stack gap="xs">
                       <Title order={3}>{card.title}</Title>
                       <Text size="sm" c="green.9">
                         {_.upperFirst(card.subtitle)}
@@ -279,12 +285,12 @@ const LandingPagePricing: React.FunctionComponent = React.memo(
             <TableThead>
               <TableTr>
                 <TableTh w="40%" />
-                <TableTh ta="center" pt={22} className={classes.pricingHeader}>
+                <TableTh ta="center" pt="lg" className={classes.pricingHeader}>
                   Free
                 </TableTh>
                 <TableTh
                   ta="center"
-                  pt={22}
+                  pt="lg"
                   bg="green.0"
                   className={classes.pricingHeader}
                 >
@@ -413,9 +419,9 @@ const LandingPageFaq: React.FunctionComponent = React.memo(
           {faqItems.map((item) => (
             <Stack
               key={item.question}
-              gap={6}
-              py={22}
-              className={classes.faqItem}
+              gap="xs"
+              py="lg"
+              className={`${classes.faqItem} ${rules.bottom}`}
             >
               <Title order={3} ff="text" fz="lg" lts={0}>
                 {item.question}

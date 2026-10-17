@@ -1,5 +1,7 @@
-/* Mantine's dropzone is already white with a dashed gray-4 border; the design
-   uses a slightly heavier dash. */
+/*
+ * Mantine's dropzone is already white with a dashed gray-4 border. We use a
+ * slightly heavier dash. Tuned by eye; no spec.
+ */
 .root {
   border-width: 1.5px;
 }

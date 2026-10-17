@@ -1,0 +1,24 @@
+/*
+ * One-sided 1px rules. Mantine's `bd` prop sets all four sides, so use these
+ * classes for a single edge.
+ */
+.top {
+  border-top: 1px solid var(--mantine-color-gray-3);
+}
+
+.bottom {
+  border-bottom: 1px solid var(--mantine-color-gray-3);
+}
+
+.left {
+  border-left: 1px solid var(--mantine-color-gray-3);
+}
+
+.right {
+  border-right: 1px solid var(--mantine-color-gray-3);
+}
+
+/* Darker top rule for a closing line that should read stronger. */
+.topDark {
+  border-top: 1px solid var(--mantine-color-gray-7);
+}

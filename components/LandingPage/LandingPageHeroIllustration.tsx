@@ -2,7 +2,9 @@ import React from 'react';
 import { Box, Group, Stack, Text } from '@mantine/core';
 import Image from '../designSystem/Image';
 import { irs1040Sample } from './landingRedactionSamples';
+import { redactionOverlayBorder } from '../Redaction/redactionLayout';
 import LandingPageTag from './LandingPageTag';
+import rules from '../designSystem/Rule.module.css';
 import classes from './LandingPageHeroIllustration.module.css';
 
 /**
@@ -14,6 +16,9 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
   function LandingPageHeroIllustration() {
     return (
       <Box pos="relative" aria-hidden>
+        {
+          // Tuned by eye; no spec.
+        }
         <Box
           bg="white"
           bd="1px solid var(--mantine-color-gray-3)"
@@ -21,13 +26,7 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
           // Lifted window; clip the page canvas to the rounded corners.
           style={{ overflow: 'hidden', boxShadow: 'var(--mantine-shadow-xl)' }}
         >
-          <Group
-            h={46}
-            px="md"
-            gap={10}
-            wrap="nowrap"
-            className={classes.windowHeader}
-          >
+          <Group h={46} px="md" gap="sm" wrap="nowrap" className={rules.bottom}>
             <Text size="sm" fw="bold" style={{ whiteSpace: 'nowrap' }}>
               Review redactions
             </Text>
@@ -51,8 +50,8 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
               w={168}
               gap={0}
               px="sm"
-              py={14}
-              className={classes.rail}
+              py="md"
+              className={rules.right}
               style={{ flexShrink: 0 }}
             >
               <Text
@@ -61,7 +60,7 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
                 tt="uppercase"
                 lts="0.04em"
                 c="gray.6"
-                mx={4}
+                mx="xs"
                 mb="sm"
               >
                 Detected
@@ -71,7 +70,7 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
                   key={label}
                   gap="sm"
                   px="sm"
-                  py={7}
+                  py="sm"
                   bdrs="sm"
                   bg={index === 0 ? 'green.0' : undefined}
                   wrap="nowrap"
@@ -81,8 +80,8 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
                 </Group>
               ))}
               <Box
-                mt={14}
-                mx={4}
+                mt="md"
+                mx="xs"
                 h={32}
                 bg="green.7"
                 c="white"
@@ -125,10 +124,10 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
                   <Box
                     key={`${box.left}-${box.top}`}
                     pos="absolute"
+                    // Border value is shared with the real redaction overlay.
+                    bd={redactionOverlayBorder}
                     className={
-                      box.isSelected
-                        ? `${classes.suggestion} ${classes.selectedSuggestion}`
-                        : classes.suggestion
+                      box.isSelected ? classes.selectedSuggestion : undefined
                     }
                     style={{
                       left: `${box.left}%`,
@@ -152,8 +151,8 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
           bg="white"
           bd="1px solid var(--mantine-color-gray-3)"
           bdrs="sm"
-          px={14}
-          py={11}
+          px="md"
+          py="sm"
           style={{ boxShadow: 'var(--mantine-shadow-md)' }}
         >
           <Text size="sm" fw="bold">
@@ -168,6 +167,8 @@ const LandingPageHeroIllustration: React.FunctionComponent = React.memo(
   }
 );
 
+export default LandingPageHeroIllustration;
+
 const detectionLabels: string[] = ['Name', 'Address', 'SSN', 'Email'];
 
 interface SuggestionBox {
@@ -180,18 +181,18 @@ interface SuggestionBox {
   isSelected: boolean;
 }
 
-// Positions of the name, SSN, and address fields on the 1040 still.
+// Positions of the name, SSN, and address fields on the 1040 still. Each box is
+// the label's ink plus 5px (3px clearance and the 2px border) at the 520px mock
+// width, so the border-box outline encloses the text.
 const suggestionBoxes: SuggestionBox[] = [
-  { left: 2.1, top: 11.4, width: 4.5, height: 1.3, isSelected: true },
-  { left: 39.1, top: 11.3, width: 3.7, height: 1.3, isSelected: false },
-  { left: 81.4, top: 11.3, width: 13.1, height: 1.3, isSelected: false },
-  { left: 2.0, top: 14.5, width: 3.8, height: 1.1, isSelected: true },
-  { left: 39.0, top: 14.5, width: 6.8, height: 1.1, isSelected: true },
-  { left: 81.3, top: 14.5, width: 13.3, height: 1.3, isSelected: false },
-  { left: 2.1, top: 17.4, width: 21.3, height: 1.4, isSelected: false },
-  { left: 2.1, top: 20.3, width: 9.6, height: 1.3, isSelected: false },
-  { left: 57.9, top: 20.2, width: 2.0, height: 1.2, isSelected: false },
-  { left: 68.9, top: 20.5, width: 4.9, height: 1.2, isSelected: false },
+  { left: 0.96, top: 11.05, width: 6.33, height: 2.34, isSelected: true },
+  { left: 37.84, top: 11.13, width: 6.11, height: 2.27, isSelected: false },
+  { left: 80.6, top: 10.9, width: 14.71, height: 2.34, isSelected: false },
+  { left: 0.96, top: 13.87, width: 6, height: 2.34, isSelected: true },
+  { left: 38.18, top: 13.87, width: 8.48, height: 2.34, isSelected: true },
+  { left: 80.03, top: 14.1, width: 15.05, height: 2.34, isSelected: false },
+  { left: 1.19, top: 16.99, width: 22.62, height: 2.58, isSelected: false },
+  { left: 1.41, top: 20.12, width: 11.31, height: 2.34, isSelected: false },
+  { left: 56.62, top: 19.65, width: 4.19, height: 2.34, isSelected: false },
+  { left: 67.93, top: 20.12, width: 6.9, height: 2.34, isSelected: false },
 ];
-
-export default LandingPageHeroIllustration;

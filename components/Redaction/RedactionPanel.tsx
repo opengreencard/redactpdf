@@ -16,7 +16,7 @@ import { downloadArrayBufferAsFile } from '../clientLib/downloadArrayBufferAsFil
 import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
 import type { ButtonSection } from '../designSystem/Button/ButtonLeftOrRightSection';
-import classes from './RedactionPanel.module.css';
+import rules from '../designSystem/Rule.module.css';
 import RedactionBoundingBoxList, {
   RedactionBoundingBoxListProps,
 } from './RedactionBoundingBoxList';
@@ -78,10 +78,7 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
 
     return (
       <Stack gap={0} mih={0} h="100%" data-testid={_redactionPanelTestId}>
-        {
-          // One-sided rule under the header: see RedactionPanel.module.css.
-        }
-        <Stack gap={18} px={20} pt="lg" pb={20} className={classes.header}>
+        <Stack gap="md" px="md" pt="lg" pb="md" className={rules.bottom}>
           <Title order={2} size="h3">
             Redacted information
           </Title>
@@ -90,7 +87,7 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
             onClick={handleDownload}
             loading={isDownloadPending}
             // w="100%" rather than fullWidth: fullWidth pins the icon to the
-            // left edge, while the design keeps it beside the centered label.
+            // left edge, but we want it beside the centered label.
             w="100%"
             size="md"
             leftSection={downloadIconSection}
@@ -100,7 +97,7 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
           </Button>
         </Stack>
         <ScrollArea flex={1} mih={0} type="auto">
-          <Stack gap="sm" px={12} pt={18} pb="lg">
+          <Stack gap="sm" px="md" pt="md" pb="lg">
             {redaction.redactionBoundingBoxes.length === 0 ? (
               <Alert color="gray" title="No automatic redactions found">
                 We could not find any automatic parts to redact. Please redact
@@ -130,8 +127,6 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
 
 export default RedactionPanel;
 
-const downloadIconSection: ButtonSection = { type: 'icon', icon: faDownload };
-
 /** Test ID for the Download button. Exported for tests. */
 export const _downloadButtonTestId = 'redaction-download-button';
 
@@ -141,3 +136,5 @@ export const _downloadErrorNotificationTestId =
 
 /** Test ID for the review suggestions rail. Exported for tests. */
 export const _redactionPanelTestId = 'redaction-panel';
+
+const downloadIconSection: ButtonSection = { type: 'icon', icon: faDownload };

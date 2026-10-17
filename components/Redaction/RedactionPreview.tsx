@@ -14,7 +14,7 @@ import RedactionPreviewToolbar, {
   RedactionPreviewToolbarProps,
   RedactionPreviewZoom,
 } from './RedactionPreviewToolbar';
-import { redactionPaneBorder } from './redactionLayout';
+import rules from '../designSystem/Rule.module.css';
 
 interface RedactionPreviewOwnProps {
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
@@ -58,8 +58,6 @@ export interface RedactionPreviewProps
       | 'redactionResponse'
       | 'onDeleteBoundingBox'
       | 'onEnabledChange'
-      | 'selectedBoxKey'
-      | 'onSelectedBoxKeyChange'
     >,
     RedactionPreviewToolbarPassThroughProps,
     RedactionPreviewPagesPassThroughProps {}
@@ -73,8 +71,6 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
       onAddBoundingBox,
       onDeleteBoundingBox,
       onEnabledChange,
-      selectedBoxKey,
-      onSelectedBoxKeyChange,
       redactionPreviewPagesRef,
       initialIsRedactingForTesting = false,
       ...passThroughProps
@@ -166,7 +162,7 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
           w="100%"
           py="sm"
           px={{ base: 'xs', xs: 'md' }}
-          style={{ borderBottom: redactionPaneBorder }}
+          className={rules.bottom}
         >
           <RedactionPreviewToolbar
             {...toolbarPassThroughProps}
@@ -189,8 +185,6 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
           onRedact={isRedacting ? onAddBoundingBox : null}
           onDeleteBoundingBox={onDeleteBoundingBox}
           onEnabledChange={onEnabledChange}
-          selectedBoxKey={selectedBoxKey}
-          onSelectedBoxKeyChange={onSelectedBoxKeyChange}
           getUrlForRedactionImageForTesting={getUrlForRedactionImageForTesting}
         />
       </Stack>

@@ -1,4 +1,0 @@
-/* Mantine's `bd` prop only sets all four sides; sections need a top rule. */
-.section {
-  border-top: 1px solid var(--mantine-color-gray-3);
-}

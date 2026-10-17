@@ -13,7 +13,9 @@ import {
 } from '@mantine/core';
 import { siteName } from '../../lib/config/brand';
 import { siteContainerSize } from '../SiteChrome/SiteChrome';
+import rules from '../designSystem/Rule.module.css';
 import classes from './LandingPageRedactionFailures.module.css';
+import { landingSpacing } from './landingLayout';
 
 /**
  * Homepage section with real news stories where someone drew black boxes over
@@ -25,9 +27,14 @@ const LandingPageRedactionFailures: React.FunctionComponent = React.memo(
     return (
       // A dark band reads like a redaction bar, so this section stands
       // apart from the ones around it.
-      <Box component="section" bg="gray.9" c="white" py={{ base: 56, sm: 88 }}>
+      <Box
+        component="section"
+        bg="gray.9"
+        c="white"
+        py={landingSpacing.sectionPaddingY}
+      >
         <Container size={siteContainerSize}>
-          <Grid rowGap={40} columnGap={72}>
+          <Grid rowGap="xl" columnGap={landingSpacing.splitColumnGap}>
             <GridCol span={{ base: 12, md: 5 }}>
               <Stack gap="md">
                 <Title order={2}>
@@ -56,7 +63,12 @@ const LandingPageRedactionFailures: React.FunctionComponent = React.memo(
               </Stack>
             </GridCol>
           </Grid>
-          <Text size="lg" mt={48} pt={28} className={classes.closer}>
+          <Text
+            size="lg"
+            mt={landingSpacing.closingGap}
+            pt="lg"
+            className={rules.topDark}
+          >
             Every one of these comes down to the same mistake. When you download
             from {siteName}, we remove the text from the PDF instead of drawing
             over it.
@@ -69,13 +81,6 @@ const LandingPageRedactionFailures: React.FunctionComponent = React.memo(
 
 export default LandingPageRedactionFailures;
 
-// 2px is smaller than Mantine's spacing scale. Keep the box on one
-// line so it doesn't look broken when the sentence wraps.
-const leakyRedactionStyle: React.CSSProperties = {
-  padding: '0 2px',
-  whiteSpace: 'nowrap',
-};
-
 /**
  * A small mock-up of the Nebraska data center filing. The black boxes leak
  * just like the real ones, so visitors can try the copy trick themselves.
@@ -87,13 +92,13 @@ const LeakyFilingMockup: React.FunctionComponent = React.memo(
         <Box
           bg="gray.0"
           c="gray.9"
-          px={20}
-          py={18}
+          px="md"
+          py="md"
           bdrs="sm"
           ff="monospace"
           fz="sm"
         >
-          <Stack gap={6}>
+          <Stack gap="xs">
             <Text inherit fw="bold">
               Data center annual report: Agate LLC
             </Text>
@@ -108,7 +113,6 @@ const LeakyFilingMockup: React.FunctionComponent = React.memo(
                 bg="black"
                 c="black"
                 className={classes.leakyRedaction}
-                style={leakyRedactionStyle}
               >
                 52.65 MW
               </Text>
@@ -120,7 +124,6 @@ const LeakyFilingMockup: React.FunctionComponent = React.memo(
                 bg="black"
                 c="black"
                 className={classes.leakyRedaction}
-                style={leakyRedactionStyle}
               >
                 13.299 million gallons
               </Text>
@@ -153,8 +156,8 @@ const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRow
     return (
       <Flex
         direction={{ base: 'column', sm: 'row' }}
-        gap={{ base: 4, sm: 20 }}
-        py={22}
+        gap={{ base: 'xs', sm: 'md' }}
+        py="lg"
         align="flex-start"
       >
         <Text
@@ -163,12 +166,12 @@ const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRow
           c="gray.5"
           // Fixed width so the years line up even when a title wraps.
           w={56}
-          pt={4}
+          pt="xs"
           style={{ flexShrink: 0 }}
         >
           {story.year}
         </Text>
-        <Stack gap={6}>
+        <Stack gap="xs">
           <Anchor
             href={story.url}
             target="_blank"
@@ -191,7 +194,7 @@ const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRow
             {story.title}
           </Anchor>
           <Text c="gray.4">{story.description}</Text>
-          <Text size="xs" fw="normal" c="gray.5" mt={2}>
+          <Text size="xs" fw="normal" c="gray.5" mt="xs">
             {story.sourceName}
           </Text>
         </Stack>

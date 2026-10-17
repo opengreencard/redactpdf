@@ -1,6 +1,9 @@
 import React from 'react';
 import { Alert, Anchor, Box, Stack, Text } from '@mantine/core';
-import { centeredAlertOrCardMaxWidth } from './redactionLayout';
+import {
+  centeredAlertOrCardMaxWidth,
+  centeredStatusWrapperProps,
+} from './redactionLayout';
 
 export interface RedactionErrorProps {
   message: string | null;
@@ -14,8 +17,7 @@ const RedactionError: React.FunctionComponent<RedactionErrorProps> = React.memo(
     const { message } = props;
 
     return (
-      // Side gutter keeps the alert off the screen edges on phones.
-      <Box px="md" mt="xl">
+      <Box {...centeredStatusWrapperProps}>
         <Alert
           maw={centeredAlertOrCardMaxWidth}
           mx="auto"

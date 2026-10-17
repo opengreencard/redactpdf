@@ -14,6 +14,7 @@ import { ErrorCode } from 'react-dropzone';
 import {
   faArrowUpFromBracket,
   faCircleXmark,
+  type IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import Button from '../designSystem/Button/Button';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
@@ -90,7 +91,7 @@ const UploadButtonAndDropzoneInner: React.FunctionComponent<UploadButtonAndDropz
           inputProps={fileInputProps}
           radius="md"
           px="lg"
-          py={36}
+          py="xl"
         >
           <DropzoneContents errorMessage={errorMessage} />
         </Dropzone>
@@ -135,7 +136,7 @@ const DropzoneContents: React.FunctionComponent<DropzoneContentsProps> =
     const { errorMessage } = props;
 
     return (
-      <Stack align="center" gap={12}>
+      <Stack align="center" gap="md">
         <DropzoneStatusIcons />
         <Button keyboardShortcut={null} onClick={null}>
           + Select file
@@ -158,7 +159,7 @@ const DropzoneContents: React.FunctionComponent<DropzoneContentsProps> =
 const FullScreenDropContents: React.FunctionComponent = React.memo(
   function FullScreenDropContents() {
     return (
-      <Stack align="center" gap={12} py="md">
+      <Stack align="center" gap="md" py="md">
         <DropzoneStatusIcons />
         <Text fw="bold">Drop a PDF here</Text>
         <Text size="sm" c="gray.6">
@@ -178,21 +179,41 @@ const DropzoneStatusIcons: React.FunctionComponent = React.memo(
     return (
       <Box>
         <DropzoneIdle>
-          <ThemeIcon color="green.0" c="green.7" size={52} radius="md">
-            <FontAwesomeIcon icon={faArrowUpFromBracket} size="xl" />
-          </ThemeIcon>
+          <StatusIconTile icon={faArrowUpFromBracket} tone="green" />
         </DropzoneIdle>
         <DropzoneAccept>
-          <ThemeIcon color="green.0" c="green.7" size={52} radius="md">
-            <FontAwesomeIcon icon={faArrowUpFromBracket} size="xl" />
-          </ThemeIcon>
+          <StatusIconTile icon={faArrowUpFromBracket} tone="green" />
         </DropzoneAccept>
         <DropzoneReject>
-          <ThemeIcon color="red.0" c="red.7" size={52} radius="md">
-            <FontAwesomeIcon icon={faCircleXmark} size="xl" />
-          </ThemeIcon>
+          <StatusIconTile icon={faCircleXmark} tone="red" />
         </DropzoneReject>
       </Box>
+    );
+  }
+);
+
+/** Square size of the status icon tile, shared by all three states. */
+const dropzoneIconSize = 52;
+
+interface StatusIconTileProps {
+  icon: IconDefinition;
+  /** Green for the upload arrow, red for the rejection X. */
+  tone: 'green' | 'red';
+}
+
+/** Tinted square that holds one dropzone status icon. */
+const StatusIconTile: React.FunctionComponent<StatusIconTileProps> = React.memo(
+  function StatusIconTile(props: StatusIconTileProps) {
+    const { icon, tone } = props;
+    return (
+      <ThemeIcon
+        color={`${tone}.0`}
+        c={`${tone}.7`}
+        size={dropzoneIconSize}
+        radius="md"
+      >
+        <FontAwesomeIcon icon={icon} size="xl" />
+      </ThemeIcon>
     );
   }
 );

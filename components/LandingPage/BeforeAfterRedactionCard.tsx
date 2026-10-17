@@ -147,7 +147,7 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
         <Stack gap="md">
           <Title order={3}>{title}</Title>
           <Box visibleFrom="sm">
-            <SimpleGrid cols={2} spacing={14}>
+            <SimpleGrid cols={2} spacing="md">
               <Stack gap="sm">
                 <SampleSideLabel side={BeforeAfterSide.before} />
                 <ButtonDiv
@@ -284,7 +284,7 @@ const SampleSideLabel: React.FunctionComponent<SampleSideLabelProps> =
     const isAfter = side === BeforeAfterSide.after;
 
     return (
-      <Group gap={6}>
+      <Group gap="xs">
         <Box w={7} h={7} bdrs="xl" bg={isAfter ? 'green.7' : 'gray.4'} />
         <Text size="sm" fw="normal" c={isAfter ? 'green.9' : 'gray.6'}>
           {isAfter ? 'After' : 'Before'}
@@ -303,7 +303,7 @@ const SampleFrame: React.FunctionComponent<SampleFrameProps> = React.memo(
     const { children } = props;
 
     return (
-      <Box bg="gray.2" bdrs="sm" p={14}>
+      <Box bg="gray.2" bdrs="sm" p="md">
         {children}
       </Box>
     );

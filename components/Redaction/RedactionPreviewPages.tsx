@@ -29,6 +29,7 @@ import {
 import { getRedactionImageUrl } from '../../lib/storage/getRedactionImageUrl';
 import ActionIcon from '../designSystem/ActionIcon';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
+import { redactionOverlayBorder } from './redactionLayout';
 import classes from './RedactionPreviewPages.module.css';
 import {
   RedactionBoundingBoxType,
@@ -37,7 +38,6 @@ import {
   type RedactionBoundingBox,
 } from '../../lib/redaction/redactionTypes';
 import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
-import { makeBoundingBoxKey } from './redactionBoundingBoxes';
 
 export interface RedactionPreviewPagesProps {
   redactionKey: string;
@@ -52,12 +52,6 @@ export interface RedactionPreviewPagesProps {
   onRedact: ((box: ManualRedactionBoundingBox) => unknown) | null;
   onDeleteBoundingBox: (box: RedactionBoundingBox) => unknown;
   onEnabledChange: (box: RedactionBoundingBox, enabled: boolean) => unknown;
-  /**
-   * `makeBoundingBoxKey` of the box whose overlay actions are open, or null.
-   * The parent owns it so the review list can highlight the matching row.
-   */
-  selectedBoxKey: string | null;
-  onSelectedBoxKeyChange: (boxKey: string | null) => unknown;
   /** Storybook / tests only — same shape as `getRedactionImageUrl`. */
   getUrlForRedactionImageForTesting?: typeof getRedactionImageUrl;
 }
@@ -103,8 +97,6 @@ const RedactionPreviewPages = forwardRef<
       onRedact,
       onDeleteBoundingBox,
       onEnabledChange,
-      selectedBoxKey,
-      onSelectedBoxKeyChange,
       getUrlForRedactionImageForTesting,
     } = props;
     const { pageSizes, redactionBoundingBoxes } = redactionResponse;
@@ -121,6 +113,7 @@ const RedactionPreviewPages = forwardRef<
     const resizeObserverRef = useRef<ResizeObserver | null>(null);
     const hasCenteredRef = useRef(false);
     const [isContainerReady, setIsContainerReady] = useState(false);
+    const [selectedBoxKey, setSelectedBoxKey] = useState<string | null>(null);
 
     /**
      * Notify the parent once the canvas has a measurable width so initial
@@ -212,7 +205,7 @@ const RedactionPreviewPages = forwardRef<
           return;
         }
         currentPageRef.current = _.clamp(box.page, 1, pageSizes.length || 1);
-        onSelectedBoxKeyChange(boxKey);
+        setSelectedBoxKey(boxKey);
         boxElement.scrollIntoView({
           behavior: 'smooth',
           block: 'center',
@@ -220,7 +213,7 @@ const RedactionPreviewPages = forwardRef<
         });
         notifyPageChange(currentPageRef.current);
       },
-      [notifyPageChange, onSelectedBoxKeyChange, pageSizes.length]
+      [notifyPageChange, pageSizes.length]
     );
 
     /**
@@ -321,7 +314,7 @@ const RedactionPreviewPages = forwardRef<
         }
         const point = getPointerPoint(event);
         event.currentTarget.setPointerCapture(event.pointerId);
-        onSelectedBoxKeyChange(null);
+        setSelectedBoxKey(null);
         setDrawingState({
           page,
           pointerId: event.pointerId,
@@ -329,7 +322,7 @@ const RedactionPreviewPages = forwardRef<
           current: point,
         });
       },
-      [onRedact, onSelectedBoxKeyChange]
+      [onRedact]
     );
 
     const handlePointerMove = useMemoizedCallback(
@@ -445,9 +438,9 @@ const RedactionPreviewPages = forwardRef<
 
     const setSelectedBoxOpened = useMemoizedCallback(
       (boxKey: string, opened: boolean): void => {
-        onSelectedBoxKeyChange(opened ? boxKey : null);
+        setSelectedBoxKey(opened ? boxKey : null);
       },
-      [onSelectedBoxKeyChange]
+      []
     );
     const handleSelectedChange = useCallbackWithPrefix<[string], [boolean]>(
       setSelectedBoxOpened
@@ -721,6 +714,16 @@ function getPointerPoint(event: PointerEvent<HTMLDivElement>): Point {
   return { clientX: event.clientX, clientY: event.clientY };
 }
 
+function makeBoundingBoxKey({
+  page,
+  box,
+}: {
+  page: number;
+  box: BoundingBox;
+}): string {
+  return [page, box.minX, box.minY, box.maxX, box.maxY].join(':');
+}
+
 function getMostVisiblePage(
   container: HTMLElement,
   pageElements: Record<number, HTMLElement | null>
@@ -747,8 +750,9 @@ function getMostVisiblePage(
 }
 
 function getOverlayBorder({ enabled }: { enabled: boolean }): string {
+  // Shared with the landing hero outline; see redactionLayout.ts.
   return enabled
-    ? '2px solid var(--mantine-color-red-6)'
+    ? redactionOverlayBorder
     : '2px dashed var(--mantine-color-gray-6)';
 }
 

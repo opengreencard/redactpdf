@@ -1,7 +1,6 @@
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import {
   RedactionBoundingBoxType,
-  type BoundingBox,
   type ManualRedactionBoundingBox,
   type RedactionBoundingBox,
 } from '../../lib/redaction/redactionTypes';
@@ -111,18 +110,4 @@ export function getRedactionBoxLabel(box: RedactionBoundingBox): string {
     default:
       throw getUnreachableError(box);
   }
-}
-
-/**
- * Stable key for a box's page and coordinates, shared by the preview overlays
- * and the review list's selected row. For example, `1:0.1:0.2:0.3:0.4`.
- */
-export function makeBoundingBoxKey({
-  page,
-  box,
-}: {
-  page: number;
-  box: BoundingBox;
-}): string {
-  return [page, box.minX, box.minY, box.maxX, box.maxY].join(':');
 }

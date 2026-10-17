@@ -1,29 +1,11 @@
-/* One-sided rules can't be set with Mantine's `bd` prop. */
-.windowHeader {
-  border-bottom: 1px solid var(--mantine-color-gray-3);
-}
-
-.rail {
-  border-right: 1px solid var(--mantine-color-gray-3);
-}
-
 /*
- * Suggested redaction outline. The negative margin and matching padding grow
- * the box past the text it covers without shifting its percentage position.
+ * Translucent fill needs color-mix, which Mantine props can't express. Keep in
+ * sync with `.overlay[data-active='true']` in RedactionPreviewPages.
  */
-.suggestion {
-  border: 2px solid var(--mantine-color-red-9);
-  border-radius: 2px;
-  margin: -3px 0 0 -3px;
-  padding: 3px;
-  box-sizing: content-box;
-}
-
-/* Translucent fill needs color-mix, which Mantine props can't express. */
 .selectedSuggestion {
   background-color: color-mix(
     in srgb,
-    var(--mantine-color-red-9) 28%,
+    var(--mantine-color-red-6) 40%,
     transparent
   );
 }

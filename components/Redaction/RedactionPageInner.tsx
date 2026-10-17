@@ -32,8 +32,7 @@ import RedactionPreview, {
 import { RedactionPreviewPagesRef } from './RedactionPreviewPages';
 import RedactionProgress from './RedactionProgress';
 import SiteChrome from '../SiteChrome/SiteChrome';
-import { redactionPaneBorder } from './redactionLayout';
-import { makeBoundingBoxKey } from './redactionBoundingBoxes';
+import rules from '../designSystem/Rule.module.css';
 
 enum MobileRedactionView {
   review = 'review',
@@ -140,9 +139,6 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
     const [mobileView, setMobileView] = useState<MobileRedactionView>(
       MobileRedactionView.review
     );
-    // Key of the box whose preview overlay is open. Lifted here so the list
-    // can highlight the matching row.
-    const [selectedBoxKey, setSelectedBoxKey] = useState<string | null>(null);
 
     /**
      * Scroll the document pane to this box. On a phone we switch to the
@@ -177,12 +173,6 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
         return <RedactionError message={getErrorMessage(redactionState)} />;
       case RedactionPageView.loaded: {
         const redaction = getLoadedRedaction(redactionState);
-        // Treat a deleted box as cleared so no stale row stays highlighted.
-        const existingSelectedBoxKey = redaction.redactionBoundingBoxes.some(
-          (box) => makeBoundingBoxKey(box) === selectedBoxKey
-        )
-          ? selectedBoxKey
-          : null;
         return (
           <Stack
             // Desktop hides the tab control. Keep this stack gap at 0 so a
@@ -236,12 +226,11 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                   mih={0}
                   h="100%"
                   bg="white"
-                  style={{ borderRight: redactionPaneBorder }}
+                  className={rules.right}
                 >
                   <RedactionPanel
                     redactionKey={redactionKey}
                     redaction={redaction}
-                    selectedBoxKey={existingSelectedBoxKey}
                     onRedactionClick={handleRedactionClick}
                     onDeleteBoundingBoxes={onDeleteBoundingBoxes}
                     onEnabledChange={onEnabledChange}
@@ -268,8 +257,6 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                   onAddBoundingBox={onAddBoundingBox}
                   onDeleteBoundingBox={handleDeleteBoundingBoxForSingleBox}
                   onEnabledChange={handleEnabledChangeForSingleBox}
-                  selectedBoxKey={existingSelectedBoxKey}
-                  onSelectedBoxKeyChange={setSelectedBoxKey}
                   redactionPreviewPagesRef={redactionPreviewPagesRef}
                   getUrlForRedactionImageForTesting={
                     getUrlForRedactionImageForTesting

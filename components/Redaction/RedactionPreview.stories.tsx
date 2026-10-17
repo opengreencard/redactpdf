@@ -38,7 +38,6 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
   function StoryWrapper(props: StoryWrapperProps) {
     const { redactionKey, initialBoxes, initialIsRedactingForTesting } = props;
     const [boxes, setBoxes] = useState(initialBoxes);
-    const [selectedBoxKey, setSelectedBoxKey] = useState<string | null>(null);
     const handleAdd = useMemoizedCallback((box: RedactionBoundingBox): void => {
       setBoxes((current) => [...current, box]);
     }, []);
@@ -77,8 +76,6 @@ const StoryWrapper: React.FunctionComponent<StoryWrapperProps> = React.memo(
       onAddBoundingBox: handleAdd,
       onDeleteBoundingBox: handleDeleteBoundingBoxForSingleBox,
       onEnabledChange: handleEnabledChangeForSingleBox,
-      selectedBoxKey,
-      onSelectedBoxKeyChange: setSelectedBoxKey,
       getUrlForRedactionImageForTesting: getStorybookRedactionImageUrl,
       initialIsRedactingForTesting,
     };

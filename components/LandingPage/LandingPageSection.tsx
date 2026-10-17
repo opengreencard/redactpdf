@@ -8,8 +8,15 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { siteContainerSize } from '../SiteChrome/SiteChrome';
-import classes from './LandingPageSection.module.css';
+import { headerHeight, siteContainerSize } from '../SiteChrome/SiteChrome';
+import rules from '../designSystem/Rule.module.css';
+import { landingSpacing } from './landingLayout';
+
+/**
+ * Breathing room between a section's top edge and the sticky header when an
+ * in-page link scrolls to it.
+ */
+const sectionAnchorOffset = 8;
 
 export enum LandingPageSectionBackgroundVariant {
   /** The page's paper background, inherited from SiteChrome. */
@@ -73,19 +80,19 @@ const LandingPageSection: React.FunctionComponent<LandingPageSectionProps> =
       <Box
         component="section"
         id={id}
-        className={classes.section}
+        className={rules.top}
         bg={backgroundColors[backgroundVariant]}
-        // Keep in-page anchors from landing under the sticky header.
-        style={{ scrollMarginTop: 72 }}
+        // Land in-page anchors below the sticky header, with a little air.
+        style={{ scrollMarginTop: headerHeight + sectionAnchorOffset }}
       >
-        <Container size={siteContainerSize} py={{ base: 56, sm: 80 }}>
+        <Container size={siteContainerSize} py={landingSpacing.sectionPaddingY}>
           {layout === LandingPageSectionLayout.split ? (
-            <Grid rowGap={28} columnGap={72}>
+            <Grid rowGap="lg" columnGap={landingSpacing.splitColumnGap}>
               <GridCol span={{ base: 12, md: 4 }}>{heading}</GridCol>
               <GridCol span={{ base: 12, md: 8 }}>{children}</GridCol>
             </Grid>
           ) : (
-            <Stack gap={36}>
+            <Stack gap="xl">
               {heading}
               {children}
             </Stack>
@@ -95,6 +102,8 @@ const LandingPageSection: React.FunctionComponent<LandingPageSectionProps> =
     );
   });
 
+export default LandingPageSection;
+
 const backgroundColors: Record<
   LandingPageSectionBackgroundVariant,
   string | undefined
@@ -102,5 +111,3 @@ const backgroundColors: Record<
   [LandingPageSectionBackgroundVariant.default]: undefined,
   [LandingPageSectionBackgroundVariant.surface]: 'white',
 };
-
-export default LandingPageSection;

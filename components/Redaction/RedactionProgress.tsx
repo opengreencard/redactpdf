@@ -6,7 +6,10 @@ import type { GetRedactionResponse } from '../../app/api/redaction/[key]/getReda
 import { useInterval } from '../../lib/hookUtilities/useInterval';
 import { estimatedMsPerPage } from '../../lib/redaction/estimatedMsPerPage';
 import Card from '../designSystem/Card';
-import { centeredAlertOrCardMaxWidth } from './redactionLayout';
+import {
+  centeredAlertOrCardMaxWidth,
+  centeredStatusWrapperProps,
+} from './redactionLayout';
 
 export interface RedactionProgressProps {
   redaction: Pick<GetRedactionResponse, 'pageCount' | 'createdAt'>;
@@ -56,8 +59,7 @@ const RedactionProgress: React.FunctionComponent<RedactionProgressProps> =
     );
 
     return (
-      // Side gutter keeps the card off the screen edges on phones.
-      <Box px="md" mt="xl">
+      <Box {...centeredStatusWrapperProps}>
         <Card
           maw={centeredAlertOrCardMaxWidth}
           mx="auto"

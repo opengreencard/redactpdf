@@ -1,14 +1,12 @@
-/* Centered page number in a small bordered box, per the toolbar design. */
+/* Centered page number in a small bordered box. */
 .pageInput {
   text-align: center;
   font-weight: 500;
 }
 
-/* The zoom value sits between rules inside the bordered zoom group. */
+/* The zoom value input takes its left and right rules from Rule.module.css. */
 .zoomPercentInput {
   padding-inline: var(--mantine-spacing-xs);
-  border-left: 1px solid var(--mantine-color-gray-3);
-  border-right: 1px solid var(--mantine-color-gray-3);
   text-align: center;
   font-weight: 500;
 }
