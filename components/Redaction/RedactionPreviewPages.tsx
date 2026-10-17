@@ -714,14 +714,17 @@ function getPointerPoint(event: PointerEvent<HTMLDivElement>): Point {
   return { clientX: event.clientX, clientY: event.clientY };
 }
 
-function makeBoundingBoxKey({
-  page,
-  box,
-}: {
-  page: number;
-  box: BoundingBox;
-}): string {
-  return [page, box.minX, box.minY, box.maxX, box.maxY].join(':');
+// Include the type so an automatic and a manual box at the same coordinates
+// stay separate overlays and selections.
+function makeBoundingBoxKey(box: RedactionBoundingBox): string {
+  return [
+    box.type,
+    box.page,
+    box.box.minX,
+    box.box.minY,
+    box.box.maxX,
+    box.box.maxY,
+  ].join(':');
 }
 
 function getMostVisiblePage(
