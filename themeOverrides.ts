@@ -38,6 +38,20 @@ const green: MantineColorsTuple = [
 /* eslint-enable no-restricted-syntax */
 
 /**
+ * Surfaces that sit directly against each other. Keep them together so a
+ * change to one is checked against the other.
+ *
+ * `segmentedControlTrack` must stay one step darker than `header`, or the
+ * segmented control disappears into the header it sits under.
+ */
+export const surfaces = {
+  /** Page background and site header. */
+  header: 'var(--mantine-color-gray-1)',
+  /** Track behind every SegmentedControl. */
+  segmentedControlTrack: 'var(--mantine-color-gray-2)',
+} as const;
+
+/**
  * Mantine theme overrides shared by `theme.ts` and `lib/config/mantineTheme.ts`.
  *
  * Component overrides are plain objects rather than `Anchor.extend(...)`
@@ -105,6 +119,11 @@ export const themeOverrides: MantineThemeOverride = {
         radius: 'md',
         withBorder: true,
         padding: 'lg',
+      },
+    },
+    SegmentedControl: {
+      styles: {
+        root: { backgroundColor: surfaces.segmentedControlTrack },
       },
     },
     Modal: {

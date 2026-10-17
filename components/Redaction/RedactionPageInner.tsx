@@ -186,9 +186,6 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
             <Box px="md" py="sm" hiddenFrom="sm">
               <SegmentedControl
                 fullWidth
-                // Drop Mantine's 4px track inset so the pill lines up with the
-                // page gutter, and the wrapper's py sets the space above and below.
-                styles={{ root: { padding: 0 } }}
                 data={mobileRedactionViewOptions}
                 value={mobileView}
                 onChange={setMobileView}

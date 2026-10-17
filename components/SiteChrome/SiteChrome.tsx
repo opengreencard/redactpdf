@@ -1,6 +1,7 @@
 import React from 'react';
 import { Anchor, Box, Container, Group, Stack, Text } from '@mantine/core';
 import { githubRepoUrl } from '../../lib/config/brand';
+import { surfaces } from '../../themeOverrides';
 import rules from '../designSystem/Rule.module.css';
 import SiteHeaderActions from './SiteHeaderActions';
 import classes from './SiteChrome.module.css';
@@ -51,7 +52,7 @@ const SiteChrome: React.FunctionComponent<SiteChromeProps> = React.memo(
         h={fullHeight ? '100vh' : undefined}
         mih="100vh"
         gap={0}
-        bg="gray.1"
+        bg={surfaces.header}
       >
         <SiteHeader isLoggedIn={isLoggedIn} containerSize={containerSize} />
         {
@@ -82,7 +83,7 @@ const SiteHeader: React.FunctionComponent<SiteHeaderProps> = React.memo(
       <Box
         component="header"
         className={`${classes.header} ${rules.bottom}`}
-        bg="gray.1"
+        bg={surfaces.header}
         pos="sticky"
         top={0}
       >
