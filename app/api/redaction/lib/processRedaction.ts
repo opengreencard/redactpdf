@@ -96,10 +96,12 @@ export async function processRedaction(
       status: succeeded ? RedactionStatus.redacted : RedactionStatus.error,
       errorMessage: succeeded
         ? null
-        : pages
-            .map((page) => page.errorMessage)
-            .filter((message): message is string => message !== null)
-            .join('\n') || 'Every page failed.',
+        : truncateErrorMessage(
+            pages
+              .map((page) => page.errorMessage)
+              .filter((message): message is string => message !== null)
+              .join('\n') || 'Every page failed.'
+          ),
     });
 
     const averageRasterizationTimeMs =
@@ -196,11 +198,25 @@ async function processImage({
   return visionResult;
 }
 
+/**
+ * Stored error messages go in a TEXT column. Vision errors can include request
+ * payloads such as base64 images, which overflow that column and fail the row
+ * update. Keep the start of the message for diagnosis.
+ */
+const maxStoredErrorMessageLength = 2000;
+
+function truncateErrorMessage(message: string): string {
+  if (message.length <= maxStoredErrorMessageLength) {
+    return message;
+  }
+  return `${message.slice(0, maxStoredErrorMessageLength - 1)}…`;
+}
+
 async function markRedactionAsError(
   redaction: RedactionInstance,
   error: Error
 ): Promise<void> {
-  const errorMessage = error.message;
+  const errorMessage = truncateErrorMessage(error.message);
 
   try {
     await redaction.update({
