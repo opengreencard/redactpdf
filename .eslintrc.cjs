@@ -149,6 +149,12 @@ const forbiddenMockTargets = [
     message:
       'Integration tests should exercise the configured API; use a dedicated mocked test only for provider failures.',
   },
+  {
+    symbol: 'renderPDFPages',
+    filePattern: 'pdfRenderer',
+    message:
+      'It is already mocked globally in lib/testUtilities/setup.ts with recorded renders, so Ghostscript differences between machines do not change test inputs.',
+  },
 ];
 
 const forbiddenMockRules = forbiddenMockTargets.flatMap(
