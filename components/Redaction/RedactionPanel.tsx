@@ -96,7 +96,15 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
             Download
           </Button>
         </Stack>
-        <ScrollArea flex={1} mih={0} type="auto">
+        <ScrollArea
+          flex={1}
+          mih={0}
+          type="auto"
+          // Mantine renders the content as display: table, which sizes to the
+          // longest unbroken label and ignores the truncate on each row. Use
+          // block so rows take the panel width and long labels ellipsize.
+          styles={{ content: { display: 'block' } }}
+        >
           <Stack gap="sm" px="md" pt="md" pb="lg">
             {redaction.redactionBoundingBoxes.length === 0 ? (
               <Alert color="gray" title="No automatic redactions found">
