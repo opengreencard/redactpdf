@@ -12,12 +12,6 @@ import { headerHeight, siteContainerSize } from '../SiteChrome/SiteChrome';
 import rules from '../designSystem/Rule.module.css';
 import { landingSpacing } from './landingLayout';
 
-/**
- * Breathing room between a section's top edge and the sticky header when an
- * in-page link scrolls to it.
- */
-const sectionAnchorOffset = 8;
-
 export enum LandingPageSectionBackgroundVariant {
   /** The page's paper background, inherited from SiteChrome. */
   default = 'default',
@@ -82,8 +76,10 @@ const LandingPageSection: React.FunctionComponent<LandingPageSectionProps> =
         id={id}
         className={rules.top}
         bg={backgroundColors[backgroundVariant]}
-        // Land in-page anchors below the sticky header, with a little air.
-        style={{ scrollMarginTop: headerHeight + sectionAnchorOffset }}
+        // Land in-page anchors below the sticky header, with theme sm of air.
+        style={{
+          scrollMarginTop: `calc(${headerHeight}px + var(--mantine-spacing-sm))`,
+        }}
       >
         <Container size={siteContainerSize} py={landingSpacing.sectionPaddingY}>
           {layout === LandingPageSectionLayout.split ? (

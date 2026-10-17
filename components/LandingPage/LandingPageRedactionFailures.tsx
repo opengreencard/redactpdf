@@ -179,7 +179,7 @@ const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRow
             c="white"
             ff="heading"
             fw="bold"
-            fz={{ base: 19, sm: 21 }}
+            fz={{ base: 'lg', sm: 'xl' }}
             lh={1.3}
             // Keep in sync with `.storyLink`: Mantine's underline can't
             // do a dim line that brightens on hover.
@@ -188,7 +188,7 @@ const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRow
             style={{
               textDecoration: 'underline',
               textDecorationColor: 'var(--mantine-color-gray-6)',
-              textUnderlineOffset: 4,
+              textUnderlineOffset: '3px',
             }}
           >
             {story.title}
