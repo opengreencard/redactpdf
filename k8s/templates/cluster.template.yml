@@ -137,18 +137,27 @@ items:
               volumeMounts:
                 - name: pdf-renderer-tmp
                   mountPath: /tmp
+              # The renderer binds to 127.0.0.1, so kubelet's httpGet probes
+              # (which target the pod IP) get "connection refused". Run the
+              # probe inside the container instead.
               readinessProbe:
-                httpGet:
-                  path: /health
-                  port: 4100
+                exec:
+                  command:
+                    - node
+                    - -e
+                    - "fetch('http://127.0.0.1:4100/health', { signal: AbortSignal.timeout(2000) }).then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"
                 initialDelaySeconds: 2
                 periodSeconds: 10
+                timeoutSeconds: 3
               livenessProbe:
-                httpGet:
-                  path: /health
-                  port: 4100
+                exec:
+                  command:
+                    - node
+                    - -e
+                    - "fetch('http://127.0.0.1:4100/health', { signal: AbortSignal.timeout(2000) }).then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"
                 initialDelaySeconds: 10
                 periodSeconds: 30
+                timeoutSeconds: 3
 
           volumes:
             - name: pdf-renderer-tmp
@@ -224,18 +233,27 @@ items:
               volumeMounts:
                 - name: pdf-renderer-tmp
                   mountPath: /tmp
+              # The renderer binds to 127.0.0.1, so kubelet's httpGet probes
+              # (which target the pod IP) get "connection refused". Run the
+              # probe inside the container instead.
               readinessProbe:
-                httpGet:
-                  path: /health
-                  port: 4100
+                exec:
+                  command:
+                    - node
+                    - -e
+                    - "fetch('http://127.0.0.1:4100/health', { signal: AbortSignal.timeout(2000) }).then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"
                 initialDelaySeconds: 2
                 periodSeconds: 10
+                timeoutSeconds: 3
               livenessProbe:
-                httpGet:
-                  path: /health
-                  port: 4100
+                exec:
+                  command:
+                    - node
+                    - -e
+                    - "fetch('http://127.0.0.1:4100/health', { signal: AbortSignal.timeout(2000) }).then((r) => process.exit(r.ok ? 0 : 1), () => process.exit(1))"
                 initialDelaySeconds: 10
                 periodSeconds: 30
+                timeoutSeconds: 3
           volumes:
             - name: pdf-renderer-tmp
               emptyDir: {}
