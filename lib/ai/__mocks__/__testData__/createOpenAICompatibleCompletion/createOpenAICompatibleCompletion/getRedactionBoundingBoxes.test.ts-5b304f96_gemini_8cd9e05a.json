@@ -1,0 +1,34 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 756,
+    "prompt_tokens": 1992,
+    "total_tokens": 2748
+  },
+  "id": "C7HTapafDduk_PUPm6LY0A4",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "EmkKZwFpFH0TOExgDJfkDiG3PGaKGVYI2CWNKdVobZj+MTE5S/pOP0VrqavR7kiQabPJbS567L1Nq8Y9eM/3x/J+dxqsrmRrGaxmu3fLzSfXAi7He11nqHBShlzWxECTFUo92SVrPwXb+T8="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean\",\"minX\":58,\"minY\":114,\"maxX\":386,\"maxY\":129},{\"dataType\":\"personName\",\"text\":\"John\",\"minX\":399,\"minY\":114,\"maxX\":764,\"maxY\":130},{\"dataType\":\"idNumber\",\"text\":\"400 00 1038\",\"minX\":776,\"minY\":112,\"maxX\":896,\"maxY\":130},{\"dataType\":\"personName\",\"text\":\"Joan\",\"minX\":58,\"minY\":143,\"maxX\":386,\"maxY\":159},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":399,\"minY\":143,\"maxX\":764,\"maxY\":159},{\"dataType\":\"idNumber\",\"text\":\"400 00 1071\",\"minX\":776,\"minY\":142,\"maxX\":897,\"maxY\":159},{\"dataType\":\"address\",\"text\":\"26 Dancing Daisy Drive\",\"minX\":62,\"minY\":173,\"maxX\":675,\"maxY\":189},{\"dataType\":\"address\",\"text\":\"Charleston\",\"minX\":62,\"minY\":201,\"maxX\":550,\"maxY\":218},{\"dataType\":\"address\",\"text\":\"SC\",\"minX\":559,\"minY\":200,\"maxX\":654,\"maxY\":218},{\"dataType\":\"address\",\"text\":\"29455\",\"minX\":664,\"minY\":201,\"maxX\":760,\"maxY\":218},{\"dataType\":\"checkbox\",\"text\":\"You\",\"minX\":820,\"minY\":233,\"maxX\":834,\"maxY\":246},{\"dataType\":\"checkbox\",\"text\":\"Spouse\",\"minX\":880,\"minY\":233,\"maxX\":893,\"maxY\":246},{\"dataType\":\"checkbox\",\"text\":\"If treating a nonresident alien or dual-status alien spouse as a U.S. resident for the entire tax year, check the box\",\"minX\":167,\"minY\":325,\"maxX\":181,\"maxY\":338},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":563,\"minY\":340,\"maxX\":938,\"maxY\":354},{\"dataType\":\"checkbox\",\"text\":\"Yes\",\"minX\":821,\"minY\":377,\"maxX\":834,\"maxY\":390},{\"dataType\":\"checkbox\",\"text\":\"No\",\"minX\":880,\"minY\":377,\"maxX\":894,\"maxY\":390},{\"dataType\":\"personName\",\"text\":\"Sam\",\"minX\":154,\"minY\":477,\"maxX\":284,\"maxY\":493},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":289,\"minY\":477,\"maxX\":431,\"maxY\":493},{\"dataType\":\"idNumber\",\"text\":\"400 00 1071\",\"minX\":441,\"minY\":477,\"maxX\":569,\"maxY\":493},{\"dataType\":\"other\",\"text\":\"son\",\"minX\":578,\"minY\":477,\"maxX\":678,\"maxY\":493}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792258320,
+  "model": "gemini-3.8-flash",
+  "timing": {
+    "msToFirstToken": 2014,
+    "outputTokensPerSecond": 214.4072603516733,
+    "totalTimeMs": 5540
+  }
+}

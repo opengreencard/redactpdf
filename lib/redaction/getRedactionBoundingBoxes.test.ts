@@ -1,7 +1,7 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles } from '../ai/createOpenAICompatibleCompletion.mock.delete';
-import { RedactedDataType } from './redactionTypes';
+import { type BoundingBox, RedactedDataType } from './redactionTypes';
 import {
   annotateJPEGWithRedactionBoxes,
   type RedactionBoxToAnnotate,
@@ -19,6 +19,14 @@ interface ExpectedRedaction {
   dataType: RedactedDataType | RedactedDataType[];
   text: RegExp;
   minimumCount: number;
+  /**
+   * Minimum normalized width of each matching box. Used for form fields, where
+   * the box must cover the whole field so its size doesn't reveal how long the
+   * entered text is.
+   */
+  minimumBoxWidth?: number;
+  /** Maximum normalized width of each matching box. */
+  maximumBoxWidth?: number;
   /** Some providers may omit this sensitive value despite the expected type. */
   optional?: boolean;
 }
@@ -141,6 +149,8 @@ describe(getRedactionBoundingBoxes, () => {
           dataType: RedactedDataType.personName,
           text: /^Sean$/i,
           minimumCount: 1,
+          // The name field is far wider than the name typed into it.
+          minimumBoxWidth: 0.25,
         },
         {
           dataType: RedactedDataType.personName,
@@ -151,6 +161,8 @@ describe(getRedactionBoundingBoxes, () => {
           dataType: RedactedDataType.personName,
           text: /^Joan$/i,
           minimumCount: 1,
+          // The name field is far wider than the name typed into it.
+          minimumBoxWidth: 0.25,
         },
         {
           dataType: RedactedDataType.personName,
@@ -201,6 +213,15 @@ describe(getRedactionBoundingBoxes, () => {
           // Gemini 3.8 was notably more exhaustive around the dependent's
           // name, including the son's repeated name in the dependents table.
         },
+        // Both options in each checkbox group are redacted, not only the
+        // selected one.
+        ...['You', 'Spouse', 'Yes', 'No'].map((label): ExpectedRedaction => ({
+          dataType: RedactedDataType.checkbox,
+          text: new RegExp(`^${label}$`, 'i'),
+          minimumCount: 1,
+          // Each square is small; the label text must stay uncovered.
+          maximumBoxWidth: 0.03,
+        })),
       ],
     },
     {
@@ -250,7 +271,10 @@ describe(getRedactionBoundingBoxes, () => {
           minimumCount: 1,
         },
         {
-          dataType: RedactedDataType.idNumber,
+          dataType: [
+            RedactedDataType.idNumber,
+            RedactedDataType.documentOrCaseId,
+          ],
           text: /M[\s-]*6131821[\s-]*07/i,
           minimumCount: 1,
           optional: true,
@@ -268,7 +292,10 @@ describe(getRedactionBoundingBoxes, () => {
           optional: true,
         },
         {
-          dataType: RedactedDataType.idNumber,
+          dataType: [
+            RedactedDataType.idNumber,
+            RedactedDataType.documentOrCaseId,
+          ],
           text: /1[\s-]*02781[\s-]*0/i,
           minimumCount: 1,
         },
@@ -341,10 +368,20 @@ function hasMinimumMatchingBoxes(
     ? expectedRedaction.dataType
     : [expectedRedaction.dataType];
   const matchingBoxes = boxes.filter(
-    ({ dataType, text }): boolean =>
-      expectedDataTypes.includes(dataType) && expectedRedaction.text.test(text)
+    ({ dataType, text, box }): boolean =>
+      expectedDataTypes.includes(dataType) &&
+      expectedRedaction.text.test(text) &&
+      isWithinExpectedWidth(box, expectedRedaction)
   );
   return matchingBoxes.length >= expectedRedaction.minimumCount;
+}
+
+function isWithinExpectedWidth(
+  box: BoundingBox,
+  { minimumBoxWidth, maximumBoxWidth }: ExpectedRedaction
+): boolean {
+  const width = box.maxX - box.minX;
+  return width >= (minimumBoxWidth ?? 0) && width <= (maximumBoxWidth ?? 1);
 }
 
 function matchesExpectedRedaction(

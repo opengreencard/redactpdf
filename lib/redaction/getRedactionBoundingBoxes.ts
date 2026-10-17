@@ -102,6 +102,8 @@ const redactedDataTypeToDescription: Record<RedactedDataType, string> = {
     'A photograph of a person, including passport and ID portraits.',
   [RedactedDataType.signature]: 'A handwritten or digital signature.',
   [RedactedDataType.barcode]: 'A barcode or QR code.',
+  [RedactedDataType.checkbox]:
+    'A single checkbox or radio button square in a group of options where at least one option is selected, such as Yes/No or race, ethnicity, or eye color choices. Cover the square only, not its label.',
   [RedactedDataType.other]:
     'Other content that could identify or embarrass someone and does not fit a more specific type.',
 };
@@ -202,6 +204,19 @@ Coordinates are integers from 0 to 1000 normalized to this image, origin
 top-left, Y down, and ordered minX, minY, maxX, maxY.
 For \`text\`, return only the sensitive value or a short description of the
 redacted content. Do not include a field label or surrounding instructions.
+
+Form fields: when redacting a value typed or written into a form field, the
+box must cover the entire printed field (the full entry box, line, or each cell
+of a row of character cells), not just the characters entered. The box size
+must not reveal how long the value is. Use the same box for a field whether its
+value is short or long.
+
+Checkbox groups: when any checkbox or radio button in a group of options is
+selected (for example Yes/No, ethnicity, race, or eye color), return one
+\`checkbox\` box for every checkbox square in that group, checked and unchecked
+alike, so the selection cannot be seen. Cover each square only, not its label
+text, and give each square its own box. For \`text\`, return the option label
+next to the square. Leave a group alone when none of its boxes are selected.
 
 Err toward boxes being slightly too large rather than too small.
 For photos, cover the entire visible photo, including faded or ghost images.
