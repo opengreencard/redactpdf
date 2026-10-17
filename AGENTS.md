@@ -56,8 +56,11 @@ rendering or compression misses the cache.
 
 ## Local Jest database
 
-Jest uses the separate `redaction_test` database and `redaction_test` MariaDB
-user. To configure a local checkout:
+Jest uses the separate `redaction_test` MariaDB user. Each Jest worker gets its
+own database, `redaction_test1`, `redaction_test2`, and so on, so test files
+running in parallel never see each other's rows. Jest's `globalSetup` recreates
+them, and each file creates its tables in `beforeAll`. To configure a local
+checkout:
 
 ```bash
 cp .env.test.example .env.test
