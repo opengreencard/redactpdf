@@ -14,7 +14,7 @@ import RedactionPreviewToolbar, {
   RedactionPreviewToolbarProps,
   RedactionPreviewZoom,
 } from './RedactionPreviewToolbar';
-import { redactionPaneBorder } from './redactionLayout';
+import rules from '../designSystem/Rule.module.css';
 
 interface RedactionPreviewOwnProps {
   onAddBoundingBox: (box: ManualRedactionBoundingBox) => unknown;
@@ -160,9 +160,9 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
         <Box
           bg="white"
           w="100%"
-          py="xs"
-          px={{ base: 'xs', xs: 0 }}
-          style={{ borderBottom: redactionPaneBorder }}
+          py="sm"
+          px={{ base: 'xs', xs: 'md' }}
+          className={rules.bottom}
         >
           <RedactionPreviewToolbar
             {...toolbarPassThroughProps}

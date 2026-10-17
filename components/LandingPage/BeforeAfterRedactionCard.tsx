@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Group, SimpleGrid, Stack, Text } from '@mantine/core';
+import { Box, Group, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { useReducedMotion } from '@mantine/hooks';
 import { Lightbox, type LightboxSlideData } from '@mantine/lightbox';
 import Button from '../designSystem/Button/Button';
@@ -133,9 +133,9 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
       h: 'auto',
       // Cap thumbnail height so cards in a row line up even when
       // the stills have different pixel sizes.
-      mah: 360,
+      mah: 330,
       fit: 'contain',
-      radius: 'sm',
+      radius: 'xs',
     };
     const slides: LightboxSlideData[] = [
       { src: beforeSrc, alt: beforeAlt, caption: 'Before' },
@@ -143,49 +143,51 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
     ];
 
     return (
-      <Card>
-        <Stack gap="sm">
-          <Text fw="bold">{title}</Text>
+      <Card h="100%">
+        <Stack gap="md">
+          <Title order={3}>{title}</Title>
           <Box visibleFrom="sm">
-            <SimpleGrid cols={2} spacing="sm">
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  Before
-                </Text>
+            <SimpleGrid cols={2} spacing="md">
+              <Stack gap="sm">
+                <SampleSideLabel side={BeforeAfterSide.before} />
                 <ButtonDiv
                   className={classes.sampleImageButton}
                   display="block"
                   onClick={openBeforeLightbox}
                   aria-label="Open before sample fullscreen"
                 >
-                  <Image
-                    {...commonImageProps}
-                    src={beforeSrc}
-                    alt={beforeAlt}
-                  />
+                  <SampleFrame>
+                    <Image
+                      {...commonImageProps}
+                      src={beforeSrc}
+                      alt={beforeAlt}
+                    />
+                  </SampleFrame>
                 </ButtonDiv>
               </Stack>
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  After
-                </Text>
+              <Stack gap="sm">
+                <SampleSideLabel side={BeforeAfterSide.after} />
                 <ButtonDiv
                   className={classes.sampleImageButton}
                   display="block"
                   onClick={openAfterLightbox}
                   aria-label="Open after sample fullscreen"
                 >
-                  <Image {...commonImageProps} src={afterSrc} alt={afterAlt} />
+                  <SampleFrame>
+                    <Image
+                      {...commonImageProps}
+                      src={afterSrc}
+                      alt={afterAlt}
+                    />
+                  </SampleFrame>
                 </ButtonDiv>
               </Stack>
             </SimpleGrid>
           </Box>
           <Box hiddenFrom="sm">
             <Stack gap="sm">
-              <Stack gap={4}>
-                <Text size="sm" c="dimmed">
-                  {side === BeforeAfterSide.before ? 'Before' : 'After'}
-                </Text>
+              <Stack gap="sm">
+                <SampleSideLabel side={side} />
                 <ButtonDiv
                   className={classes.sampleImageButton}
                   display="block"
@@ -194,28 +196,30 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
                     side === BeforeAfterSide.before ? 'before' : 'after'
                   } sample fullscreen`}
                 >
-                  <Box
-                    pos="relative"
-                    data-testid={_mobileSampleImageTestId}
-                    data-side={side}
-                  >
-                    <Fade visible={side === BeforeAfterSide.before}>
-                      <Image
-                        {...commonImageProps}
-                        src={beforeSrc}
-                        alt={beforeAlt}
-                      />
-                    </Fade>
-                    <Box pos="absolute" inset={0}>
-                      <Fade visible={side === BeforeAfterSide.after}>
+                  <SampleFrame>
+                    <Box
+                      pos="relative"
+                      data-testid={_mobileSampleImageTestId}
+                      data-side={side}
+                    >
+                      <Fade visible={side === BeforeAfterSide.before}>
                         <Image
                           {...commonImageProps}
-                          src={afterSrc}
-                          alt={afterAlt}
+                          src={beforeSrc}
+                          alt={beforeAlt}
                         />
                       </Fade>
+                      <Box pos="absolute" inset={0}>
+                        <Fade visible={side === BeforeAfterSide.after}>
+                          <Image
+                            {...commonImageProps}
+                            src={afterSrc}
+                            alt={afterAlt}
+                          />
+                        </Fade>
+                      </Box>
                     </Box>
-                  </Box>
+                  </SampleFrame>
                 </ButtonDiv>
               </Stack>
               <Group grow>
@@ -268,3 +272,40 @@ const BeforeAfterRedactionCard: React.FunctionComponent<BeforeAfterRedactionCard
   });
 
 export default BeforeAfterRedactionCard;
+
+interface SampleSideLabelProps {
+  side: BeforeAfterSide;
+}
+
+/** "Before" / "After" caption with a dot; After is green like the result. */
+const SampleSideLabel: React.FunctionComponent<SampleSideLabelProps> =
+  React.memo(function SampleSideLabel(props: SampleSideLabelProps) {
+    const { side } = props;
+    const isAfter = side === BeforeAfterSide.after;
+
+    return (
+      <Group gap="xs">
+        <Box w={7} h={7} bdrs="xl" bg={isAfter ? 'green.7' : 'gray.4'} />
+        <Text size="sm" fw="normal" c={isAfter ? 'green.9' : 'gray.6'}>
+          {isAfter ? 'After' : 'Before'}
+        </Text>
+      </Group>
+    );
+  });
+
+interface SampleFrameProps {
+  children: React.ReactNode;
+}
+
+/** Paper mat behind a still so white page edges stay visible on the card. */
+const SampleFrame: React.FunctionComponent<SampleFrameProps> = React.memo(
+  function SampleFrame(props: SampleFrameProps) {
+    const { children } = props;
+
+    return (
+      <Box bg="gray.2" bdrs="sm" p="md">
+        {children}
+      </Box>
+    );
+  }
+);

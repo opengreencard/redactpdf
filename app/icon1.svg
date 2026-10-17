@@ -10,12 +10,12 @@
   -->
   <style>
     .wordmark {
-      fill: #212529;
+      fill: #18201c;
     }
 
     @media (prefers-color-scheme: dark) {
       .wordmark {
-        fill: #f8f9fa;
+        fill: #f6f4ef;
       }
     }
   </style>
@@ -25,7 +25,7 @@
     width="17"
     height="17"
     rx="3"
-    fill="#2f9e44"
+    fill="#1d6b47"
   />
   <text
     x="11.5"

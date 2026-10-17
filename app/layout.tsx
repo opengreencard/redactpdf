@@ -8,7 +8,7 @@ import {
   siteTitle,
   siteUrl,
 } from '../lib/config/brand';
-import { outfit } from '../lib/config/fonts';
+import { fontClassNames } from '../lib/config/fonts';
 import TopLevelLayoutComponents from '../components/TopLevelLayout/TopLevelLayoutComponents';
 
 /**
@@ -56,7 +56,7 @@ export default async function RootLayout(
   // attribute can differ from the server-rendered markup during hydration.
   return (
     // Keep any extra theme-related classes in sync with storybook/preview.tsx
-    <html lang="en" className={outfit.variable} suppressHydrationWarning>
+    <html lang="en" className={fontClassNames} suppressHydrationWarning>
       <head>
         <ColorSchemeScript />
       </head>

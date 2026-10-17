@@ -32,7 +32,7 @@ import RedactionPreview, {
 import { RedactionPreviewPagesRef } from './RedactionPreviewPages';
 import RedactionProgress from './RedactionProgress';
 import SiteChrome from '../SiteChrome/SiteChrome';
-import { redactionPaneBorder } from './redactionLayout';
+import rules from '../designSystem/Rule.module.css';
 
 enum MobileRedactionView {
   review = 'review',
@@ -183,7 +183,7 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
             mih={0}
             w="100%"
           >
-            <Box px="md" pb="md" hiddenFrom="sm">
+            <Box px="md" py="sm" hiddenFrom="sm">
               <SegmentedControl
                 fullWidth
                 data={mobileRedactionViewOptions}
@@ -225,7 +225,8 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                   flex={1}
                   mih={0}
                   h="100%"
-                  style={{ borderRight: redactionPaneBorder }}
+                  bg="white"
+                  className={rules.right}
                 >
                   <RedactionPanel
                     redactionKey={redactionKey}

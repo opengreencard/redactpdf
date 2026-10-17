@@ -4,16 +4,18 @@ import {
   Box,
   Container,
   Divider,
+  Flex,
   Grid,
   GridCol,
-  Group,
   Stack,
   Text,
   Title,
 } from '@mantine/core';
 import { siteName } from '../../lib/config/brand';
 import { siteContainerSize } from '../SiteChrome/SiteChrome';
+import rules from '../designSystem/Rule.module.css';
 import classes from './LandingPageRedactionFailures.module.css';
+import { landingSpacing } from './landingLayout';
 
 /**
  * Homepage section with real news stories where someone drew black boxes over
@@ -25,20 +27,25 @@ const LandingPageRedactionFailures: React.FunctionComponent = React.memo(
     return (
       // A dark band reads like a redaction bar, so this section stands
       // apart from the ones around it.
-      <Box bg="dark.8" c="gray.0" py={64}>
+      <Box
+        component="section"
+        bg="gray.9"
+        c="white"
+        py={landingSpacing.sectionPaddingY}
+      >
         <Container size={siteContainerSize}>
-          <Grid gap={48}>
+          <Grid rowGap="xl" columnGap={landingSpacing.splitColumnGap}>
             <GridCol span={{ base: 12, md: 5 }}>
-              <Stack gap="lg">
+              <Stack gap="md">
                 <Title order={2}>
                   Black boxes that didn&apos;t hide anything
                 </Title>
-                <Text c="gray.4">
+                <Text size="lg" c="gray.4">
                   Drawing a black box over text in a PDF hides it on screen, but
                   the text is usually still in the file. Anyone can select it,
                   copy it, and paste it somewhere else.
                 </Text>
-                <Text c="gray.4">
+                <Text size="lg" c="gray.4">
                   It&apos;s an easy mistake to make, and federal agencies and
                   high-profile lawyers keep making it.
                 </Text>
@@ -49,14 +56,19 @@ const LandingPageRedactionFailures: React.FunctionComponent = React.memo(
               <Stack gap={0}>
                 {redactionFailureStories.map((story, index) => (
                   <React.Fragment key={story.url}>
-                    {index > 0 && <Divider color="dark.5" />}
+                    {index > 0 && <Divider color="gray.7" />}
                     <RedactionFailureStoryRow story={story} />
                   </React.Fragment>
                 ))}
               </Stack>
             </GridCol>
           </Grid>
-          <Text mt={48} maw={720}>
+          <Text
+            size="lg"
+            mt={landingSpacing.closingGap}
+            pt="lg"
+            className={rules.topDark}
+          >
             Every one of these comes down to the same mistake. When you download
             from {siteName}, we remove the text from the PDF instead of drawing
             over it.
@@ -69,13 +81,6 @@ const LandingPageRedactionFailures: React.FunctionComponent = React.memo(
 
 export default LandingPageRedactionFailures;
 
-// 2px is smaller than Mantine's spacing scale. Keep the box on one
-// line so it doesn't look broken when the sentence wraps.
-const leakyRedactionStyle: React.CSSProperties = {
-  padding: '0 2px',
-  whiteSpace: 'nowrap',
-};
-
 /**
  * A small mock-up of the Nebraska data center filing. The black boxes leak
  * just like the real ones, so visitors can try the copy trick themselves.
@@ -83,9 +88,17 @@ const leakyRedactionStyle: React.CSSProperties = {
 const LeakyFilingMockup: React.FunctionComponent = React.memo(
   function LeakyFilingMockup() {
     return (
-      <Stack gap="xs">
-        <Box bg="white" c="dark.9" p="md" bdrs="sm" ff="monospace" fz="sm">
-          <Stack gap={6}>
+      <Stack gap="sm" mt="sm">
+        <Box
+          bg="gray.0"
+          c="gray.9"
+          px="md"
+          py="md"
+          bdrs="sm"
+          ff="monospace"
+          fz="sm"
+        >
+          <Stack gap="xs">
             <Text inherit fw="bold">
               Data center annual report: Agate LLC
             </Text>
@@ -100,7 +113,6 @@ const LeakyFilingMockup: React.FunctionComponent = React.memo(
                 bg="black"
                 c="black"
                 className={classes.leakyRedaction}
-                style={leakyRedactionStyle}
               >
                 52.65 MW
               </Text>
@@ -112,7 +124,6 @@ const LeakyFilingMockup: React.FunctionComponent = React.memo(
                 bg="black"
                 c="black"
                 className={classes.leakyRedaction}
-                style={leakyRedactionStyle}
               >
                 13.299 million gallons
               </Text>
@@ -143,44 +154,51 @@ const RedactionFailureStoryRow: React.FunctionComponent<RedactionFailureStoryRow
     const { story } = props;
 
     return (
-      <Group gap="lg" py="lg" wrap="nowrap" align="flex-start">
+      <Flex
+        direction={{ base: 'column', sm: 'row' }}
+        gap={{ base: 'xs', sm: 'md' }}
+        py="lg"
+        align="flex-start"
+      >
         <Text
           ff="monospace"
+          size="sm"
           c="gray.5"
           // Fixed width so the years line up even when a title wraps.
-          w={48}
+          w={56}
+          pt="xs"
           style={{ flexShrink: 0 }}
         >
           {story.year}
         </Text>
-        <Stack gap={6}>
+        <Stack gap="xs">
           <Anchor
             href={story.url}
             target="_blank"
             rel="noreferrer"
             c="white"
+            ff="heading"
             fw="bold"
-            fz="lg"
+            fz={{ base: 'lg', sm: 'xl' }}
+            lh={1.3}
             // Keep in sync with `.storyLink`: Mantine's underline can't
             // do a dim line that brightens on hover.
             underline="never"
             className={classes.storyLink}
             style={{
               textDecoration: 'underline',
-              textDecorationColor: 'var(--mantine-color-dark-2)',
-              textUnderlineOffset: 3,
+              textDecorationColor: 'var(--mantine-color-gray-6)',
+              textUnderlineOffset: '3px',
             }}
           >
             {story.title}
           </Anchor>
-          <Text size="sm" c="gray.4">
-            {story.description}
-          </Text>
-          <Text size="xs" c="gray.5">
+          <Text c="gray.4">{story.description}</Text>
+          <Text size="xs" fw="normal" c="gray.5" mt="xs">
             {story.sourceName}
           </Text>
         </Stack>
-      </Group>
+      </Flex>
     );
   });
 

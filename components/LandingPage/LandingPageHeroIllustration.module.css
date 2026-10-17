@@ -1,0 +1,11 @@
+/*
+ * Translucent fill needs color-mix, which Mantine props can't express. Keep in
+ * sync with `.overlay[data-active='true']` in RedactionPreviewPages.
+ */
+.selectedSuggestion {
+  background-color: color-mix(
+    in srgb,
+    var(--mantine-color-red-6) 40%,
+    transparent
+  );
+}

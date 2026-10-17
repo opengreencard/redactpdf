@@ -1,0 +1,16 @@
+/* Centered page number in a small bordered box. */
+.pageInput {
+  text-align: center;
+  font-weight: 500;
+}
+
+/* The zoom value input takes its left and right rules from Rule.module.css. */
+.zoomPercentInput {
+  padding-inline: var(--mantine-spacing-xs);
+  text-align: center;
+  font-weight: 500;
+}
+
+.switchLabel {
+  font-weight: 500;
+}

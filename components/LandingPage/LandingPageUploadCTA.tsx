@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import Button from '../designSystem/Button/Button';
 import { useLandingPageUploadModalState } from './LandingPageUploadModalProvider';
 
@@ -19,6 +20,8 @@ const LandingPageUploadCTA: React.FunctionComponent<LandingPageUploadCTAProps> =
         keyboardShortcut={null}
         onClick={openUploadModal}
         fullWidth={fullWidth}
+        size="md"
+        rightSection={{ type: 'icon', icon: faArrowRight }}
       >
         Upload your PDF
       </Button>

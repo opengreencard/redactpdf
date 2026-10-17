@@ -1,8 +1,14 @@
 .occurrenceRow {
+  border-radius: var(--mantine-radius-sm);
   transition: background-color 150ms ease;
 }
 
 .occurrenceRow:hover,
 .occurrenceRow:focus-within {
-  background-color: var(--mantine-color-gray-0);
+  background-color: var(--mantine-color-gray-1);
+}
+
+/* Rule between data-type groups; the first group sits flush under the intro. */
+.typeGroup + .typeGroup {
+  border-top: 1px solid var(--mantine-color-gray-3);
 }

@@ -29,6 +29,7 @@ import {
 import { getRedactionImageUrl } from '../../lib/storage/getRedactionImageUrl';
 import ActionIcon from '../designSystem/ActionIcon';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
+import { redactionOverlayBorder } from './redactionLayout';
 import classes from './RedactionPreviewPages.module.css';
 import {
   RedactionBoundingBoxType,
@@ -464,7 +465,7 @@ const RedactionPreviewPages = forwardRef<
         mih={0}
         // Keep this padding inside the scrollable canvas so it moves away
         // with the pages instead of becoming fixed viewer chrome.
-        p="xs"
+        p={{ base: 'xs', sm: 'lg' }}
         bg="gray.2"
         style={{ overflow: 'auto' }}
       >
@@ -502,9 +503,8 @@ const RedactionPreviewPages = forwardRef<
                 w={width}
                 h={height}
                 bg="white"
-                bd="1px solid var(--mantine-color-gray-5)"
                 flex="0 0 auto"
-                style={{ boxShadow: 'var(--mantine-shadow-sm)' }}
+                style={{ boxShadow: 'var(--mantine-shadow-xs)' }}
               >
                 <Box
                   pos="relative"
@@ -663,6 +663,7 @@ const RedactionBoxOverlay: React.FunctionComponent<RedactionBoxOverlayProps> =
             <ActionIcon
               tooltip="Toggle redaction on/off"
               variant="subtle"
+              color="gray"
               onClick={handleEnabledChange}
             >
               <FontAwesomeIcon
@@ -672,6 +673,7 @@ const RedactionBoxOverlay: React.FunctionComponent<RedactionBoxOverlayProps> =
             <ActionIcon
               tooltip="Delete redaction"
               variant="subtle"
+              color="red"
               onClick={handleDelete}
             >
               <FontAwesomeIcon icon={faXmark} />
@@ -712,14 +714,17 @@ function getPointerPoint(event: PointerEvent<HTMLDivElement>): Point {
   return { clientX: event.clientX, clientY: event.clientY };
 }
 
-function makeBoundingBoxKey({
-  page,
-  box,
-}: {
-  page: number;
-  box: BoundingBox;
-}): string {
-  return [page, box.minX, box.minY, box.maxX, box.maxY].join(':');
+// Include the type so an automatic and a manual box at the same coordinates
+// stay separate overlays and selections.
+function makeBoundingBoxKey(box: RedactionBoundingBox): string {
+  return [
+    box.type,
+    box.page,
+    box.box.minX,
+    box.box.minY,
+    box.box.maxX,
+    box.box.maxY,
+  ].join(':');
 }
 
 function getMostVisiblePage(
@@ -748,8 +753,9 @@ function getMostVisiblePage(
 }
 
 function getOverlayBorder({ enabled }: { enabled: boolean }): string {
+  // Shared with the landing hero outline; see redactionLayout.ts.
   return enabled
-    ? '2px solid var(--mantine-color-red-6)'
+    ? redactionOverlayBorder
     : '2px dashed var(--mantine-color-gray-6)';
 }
 

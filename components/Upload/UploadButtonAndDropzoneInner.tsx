@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Stack, Text } from '@mantine/core';
+import { Box, Stack, Text, ThemeIcon } from '@mantine/core';
 import {
   Dropzone,
   DropzoneAccept,
@@ -12,8 +12,9 @@ import {
 import type { FileRejection } from '@mantine/dropzone';
 import { ErrorCode } from 'react-dropzone';
 import {
+  faArrowUpFromBracket,
   faCircleXmark,
-  faCloudArrowUp,
+  type IconDefinition,
 } from '@fortawesome/free-solid-svg-icons';
 import Button from '../designSystem/Button/Button';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
@@ -88,7 +89,9 @@ const UploadButtonAndDropzoneInner: React.FunctionComponent<UploadButtonAndDropz
           loading={isUploading}
           classNames={{ root: classes.root }}
           inputProps={fileInputProps}
-          p="xl"
+          radius="md"
+          px="lg"
+          py="xl"
         >
           <DropzoneContents errorMessage={errorMessage} />
         </Dropzone>
@@ -133,13 +136,16 @@ const DropzoneContents: React.FunctionComponent<DropzoneContentsProps> =
     const { errorMessage } = props;
 
     return (
-      <Stack align="center" gap="sm" py="md">
+      <Stack align="center" gap="md">
         <DropzoneStatusIcons />
         <Button keyboardShortcut={null} onClick={null}>
           + Select file
         </Button>
-        <Text size="sm" c="dimmed">
-          PDF only
+        <Text size="sm" c="gray.6">
+          <Text span inherit c="gray.7">
+            or drop a PDF here
+          </Text>{' '}
+          · PDF only
         </Text>
         {errorMessage && (
           <Text c="red" size="sm" data-testid={_uploadErrorMessageTestId}>
@@ -153,10 +159,10 @@ const DropzoneContents: React.FunctionComponent<DropzoneContentsProps> =
 const FullScreenDropContents: React.FunctionComponent = React.memo(
   function FullScreenDropContents() {
     return (
-      <Stack align="center" gap="sm" py="md">
+      <Stack align="center" gap="md" py="md">
         <DropzoneStatusIcons />
         <Text fw="bold">Drop a PDF here</Text>
-        <Text size="sm" c="dimmed">
+        <Text size="sm" c="gray.6">
           PDF only
         </Text>
       </Stack>
@@ -164,26 +170,50 @@ const FullScreenDropContents: React.FunctionComponent = React.memo(
   }
 );
 
+/**
+ * Tinted icon tile above the picker: an upload arrow while idle or while a PDF
+ * is dragged over, and a red X when the dragged file will be rejected.
+ */
 const DropzoneStatusIcons: React.FunctionComponent = React.memo(
   function DropzoneStatusIcons() {
     return (
       <Box>
         <DropzoneIdle>
-          <Box c="green.8">
-            <FontAwesomeIcon icon={faCloudArrowUp} size="2x" />
-          </Box>
+          <StatusIconTile icon={faArrowUpFromBracket} tone="green" />
         </DropzoneIdle>
         <DropzoneAccept>
-          <Box c="green.8">
-            <FontAwesomeIcon icon={faCloudArrowUp} size="2x" />
-          </Box>
+          <StatusIconTile icon={faArrowUpFromBracket} tone="green" />
         </DropzoneAccept>
         <DropzoneReject>
-          <Box c="red.6">
-            <FontAwesomeIcon icon={faCircleXmark} size="2x" />
-          </Box>
+          <StatusIconTile icon={faCircleXmark} tone="red" />
         </DropzoneReject>
       </Box>
+    );
+  }
+);
+
+/** Square size of the status icon tile, shared by all three states. */
+const dropzoneIconSize = 52;
+
+interface StatusIconTileProps {
+  icon: IconDefinition;
+  /** Green for the upload arrow, red for the rejection X. */
+  tone: 'green' | 'red';
+}
+
+/** Tinted square that holds one dropzone status icon. */
+const StatusIconTile: React.FunctionComponent<StatusIconTileProps> = React.memo(
+  function StatusIconTile(props: StatusIconTileProps) {
+    const { icon, tone } = props;
+    return (
+      <ThemeIcon
+        color={`${tone}.0`}
+        c={`${tone}.7`}
+        size={dropzoneIconSize}
+        radius="md"
+      >
+        <FontAwesomeIcon icon={icon} size="xl" />
+      </ThemeIcon>
     );
   }
 );

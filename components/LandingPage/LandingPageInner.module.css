@@ -1,0 +1,21 @@
+/* Line the first question up with the section heading. */
+.faqItem:first-child {
+  padding-top: 0;
+}
+
+/* The card border already closes the table. */
+.pricingTable tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+/* Keep "Free" on the same baseline as the two-line "Registered" header. */
+.pricingHeader {
+  vertical-align: bottom;
+}
+
+/* Button's `fullWidth` is a boolean, so stretch the hero CTA on phones here. */
+@mixin smaller-than $mantine-breakpoint-sm {
+  .heroCta :global(.mantine-Button-root) {
+    width: 100%;
+  }
+}
