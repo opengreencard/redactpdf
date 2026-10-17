@@ -549,6 +549,7 @@ const redactedDataTypeToText: Record<RedactedDataType, string> = {
   [RedactedDataType.personPhoto]: 'Photo',
   [RedactedDataType.signature]: 'Signature',
   [RedactedDataType.barcode]: 'Barcode',
+  [RedactedDataType.checkbox]: 'Checkbox',
   [RedactedDataType.other]: 'Other',
 };
 

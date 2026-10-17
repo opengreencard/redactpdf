@@ -102,6 +102,8 @@ const redactedDataTypeToDescription: Record<RedactedDataType, string> = {
     'A photograph of a person, including passport and ID portraits.',
   [RedactedDataType.signature]: 'A handwritten or digital signature.',
   [RedactedDataType.barcode]: 'A barcode or QR code.',
+  [RedactedDataType.checkbox]:
+    'A checkbox square in a group whose selection reveals something personal, such as race, ethnicity, eye color, sex, health, or religion. Cover the square only, not its label.',
   [RedactedDataType.other]:
     'Other content that could identify or embarrass someone and does not fit a more specific type.',
 };
@@ -185,26 +187,30 @@ function makeRedactionPrompt(): string {
     )
     .join('\n');
 
-  return `Find every item in this page that could identify or embarrass
-someone and should be redacted. Err toward over-redacting.
-
-Be aggressive about content that is faded, low-contrast, blurred, partially
-obscured, or degraded by scanning. A faded text fragment or photo-like scan
-artifact may still contain identifying information and should be redacted when
-it could be a person, identifier, or other sensitive content.
+  return `Find every item on this page that could identify or embarrass someone
+and should be redacted. Err toward over-redacting, including faded, blurred,
+or scanned-in content.
 
 Classify each box with exactly one of these dataType values:
 ${dataTypeLines}
 
 Return only this JSON shape:
 {"boxes":[{"dataType":"personName","text":"visible text or description","minX":0,"minY":0,"maxX":0,"maxY":0}]}
-Coordinates are integers from 0 to 1000 normalized to this image, origin
-top-left, Y down, and ordered minX, minY, maxX, maxY.
-For \`text\`, return only the sensitive value or a short description of the
-redacted content. Do not include a field label or surrounding instructions.
+Coordinates are integers from 0 to 1000, normalized to this image, with the
+origin at the top-left, ordered minX, minY, maxX, maxY. Make boxes slightly too
+large rather than too small.
 
-Err toward boxes being slightly too large rather than too small.
-For photos, cover the entire visible photo, including faded or ghost images.
+- \`text\`: only the sensitive value or a short description, without field labels.
+- Form fields: box the entire printed field (the entry box, line, or row of
+  character cells), not just the typed text, so the box size doesn't reveal the
+  length of the value.
+- Checkbox groups: only when the selection reveals something personal, such as
+  race, ethnicity, eye color, sex, health, or religion. Then box every square in
+  the group, checked or not, with the square only, not its label. Don't box
+  groups whose answers aren't personal, such as filing status or tax yes/no
+  questions.
+- Photos: cover the entire visible photo, including faded or ghost images.
+
 For example, return \`03005988\`, not \`Passport card number 03005988\`.`;
 }
 

@@ -39,6 +39,7 @@ export enum RedactedDataType {
   personPhoto = 'personPhoto',
   signature = 'signature',
   barcode = 'barcode',
+  checkbox = 'checkbox',
   other = 'other',
 }
 

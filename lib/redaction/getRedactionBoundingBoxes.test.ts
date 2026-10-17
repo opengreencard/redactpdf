@@ -1,7 +1,8 @@
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
+import sharp from 'sharp';
 import { maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles } from '../ai/createOpenAICompatibleCompletion.mock.delete';
-import { RedactedDataType } from './redactionTypes';
+import { type BoundingBox, RedactedDataType } from './redactionTypes';
 import {
   annotateJPEGWithRedactionBoxes,
   type RedactionBoxToAnnotate,
@@ -19,6 +20,12 @@ interface ExpectedRedaction {
   dataType: RedactedDataType | RedactedDataType[];
   text: RegExp;
   minimumCount: number;
+  /**
+   * Minimum normalized width of each matching box. Used for form fields, where
+   * the box must cover the whole field so its size doesn't reveal how long the
+   * entered text is.
+   */
+  minimumBoxWidth?: number;
   /** Some providers may omit this sensitive value despite the expected type. */
   optional?: boolean;
 }
@@ -141,6 +148,8 @@ describe(getRedactionBoundingBoxes, () => {
           dataType: RedactedDataType.personName,
           text: /^Sean$/i,
           minimumCount: 1,
+          // The name field is far wider than the name typed into it.
+          minimumBoxWidth: 0.25,
         },
         {
           dataType: RedactedDataType.personName,
@@ -151,6 +160,8 @@ describe(getRedactionBoundingBoxes, () => {
           dataType: RedactedDataType.personName,
           text: /^Joan$/i,
           minimumCount: 1,
+          // The name field is far wider than the name typed into it.
+          minimumBoxWidth: 0.25,
         },
         {
           dataType: RedactedDataType.personName,
@@ -250,7 +261,10 @@ describe(getRedactionBoundingBoxes, () => {
           minimumCount: 1,
         },
         {
-          dataType: RedactedDataType.idNumber,
+          dataType: [
+            RedactedDataType.idNumber,
+            RedactedDataType.documentOrCaseId,
+          ],
           text: /M[\s-]*6131821[\s-]*07/i,
           minimumCount: 1,
           optional: true,
@@ -268,18 +282,55 @@ describe(getRedactionBoundingBoxes, () => {
           optional: true,
         },
         {
-          dataType: RedactedDataType.idNumber,
+          dataType: [
+            RedactedDataType.idNumber,
+            RedactedDataType.documentOrCaseId,
+          ],
           text: /1[\s-]*02781[\s-]*0/i,
           minimumCount: 1,
+        },
+      ],
+    },
+    {
+      label: 'Form I-130 page 4 with placeholder data',
+      imageFileName: 'i130Page4.png',
+      expectedRedactions: [
+        {
+          dataType: RedactedDataType.organizationName,
+          text: /Example Co/i,
+          minimumCount: 1,
+          // The entry box is much wider than "Example Co.".
+          minimumBoxWidth: 0.25,
+        },
+        {
+          dataType: RedactedDataType.address,
+          text: /123 Fake St/i,
+          minimumCount: 1,
+          minimumBoxWidth: 0.2,
+        },
+        // Every option in these groups is redacted, because the selection
+        // reveals something personal.
+        {
+          dataType: RedactedDataType.checkbox,
+          text: /Hispanic or Latino/i,
+          minimumCount: 2,
+        },
+        {
+          dataType: RedactedDataType.checkbox,
+          text: /White|Asian|Black or African American|American Indian or Alaska Native|Native Hawaiian or Other Pacific Islander/i,
+          minimumCount: 5,
+        },
+        {
+          dataType: RedactedDataType.checkbox,
+          text: /Black|Blue|Brown|Gray|Green|Hazel|Maroon|Pink|Unknown\/Other/i,
+          minimumCount: 9,
         },
       ],
     },
   ])(
     'redacts the expected information from the $label',
     async ({ label, imageFileName, expectedRedactions }) => {
-      const image = await fs.readFile(
-        path.join(__dirname, '__testData__', imageFileName)
-      );
+      const image = await readTestImage(imageFileName);
       const result = await getRedactionBoundingBoxes(image);
 
       if (process.env.CI !== 'true') {
@@ -321,14 +372,23 @@ describe(getRedactionBoundingBoxes, () => {
   );
 });
 
-function getAnnotatedImagePath(imageFileName: string): string {
-  const extension = path.extname(imageFileName);
-  const baseName = path.basename(imageFileName, extension);
-  return path.join(
-    __dirname,
-    '__testData__',
-    `${baseName}.annotated${extension}`
+/**
+ * Production sends page renders as JPEG, so PNG fixtures are converted the
+ * same way before they reach the vision model.
+ */
+async function readTestImage(imageFileName: string): Promise<Buffer> {
+  const image = await fs.readFile(
+    path.join(__dirname, '__testData__', imageFileName)
   );
+  if (path.extname(imageFileName) !== '.png') {
+    return image;
+  }
+  return sharp(image).jpeg({ quality: 85 }).toBuffer();
+}
+
+function getAnnotatedImagePath(imageFileName: string): string {
+  const baseName = path.basename(imageFileName, path.extname(imageFileName));
+  return path.join(__dirname, '__testData__', `${baseName}.annotated.jpg`);
 }
 
 function hasMinimumMatchingBoxes(
@@ -341,10 +401,19 @@ function hasMinimumMatchingBoxes(
     ? expectedRedaction.dataType
     : [expectedRedaction.dataType];
   const matchingBoxes = boxes.filter(
-    ({ dataType, text }): boolean =>
-      expectedDataTypes.includes(dataType) && expectedRedaction.text.test(text)
+    ({ dataType, text, box }): boolean =>
+      expectedDataTypes.includes(dataType) &&
+      expectedRedaction.text.test(text) &&
+      isWithinExpectedWidth(box, expectedRedaction)
   );
   return matchingBoxes.length >= expectedRedaction.minimumCount;
+}
+
+function isWithinExpectedWidth(
+  box: BoundingBox,
+  { minimumBoxWidth }: ExpectedRedaction
+): boolean {
+  return box.maxX - box.minX >= (minimumBoxWidth ?? 0);
 }
 
 function matchesExpectedRedaction(
