@@ -2,22 +2,15 @@
   {
     "type": "automatic",
     "dataType": "personPhoto",
-    "text": "photograph of cardholder",
-    "box": { "minX": 0.028, "minY": 0.228, "maxX": 0.337, "maxY": 0.846 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "personPhoto",
-    "text": "ghost portrait of cardholder",
-    "box": { "minX": 0.835, "minY": 0.447, "maxX": 0.978, "maxY": 0.712 },
+    "text": "personPhoto",
+    "box": { "minX": 0.025, "minY": 0.232, "maxX": 0.339, "maxY": 0.848 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "idNumber",
     "text": "C03005988",
-    "box": { "minX": 0.718, "minY": 0.247, "maxX": 0.911, "maxY": 0.298 },
+    "box": { "minX": 0.717, "minY": 0.247, "maxX": 0.911, "maxY": 0.297 },
     "enabled": true
   },
   {
@@ -29,65 +22,65 @@
   },
   {
     "type": "automatic",
-    "dataType": "personName",
-    "text": "HAPPY",
-    "box": { "minX": 0.479, "minY": 0.494, "maxX": 0.58, "maxY": 0.539 },
+    "dataType": "personPhoto",
+    "text": "personPhoto",
+    "box": { "minX": 0.835, "minY": 0.45, "maxX": 0.978, "maxY": 0.712 },
     "enabled": true
   },
   {
     "type": "automatic",
-    "dataType": "other",
-    "text": "M",
-    "box": { "minX": 0.502, "minY": 0.613, "maxX": 0.529, "maxY": 0.653 },
+    "dataType": "personName",
+    "text": "HAPPY",
+    "box": { "minX": 0.479, "minY": 0.494, "maxX": 0.579, "maxY": 0.539 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "dateOfBirth",
     "text": "1 JAN 1981",
-    "box": { "minX": 0.584, "minY": 0.601, "maxX": 0.739, "maxY": 0.649 },
+    "box": { "minX": 0.58, "minY": 0.603, "maxX": 0.74, "maxY": 0.651 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "address",
     "text": "NEW YORK, U.S.A.",
-    "box": { "minX": 0.477, "minY": 0.719, "maxX": 0.742, "maxY": 0.766 },
+    "box": { "minX": 0.477, "minY": 0.72, "maxX": 0.742, "maxY": 0.767 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "issueDate",
     "text": "30 NOV 2009",
-    "box": { "minX": 0.486, "minY": 0.819, "maxX": 0.665, "maxY": 0.863 },
+    "box": { "minX": 0.486, "minY": 0.818, "maxX": 0.664, "maxY": 0.864 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "expiryDate",
     "text": "29 NOV 2019",
-    "box": { "minX": 0.699, "minY": 0.819, "maxX": 0.884, "maxY": 0.866 },
+    "box": { "minX": 0.703, "minY": 0.818, "maxX": 0.884, "maxY": 0.865 },
     "enabled": true
   },
   {
     "type": "automatic",
-    "dataType": "idNumber",
-    "text": "43309.W27S+",
-    "box": { "minX": 0.005, "minY": 0.432, "maxX": 0.026, "maxY": 0.878 },
+    "dataType": "documentOrCaseId",
+    "text": "43309-W27S",
+    "box": { "minX": 0.004, "minY": 0.433, "maxX": 0.026, "maxY": 0.875 },
     "enabled": true
   },
   {
     "type": "automatic",
-    "dataType": "idNumber",
+    "dataType": "documentOrCaseId",
     "text": "M-6131821-07",
-    "box": { "minX": 0.062, "minY": 0.862, "maxX": 0.258, "maxY": 0.909 },
+    "box": { "minX": 0.062, "minY": 0.862, "maxX": 0.259, "maxY": 0.907 },
     "enabled": true
   },
   {
     "type": "automatic",
-    "dataType": "idNumber",
+    "dataType": "documentOrCaseId",
     "text": "1-02781-0",
-    "box": { "minX": 0.808, "minY": 0.873, "maxX": 0.931, "maxY": 0.912 },
+    "box": { "minX": 0.808, "minY": 0.871, "maxX": 0.928, "maxY": 0.914 },
     "enabled": true
   }
 ]

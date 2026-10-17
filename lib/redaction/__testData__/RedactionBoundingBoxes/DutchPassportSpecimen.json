@@ -2,120 +2,106 @@
   {
     "type": "automatic",
     "dataType": "idNumber",
-    "text": "SPECI2014",
-    "box": { "minX": 0.878, "minY": 0.097, "maxX": 0.947, "maxY": 0.431 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "idNumber",
-    "text": "SPECI2014",
-    "box": { "minX": 0.721, "minY": 0.569, "maxX": 0.839, "maxY": 0.586 },
+    "text": "SPEC12014",
+    "box": { "minX": 0.88, "minY": 0.097, "maxX": 0.943, "maxY": 0.426 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "personPhoto",
-    "text": "person photo",
-    "box": { "minX": 0.05, "minY": 0.567, "maxX": 0.304, "maxY": 0.81 },
+    "text": "photograph",
+    "box": { "minX": 0.049, "minY": 0.571, "maxX": 0.303, "maxY": 0.803 },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "dateOfBirth",
+    "text": "1965",
+    "box": { "minX": 0.052, "minY": 0.77, "maxX": 0.154, "maxY": 0.804 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "personName",
     "text": "De Bruijn\ne/v Molenaar",
-    "box": { "minX": 0.328, "minY": 0.597, "maxX": 0.477, "maxY": 0.636 },
+    "box": { "minX": 0.33, "minY": 0.596, "maxX": 0.477, "maxY": 0.633 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "personName",
     "text": "Willeke Liselotte",
-    "box": { "minX": 0.33, "minY": 0.641, "maxX": 0.512, "maxY": 0.66 },
+    "box": { "minX": 0.33, "minY": 0.644, "maxX": 0.511, "maxY": 0.657 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "dateOfBirth",
     "text": "10 MAA/MAR 1965",
-    "box": { "minX": 0.33, "minY": 0.669, "maxX": 0.554, "maxY": 0.687 },
+    "box": { "minX": 0.331, "minY": 0.67, "maxX": 0.553, "maxY": 0.684 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "address",
     "text": "Specimen",
-    "box": { "minX": 0.33, "minY": 0.698, "maxX": 0.437, "maxY": 0.717 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "sensitiveQuantity",
-    "text": "1,75 m",
-    "box": { "minX": 0.749, "minY": 0.725, "maxX": 0.826, "maxY": 0.743 },
+    "box": { "minX": 0.331, "minY": 0.701, "maxX": 0.439, "maxY": 0.715 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "issueDate",
     "text": "09 MAA/MAR 2014",
-    "box": { "minX": 0.33, "minY": 0.752, "maxX": 0.536, "maxY": 0.769 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "personPhoto",
-    "text": "ghost photo",
-    "box": { "minX": 0.62, "minY": 0.664, "maxX": 0.742, "maxY": 0.77 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "expiryDate",
-    "text": "09 MAA/MAR 2024",
-    "box": { "minX": 0.749, "minY": 0.752, "maxX": 0.955, "maxY": 0.769 },
+    "box": { "minX": 0.331, "minY": 0.755, "maxX": 0.534, "maxY": 0.769 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "signature",
-    "text": "W.L. de Bruijn",
-    "box": { "minX": 0.335, "minY": 0.799, "maxX": 0.591, "maxY": 0.84 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "personName",
-    "text": "DE<BRUIJN<<WILLEKE<LISELOTTE",
-    "box": { "minX": 0.125, "minY": 0.881, "maxX": 0.715, "maxY": 0.901 },
+    "text": "signature",
+    "box": { "minX": 0.335, "minY": 0.799, "maxX": 0.586, "maxY": 0.836 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "idNumber",
     "text": "SPECI2014",
-    "box": { "minX": 0.068, "minY": 0.914, "maxX": 0.236, "maxY": 0.934 },
+    "box": { "minX": 0.723, "minY": 0.571, "maxX": 0.836, "maxY": 0.584 },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personPhoto",
+    "text": "ghost photograph",
+    "box": { "minX": 0.623, "minY": 0.664, "maxX": 0.741, "maxY": 0.767 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "dateOfBirth",
-    "text": "650310",
-    "box": { "minX": 0.323, "minY": 0.914, "maxX": 0.423, "maxY": 0.934 },
+    "text": "19 65",
+    "box": { "minX": 0.628, "minY": 0.747, "maxX": 0.73, "maxY": 0.766 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "expiryDate",
-    "text": "240309",
-    "box": { "minX": 0.479, "minY": 0.914, "maxX": 0.579, "maxY": 0.934 },
+    "text": "09 MAA/MAR 2024",
+    "box": { "minX": 0.749, "minY": 0.754, "maxX": 0.954, "maxY": 0.768 },
+    "enabled": true
+  },
+  {
+    "type": "automatic",
+    "dataType": "personName",
+    "text": "P<NLDDE<BRUIJN<<WILLEKE<LISELOTTE<<<<<<<<<<<<",
+    "box": { "minX": 0.067, "minY": 0.881, "maxX": 0.929, "maxY": 0.898 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "idNumber",
-    "text": "6999999990",
-    "box": { "minX": 0.579, "minY": 0.914, "maxX": 0.75, "maxY": 0.934 },
+    "text": "SPECI20142NLD6503101F2403096999999990<<<<<84",
+    "box": { "minX": 0.068, "minY": 0.915, "maxX": 0.929, "maxY": 0.932 },
     "enabled": true
   }
 ]

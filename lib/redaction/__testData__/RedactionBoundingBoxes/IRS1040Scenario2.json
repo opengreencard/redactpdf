@@ -3,140 +3,98 @@
     "type": "automatic",
     "dataType": "personName",
     "text": "Sean",
-    "box": { "minX": 0.056, "minY": 0.1, "maxX": 0.388, "maxY": 0.129 },
+    "box": { "minX": 0.056, "minY": 0.105, "maxX": 0.389, "maxY": 0.13 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "personName",
     "text": "John",
-    "box": { "minX": 0.39, "minY": 0.1, "maxX": 0.762, "maxY": 0.129 },
+    "box": { "minX": 0.389, "minY": 0.105, "maxX": 0.768, "maxY": 0.13 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "idNumber",
     "text": "400 00 1038",
-    "box": { "minX": 0.771, "minY": 0.111, "maxX": 0.924, "maxY": 0.127 },
+    "box": { "minX": 0.768, "minY": 0.105, "maxX": 0.941, "maxY": 0.13 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "personName",
     "text": "Joan",
-    "box": { "minX": 0.056, "minY": 0.13, "maxX": 0.388, "maxY": 0.159 },
+    "box": { "minX": 0.056, "minY": 0.14, "maxX": 0.389, "maxY": 0.159 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "personName",
     "text": "Jackson",
-    "box": { "minX": 0.39, "minY": 0.13, "maxX": 0.762, "maxY": 0.159 },
+    "box": { "minX": 0.389, "minY": 0.14, "maxX": 0.768, "maxY": 0.159 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "idNumber",
     "text": "400 00 1071",
-    "box": { "minX": 0.771, "minY": 0.143, "maxX": 0.925, "maxY": 0.158 },
+    "box": { "minX": 0.768, "minY": 0.14, "maxX": 0.941, "maxY": 0.159 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "address",
     "text": "26 Dancing Daisy Drive",
-    "box": { "minX": 0.062, "minY": 0.167, "maxX": 0.677, "maxY": 0.189 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "checkbox",
-    "text": "You",
-    "box": { "minX": 0.82, "minY": 0.233, "maxX": 0.836, "maxY": 0.246 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "checkbox",
-    "text": "Spouse",
-    "box": { "minX": 0.88, "minY": 0.233, "maxX": 0.896, "maxY": 0.246 },
+    "box": { "minX": 0.056, "minY": 0.17, "maxX": 0.681, "maxY": 0.189 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "address",
     "text": "Charleston",
-    "box": { "minX": 0.063, "minY": 0.196, "maxX": 0.55, "maxY": 0.218 },
+    "box": { "minX": 0.056, "minY": 0.2, "maxX": 0.554, "maxY": 0.218 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "address",
     "text": "SC",
-    "box": { "minX": 0.561, "minY": 0.196, "maxX": 0.654, "maxY": 0.218 },
+    "box": { "minX": 0.554, "minY": 0.2, "maxX": 0.659, "maxY": 0.218 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "address",
     "text": "29455",
-    "box": { "minX": 0.662, "minY": 0.196, "maxX": 0.756, "maxY": 0.218 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "checkbox",
-    "text": "If treating a nonresident alien or dual-status alien spouse as a U.S. resident...",
-    "box": { "minX": 0.168, "minY": 0.327, "maxX": 0.182, "maxY": 0.339 },
+    "box": { "minX": 0.659, "minY": 0.2, "maxX": 0.768, "maxY": 0.218 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "personName",
     "text": "Joan Jackson",
-    "box": { "minX": 0.563, "minY": 0.337, "maxX": 0.941, "maxY": 0.354 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "checkbox",
-    "text": "Yes",
-    "box": { "minX": 0.821, "minY": 0.377, "maxX": 0.836, "maxY": 0.389 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "checkbox",
-    "text": "No",
-    "box": { "minX": 0.88, "minY": 0.377, "maxX": 0.895, "maxY": 0.389 },
+    "box": { "minX": 0.56, "minY": 0.336, "maxX": 0.94, "maxY": 0.356 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "personName",
     "text": "Sam",
-    "box": { "minX": 0.151, "minY": 0.477, "maxX": 0.273, "maxY": 0.492 },
+    "box": { "minX": 0.151, "minY": 0.474, "maxX": 0.286, "maxY": 0.494 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "personName",
     "text": "Jackson",
-    "box": { "minX": 0.279, "minY": 0.478, "maxX": 0.429, "maxY": 0.493 },
+    "box": { "minX": 0.286, "minY": 0.474, "maxX": 0.435, "maxY": 0.494 },
     "enabled": true
   },
   {
     "type": "automatic",
     "dataType": "idNumber",
     "text": "400 00 1071",
-    "box": { "minX": 0.441, "minY": 0.474, "maxX": 0.569, "maxY": 0.49 },
-    "enabled": true
-  },
-  {
-    "type": "automatic",
-    "dataType": "other",
-    "text": "son",
-    "box": { "minX": 0.578, "minY": 0.478, "maxX": 0.679, "maxY": 0.492 },
+    "box": { "minX": 0.435, "minY": 0.474, "maxX": 0.575, "maxY": 0.494 },
     "enabled": true
   }
 ]
