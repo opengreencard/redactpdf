@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from 'node:async_hooks';
 import { createHash } from 'node:crypto';
 import { promises as fs } from 'node:fs';
 import path from 'node:path';
@@ -103,7 +104,7 @@ export function makeMockedPassThroughFunction<
         // Avoid caching if we're being called from within another cached
         // function. Those extra cache files are unneeded and can be confusing
         // if someone wants to refresh the outer cache.
-        inMockedPassThroughFunctionLayer === 0 &&
+        mockedPassThroughLayer.getStore() === undefined &&
         // Avoid caching if MOCK_FUNCTIONS_SKIP_CACHE is set to allow rerunning
         // tests that use cached requests, e.g., to check flakiness.
         !process.env.MOCK_FUNCTIONS_SKIP_CACHE &&
@@ -190,10 +191,12 @@ export function makeMockedPassThroughFunction<
       }
 
       try {
-        inMockedPassThroughFunctionLayer += 1;
-        const result = (await origFunction(...args)) as Awaited<
-          ReturnType<FunctionT>
-        >;
+        // Only calls made from inside this one see the layer. A global counter
+        // made a second page request, started while the first was waiting on
+        // Gemini, look nested. It then skipped the cache and called Gemini live.
+        const result = (await mockedPassThroughLayer.run(true, () =>
+          origFunction(...args)
+        )) as Awaited<ReturnType<FunctionT>>;
 
         if (shouldUseCache) {
           await fs.mkdir(cacheDir, { recursive: true });
@@ -231,8 +234,6 @@ export function makeMockedPassThroughFunction<
           );
         }
         throw error;
-      } finally {
-        inMockedPassThroughFunctionLayer -= 1;
       }
     }
   );
@@ -387,9 +388,10 @@ const usedFilePaths: string[] = [];
 /**
  * If we're inside a mocked pass-through function, don't use cache for
  * anything else that's cached inside of it. That will cause multiple levels
- * of caching, which is unneeded.
+ * of caching, which is unneeded. Tracked per async context so concurrent
+ * calls (for example, parallel vision requests) each still use the cache.
  */
-let inMockedPassThroughFunctionLayer = 0;
+const mockedPassThroughLayer = new AsyncLocalStorage<true>();
 
 function maybeLogMockFunctionCacheLookup({
   key,

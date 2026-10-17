@@ -1,3 +1,4 @@
+import PQueue from 'p-queue';
 import type { RedactionInstance } from '../../../../lib/models/Redaction';
 import {
   RedactionBoundingBox,
@@ -10,6 +11,22 @@ import {
 } from '../../../../lib/pdf/pdfToImage';
 import { getRedactionBoundingBoxes } from '../../../../lib/redaction/getRedactionBoundingBoxes';
 import { putRedactionImage } from '../../../../lib/storage/storageFunctions/redactionImage';
+
+/**
+ * Vision requests in flight at once, per server process. Each pod has its
+ * own queue, so the total across pods is this number times the pod count.
+ *
+ * Gemini doesn't publish a concurrency limit for these calls. What applies:
+ *
+ * - Requests per minute for the project. AI Studio shows it:
+ *   https://aistudio.google.com/rate-limit
+ * - Spend per 10 minutes, $10 on Tier 1:
+ *   https://ai.google.dev/gemini-api/docs/rate-limits
+ *
+ * One pod sends about `concurrency × 60 / seconds per request` requests a
+ * minute. Check that total against the RPM before raising this.
+ */
+const visionQueue = new PQueue({ concurrency: 8 });
 
 /** Timing and success information for one page's vision request. */
 export interface ProcessRedactionPageTiming {
@@ -39,18 +56,31 @@ export async function processRedaction(
 ): Promise<ProcessRedactionResult> {
   try {
     const pageSizes: PageSize[] = [];
-    const pages: ProcessImageResult[] = [];
+    const pageRequests: Promise<ProcessImageResult>[] = [];
     const { rasterizationTimeMs } = await processPDFPagesInBatches(
       buffer,
       async ({ page, png, pageSize }) => {
         pageSizes[page - 1] = pageSize;
-        pages[page - 1] = await processImage({
-          png,
-          page,
-          key: redaction.key,
+        // Encode before queueing so waiting requests hold small JPEGs, not
+        // raw page PNGs.
+        const previewJPEG = await compressImage({ pngBuffer: png, size: null });
+        const visionJPEG = await compressImage({
+          pngBuffer: png,
+          size: pageSize,
         });
+        // Don't await the request: rasterization moves on to the next pages
+        // while up to 8 vision requests run.
+        pageRequests[page - 1] = visionQueue.add(() =>
+          processImage({
+            previewJPEG,
+            visionJPEG,
+            page,
+            key: redaction.key,
+          })
+        );
       }
     );
+    const pages = await Promise.all(pageRequests);
 
     const boundingBoxes = pages.flatMap((page) => page.boundingBoxes);
     const pageTimings = pages.map((page) => page.timing);
@@ -90,7 +120,10 @@ export async function processRedaction(
 }
 
 interface ProcessImageOptions {
-  png: Uint8Array;
+  /** Stored preview at full preview resolution. */
+  previewJPEG: Uint8Array;
+  /** Page size in points (72 DPI), which keeps the model input small. */
+  visionJPEG: Uint8Array;
   page: number;
   key: string;
 }
@@ -102,78 +135,63 @@ interface ProcessImageResult {
 }
 
 /**
- * Compress one page PNG, then upload and run vision concurrently.
+ * Upload the preview and run vision concurrently.
  */
 async function processImage({
-  png,
+  previewJPEG,
+  visionJPEG,
   page,
   key,
 }: ProcessImageOptions): Promise<ProcessImageResult> {
-  try {
-    const jpeg = await compressImage(png);
-    const visionStartedAt = Date.now();
-    const [visionResult] = await Promise.all([
-      (async (): Promise<ProcessImageResult> => {
-        try {
-          const result = await getRedactionBoundingBoxes(jpeg);
-          const processResult: ProcessImageResult = {
-            boundingBoxes: result.boxes.map((box): RedactionBoundingBox => ({
-              ...box,
-              page,
-            })),
-            timing: {
-              page,
-              visionTimeMs: Date.now() - visionStartedAt,
-              succeeded: true,
-            },
-            errorMessage: null,
-          };
-          return processResult;
-        } catch (error) {
-          // eslint-disable-next-line no-console -- page failures are useful operational diagnostics
-          console.error(
-            `Could not process redaction ${key}, page ${page}.`,
-            error
-          );
-          const processResult: ProcessImageResult = {
-            boundingBoxes: [],
-            timing: {
-              page,
-              visionTimeMs: Date.now() - visionStartedAt,
-              succeeded: false,
-            },
-            errorMessage: error.message,
-          };
-          return processResult;
-        }
-      })(),
-      (async (): Promise<void> => {
-        try {
-          await putRedactionImage(jpeg, 'image/jpeg', { key, page });
-        } catch (error) {
-          // eslint-disable-next-line no-console -- page failures are useful operational diagnostics
-          console.error(
-            `Could not store redaction image for ${key}, page ${page}.`,
-            error.stack
-          );
-        }
-      })(),
-    ]);
-    return visionResult;
-  } catch (error) {
-    // eslint-disable-next-line no-console -- page failures are useful operational diagnostics
-    console.error(`Could not process redaction ${key}, page ${page}.`, error);
-    const processResult: ProcessImageResult = {
-      boundingBoxes: [],
-      timing: {
-        page,
-        visionTimeMs: 0,
-        succeeded: false,
-      },
-      errorMessage: error.message,
-    };
-    return processResult;
-  }
+  const visionStartedAt = Date.now();
+  const [visionResult] = await Promise.all([
+    (async (): Promise<ProcessImageResult> => {
+      try {
+        const result = await getRedactionBoundingBoxes(visionJPEG);
+        const processResult: ProcessImageResult = {
+          boundingBoxes: result.boxes.map((box): RedactionBoundingBox => ({
+            ...box,
+            page,
+          })),
+          timing: {
+            page,
+            visionTimeMs: Date.now() - visionStartedAt,
+            succeeded: true,
+          },
+          errorMessage: null,
+        };
+        return processResult;
+      } catch (error) {
+        // eslint-disable-next-line no-console -- page failures are useful operational diagnostics
+        console.error(
+          `Could not process redaction ${key}, page ${page}.`,
+          error
+        );
+        const processResult: ProcessImageResult = {
+          boundingBoxes: [],
+          timing: {
+            page,
+            visionTimeMs: Date.now() - visionStartedAt,
+            succeeded: false,
+          },
+          errorMessage: error.message,
+        };
+        return processResult;
+      }
+    })(),
+    (async (): Promise<void> => {
+      try {
+        await putRedactionImage(previewJPEG, 'image/jpeg', { key, page });
+      } catch (error) {
+        // eslint-disable-next-line no-console -- page failures are useful operational diagnostics
+        console.error(
+          `Could not store redaction image for ${key}, page ${page}.`,
+          error.stack
+        );
+      }
+    })(),
+  ]);
+  return visionResult;
 }
 
 async function markRedactionAsError(

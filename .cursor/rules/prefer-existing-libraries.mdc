@@ -1,15 +1,17 @@
 ---
-description: Prefer a maintained library over a custom reimplementation.
+description: Prefer a maintained npm package over custom code.
 globs: '**/*.{ts,tsx}'
 alwaysApply: false
 ---
 
 # Prefer existing libraries
 
-Before writing a custom component for a common UI pattern (lightbox,
-carousel, date picker, notifications), look at Mantine and other packages
-we already use.
+Before writing a utility, component, or concurrency helper, search npm and check
+`package.json` for a maintained package. Write custom code only when no package
+fits.
 
-- Check https://mantine.dev for a maintained component
-- Add the matching `@mantine/*` package rather than rebuilding it
-  (for example `@mantine/lightbox` instead of a `Modal` plus an `Image`)
+- Check https://www.npmjs.com for a maintained package that solves the problem
+- For UI patterns, check https://mantine.dev and add the matching `@mantine/*`
+  package (for example `@mantine/lightbox` instead of a `Modal` plus an `Image`)
+
+Example: use `p-queue` for concurrency instead of a hand-written limiter.

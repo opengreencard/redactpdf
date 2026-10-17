@@ -49,6 +49,32 @@ describe(generateRedactedPDF, () => {
     // Page 2 had only a disabled box, so its text layer stays.
     expect(pageTexts[1]).toContain('Form 1040');
   }, 30000);
+
+  // Owner-password files throw in pdf-lib unless they are decrypted first. The
+  // copied page must come out readable, not as ciphertext.
+  it('redacts an owner-password PDF and keeps copied pages readable', async () => {
+    const encryptedPDF = await fs.readFile(
+      path.join(
+        __dirname,
+        '../redaction/__testData__/irs1040Scenario2First2PagesOwnerPassword.pdf'
+      )
+    );
+
+    const result = await generateRedactedPDF({
+      pdf: encryptedPDF,
+      redactionBoundingBoxes: [
+        ClientFakeData.makeAutoRedactionBoundingBox({
+          page: 1,
+          enabled: true,
+        }),
+      ],
+    });
+
+    const pageTexts = await extractPageTexts(result);
+    expect(pageTexts).toHaveLength(2);
+    expect(pageTexts[0]).not.toContain('400-00-1038');
+    expect(pageTexts[1]).toContain('Form 1040');
+  }, 30000);
 });
 
 /** Pull each page's selectable text so we can tell flatten from copy. */

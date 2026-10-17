@@ -97,6 +97,62 @@ items:
                   port: 3000
                 initialDelaySeconds: 30
                 periodSeconds: 30
+            - name: pdf-renderer
+              # Same image as the app, which has Ghostscript and
+              # pdf-renderer/bin/www.ts. Keep in sync with the other sidecar in
+              # this file and the `pdf-renderer` script in package.json.
+              #
+              # No envFrom Secret, so Ghostscript never sees app secrets. The
+              # app reaches it at PDF_RENDERER_URL (see .env.production.nonsecret).
+              image: opengreencard/redactpdf:%REVISION%
+              command:
+                - node
+                - -r
+                - '@swc-node/register'
+                - pdf-renderer/bin/www.ts
+              env:
+                # The root filesystem is read-only, and @swc/core caches its
+                # native binary under HOME. Point HOME at the /tmp emptyDir.
+                # That only works because a plain emptyDir isn't mounted
+                # noexec.
+                - name: HOME
+                  value: /tmp
+              ports:
+                - containerPort: 4100
+                  name: pdf-renderer
+              resources:
+                requests:
+                  memory: '256M'
+                  cpu: '250m'
+                limits:
+                  memory: '1G'
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 1000
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: pdf-renderer-tmp
+                  mountPath: /tmp
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: 4100
+                initialDelaySeconds: 2
+                periodSeconds: 10
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 4100
+                initialDelaySeconds: 10
+                periodSeconds: 30
+
+          volumes:
+            - name: pdf-renderer-tmp
+              emptyDir: {}
 
   - apiVersion: apps/v1
     kind: Deployment
@@ -128,3 +184,58 @@ items:
                   cpu: '100m'
                 limits:
                   memory: '512M'
+            - name: pdf-renderer
+              # Same image as the app, which has Ghostscript and
+              # pdf-renderer/bin/www.ts. Keep in sync with the other sidecar in
+              # this file and the `pdf-renderer` script in package.json.
+              #
+              # No envFrom Secret, so Ghostscript never sees app secrets. The
+              # app reaches it at PDF_RENDERER_URL (see .env.production.nonsecret).
+              image: opengreencard/redactpdf:%REVISION%
+              command:
+                - node
+                - -r
+                - '@swc-node/register'
+                - pdf-renderer/bin/www.ts
+              env:
+                # The root filesystem is read-only, and @swc/core caches its
+                # native binary under HOME. Point HOME at the /tmp emptyDir.
+                # That only works because a plain emptyDir isn't mounted
+                # noexec.
+                - name: HOME
+                  value: /tmp
+              ports:
+                - containerPort: 4100
+                  name: pdf-renderer
+              resources:
+                requests:
+                  memory: '256M'
+                  cpu: '250m'
+                limits:
+                  memory: '1G'
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 1000
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop:
+                    - ALL
+              volumeMounts:
+                - name: pdf-renderer-tmp
+                  mountPath: /tmp
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: 4100
+                initialDelaySeconds: 2
+                periodSeconds: 10
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 4100
+                initialDelaySeconds: 10
+                periodSeconds: 30
+          volumes:
+            - name: pdf-renderer-tmp
+              emptyDir: {}

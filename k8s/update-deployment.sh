@@ -52,13 +52,14 @@ END
   exit 1
 fi
 
-kubectl set image deployment/redaction redaction="$image:$REVISION"
+# The pdf-renderer sidecar runs the same image, so update it in the same step.
+kubectl set image deployment/redaction redaction="$image:$REVISION" pdf-renderer="$image:$REVISION"
 kubectl annotate deployment/redaction \
   kubernetes.io/change-cause="Updated to revision $REVISION at $(date)"
 kubectl rollout status deployment/redaction --timeout="$TIMEOUT"
 
 kubectl set image deployment/redaction-background-worker \
-  redaction-background-worker="$image:$REVISION"
+  redaction-background-worker="$image:$REVISION" pdf-renderer="$image:$REVISION"
 kubectl annotate deployment/redaction-background-worker \
   kubernetes.io/change-cause="Updated to revision $REVISION at $(date)"
 kubectl rollout status deployment/redaction-background-worker --timeout="$TIMEOUT"

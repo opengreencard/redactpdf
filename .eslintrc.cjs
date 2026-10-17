@@ -597,6 +597,30 @@ const commonNoRestrictedSyntaxRules = [
       'Prefer promiseAllThrottled over Promise.all(arr.map(...)) for I/O-bound parallel work. promiseAllThrottled limits concurrency, preventing resource exhaustion. Convert .map(fn) to .map(item => async () => fn(item)), then pass generators to promiseAllThrottled(generators, concurrency). For database updates, consider using bulkCreate with updateOnDuplicate instead of individual queries.',
   },
   {
+    // Bad: PDFDocument.load(buffer) — no or incomplete options
+    // Good: PDFDocument.load(buffer, { ignoreEncryption: true })
+    //
+    // ignoreEncryption only lets pdf-lib open the file; it cannot decrypt
+    // streams. Encrypted input must be decrypted first (see
+    // removeEncryptionIfNeeded in lib/pdf/generateRedactedPDF.ts).
+    selector:
+      'CallExpression[callee.type="MemberExpression"][callee.object.type="Identifier"][callee.object.name="PDFDocument"][callee.property.type="Identifier"][callee.property.name="load"][arguments.length<2], CallExpression[callee.type="MemberExpression"][callee.object.type="Identifier"][callee.object.name="PDFDocument"][callee.property.type="Identifier"][callee.property.name="load"] > ObjectExpression:not(:has(Property[key.name="ignoreEncryption"][value.type="Literal"][value.value="true"]))',
+    message:
+      'Always pass { ignoreEncryption: true } as the second argument to PDFDocument.load() to handle encrypted PDFs.',
+  },
+  {
+    // Bad: execFile('gs', args), spawn('gm', args)
+    // Good: lib/pdf/pdfRenderer.ts, which calls the PDF renderer
+    //
+    // We match the call instead of the `child_process` import, because other
+    // code may use child_process for other things. This only catches a binary
+    // name passed as a string literal. Variables holding the name are missed.
+    selector:
+      'CallExpression[arguments.0.type="Literal"][arguments.0.value=/^(gs|gm|magick|ghostscript)$/]',
+    message:
+      'Ghostscript and GraphicsMagick run only in pdf-renderer/. Use the PDF renderer client in lib/pdf/pdfRenderer.ts instead.',
+  },
+  {
     // Bad: promise.then((value) => ...).catch((error) => ...)
     // Good: const value = await promise;
     // Good: try { await promise; } catch (error) { ... }
@@ -888,6 +912,28 @@ module.exports = {
 
     'no-restricted-imports': [
       'error',
+      // Ghostscript and GraphicsMagick parse untrusted PDFs and have had sandbox
+      // escapes. Only pdf-renderer/ may import these wrapper packages.
+      {
+        name: 'pdf2pic',
+        message:
+          'Ghostscript and GraphicsMagick run only in pdf-renderer/. Use the PDF renderer client in lib/pdf/pdfRenderer.ts instead.',
+      },
+      {
+        name: 'ghostscript4js',
+        message:
+          'Ghostscript and GraphicsMagick run only in pdf-renderer/. Use the PDF renderer client in lib/pdf/pdfRenderer.ts instead.',
+      },
+      {
+        name: 'ghostscript-node',
+        message:
+          'Ghostscript and GraphicsMagick run only in pdf-renderer/. Use the PDF renderer client in lib/pdf/pdfRenderer.ts instead.',
+      },
+      {
+        name: 'node-gs',
+        message:
+          'Ghostscript and GraphicsMagick run only in pdf-renderer/. Use the PDF renderer client in lib/pdf/pdfRenderer.ts instead.',
+      },
       {
         name: 'next/image',
         importNames: ['Image'],
