@@ -69,6 +69,10 @@ jobs:
       # service starts empty, so CI tests fail with table-not-found errors
       # without it.
       SETUP_TEST_DB: 'true'
+      # TEMPORARY DEBUG (branch debug/ci-mock-inputs, do not merge): print
+      # mock cache keys and write request inputs for comparison with macOS.
+      MOCK_FUNCTIONS_DEBUG_CACHE_KEY: '1'
+      MOCK_FUNCTIONS_DEBUG_INPUTS: '1'
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -80,6 +84,13 @@ jobs:
       - run: corepack enable
       - run: yarn install --immutable
       - run: yarn jest
+      # TEMPORARY DEBUG: keep the input dumps from the mocked Gemini calls.
+      - if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: mock-inputs
+          path: lib/ai/__mocks__/__testData__/**/*.input.json
+          if-no-files-found: ignore
 
   docker:
     runs-on: ubuntu-latest
