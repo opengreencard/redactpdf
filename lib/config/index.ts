@@ -44,6 +44,8 @@ interface Config {
     accessKeyId: string;
     secretAccessKey: string;
   };
+  /** PDF renderer sidecar URL. Unset means run Ghostscript in this process. */
+  pdfRendererURL: string | undefined;
 }
 
 const dbHost = process.env.DB_HOST ?? '127.0.0.1';
@@ -73,6 +75,7 @@ const config: Config = {
     accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
   },
+  pdfRendererURL: process.env.PDF_RENDERER_URL || undefined,
 };
 
 export default config;

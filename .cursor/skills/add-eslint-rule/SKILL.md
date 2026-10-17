@@ -62,7 +62,7 @@ import { DEFAULT_THEME, mergeMantineTheme } from '@mantine/core';
 export default async function RootLayout(props: RootLayoutProps) { ... }
 ```
 
-Follow `comments.mdc`: every disable needs a one-line reason and the rule name.
+Follow `writing-comments.mdc`: every disable needs a one-line reason and the rule name.
 Avoid file-wide disables.
 
 ## Keep rule objects inline

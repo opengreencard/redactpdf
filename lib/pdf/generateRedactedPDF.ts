@@ -5,6 +5,7 @@ import type {
   BoundingBox,
   RedactionBoundingBox,
 } from '../redaction/redactionTypes';
+import { decryptPDF } from './pdfRenderer';
 import { getPDFPageSizes } from './getPDFPageSizes';
 import { rasterizePDFPages } from './pdfToImage';
 
@@ -30,9 +31,12 @@ export async function generateRedactedPDF({
   redactionBoundingBoxes,
 }: GenerateRedactedPDFOptions): Promise<Buffer> {
   try {
-    const pageSizes = await getPDFPageSizes(pdf);
+    const sourceBuffer = await removeEncryptionIfNeeded(pdf);
+    const pageSizes = await getPDFPageSizes(sourceBuffer);
     const enabledBoxesByPage = groupEnabledBoxesByPage(redactionBoundingBoxes);
-    const sourcePDF = await PDFDocument.load(pdf);
+    const sourcePDF = await PDFDocument.load(sourceBuffer, {
+      ignoreEncryption: true,
+    });
     const outputPDF = await PDFDocument.create();
 
     const unboxedPageIndices = pageSizes.flatMap((_, pageIndex) =>
@@ -60,7 +64,7 @@ export async function generateRedactedPDF({
       // Only this page batch keeps rasterized PNGs alive. Each page is burned
       // and embedded before the next batch is rasterized.
       // eslint-disable-next-line no-await-in-loop -- batches bound image memory
-      const rasters = await rasterizePDFPages(pdf, {
+      const rasters = await rasterizePDFPages(sourceBuffer, {
         pageNumbers: batchPageNumbers,
         dpi: flattenedPageDPI,
       });
@@ -83,7 +87,7 @@ export async function generateRedactedPDF({
         // Burn and embed one page before moving on so image buffers can be
         // released instead of accumulating across the whole document.
         // eslint-disable-next-line no-await-in-loop -- pages are processed in order
-        const burnedJPEG = await burnRedactionBoxesOnImage(raster.png, boxes);
+        const burnedJPEG = await burnRedactionBoxesOnImage(raster, boxes);
         // embedJpg writes into this document, so pages stay sequential.
         // eslint-disable-next-line no-await-in-loop -- pages must stay ordered
         const embeddedJPEG = await outputPDF.embedJpg(burnedJPEG);
@@ -108,6 +112,19 @@ export async function generateRedactedPDF({
       `Could not generate the redacted PDF (${message}).`
     );
   }
+}
+
+/**
+ * pdf-lib can open an encrypted file only with `ignoreEncryption`, and it
+ * cannot decrypt streams. Copied pages would keep ciphertext, so encrypted
+ * input is decrypted by the PDF renderer before pdf-lib reads it.
+ */
+async function removeEncryptionIfNeeded(pdf: Buffer): Promise<Buffer> {
+  const { context } = await PDFDocument.load(pdf, { ignoreEncryption: true });
+  if (context.trailerInfo.Encrypt === undefined) {
+    return pdf;
+  }
+  return decryptPDF(pdf);
 }
 
 function groupEnabledBoxesByPage(

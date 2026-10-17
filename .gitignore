@@ -43,3 +43,7 @@ spec/
 
 # Ignore temporary files
 /temp*
+
+# Ignore next-env.d.ts: it changes depending on whether we run `yarn dev` or
+# `yarn build`
+/next-env.d.ts

@@ -106,4 +106,30 @@ describe(processRedaction, () => {
     expect(updatedRedaction?.status).toBe(RedactionStatus.error);
     expect(updatedRedaction?.errorMessage).toContain('vision unavailable');
   }, 120000);
+
+  it('stores a truncated error message when the vision error is too long for the column', async () => {
+    const redactionKey = generateRedactionKey();
+    const redaction = await FakeData.makeDBRedaction({
+      key: redactionKey,
+      pageCount: 2,
+    });
+    // Longer than the TEXT column. Real errors can embed base64 images.
+    createOpenAICompatibleCompletionMock.mockRejectedValue(
+      new Error(`vision unavailable ${'x'.repeat(100_000)}`)
+    );
+
+    await processRedaction(redaction, twoPagePDF);
+
+    const updatedRedaction = (await Redaction.findOne({
+      where: { key: redactionKey },
+      attributes: ['status', 'errorMessage'],
+    })) as PartialInstance<
+      RedactionAttributes,
+      'status' | 'errorMessage'
+    > | null;
+
+    expect(updatedRedaction?.status).toBe(RedactionStatus.error);
+    expect(updatedRedaction?.errorMessage).toMatch(/^vision unavailable x+…$/);
+    expect(updatedRedaction?.errorMessage?.length).toBeLessThanOrEqual(2000);
+  }, 120000);
 });

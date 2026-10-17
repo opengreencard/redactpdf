@@ -30,6 +30,30 @@ opt in:
   `yarn devdb-testdata-jest path/to/index.test.ts`, or
   `yarn proddb-testdata-jest` when the fixture must come from production.
 
+## Recorded API responses
+
+Some tests replay recorded API responses from `__mocks__/__testData__`. The
+cache key includes the full request, including image bytes, so any change to
+rendering or compression misses the cache.
+
+- Run `CI=true yarn jest ...` when checking changes. A cache miss then fails
+  instead of making a live, billed call.
+- To re-record, run `DELETE_UNUSED=1 yarn jest <file>`. This makes live calls
+  and deletes recordings that the file didn't use during the run.
+
+## PDF rendering
+
+- Ghostscript runs only in `pdf-renderer/`. ESLint enforces this for
+  `execFile('gs', ...)`-style calls and for the PDF wrapper packages.
+- `lib/pdf/pdfRenderer.ts` is the client. It calls the renderer at
+  `PDF_RENDERER_URL` when that is set. Otherwise it runs Ghostscript in-process,
+  which is how dev and tests run.
+- Production sets `PDF_RENDERER_URL` in `.env.production.nonsecret`. Each pod
+  runs the renderer as a sidecar container with no app secrets (see
+  `k8s/templates/cluster.template.yml`).
+- To test the HTTP path locally, run `yarn pdf-renderer` and set
+  `PDF_RENDERER_URL=http://127.0.0.1:4100` in the shell.
+
 ## Local Jest database
 
 Jest uses the separate `redaction_test` database and `redaction_test` MariaDB
@@ -72,7 +96,8 @@ docker-compose exec -T mariadb mariadb -uroot -predaction-root \
   The image also has Node 22 earlier on `PATH`.
 - Signup and `yarn jest` do not need real Google, Spaces, or model keys.
   Uploading a PDF does.
-- GraphicsMagick and Ghostscript are installed for the PDF tests.
+- Ghostscript is installed for the PDF tests and `yarn dev`. See
+  [PDF rendering](#pdf-rendering).
 
 <!-- BEGIN:nextjs-agent-rules -->
 

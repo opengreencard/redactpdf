@@ -37,6 +37,7 @@
     "**/*.ts",
     "**/*.tsx",
     "next.config.mjs",
+    "jest.config.cjs",
     ".next/types/**/*.ts",
     "**/*.eslintrc.cjs",
     ".next/dev/types/**/*.ts"

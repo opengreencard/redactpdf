@@ -17,6 +17,12 @@ import { getRedactionImage } from '../../../../lib/storage/storageFunctions/reda
 import { putRedactionFile } from '../../../../lib/storage/storageFunctions/redactionFile';
 import { promiseAllThrottled } from '../../../../lib/utilities/promiseAllThrottled';
 
+// The Gemini calls below replay recordings from `__mocks__/__testData__`. The
+// cache key includes the JPEG bytes, so any change to rendering or compression
+// misses the cache. In CI, a miss fails the test. To re-record, run:
+//   DELETE_UNUSED=1 yarn jest app/api/redaction/lib/processRedaction.test.ts
+// That makes live, billed Gemini calls. It also deletes recordings that this
+// file didn't use during the run.
 afterAll(async () => {
   await maybeDeleteUnusedOpenAICompatibleCompletionCacheFiles(__filename);
 });

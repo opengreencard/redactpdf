@@ -25,7 +25,8 @@ export interface RedactionAttributes {
   /** Number of pages in the uploaded PDF. Known at upload time. */
   pageCount: number;
   /**
-   * Pixel size of each rasterized page image, in page order.
+   * Size of each page in PDF points, in page order. The review UI displays
+   * each page image at this size, so preview images can be higher resolution.
    * Null until `processRedaction` finishes rasterizing.
    */
   pageSizes: PageSize[] | null;
