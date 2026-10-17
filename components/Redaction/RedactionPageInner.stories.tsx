@@ -22,6 +22,7 @@ import {
   removeBoundingBoxesFromResponse,
   setBoundingBoxesEnabledInResponse,
 } from './redactionBoundingBoxes';
+import { TestRedactionBoundingBoxes } from '../../lib/redaction/__testData__/RedactionBoundingBoxes';
 import {
   getStorybookRedactionImageUrl,
   makeStorybookRedactedResponse,
@@ -135,7 +136,29 @@ Error.args = {
   ),
 };
 
+/**
+ * Long detected text in the left rail. An unbroken value must truncate inside
+ * the rail instead of widening the panel and pushing the document pane off
+ * screen.
+ */
+const longLabelTexts = [
+  'Name of a very long employer and its subsidiary legal entity for the record',
+  'AVeryLongUnbrokenIdentifierWithNoSpacesAtAllThatCannotWrapInTheRowLabel0123456789',
+];
+const longLabelRedactionBoundingBoxes: RedactionBoundingBox[] =
+  TestRedactionBoundingBoxes.irs1040Scenario2
+    .slice(0, longLabelTexts.length)
+    .map((box, index): RedactionBoundingBox => ({
+      ...box,
+      page: 1,
+      text: longLabelTexts[index],
+    }));
+
 export const Loaded: StoryFn<StoryWrapperProps> = Template.bind({});
 Loaded.args = {
-  initialRedactionState: makeDoneState(makeStorybookRedactedResponse()),
+  initialRedactionState: makeDoneState(
+    makeStorybookRedactedResponse({
+      redactionBoundingBoxes: longLabelRedactionBoundingBoxes,
+    })
+  ),
 };

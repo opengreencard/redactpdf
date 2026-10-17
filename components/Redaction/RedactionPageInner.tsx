@@ -213,6 +213,9 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
               <GridCol
                 span={{ base: 12, sm: 3 }}
                 mih={0}
+                // Without miw={0}, a wide label sets this column's minimum
+                // width and pushes the document pane out of the viewport.
+                miw={0}
                 h="100%"
                 p={0}
                 display={{
@@ -224,6 +227,7 @@ const RedactionPageViewBody: React.FunctionComponent<RedactionPageViewBodyProps>
                 <Box
                   flex={1}
                   mih={0}
+                  miw={0}
                   h="100%"
                   bg="white"
                   className={rules.right}
