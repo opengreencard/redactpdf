@@ -42,7 +42,7 @@ export default async function setupDatabases(
         const name = getWorkerDatabaseName(workerId);
         await db.query(`DROP DATABASE IF EXISTS \`${name}\``);
         await db.query(
-          `CREATE DATABASE \`${name}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`
+          `CREATE DATABASE \`${name}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_uca1400_ai_ci`
         );
       }),
       1
