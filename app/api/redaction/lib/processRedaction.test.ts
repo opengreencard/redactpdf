@@ -53,6 +53,11 @@ describe(processRedaction, () => {
     ]);
 
     processResult = await processRedaction(redaction, twoPagePDF);
+    for (const { page, cost } of processResult.pageTimings) {
+      console.info(
+        `processRedaction page ${page} vision cost: $${cost?.totalUSD.toFixed(6) ?? 'none'}`
+      );
+    }
 
     const updatedRedaction = (await Redaction.findOne({
       where: { key: redactionKey },

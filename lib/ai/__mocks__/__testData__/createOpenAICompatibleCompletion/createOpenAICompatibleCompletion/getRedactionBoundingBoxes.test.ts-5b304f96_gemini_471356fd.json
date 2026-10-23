@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 839,
+    "prompt_tokens": 2635,
+    "total_tokens": 3474
+  },
+  "id": "L-HbaqKVEK3c_uMP1uCAMA",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TisW63yvcOmUAdzJ9GRGg8Hjmg3PRliB8yxg0Sy4FEIOPiolD2AV+uBVtu1tN67bPR9zdlLbchkPPI6uYDKjrbPCEkT4W5h0PwUf7Gr3uBMhSJw=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean\",\"minX\":58,\"minY\":111,\"maxX\":388,\"maxY\":126},{\"dataType\":\"personName\",\"text\":\"John\",\"minX\":388,\"minY\":111,\"maxX\":765,\"maxY\":126},{\"dataType\":\"idNumber\",\"text\":\"400001038\",\"minX\":765,\"minY\":111,\"maxX\":941,\"maxY\":126},{\"dataType\":\"personName\",\"text\":\"Joan\",\"minX\":58,\"minY\":141,\"maxX\":388,\"maxY\":157},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":388,\"minY\":141,\"maxX\":765,\"maxY\":157},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":765,\"minY\":141,\"maxX\":941,\"maxY\":157},{\"dataType\":\"address\",\"text\":\"26 Dancing Daisy Drive\",\"minX\":58,\"minY\":171,\"maxX\":681,\"maxY\":187},{\"dataType\":\"address\",\"text\":\"Charleston\",\"minX\":58,\"minY\":201,\"maxX\":552,\"maxY\":217},{\"dataType\":\"address\",\"text\":\"SC\",\"minX\":552,\"minY\":199,\"maxX\":658,\"maxY\":217},{\"dataType\":\"address\",\"text\":\"29455\",\"minX\":658,\"minY\":201,\"maxX\":765,\"maxY\":217},{\"dataType\":\"checkbox\",\"text\":\"You\",\"minX\":822,\"minY\":231,\"maxX\":837,\"maxY\":242},{\"dataType\":\"checkbox\",\"text\":\"Spouse\",\"minX\":882,\"minY\":231,\"maxX\":895,\"maxY\":242},{\"dataType\":\"checkbox\",\"text\":\"If treating a nonresident alien or dual-status alien spouse as a U.S. resident for the entire tax year, check the box and enter their name (see instructions and attach statement if required):\",\"minX\":168,\"minY\":326,\"maxX\":182,\"maxY\":337},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":552,\"minY\":341,\"maxX\":917,\"maxY\":355},{\"dataType\":\"checkbox\",\"text\":\"Yes\",\"minX\":823,\"minY\":378,\"maxX\":837,\"maxY\":388},{\"dataType\":\"checkbox\",\"text\":\"No\",\"minX\":882,\"minY\":378,\"maxX\":895,\"maxY\":388},{\"dataType\":\"personName\",\"text\":\"Sam\",\"minX\":154,\"minY\":475,\"maxX\":289,\"maxY\":491},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":289,\"minY\":475,\"maxX\":434,\"maxY\":491},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":435,\"minY\":475,\"maxX\":576,\"maxY\":491},{\"dataType\":\"other\",\"text\":\"son\",\"minX\":576,\"minY\":475,\"maxX\":681,\"maxY\":491}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792794941,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.00527,
+    "outputUSD": 0.00839,
+    "totalUSD": 0.01366
+  },
+  "timing": {
+    "msToFirstToken": 7740,
+    "outputTokensPerSecond": 128.66124827480448,
+    "totalTimeMs": 14261
+  }
+}

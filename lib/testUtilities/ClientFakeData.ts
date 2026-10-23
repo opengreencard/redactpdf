@@ -142,6 +142,11 @@ function makeOpenAICompatibleCompletionResult(
         logprobs: null,
       },
     ],
+    cost: options.cost ?? {
+      inputUSD: 0.000001,
+      outputUSD: 0.000002,
+      totalUSD: 0.000003,
+    },
     timing: options.timing ?? {
       msToFirstToken: 1,
       outputTokensPerSecond: 1,

@@ -46,6 +46,7 @@ export interface OpenAICompatibleCompletionUsage {
 
 /** Text and usage metadata returned by an OpenAI-compatible completion. */
 export interface OpenAICompatibleCompletionResult extends ChatCompletion {
+  cost: OpenAICompatibleCompletionCost;
   timing: OpenAICompatibleCompletionTiming;
 }
 
@@ -54,6 +55,13 @@ export interface OpenAICompatibleCompletionTiming {
   msToFirstToken: number | null;
   outputTokensPerSecond: number;
   totalTimeMs: number;
+}
+
+/** Estimated USD cost of one completion, from list prices. */
+export interface OpenAICompatibleCompletionCost {
+  inputUSD: number;
+  outputUSD: number;
+  totalUSD: number;
 }
 
 /**
@@ -67,6 +75,12 @@ export async function createOpenAICompatibleCompletion({
   provider,
   ...options
 }: CreateOpenAICompatibleCompletionOptions): Promise<OpenAICompatibleCompletionResult> {
+  // Check the price before the paid request, so an unpriced model fails fast.
+  const pricing = modelPricingByName[options.model];
+  if (!pricing) {
+    throw new ApplicationError(`No pricing configured for ${options.model}.`);
+  }
+
   const startedAt = Date.now();
   const stream = getOrCreateOpenAIClient(provider).chat.completions.stream({
     ...options,
@@ -97,8 +111,25 @@ export async function createOpenAICompatibleCompletion({
     firstTokenAt === null ? null : firstTokenAt - startedAt;
   const generationTimeMs =
     msToFirstToken === null ? totalTimeMs : totalTimeMs - msToFirstToken;
+  const { usage } = response;
+  if (!usage) {
+    throw new ApplicationError(`No token usage returned for ${options.model}.`);
+  }
+  // completion_tokens leaves out thinking tokens, but total_tokens includes
+  // them. Google bills thinking at the output rate, so bill everything after
+  // the prompt.
+  const inputUSD =
+    (usage.prompt_tokens * pricing.inputUSDPerMillionTokens) / 1_000_000;
+  const outputTokens = usage.total_tokens - usage.prompt_tokens;
+  const outputUSD =
+    (outputTokens * pricing.outputUSDPerMillionTokens) / 1_000_000;
   return {
     ...response,
+    cost: {
+      inputUSD,
+      outputUSD,
+      totalUSD: inputUSD + outputUSD,
+    },
     timing: {
       msToFirstToken,
       outputTokensPerSecond:
@@ -110,6 +141,31 @@ export async function createOpenAICompatibleCompletion({
     },
   };
 }
+
+/** USD per 1M tokens for one model. */
+interface ModelPricing {
+  inputUSDPerMillionTokens: number;
+  outputUSDPerMillionTokens: number;
+}
+
+/**
+ * Standard paid-tier list prices from
+ * https://ai.google.dev/gemini-api/docs/pricing, checked 2026-10-23.
+ *
+ * Prices step up later, so update these when they do:
+ * - Gemini 4 Argon: Dec 1, 2026 ($4 input, $20 output)
+ * - Gemini 3.8 Flash: Jan 1, 2027 ($1.50 input, $7.50 output)
+ */
+const modelPricingByName: Record<string, ModelPricing> = {
+  'gemini-4-argon': {
+    inputUSDPerMillionTokens: 2,
+    outputUSDPerMillionTokens: 10,
+  },
+  'gemini-3.8-flash': {
+    inputUSDPerMillionTokens: 0.75,
+    outputUSDPerMillionTokens: 3.75,
+  },
+};
 
 interface ProviderConfiguration {
   apiKey: string | undefined;

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   createOpenAICompatibleCompletion,
+  type OpenAICompatibleCompletionCost,
   type OpenAICompatibleCompletionResult,
   OpenAICompatibleProvider,
 } from '../ai/createOpenAICompatibleCompletion';
@@ -14,6 +15,8 @@ import { redactionBoundingBoxesModel } from './redactionBoundingBoxesModel';
 /** Redaction boxes and token usage returned for one page. */
 export interface GetRedactionBoundingBoxesResult {
   boxes: SinglePageRedactionBoundingBox[];
+  /** Same value as `response.cost`, for callers that only need the price. */
+  cost: OpenAICompatibleCompletionCost;
   response: OpenAICompatibleCompletionResult;
 }
 
@@ -23,9 +26,7 @@ export interface GetRedactionBoundingBoxesResult {
  * Coordinates are integers from 0 through 1000 in the model response, then
  * converted to the normalized coordinates used by the app.
  *
- * Gemini 3.8 Flash is intentionally used here because local comparisons show
- * it is more exhaustive at finding sensitive content, including repeated or
- * faint values, than the previous Flash Lite model.
+ * Uses `redactionBoundingBoxesModel` at low reasoning effort.
  */
 export async function getRedactionBoundingBoxes(
   image: Uint8Array
@@ -41,6 +42,7 @@ export async function getRedactionBoundingBoxes(
 
   return {
     boxes: boxes.map(mapRedactionBoxToBoundingBox),
+    cost: response.cost,
     response,
   };
 }
@@ -145,7 +147,7 @@ function requestRedactionVision({
   return createOpenAICompatibleCompletion({
     provider: OpenAICompatibleProvider.gemini,
     model: redactionBoundingBoxesModel,
-    reasoning_effort: 'medium',
+    reasoning_effort: 'low',
     messages: [
       {
         role: 'user',
@@ -206,16 +208,19 @@ Coordinates are integers from 0 to 1000, normalized to this image, with the
 origin at the top-left, ordered minX, minY, maxX, maxY. Make boxes slightly too
 large rather than too small.
 
-- \`text\`: only the sensitive value or a short description, without field labels.
+
+How big to make the box:
 - Form fields: box the entire printed field (the entry box, line, or row of
   character cells), not just the typed text, so the box size doesn't reveal the
   length of the value.
-- Checkbox groups: only when the selection reveals something personal, such as
-  race, ethnicity, eye color, sex, health, or religion. Then box every square in
-  the group, checked or not, with the square only, not its label. Don't box
-  groups whose answers aren't personal, such as filing status or tax yes/no
-  questions.
+- Checkbox/radio groups: if the checkboxes relate to sensitive/embarrassing
+  info, box every square in the group, checked or not, with the square only, not
+  its label. Use each option's printed label as \`text\`, not "checked" or
+  "unchecked".
 - Photos: cover the entire visible photo, including faded or ghost images.
+- Text: cover the entire text, including descenders, ascenders, accent marks.
+  Try to maybe cover _slightly beyond the text_: expand it into the whitespace
+  slightly to avoid missing anything.
 
 When to redact and when not to redact:
 - Specificity: redact details that give lots of bits of info about a person:
