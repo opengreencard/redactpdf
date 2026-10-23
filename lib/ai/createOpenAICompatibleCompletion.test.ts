@@ -26,6 +26,11 @@ describe('createOpenAICompatibleCompletion', () => {
         completion_tokens: expect.any(Number),
       },
     });
+    expect(response.cost).toEqual({
+      inputUSD: expect.any(Number),
+      outputUSD: expect.any(Number),
+      totalUSD: expect.any(Number),
+    });
     expect(response.timing).toEqual({
       msToFirstToken: expect.any(Number),
       outputTokensPerSecond: expect.any(Number),

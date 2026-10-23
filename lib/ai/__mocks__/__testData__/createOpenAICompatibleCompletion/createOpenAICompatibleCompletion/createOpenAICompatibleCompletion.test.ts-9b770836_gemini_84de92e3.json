@@ -3,16 +3,16 @@
   "usage": {
     "completion_tokens": 7,
     "prompt_tokens": 8,
-    "total_tokens": 81
+    "total_tokens": 88
   },
-  "id": "KwO_apvVI4KT1MkPkbSD2Q0",
+  "id": "ZtjbapytNJDX-8YP75WskQc",
   "choices": [
     {
       "message": {
         "role": "assistant",
         "extra_content": {
           "google": {
-            "thought_signature": "EoADCv0CAWkUfROynfRWo3CQiLim/lauCnKu92YC76F5DrCLIqtpw5rR/nj/yCOLgpVSdY95ZZV8++wgZpwABlfqvjlLY3jhvedh0VbCFRbhaD475jysm+krk8QznWKny3e95yG4xm8DMVfcWkWfv3/xno4bifjDyIZaQp0+aE+wsPCJZjCoz/zguwBg72zEzIr6/AuJhd+zAOgG6zSN6rgOcOPZYKLknEEEvIg8Sv9ipLccWdMr+QX01VsL7MupG7IrJsBFb5Q0q2jCYTlHRIvbIzyBx5uPZe3PeeQ6l1rQmRhElk5i3EqigoBaui1a6Kku7YsqtE6thOe0UFgoLRPbCmCYO9H+GbIgKn/Bt0adhz0sKvzHi+LlwZwb6btWkTgSqqiKvy0Tqftbol/uiDSHuxKzcdNpDsiiqTzfhDfmziZPe5rsHlGKDLzW8ORJmhBaIlGFazexEsT754RkSU3P9Kx0elkbWBQzNK4LDYgv3PuEHus0HSZ6HL1bx+PK0Blh"
+            "thought_signature": "EogDCoUDAWkUfRN7pfIX3KmCMUIEr9Bh9F6z552gcmpMr0tVx0qW5zydJAEGL2rYp48WPfoOQc8lPstQkOR0ChtLqHC/ZozM1bd1X2SV7/7TdQXWcHErAmxY7iLONP8kzadWnwZkpcSTq3jhoQsZSoPxiOXFLOOnLHSirjgVK2ETzb0GbYgydNAPF/gEsKOpsOYycm2W/khvHBgQlCZsO0YrgUGrGiovQOa2sKSpsCmvwJxsxm90yNYVSQ8bj4f4Bva7rFHzqDN8eGaeKy63oSQhvLxq1A0rf+jvr2AtaRa5qSNfgis+OGqfFLAOrA3YoUlTuS0HI2LnTrcbJ6Oo6ltLSsRq92FAcaP+kWKoDymsFosaSvxQjSUQ63eVrWtyhDI3JvpKMYb0wYIvC4DMrRRfsMPcCA7mgpi/k8lIQE8uJjpNKGiwR9DMaDjKxFg5iAY/yy1uM6X6LHJH1Rrwc+LavZfiwOI5RM+iqQ+y0SOprRQY8RH4/UJBW94Tz+MTvIPLc9RzNtgddbk="
           }
         },
         "content": "1 + 1 = 2",
@@ -24,11 +24,16 @@
       "logprobs": null
     }
   ],
-  "created": 1790903084,
+  "created": 1792792680,
   "model": "gemini-3.8-flash",
+  "cost": {
+    "inputUSD": 0.000006,
+    "outputUSD": 0.0003,
+    "totalUSD": 0.00030599999999999996
+  },
   "timing": {
-    "msToFirstToken": 824,
-    "outputTokensPerSecond": 777.7777777777778,
-    "totalTimeMs": 833
+    "msToFirstToken": 2296,
+    "outputTokensPerSecond": 3500,
+    "totalTimeMs": 2298
   }
 }

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import {
   createOpenAICompatibleCompletion,
+  type OpenAICompatibleCompletionCost,
   type OpenAICompatibleCompletionResult,
   OpenAICompatibleProvider,
 } from '../ai/createOpenAICompatibleCompletion';
@@ -14,6 +15,8 @@ import { redactionBoundingBoxesModel } from './redactionBoundingBoxesModel';
 /** Redaction boxes and token usage returned for one page. */
 export interface GetRedactionBoundingBoxesResult {
   boxes: SinglePageRedactionBoundingBox[];
+  /** Same value as `response.cost`, for callers that only need the price. */
+  cost: OpenAICompatibleCompletionCost;
   response: OpenAICompatibleCompletionResult;
 }
 
@@ -23,24 +26,23 @@ export interface GetRedactionBoundingBoxesResult {
  * Coordinates are integers from 0 through 1000 in the model response, then
  * converted to the normalized coordinates used by the app.
  *
- * Gemini 3.8 Flash is intentionally used here because local comparisons show
- * it is more exhaustive at finding sensitive content, including repeated or
- * faint values, than the previous Flash Lite model.
+ * Uses `redactionBoundingBoxesModel` at low reasoning effort.
  */
 export async function getRedactionBoundingBoxes(
   image: Uint8Array
 ): Promise<GetRedactionBoundingBoxesResult> {
-  const response = await requestRedactionVision(
-    makeImageDataURL(image),
-    redactionPrompt,
-    redactionResponseJSONSchema
-  );
+  const response = await requestRedactionVision({
+    imageDataURL: makeImageDataURL(image),
+    prompt: redactionPrompt,
+    responseSchema: redactionResponseJSONSchema,
+  });
   const { boxes } = parseRedactionResponse(
     response.choices[0]?.message.content
   );
 
   return {
     boxes: boxes.map(mapRedactionBoxToBoundingBox),
+    cost: response.cost,
     response,
   };
 }
@@ -128,17 +130,24 @@ const redactionResponseSchema: z.ZodType<RedactionResponse> = z.object({
   boxes: redactionBoxSchema.array(),
 });
 
-// TODO: Use a keyed parameter object now that max-params is 2.
-// eslint-disable-next-line max-params
-function requestRedactionVision(
-  imageDataURL: string,
-  prompt: string,
-  responseSchema: Record<string, unknown>
-): ReturnType<typeof createOpenAICompatibleCompletion> {
+/** Inputs for one vision request. */
+interface RequestRedactionVisionOptions {
+  imageDataURL: string;
+  prompt: string;
+  responseSchema: Record<string, unknown>;
+}
+
+function requestRedactionVision({
+  imageDataURL,
+  prompt,
+  responseSchema,
+}: RequestRedactionVisionOptions): ReturnType<
+  typeof createOpenAICompatibleCompletion
+> {
   return createOpenAICompatibleCompletion({
     provider: OpenAICompatibleProvider.gemini,
     model: redactionBoundingBoxesModel,
-    reasoning_effort: 'medium',
+    reasoning_effort: 'low',
     messages: [
       {
         role: 'user',
@@ -179,15 +188,14 @@ function makeImageDataURL(image: Uint8Array): string {
   return `data:image/jpeg;base64,${Buffer.from(image).toString('base64')}`;
 }
 
-function makeRedactionPrompt(): string {
-  const dataTypeLines = Object.values(RedactedDataType)
-    .map(
-      (dataType): string =>
-        `- ${dataType}: ${redactedDataTypeToDescription[dataType]}`
-    )
-    .join('\n');
+const dataTypeLines = Object.values(RedactedDataType)
+  .map(
+    (dataType): string =>
+      `- ${dataType}: ${redactedDataTypeToDescription[dataType]}`
+  )
+  .join('\n');
 
-  return `Find every item on this page that could identify or embarrass someone
+const redactionPrompt = `Find every item on this page that could identify or embarrass someone
 and should be redacted. Err toward over-redacting, including faded, blurred,
 or scanned-in content.
 
@@ -200,21 +208,42 @@ Coordinates are integers from 0 to 1000, normalized to this image, with the
 origin at the top-left, ordered minX, minY, maxX, maxY. Make boxes slightly too
 large rather than too small.
 
-- \`text\`: only the sensitive value or a short description, without field labels.
+
+How big to make the box:
 - Form fields: box the entire printed field (the entry box, line, or row of
   character cells), not just the typed text, so the box size doesn't reveal the
   length of the value.
-- Checkbox groups: only when the selection reveals something personal, such as
-  race, ethnicity, eye color, sex, health, or religion. Then box every square in
-  the group, checked or not, with the square only, not its label. Don't box
-  groups whose answers aren't personal, such as filing status or tax yes/no
-  questions.
+- Checkbox/radio groups: if the checkboxes relate to sensitive/embarrassing
+  info, box every square in the group, checked or not, with the square only, not
+  its label. Use each option's printed label as \`text\`, not "checked" or
+  "unchecked".
 - Photos: cover the entire visible photo, including faded or ghost images.
+- Text: cover the entire text, including descenders, ascenders, accent marks.
+  Try to maybe cover _slightly beyond the text_: expand it into the whitespace
+  slightly to avoid missing anything.
 
-For example, return \`03005988\`, not \`Passport card number 03005988\`.`;
-}
+When to redact and when not to redact:
+- Specificity: redact details that give lots of bits of info about a person:
+  - Highly specific: (redact)
+    - Marriage date
+    - Birth date
+    - Home address
+    - Bank balance
+    - Invoice amount
+  - Borderline specific: shared by quite a few people, but still can be used
+    together with other bits of info to identify a person (redact)
+    - City of residence
+    - Specialty at one employer (e.g., "Cardiologist at UCSF")
+  - Not specific: (leave alone)
+    - Date of a transaction if hundreds of people probably made a transaction
+      at this retailer on that date
+    - Amount or fact that many people share (e.g., country of residence, fact
+      they own a dog, profession as "Physician" without place of work)
 
-const redactionPrompt = makeRedactionPrompt();
+For the redacted value, return ONLY the sensitive value, not the form field
+label, etc.: e.g., return \`03005988\`, not \`Passport card number 03005988\`.
+Remove empty spaces (e.g., even if represented in file as "0 3 0 5", return
+"0305").`;
 
 function mapRedactionBoxToBoundingBox(
   rawBox: RedactionBoxContent

@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 456,
+    "prompt_tokens": 2635,
+    "total_tokens": 3091
+  },
+  "id": "JuHbasOyMIqa_uMPmKTUkQs",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TxgaV+JNFUrrVdSu8rX3f8/OYWQJfjHeAMOuOYc3aOuVctyQupAPbsJNPfVft1QdoHCQN3ECY5q0H1b7AlMtboFqZ0frbmNpjJCwokpInzJjYUg=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean John\",\"minX\":427,\"minY\":113,\"maxX\":526,\"maxY\":129},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":571,\"minY\":114,\"maxX\":704,\"maxY\":129},{\"dataType\":\"idNumber\",\"text\":\"400-00-1038\",\"minX\":490,\"minY\":131,\"maxX\":602,\"maxY\":146},{\"dataType\":\"dateOfBirth\",\"text\":\"August 2, 1966\",\"minX\":463,\"minY\":519,\"maxX\":590,\"maxY\":535},{\"dataType\":\"dateOfBirth\",\"text\":\"March 19,1965\",\"minX\":487,\"minY\":537,\"maxX\":613,\"maxY\":553},{\"dataType\":\"dateOfBirth\",\"text\":\"July 20, 2006\",\"minX\":404,\"minY\":557,\"maxX\":518,\"maxY\":573},{\"dataType\":\"idNumber\",\"text\":\"876543\",\"minX\":450,\"minY\":575,\"maxX\":514,\"maxY\":591},{\"dataType\":\"dollarAmount\",\"text\":\"$425.00\",\"minX\":539,\"minY\":632,\"maxX\":608,\"maxY\":648},{\"dataType\":\"dollarAmount\",\"text\":\"$200\",\"minX\":160,\"minY\":687,\"maxX\":201,\"maxY\":703},{\"dataType\":\"dollarAmount\",\"text\":\"$250\",\"minX\":482,\"minY\":686,\"maxX\":523,\"maxY\":703}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792794925,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.00527,
+    "outputUSD": 0.00456,
+    "totalUSD": 0.00983
+  },
+  "timing": {
+    "msToFirstToken": 3925,
+    "outputTokensPerSecond": 154.36696005416383,
+    "totalTimeMs": 6879
+  }
+}

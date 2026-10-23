@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 537,
+    "prompt_tokens": 2625,
+    "total_tokens": 3162
+  },
+  "id": "PeHbavnTKbOr_uMPuJD7QA",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0ToO3iMHJ6pdNPjU/YchL/gbe7SMCV169zl0Mkq231Sq24fW3fAeyk/6LzLiq3XE3gFdF8zufWN2q6QQQZ2vlAYjJtnuW243xqYEHiSmfpwxq/xQ=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"idNumber\",\"text\":\"C03005988\",\"minX\":715,\"minY\":249,\"maxX\":909,\"maxY\":306},{\"dataType\":\"personName\",\"text\":\"TRAVELER\",\"minX\":401,\"minY\":381,\"maxX\":568,\"maxY\":427},{\"dataType\":\"personName\",\"text\":\"HAPPY\",\"minX\":475,\"minY\":492,\"maxX\":583,\"maxY\":543},{\"dataType\":\"dateOfBirth\",\"text\":\"1 JAN 1981\",\"minX\":581,\"minY\":604,\"maxX\":742,\"maxY\":654},{\"dataType\":\"address\",\"text\":\"NEW YORK, U.S.A.\",\"minX\":477,\"minY\":717,\"maxX\":747,\"maxY\":769},{\"dataType\":\"issueDate\",\"text\":\"30 NOV 2009\",\"minX\":486,\"minY\":815,\"maxX\":672,\"maxY\":866},{\"dataType\":\"expiryDate\",\"text\":\"29 NOV 2019\",\"minX\":702,\"minY\":818,\"maxX\":882,\"maxY\":868},{\"dataType\":\"personPhoto\",\"text\":\"Passport portrait\",\"minX\":23,\"minY\":228,\"maxX\":338,\"maxY\":845},{\"dataType\":\"personPhoto\",\"text\":\"Secondary ghost portrait\",\"minX\":839,\"minY\":457,\"maxX\":971,\"maxY\":710},{\"dataType\":\"idNumber\",\"text\":\"43309•W27S\",\"minX\":6,\"minY\":429,\"maxX\":27,\"maxY\":825},{\"dataType\":\"idNumber\",\"text\":\"M-6131821-07\",\"minX\":62,\"minY\":864,\"maxX\":263,\"maxY\":909},{\"dataType\":\"idNumber\",\"text\":\"1-02781-0\",\"minX\":805,\"minY\":874,\"maxX\":932,\"maxY\":915}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792794948,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.00525,
+    "outputUSD": 0.00537,
+    "totalUSD": 0.010620000000000001
+  },
+  "timing": {
+    "msToFirstToken": 2879,
+    "outputTokensPerSecond": 129.92983305105253,
+    "totalTimeMs": 7012
+  }
+}

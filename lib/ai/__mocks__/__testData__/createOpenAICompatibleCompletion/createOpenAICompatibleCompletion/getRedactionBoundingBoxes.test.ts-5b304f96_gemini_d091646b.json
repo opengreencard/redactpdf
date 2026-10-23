@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 502,
+    "prompt_tokens": 2635,
+    "total_tokens": 3137
+  },
+  "id": "UOHbaszOOdSu1MkP1_reqAM",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TdBl3Toaw8W7h8uiWBy11mUeKR5ubjzxgAHzDlVgI2hvr6wRMvHohr0Xm/VzFQz4a6e7jqHCQA/iaU+AtGaOsmMf60fFQmxy/1/Klws8AqeAvlg=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Jane Doe\",\"minX\":62,\"minY\":62,\"maxX\":128,\"maxY\":73},{\"dataType\":\"address\",\"text\":\"123 Example Street\\nSpringfield, IL 62701\",\"minX\":62,\"minY\":78,\"maxX\":214,\"maxY\":108},{\"dataType\":\"personName\",\"text\":\"Jane Doe\",\"minX\":179,\"minY\":264,\"maxX\":246,\"maxY\":275},{\"dataType\":\"idNumber\",\"text\":\"123456789\",\"minX\":359,\"minY\":264,\"maxX\":438,\"maxY\":275},{\"dataType\":\"personName\",\"text\":\"Jane Doe\",\"minX\":76,\"minY\":341,\"maxX\":142,\"maxY\":353},{\"dataType\":\"other\",\"text\":\"pediatric infectious disease\",\"minX\":357,\"minY\":341,\"maxX\":550,\"maxY\":354},{\"dataType\":\"organizationName\",\"text\":\"Example Hospital\",\"minX\":62,\"minY\":356,\"maxX\":189,\"maxY\":369},{\"dataType\":\"personName\",\"text\":\"John Roe\",\"minX\":62,\"minY\":372,\"maxX\":129,\"maxY\":383},{\"dataType\":\"organizationName\",\"text\":\"State University\",\"minX\":449,\"minY\":372,\"maxX\":562,\"maxY\":385},{\"dataType\":\"other\",\"text\":\"April 15, 2023\",\"minX\":292,\"minY\":387,\"maxX\":396,\"maxY\":400},{\"dataType\":\"address\",\"text\":\"Springfield\",\"minX\":62,\"minY\":402,\"maxX\":142,\"maxY\":416},{\"dataType\":\"address\",\"text\":\"Springfield\",\"minX\":350,\"minY\":402,\"maxX\":429,\"maxY\":416}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792794968,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.00527,
+    "outputUSD": 0.00502,
+    "totalUSD": 0.01029
+  },
+  "timing": {
+    "msToFirstToken": 4087,
+    "outputTokensPerSecond": 131.65486493574613,
+    "totalTimeMs": 7900
+  }
+}

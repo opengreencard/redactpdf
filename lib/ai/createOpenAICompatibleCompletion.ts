@@ -4,6 +4,7 @@ import type {
   ChatCompletionCreateParamsStreaming,
 } from 'openai/resources/chat/completions/completions';
 import { ApplicationError } from '../errors/applicationError';
+import { getModelPricing } from './modelPricing';
 
 /**
  * Providers backed by OpenAI-compatible chat-completions APIs.
@@ -46,6 +47,7 @@ export interface OpenAICompatibleCompletionUsage {
 
 /** Text and usage metadata returned by an OpenAI-compatible completion. */
 export interface OpenAICompatibleCompletionResult extends ChatCompletion {
+  cost: OpenAICompatibleCompletionCost;
   timing: OpenAICompatibleCompletionTiming;
 }
 
@@ -54,6 +56,13 @@ export interface OpenAICompatibleCompletionTiming {
   msToFirstToken: number | null;
   outputTokensPerSecond: number;
   totalTimeMs: number;
+}
+
+/** Estimated USD cost of one completion, from list prices. */
+export interface OpenAICompatibleCompletionCost {
+  inputUSD: number;
+  outputUSD: number;
+  totalUSD: number;
 }
 
 /**
@@ -67,6 +76,14 @@ export async function createOpenAICompatibleCompletion({
   provider,
   ...options
 }: CreateOpenAICompatibleCompletionOptions): Promise<OpenAICompatibleCompletionResult> {
+  // Check the price before the paid request, so an unpriced model fails fast.
+  const pricing = getModelPricing(options.model, new Date());
+  if (!pricing) {
+    throw new ApplicationError(
+      `No pricing in effect for ${options.model} via ${provider}. To fix this, look up the list price per 1M input and output tokens on the provider's pricing page, then add an entry for ${options.model} to modelPricingByName in lib/ai/modelPricing.ts. Entries are in time order; set introductoryPeriodEndTime on any entry whose prices end.`
+    );
+  }
+
   const startedAt = Date.now();
   const stream = getOrCreateOpenAIClient(provider).chat.completions.stream({
     ...options,
@@ -97,8 +114,25 @@ export async function createOpenAICompatibleCompletion({
     firstTokenAt === null ? null : firstTokenAt - startedAt;
   const generationTimeMs =
     msToFirstToken === null ? totalTimeMs : totalTimeMs - msToFirstToken;
+  const { usage } = response;
+  if (!usage) {
+    throw new ApplicationError(`No token usage returned for ${options.model}.`);
+  }
+  // completion_tokens leaves out thinking tokens, but total_tokens includes
+  // them. Google bills thinking at the output rate, so bill everything after
+  // the prompt.
+  const inputUSD =
+    (usage.prompt_tokens * pricing.inputUSDPerMillionTokens) / 1_000_000;
+  const outputTokens = usage.total_tokens - usage.prompt_tokens;
+  const outputUSD =
+    (outputTokens * pricing.outputUSDPerMillionTokens) / 1_000_000;
   return {
     ...response,
+    cost: {
+      inputUSD,
+      outputUSD,
+      totalUSD: inputUSD + outputUSD,
+    },
     timing: {
       msToFirstToken,
       outputTokensPerSecond:

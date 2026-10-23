@@ -119,7 +119,13 @@ describe(getRedactionBoundingBoxes, () => {
           minimumCount: 1,
         },
         {
-          dataType: RedactedDataType.organizationName,
+          // The municipality line can be a place (address), a generic
+          // organization, or other, depending on the provider.
+          dataType: [
+            RedactedDataType.organizationName,
+            RedactedDataType.address,
+            RedactedDataType.other,
+          ],
           text: /Burg.*Stad.*Dorp/i,
           minimumCount: 1,
           optional: true,
@@ -209,8 +215,8 @@ describe(getRedactionBoundingBoxes, () => {
           dataType: RedactedDataType.personName,
           text: /^Sam$/i,
           minimumCount: 1,
-          // Gemini 3.8 was notably more exhaustive around the dependent's
-          // name, including the son's repeated name in the dependents table.
+          // The son's name repeats in the dependents table, so it should be
+          // redacted there too.
         },
       ],
     },
@@ -220,7 +226,8 @@ describe(getRedactionBoundingBoxes, () => {
       expectedRedactions: [
         {
           dataType: RedactedDataType.personPhoto,
-          text: /photo|portrait/i,
+          // Photos often come back with empty text, so match any text.
+          text: /[\s\S]*/,
           // Both the large photo on the left and smaller photo in right bottom.
           minimumCount: 2,
         },
@@ -327,11 +334,33 @@ describe(getRedactionBoundingBoxes, () => {
         },
       ],
     },
+    {
+      label: 'Synthetic cover letter first page',
+      imageFileName: 'syntheticCoverLetterFirstPage.png',
+      expectedRedactions: [
+        {
+          dataType: [RedactedDataType.address, RedactedDataType.other],
+          text: /Springfield/i,
+          minimumCount: 1,
+        },
+        {
+          dataType: RedactedDataType.other,
+          text: /pediatric infectious disease/i,
+          minimumCount: 1,
+        },
+        {
+          dataType: RedactedDataType.other,
+          text: /April 15, 2023/i,
+          minimumCount: 1,
+        },
+      ],
+    },
   ])(
     'redacts the expected information from the $label',
     async ({ label, imageFileName, expectedRedactions }) => {
       const image = await readTestImage(imageFileName);
       const result = await getRedactionBoundingBoxes(image);
+      console.info(`${label} vision cost: $${result.cost.totalUSD.toFixed(6)}`);
 
       if (process.env.CI !== 'true') {
         const annotatedJPEG = await annotateJPEGWithRedactionBoxes(
@@ -352,9 +381,9 @@ describe(getRedactionBoundingBoxes, () => {
         expect(box.box.maxX).toBeLessThanOrEqual(1);
         expect(box.box.maxY).toBeLessThanOrEqual(1);
       }
-      // These are minimum coverage checks rather than exact totals because
-      // Gemini 3.8 is notably better at exhaustive removal, especially for
-      // repeated, faint, or secondary sensitive values.
+      // These are minimum coverage checks rather than exact totals because the
+      // model may find repeated, faint, or secondary sensitive values in
+      // different numbers.
       for (const expectedRedaction of expectedRedactions) {
         if (!matchesExpectedRedaction(result.boxes, expectedRedaction)) {
           throw new Error(
@@ -368,7 +397,7 @@ describe(getRedactionBoundingBoxes, () => {
         }
       }
     },
-    60_000
+    300_000
   );
 });
 

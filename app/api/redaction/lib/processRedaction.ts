@@ -5,6 +5,7 @@ import {
   RedactionStatus,
 } from '../../../../lib/redaction/redactionTypes';
 import type { PageSize } from '../../../../lib/pdf/pdfTypes';
+import type { OpenAICompatibleCompletionCost } from '../../../../lib/ai/createOpenAICompatibleCompletion';
 import {
   compressImage,
   processPDFPagesInBatches,
@@ -30,10 +31,12 @@ import { putRedactionImage } from '../../../../lib/storage/storageFunctions/reda
  */
 const visionQueue = new PQueue({ concurrency: 32 });
 
-/** Timing and success information for one page's vision request. */
+/** Timing, cost, and success information for one page's vision request. */
 export interface ProcessRedactionPageTiming {
   page: number;
   visionTimeMs: number;
+  /** Null when the vision request failed, so no completion came back. */
+  cost: OpenAICompatibleCompletionCost | null;
   succeeded: boolean;
 }
 
@@ -160,6 +163,7 @@ async function processImage({
           timing: {
             page,
             visionTimeMs: Date.now() - visionStartedAt,
+            cost: result.cost,
             succeeded: true,
           },
           errorMessage: null,
@@ -176,6 +180,7 @@ async function processImage({
           timing: {
             page,
             visionTimeMs: Date.now() - visionStartedAt,
+            cost: null,
             succeeded: false,
           },
           errorMessage: error.message,

@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 783,
+    "prompt_tokens": 2613,
+    "total_tokens": 3396
+  },
+  "id": "JeHbarXpPPnP_uMP47v7OA",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0Tuwjk3Alv664c4WAM28qgdi2QqpxjlsOBPmjvS8HIUP4lEnmk+4F5hG8SSjcmPAZ0GVSxgWMax5jQjvNYApo7dM14GQjXtT6FeBGg1RKvxryHBA=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"idNumber\",\"text\":\"SPECI2014\",\"minX\":871,\"minY\":89,\"maxX\":951,\"maxY\":426},{\"dataType\":\"idNumber\",\"text\":\"SPECI2014\",\"minX\":721,\"minY\":569,\"maxX\":843,\"maxY\":585},{\"dataType\":\"personName\",\"text\":\"De Bruijn\",\"minX\":330,\"minY\":597,\"maxX\":448,\"maxY\":615},{\"dataType\":\"personName\",\"text\":\"e/v Molenaar\",\"minX\":329,\"minY\":616,\"maxX\":482,\"maxY\":633},{\"dataType\":\"personName\",\"text\":\"Willeke Liselotte\",\"minX\":330,\"minY\":643,\"maxX\":516,\"maxY\":660},{\"dataType\":\"dateOfBirth\",\"text\":\"10 MAA/MAR 1965\",\"minX\":328,\"minY\":669,\"maxX\":557,\"maxY\":686},{\"dataType\":\"address\",\"text\":\"Specimen\",\"minX\":330,\"minY\":698,\"maxX\":440,\"maxY\":715},{\"dataType\":\"other\",\"text\":\"V/F\",\"minX\":330,\"minY\":726,\"maxX\":372,\"maxY\":743},{\"dataType\":\"other\",\"text\":\"1,75 m\",\"minX\":745,\"minY\":726,\"maxX\":829,\"maxY\":743},{\"dataType\":\"issueDate\",\"text\":\"09 MAA/MAR 2014\",\"minX\":331,\"minY\":753,\"maxX\":539,\"maxY\":770},{\"dataType\":\"expiryDate\",\"text\":\"09 MAA/MAR 2024\",\"minX\":748,\"minY\":752,\"maxX\":959,\"maxY\":769},{\"dataType\":\"organizationName\",\"text\":\"Burg. van Stad en Dorp\",\"minX\":626,\"minY\":781,\"maxX\":859,\"maxY\":797},{\"dataType\":\"signature\",\"text\":\"W.L. de Bruijn\",\"minX\":333,\"minY\":798,\"maxX\":587,\"maxY\":837},{\"dataType\":\"personPhoto\",\"text\":\"main passport portrait\",\"minX\":54,\"minY\":569,\"maxX\":304,\"maxY\":815},{\"dataType\":\"personPhoto\",\"text\":\"secondary passport portrait\",\"minX\":623,\"minY\":664,\"maxX\":736,\"maxY\":769},{\"dataType\":\"personName\",\"text\":\"P<NLDDE<BRUIJN<<WILLEKE<LISELOTTE<<<<<<<<<<<\",\"minX\":65,\"minY\":879,\"maxX\":932,\"maxY\":900},{\"dataType\":\"idNumber\",\"text\":\"SPECI20142NLD6503101F2403096999999990<<<<<84\",\"minX\":65,\"minY\":913,\"maxX\":932,\"maxY\":935}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792794926,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.005226,
+    "outputUSD": 0.00783,
+    "totalUSD": 0.013056
+  },
+  "timing": {
+    "msToFirstToken": 3463,
+    "outputTokensPerSecond": 136.05560382276283,
+    "totalTimeMs": 9218
+  }
+}
