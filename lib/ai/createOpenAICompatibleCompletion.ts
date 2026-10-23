@@ -78,7 +78,9 @@ export async function createOpenAICompatibleCompletion({
   // Check the price before the paid request, so an unpriced model fails fast.
   const pricing = modelPricingByName[options.model];
   if (!pricing) {
-    throw new ApplicationError(`No pricing configured for ${options.model}.`);
+    throw new ApplicationError(
+      `No pricing configured for ${options.model} via ${provider}. To fix this, look up the list price per 1M input and output tokens on the provider's pricing page, then add an entry for ${options.model} to modelPricingByName in lib/ai/createOpenAICompatibleCompletion.ts.`
+    );
   }
 
   const startedAt = Date.now();
