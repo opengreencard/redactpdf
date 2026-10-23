@@ -32,16 +32,15 @@ export function getModelPricing(
  * Current paid-tier list prices from
  * https://ai.google.dev/gemini-api/docs/pricing, checked 2026-10-23.
  *
- * The pricing page gives cutoff dates without a time zone. We assume midnight
- * Pacific time, which is a guess. When a model's price changes again, add
- * another entry at the end and set the previous entry's cutoff.
+ * When a model's price changes again, add another entry at the end and set the
+ * previous entry's cutoff.
  */
 const modelPricingByName: Record<string, ModelPricingEntry[]> = {
   'gemini-4-argon': [
     {
       inputUSDPerMillionTokens: 2,
       outputUSDPerMillionTokens: 10,
-      introductoryPeriodEndTime: new Date('2026-12-01T00:00:00-08:00'),
+      introductoryPeriodEndTime: new Date('2026-12-01T00:00:00Z'),
     },
     { inputUSDPerMillionTokens: 4, outputUSDPerMillionTokens: 20 },
   ],
@@ -49,7 +48,7 @@ const modelPricingByName: Record<string, ModelPricingEntry[]> = {
     {
       inputUSDPerMillionTokens: 0.75,
       outputUSDPerMillionTokens: 3.75,
-      introductoryPeriodEndTime: new Date('2027-01-01T00:00:00-08:00'),
+      introductoryPeriodEndTime: new Date('2027-01-01T00:00:00Z'),
     },
     { inputUSDPerMillionTokens: 1.5, outputUSDPerMillionTokens: 7.5 },
   ],
