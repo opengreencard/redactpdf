@@ -1,7 +1,7 @@
 import { getModelPricing } from './modelPricing';
 
 describe('getModelPricing', () => {
-  // One minute before the Pacific midnight cutoff, the introductory prices apply.
+  // One second before the assumed Pacific midnight cutoff, introductory prices apply.
   it('uses introductory prices before the cutoff', () => {
     expect(
       getModelPricing('gemini-4-argon', new Date('2026-11-30T23:59:59-08:00'))

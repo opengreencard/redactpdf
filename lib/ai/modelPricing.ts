@@ -32,7 +32,8 @@ export function getModelPricing(
  * Current paid-tier list prices from
  * https://ai.google.dev/gemini-api/docs/pricing, checked 2026-10-23.
  *
- * Cutoffs are midnight Pacific time. When a model's price changes again, add
+ * The pricing page gives cutoff dates without a time zone. We assume midnight
+ * Pacific time, which is a guess. When a model's price changes again, add
  * another entry at the end and set the previous entry's cutoff.
  */
 const modelPricingByName: Record<string, ModelPricingEntry[]> = {
