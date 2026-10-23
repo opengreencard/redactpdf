@@ -4,6 +4,7 @@ import type {
   ChatCompletionCreateParamsStreaming,
 } from 'openai/resources/chat/completions/completions';
 import { ApplicationError } from '../errors/applicationError';
+import { getModelPricing } from './modelPricing';
 
 /**
  * Providers backed by OpenAI-compatible chat-completions APIs.
@@ -76,10 +77,10 @@ export async function createOpenAICompatibleCompletion({
   ...options
 }: CreateOpenAICompatibleCompletionOptions): Promise<OpenAICompatibleCompletionResult> {
   // Check the price before the paid request, so an unpriced model fails fast.
-  const pricing = modelPricingByName[options.model];
+  const pricing = getModelPricing(options.model, new Date());
   if (!pricing) {
     throw new ApplicationError(
-      `No pricing configured for ${options.model} via ${provider}. To fix this, look up the list price per 1M input and output tokens on the provider's pricing page, then add an entry for ${options.model} to modelPricingByName in lib/ai/createOpenAICompatibleCompletion.ts.`
+      `No pricing in effect for ${options.model} via ${provider}. To fix this, look up the list price per 1M input and output tokens on the provider's pricing page, then add an entry for ${options.model} to modelPricingByName in lib/ai/modelPricing.ts. Entries are in time order; set introductoryPeriodEndTime on any entry whose prices end.`
     );
   }
 
@@ -143,31 +144,6 @@ export async function createOpenAICompatibleCompletion({
     },
   };
 }
-
-/** USD per 1M tokens for one model. */
-interface ModelPricing {
-  inputUSDPerMillionTokens: number;
-  outputUSDPerMillionTokens: number;
-}
-
-/**
- * Standard paid-tier list prices from
- * https://ai.google.dev/gemini-api/docs/pricing, checked 2026-10-23.
- *
- * Prices step up later, so update these when they do:
- * - Gemini 4 Argon: Dec 1, 2026 ($4 input, $20 output)
- * - Gemini 3.8 Flash: Jan 1, 2027 ($1.50 input, $7.50 output)
- */
-const modelPricingByName: Record<string, ModelPricing> = {
-  'gemini-4-argon': {
-    inputUSDPerMillionTokens: 2,
-    outputUSDPerMillionTokens: 10,
-  },
-  'gemini-3.8-flash': {
-    inputUSDPerMillionTokens: 0.75,
-    outputUSDPerMillionTokens: 3.75,
-  },
-};
 
 interface ProviderConfiguration {
   apiKey: string | undefined;
