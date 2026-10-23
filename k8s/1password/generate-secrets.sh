@@ -79,6 +79,7 @@ s3SecretAccessKey=''
 googleClientId=''
 googleClientSecret=''
 geminiAPIKey=''
+typeSafeAPIKey=''
 
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'S3_ACCESS_KEY_ID'; then
   echo 'Enter external provider secrets:'
@@ -109,6 +110,12 @@ if [ "$OVERWRITE" = 'true' ] || ! hasField 'GEMINI_API_KEY'; then
   [ -n "$geminiAPIKey" ] || { echo 'Error: Gemini API key is required.'; exit 1; }
 fi
 
+if [ "$OVERWRITE" = 'true' ] || ! hasField 'TYPESAFE_API_KEY'; then
+  read -rsp 'TypeSafe API key (https://docs.typesafe.ai/introduction/quickstart): ' typeSafeAPIKey
+  echo
+  [ -n "$typeSafeAPIKey" ] || { echo 'Error: TypeSafe API key is required.'; exit 1; }
+fi
+
 if [ "$OVERWRITE" = 'true' ] || ! hasField 'DB_PASS'; then
   dbPass=$(openssl rand -base64 32)
 fi
@@ -136,6 +143,7 @@ addField 'GOOGLE_CLIENT_SECRET' "$googleClientSecret"
 addField 'S3_ACCESS_KEY_ID' "$s3AccessKeyId"
 addField 'S3_SECRET_ACCESS_KEY' "$s3SecretAccessKey"
 addField 'GEMINI_API_KEY' "$geminiAPIKey"
+addField 'TYPESAFE_API_KEY' "$typeSafeAPIKey"
 
 if [ ${#fieldAssignments[@]} -eq 0 ]; then
   echo "No new or missing fields to add. All secrets are already set in $itemFQN."

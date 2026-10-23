@@ -255,7 +255,8 @@ const LandingPagePrivacy: React.FunctionComponent = React.memo(
           <Text size="sm" c="gray.6">
             To find likely sensitive information, we send page images to{' '}
             {userFacingRedactionBoundingBoxesModel} through the Gemini Developer
-            API.
+            API. We also send small crops of those pages to TypeSafe to tighten
+            each suggested outline.
           </Text>
         </Stack>
       </LandingPageSection>
@@ -562,7 +563,7 @@ const faqItems: FaqItem[] = [
   },
   {
     question: 'Do you send files to a cloud AI model?',
-    answer: `Yes. We send page images to ${userFacingRedactionBoundingBoxesModel} to suggest redactions. We delete the original PDF, page images, and working files ${_deleteOldRedactionHoursText}.`,
+    answer: `Yes. We send page images to ${userFacingRedactionBoundingBoxesModel} to suggest redactions, and small crops of those pages to TypeSafe to tighten each outline. We delete the original PDF, page images, and working files ${_deleteOldRedactionHoursText}.`,
   },
   {
     question: 'Is this open source?',

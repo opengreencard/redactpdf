@@ -155,6 +155,10 @@ const PrivacyPolicyPage: React.FunctionComponent = React.memo(
               detections or false positives.
             </Text>
             <Text>
+              To tighten the outline of each suggested area, we also send small
+              crops of those pages to TypeSafe (typesafe.ai).
+            </Text>
+            <Text>
               We use submitted documents to provide the requested Service and do
               not intentionally use them to train our own models. Third-party
               providers may process data under their own terms and policies. Do

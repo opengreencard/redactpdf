@@ -1,0 +1,10 @@
+{
+  "box": {
+    "top": 0.43,
+    "bottom": 0.65,
+    "left": 0.05,
+    "right": 0.26
+  },
+  "confidence": 0.33,
+  "inputTokens": 519
+}

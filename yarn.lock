@@ -5092,6 +5092,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@typesafe-ai/sdk@npm:0.7.0":
+  version: 0.7.0
+  resolution: "@typesafe-ai/sdk@npm:0.7.0"
+  checksum: 10c0/a48b8e9ce1367caa2cb25e51f2a1e33b15b4371577bd4ebd9d582a8345e43f907caf9cfae4eda68ce433cdcd035d7b92c612c79d0bcd9b6dbffc1eba44d92827
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/eslint-plugin@npm:7.18.0, @typescript-eslint/eslint-plugin@npm:^7.18.0":
   version: 7.18.0
   resolution: "@typescript-eslint/eslint-plugin@npm:7.18.0"
@@ -14037,6 +14044,7 @@ __metadata:
     "@types/randomstring": "npm:^1"
     "@types/react": "npm:^19"
     "@types/react-dom": "npm:^19"
+    "@typesafe-ai/sdk": "npm:0.7.0"
     "@typescript-eslint/eslint-plugin": "npm:^7.18.0"
     "@typescript-eslint/parser": "npm:^7.18.0"
     axios: "npm:^1.19.0"

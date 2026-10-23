@@ -10,6 +10,7 @@ import {
   processPDFPagesInBatches,
 } from '../../../../lib/pdf/pdfToImage';
 import { getRedactionBoundingBoxes } from '../../../../lib/redaction/getRedactionBoundingBoxes';
+import { refineRedactionBoxes } from '../../../../lib/redaction/refineRedactionBoxes';
 import { putRedactionImage } from '../../../../lib/storage/storageFunctions/redactionImage';
 
 /**
@@ -152,6 +153,33 @@ async function processImage({
     (async (): Promise<ProcessImageResult> => {
       try {
         const result = await getRedactionBoundingBoxes(visionJPEG);
+        // Shadow run: refine the boxes with Box and log the summary, but keep
+        // the Gemini boxes as the output until the refined boxes are checked.
+        // A failure here must not fail the page.
+        try {
+          const refinement = await refineRedactionBoxes({
+            previewJPEG,
+            boxes: result.boxes,
+            debugSink: null,
+          });
+          // eslint-disable-next-line no-console -- shadow-run summary while Box refinement is evaluated
+          console.info(
+            JSON.stringify({
+              key,
+              page,
+              boxCount: result.boxes.length,
+              refinedCount: refinement.refinedCount,
+              keptApproximateCount: refinement.keptApproximateCount,
+              inputTokens: refinement.inputTokens,
+            })
+          );
+        } catch (error) {
+          // eslint-disable-next-line no-console -- shadow failures are logged, not surfaced to users
+          console.error(
+            `Could not refine boxes for ${key}, page ${page}.`,
+            error
+          );
+        }
         const processResult: ProcessImageResult = {
           boundingBoxes: result.boxes.map((box): RedactionBoundingBox => ({
             ...box,

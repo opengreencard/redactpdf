@@ -53,6 +53,7 @@
     "@mantine/hooks": "9.6.3",
     "@mantine/lightbox": "9.6.3",
     "@mantine/notifications": "9.6.3",
+    "@typesafe-ai/sdk": "0.7.0",
     "axios": "^1.19.0",
     "bcrypt": "^6.0.0",
     "croner": "^10.0.1",
