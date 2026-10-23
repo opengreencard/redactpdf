@@ -30,11 +30,11 @@ export interface GetRedactionBoundingBoxesResult {
 export async function getRedactionBoundingBoxes(
   image: Uint8Array
 ): Promise<GetRedactionBoundingBoxesResult> {
-  const response = await requestRedactionVision(
-    makeImageDataURL(image),
-    redactionPrompt,
-    redactionResponseJSONSchema
-  );
+  const response = await requestRedactionVision({
+    imageDataURL: makeImageDataURL(image),
+    prompt: redactionPrompt,
+    responseSchema: redactionResponseJSONSchema,
+  });
   const { boxes } = parseRedactionResponse(
     response.choices[0]?.message.content
   );
@@ -128,13 +128,20 @@ const redactionResponseSchema: z.ZodType<RedactionResponse> = z.object({
   boxes: redactionBoxSchema.array(),
 });
 
-// TODO: Use a keyed parameter object now that max-params is 2.
-// eslint-disable-next-line max-params
-function requestRedactionVision(
-  imageDataURL: string,
-  prompt: string,
-  responseSchema: Record<string, unknown>
-): ReturnType<typeof createOpenAICompatibleCompletion> {
+/** Inputs for one vision request. */
+interface RequestRedactionVisionOptions {
+  imageDataURL: string;
+  prompt: string;
+  responseSchema: Record<string, unknown>;
+}
+
+function requestRedactionVision({
+  imageDataURL,
+  prompt,
+  responseSchema,
+}: RequestRedactionVisionOptions): ReturnType<
+  typeof createOpenAICompatibleCompletion
+> {
   return createOpenAICompatibleCompletion({
     provider: OpenAICompatibleProvider.gemini,
     model: redactionBoundingBoxesModel,
@@ -179,15 +186,14 @@ function makeImageDataURL(image: Uint8Array): string {
   return `data:image/jpeg;base64,${Buffer.from(image).toString('base64')}`;
 }
 
-function makeRedactionPrompt(): string {
-  const dataTypeLines = Object.values(RedactedDataType)
-    .map(
-      (dataType): string =>
-        `- ${dataType}: ${redactedDataTypeToDescription[dataType]}`
-    )
-    .join('\n');
+const dataTypeLines = Object.values(RedactedDataType)
+  .map(
+    (dataType): string =>
+      `- ${dataType}: ${redactedDataTypeToDescription[dataType]}`
+  )
+  .join('\n');
 
-  return `Find every item on this page that could identify or embarrass someone
+const redactionPrompt = `Find every item on this page that could identify or embarrass someone
 and should be redacted. Err toward over-redacting, including faded, blurred,
 or scanned-in content.
 
@@ -211,10 +217,28 @@ large rather than too small.
   questions.
 - Photos: cover the entire visible photo, including faded or ghost images.
 
-For example, return \`03005988\`, not \`Passport card number 03005988\`.`;
-}
+When to redact and when not to redact:
+- Specificity: redact details that give lots of bits of info about a person:
+  - Highly specific: (redact)
+    - Marriage date
+    - Birth date
+    - Home address
+    - Bank balance
+    - Invoice amount
+  - Borderline specific: shared by quite a few people, but still can be used
+    together with other bits of info to identify a person (redact)
+    - City of residence
+    - Specialty at one employer (e.g., "Cardiologist at UCSF")
+  - Not specific: (leave alone)
+    - Date of a transaction if hundreds of people probably made a transaction
+      at this retailer on that date
+    - Amount or fact that many people share (e.g., country of residence, fact
+      they own a dog, profession as "Physician" without place of work)
 
-const redactionPrompt = makeRedactionPrompt();
+For the redacted value, return ONLY the sensitive value, not the form field
+label, etc.: e.g., return \`03005988\`, not \`Passport card number 03005988\`.
+Remove empty spaces (e.g., even if represented in file as "0 3 0 5", return
+"0305").`;
 
 function mapRedactionBoxToBoundingBox(
   rawBox: RedactionBoxContent

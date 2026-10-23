@@ -327,6 +327,27 @@ describe(getRedactionBoundingBoxes, () => {
         },
       ],
     },
+    {
+      label: 'Synthetic cover letter first page',
+      imageFileName: 'syntheticCoverLetterFirstPage.png',
+      expectedRedactions: [
+        {
+          dataType: [RedactedDataType.address, RedactedDataType.other],
+          text: /Springfield/i,
+          minimumCount: 1,
+        },
+        {
+          dataType: RedactedDataType.other,
+          text: /pediatric infectious disease/i,
+          minimumCount: 1,
+        },
+        {
+          dataType: RedactedDataType.other,
+          text: /April 15, 2023/i,
+          minimumCount: 1,
+        },
+      ],
+    },
   ])(
     'redacts the expected information from the $label',
     async ({ label, imageFileName, expectedRedactions }) => {
