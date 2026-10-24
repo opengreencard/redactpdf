@@ -88,6 +88,7 @@ function makeGenericGetRedactionResponse(
     status: options.status ?? RedactionStatus.redacting,
     pageCount: options.pageCount ?? 1,
     createdAt: options.createdAt ?? '2026-01-01T00:00:00.000Z',
+    originalFileName: options.originalFileName ?? 'Document.pdf',
   };
   return response;
 }
@@ -106,6 +107,7 @@ function makeRedactedGetRedactionResponse(
       makeAutoRedactionBoundingBox(),
     ],
     createdAt: options.createdAt ?? '2026-01-01T00:00:00.000Z',
+    originalFileName: options.originalFileName ?? 'Document.pdf',
   };
   return response;
 }

@@ -17,6 +17,8 @@ export const _maxRedactionPageCount = 100;
 /** The server input for creating a redaction document. */
 export interface UploadFileForRedactionRequest {
   buffer: Buffer;
+  /** The user's file name, kept so the download can reuse it. */
+  fileName: string;
 }
 
 /** The key and page count needed to open the redaction page after upload. */
@@ -34,6 +36,7 @@ export interface UploadFileForRedactionResponse {
  */
 export async function uploadFileForRedaction({
   buffer,
+  fileName,
 }: UploadFileForRedactionRequest): Promise<UploadFileForRedactionResponse> {
   if (buffer.length > _maxRedactionFileSizeBytes) {
     throw new ApplicationError(
@@ -52,6 +55,7 @@ export async function uploadFileForRedaction({
     pageSizes: null,
     redactionBoundingBoxes: [],
     status: RedactionStatus.redacting,
+    originalFileName: fileName,
     errorMessage: null,
     // Cleanup clocks from openedAt. Upload is the first "open": if nobody
     // ever reviews the file, we still want it to expire after the idle

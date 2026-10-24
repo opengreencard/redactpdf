@@ -35,21 +35,26 @@ describe(uploadFileForRedaction, () => {
   });
 
   it('stores a valid PDF and creates a redacting row', async () => {
-    const result = await uploadFileForRedaction({ buffer: onePagePDF });
+    const result = await uploadFileForRedaction({
+      buffer: onePagePDF,
+      fileName: 'Passport.pdf',
+    });
 
     expect(result.key).toHaveLength(redactionKeyLength);
     expect(result.pageCount).toBe(1);
 
     const redaction = (await Redaction.findOne({
       where: { key: result.key },
-      attributes: ['status', 'redactionBoundingBoxes'],
+      attributes: ['status', 'redactionBoundingBoxes', 'originalFileName'],
     })) as PartialInstance<
       RedactionAttributes,
-      'status' | 'redactionBoundingBoxes'
+      'status' | 'redactionBoundingBoxes' | 'originalFileName'
     > | null;
     expect(redaction).not.toBeNull();
     expect(redaction?.status).toBe(RedactionStatus.redacting);
     expect(redaction?.redactionBoundingBoxes).toEqual([]);
+    // Downloads are named from this, so it must match the upload's name.
+    expect(redaction?.originalFileName).toBe('Passport.pdf');
     const storedPDF = await getRedactionFile(result.key);
     expect(storedPDF).toEqual(onePagePDF);
   });
@@ -62,7 +67,10 @@ describe(uploadFileForRedaction, () => {
     const redactionCountBefore = await Redaction.count();
 
     await expect(
-      uploadFileForRedaction({ buffer: Buffer.from('not a PDF') })
+      uploadFileForRedaction({
+        buffer: Buffer.from('not a PDF'),
+        fileName: 'Passport.pdf',
+      })
     ).rejects.toMatchObject({ statusCode: 400 });
 
     expect(await Redaction.count()).toBe(redactionCountBefore);
@@ -73,7 +81,7 @@ describe(uploadFileForRedaction, () => {
     const emptyPDF = makeZeroPagePDFBuffer();
 
     await expect(
-      uploadFileForRedaction({ buffer: emptyPDF })
+      uploadFileForRedaction({ buffer: emptyPDF, fileName: 'Passport.pdf' })
     ).rejects.toMatchObject({ statusCode: 400 });
 
     expect(await Redaction.count()).toBe(redactionCountBefore);
@@ -84,7 +92,10 @@ describe(uploadFileForRedaction, () => {
     const oversizedBuffer = Buffer.alloc(_maxRedactionFileSizeBytes + 1);
 
     await expect(
-      uploadFileForRedaction({ buffer: oversizedBuffer })
+      uploadFileForRedaction({
+        buffer: oversizedBuffer,
+        fileName: 'Passport.pdf',
+      })
     ).rejects.toMatchObject({ statusCode: 413 });
 
     expect(await Redaction.count()).toBe(redactionCountBefore);
@@ -94,14 +105,20 @@ describe(uploadFileForRedaction, () => {
     const redactionCountBefore = await Redaction.count();
 
     await expect(
-      uploadFileForRedaction({ buffer: tooManyPagesPDF })
+      uploadFileForRedaction({
+        buffer: tooManyPagesPDF,
+        fileName: 'Passport.pdf',
+      })
     ).rejects.toMatchObject({ statusCode: 413 });
 
     expect(await Redaction.count()).toBe(redactionCountBefore);
   });
 
   it('starts processing without waiting for it to finish', async () => {
-    const result = await uploadFileForRedaction({ buffer: onePagePDF });
+    const result = await uploadFileForRedaction({
+      buffer: onePagePDF,
+      fileName: 'Passport.pdf',
+    });
 
     expect(result.pageCount).toBe(1);
     expect(processRedaction).toHaveBeenCalledWith(
@@ -116,7 +133,7 @@ describe(uploadFileForRedaction, () => {
       .mockRejectedValueOnce(new Error('database unavailable'));
 
     await expect(
-      uploadFileForRedaction({ buffer: onePagePDF })
+      uploadFileForRedaction({ buffer: onePagePDF, fileName: 'Passport.pdf' })
     ).rejects.toThrow('database unavailable');
 
     const [putOptions] = jest.mocked(putObject).mock.calls[0];
@@ -131,7 +148,7 @@ describe(uploadFileForRedaction, () => {
     jest.mocked(putObject).mockRejectedValue(new Error('storage unavailable'));
 
     await expect(
-      uploadFileForRedaction({ buffer: onePagePDF })
+      uploadFileForRedaction({ buffer: onePagePDF, fileName: 'Passport.pdf' })
     ).rejects.toThrow('storage unavailable');
 
     expect(await Redaction.count()).toBe(redactionCountBefore);

@@ -8,18 +8,22 @@ import { notifications } from '@mantine/notifications';
 import Button from '../designSystem/Button/Button';
 import { useAPICall } from '../../lib/hookUtilities/useAPICall';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
-import {
-  GenerateRedactedPDFClientRequest,
-  generateRedactedPDFClient,
-} from '../clientLib/api/redaction';
+import { generateRedactedPDFClient } from '../clientLib/api/redaction';
 import { downloadArrayBufferAsFile } from '../clientLib/downloadArrayBufferAsFile';
 import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
+import { makeRedactedPDFFileName } from '../../lib/redaction/makeRedactedPDFFileName';
 import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
 import type { ButtonSection } from '../designSystem/Button/ButtonLeftOrRightSection';
 import rules from '../designSystem/Rule.module.css';
 import RedactionBoundingBoxList, {
   RedactionBoundingBoxListProps,
 } from './RedactionBoundingBoxList';
+
+/** Arguments for one PDF download. The name is built from the document's upload name. */
+interface DownloadRedactedPDFRequest {
+  key: string;
+  fileName: string;
+}
 
 interface RedactionPanelOwnProps {
   redactionKey: string;
@@ -48,14 +52,17 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
     };
     const { call: startDownload, state: downloadState } = useAPICall(
       useMemoizedCallback(
-        async ({ key }: GenerateRedactedPDFClientRequest): Promise<void> => {
+        async ({
+          key,
+          fileName,
+        }: DownloadRedactedPDFRequest): Promise<void> => {
           const arrayBuffer = await generateRedactedPDFClient({
             key,
           });
           downloadArrayBufferAsFile({
             arrayBuffer,
             contentType: 'application/pdf',
-            fileName: 'redacted.pdf',
+            fileName,
           });
         },
         []
@@ -64,7 +71,10 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
     const isDownloadPending = downloadState?.status === 'inProgress';
 
     const handleDownload = useMemoizedCallback(async () => {
-      const outcome = await startDownload({ key: redactionKey });
+      const outcome = await startDownload({
+        key: redactionKey,
+        fileName: makeRedactedPDFFileName(redaction.originalFileName),
+      });
       if (outcome.status === 'error') {
         const notification: NotificationData = {
           color: 'red',
@@ -74,7 +84,7 @@ const RedactionPanel: React.FunctionComponent<RedactionPanelProps> = React.memo(
         };
         notifications.show(notification);
       }
-    }, [redactionKey, startDownload]);
+    }, [redaction.originalFileName, redactionKey, startDownload]);
 
     return (
       <Stack gap={0} mih={0} h="100%" data-testid={_redactionPanelTestId}>

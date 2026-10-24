@@ -38,6 +38,7 @@ async function makeDBRedaction(
           : defaultPageSizesForStatus({ status, pageCount }),
       redactionBoundingBoxes: options.redactionBoundingBoxes ?? [],
       status,
+      originalFileName: options.originalFileName ?? 'Document.pdf',
       errorMessage: options.errorMessage ?? null,
       openedAt: options.openedAt ?? new Date(),
     };

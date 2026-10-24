@@ -37,6 +37,8 @@ export interface RedactionAttributes {
   redactionBoundingBoxes: RedactionBoundingBox[];
   /** `redacting` while the background job runs, then `redacted` or `error`. */
   status: RedactionStatus;
+  /** File name the user uploaded, used to name the download. */
+  originalFileName: string;
   /** If the redaction errors, the error message that we got */
   errorMessage: string | null;
   /**
@@ -96,6 +98,10 @@ const Redaction = db.define<
     },
     status: {
       type: DataTypes.ENUM(...Object.values(RedactionStatus)),
+      allowNull: false,
+    },
+    originalFileName: {
+      type: DataTypes.TEXT(),
       allowNull: false,
     },
     errorMessage: {
