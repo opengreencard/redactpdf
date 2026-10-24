@@ -37,10 +37,7 @@ export interface RedactionAttributes {
   redactionBoundingBoxes: RedactionBoundingBox[];
   /** `redacting` while the background job runs, then `redacted` or `error`. */
   status: RedactionStatus;
-  /**
-   * File name the user uploaded, used to name the download. Empty for rows
-   * created before this column existed.
-   */
+  /** File name the user uploaded, used to name the download. */
   originalFileName: string;
   /** If the redaction errors, the error message that we got */
   errorMessage: string | null;

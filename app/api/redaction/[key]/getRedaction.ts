@@ -9,7 +9,7 @@ import { findRedactionByKeyOrError } from '../lib/findRedactionByKeyOrError';
 interface GetRedactionResponseCommon {
   pageCount: number;
   createdAt: string;
-  /** The uploaded file name. Empty for documents uploaded before we stored it. */
+  /** The uploaded file name. */
   originalFileName: string;
 }
 
