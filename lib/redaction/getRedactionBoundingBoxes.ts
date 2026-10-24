@@ -310,7 +310,9 @@ function mapRedactionBoxToBoundingBox(
  * not a true 1/4 line height on pages whose width and height differ.
  */
 function expandTextBox(box: BoundingBox, lineHeight: number): BoundingBox {
-  const verticalPadding = lineHeight / 8;
+  // Padding on each side is a quarter line height. A smaller value left the
+  // descenders of g, j, p, q, and y partly visible.
+  const verticalPadding = lineHeight / 4;
   const horizontalPadding = lineHeight / 4;
   return {
     minX: Math.max(0, box.minX - horizontalPadding),
