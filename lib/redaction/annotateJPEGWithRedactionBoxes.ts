@@ -1,5 +1,5 @@
 import sharp from 'sharp';
-import type { AutoRedactionBoundingBox } from './redactionTypes';
+import type { AutoRedactionBoundingBox, BoundingBox } from './redactionTypes';
 
 /** Automatic box plus the numeric ID shown in inspection annotations. */
 export interface RedactionBoxToAnnotate extends Omit<
@@ -7,10 +7,12 @@ export interface RedactionBoxToAnnotate extends Omit<
   'page'
 > {
   id: number;
+  /** The box before text padding. Drawn in blue under the red `box`. */
+  beforeExpansion: BoundingBox;
 }
 
 /**
- * Draw red outlines around normalized automatic redaction boxes.
+ * Draw the padded box in red and the pre-padding box in blue.
  *
  * The returned JPEG preserves the input dimensions and is intended for manual
  * inspection, not as the final redacted document. For example, a box with
@@ -32,16 +34,23 @@ export async function annotateJPEGWithRedactionBoxes(
   }
 
   const { width, height } = metadata;
-  const strokeWidth = Math.max(3, Math.round(Math.min(width, height) / 250));
+  // Thin enough that the blue box inside the red one stays visible.
+  const strokeWidth = Math.max(2, Math.round(Math.min(width, height) / 400));
   const rectangles = boxes
-    .map(({ box, id }): string => {
+    .map(({ box, beforeExpansion, id }): string => {
       const x = box.minX * width;
       const y = box.minY * height;
       const boxWidth = (box.maxX - box.minX) * width;
       const boxHeight = (box.maxY - box.minY) * height;
+      const beforeX = beforeExpansion.minX * width;
+      const beforeY = beforeExpansion.minY * height;
+      const beforeWidth = (beforeExpansion.maxX - beforeExpansion.minX) * width;
+      const beforeHeight =
+        (beforeExpansion.maxY - beforeExpansion.minY) * height;
       const fontSize = Math.min(36, Math.max(12, boxHeight * 0.75));
       const textStrokeWidth = Math.max(2, Math.round(fontSize / 8));
-      return `<rect x="${x}" y="${y}" width="${boxWidth}" height="${boxHeight}" fill="none" stroke="#ff0000" stroke-width="${strokeWidth}"/><text x="${x + 2}" y="${y + fontSize}" fill="#ffff00" stroke="#000000" stroke-width="${textStrokeWidth}" paint-order="stroke" font-family="sans-serif" font-size="${fontSize}" font-weight="bold">${id}</text>`;
+      // Blue first so the red outline paints over it where they meet.
+      return `<rect x="${beforeX}" y="${beforeY}" width="${beforeWidth}" height="${beforeHeight}" fill="none" stroke="#0066ff" stroke-width="${strokeWidth}"/><rect x="${x}" y="${y}" width="${boxWidth}" height="${boxHeight}" fill="none" stroke="#ff0000" stroke-width="${strokeWidth}"/><text x="${x + 2}" y="${y + fontSize}" fill="#ffff00" stroke="#000000" stroke-width="${textStrokeWidth}" paint-order="stroke" font-family="sans-serif" font-size="${fontSize}" font-weight="bold">${id}</text>`;
     })
     .join('');
   const overlay: Buffer = Buffer.from(

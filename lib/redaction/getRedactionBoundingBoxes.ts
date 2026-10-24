@@ -13,9 +13,18 @@ import {
 } from './redactionTypes';
 import { redactionBoundingBoxesModel } from './redactionBoundingBoxesModel';
 
+/** A returned box plus the box it had before text padding, for tests. */
+export interface RedactionBoxWithPreExpansion extends SinglePageRedactionBoundingBox {
+  /**
+   * The box before text padding was added. Use only in tests, such as to draw
+   * the unpadded text box. Production code should use `box`.
+   */
+  beforeExpansion: BoundingBox;
+}
+
 /** Redaction boxes and token usage returned for one page. */
 export interface GetRedactionBoundingBoxesResult {
-  boxes: SinglePageRedactionBoundingBox[];
+  boxes: RedactionBoxWithPreExpansion[];
   /** Same value as `response.cost`, for callers that only need the price. */
   cost: OpenAICompatibleCompletionCost;
   response: OpenAICompatibleCompletionResult;
@@ -28,7 +37,7 @@ export interface GetRedactionBoundingBoxesResult {
  * converted to the normalized coordinates used by the app. Text boxes grow by
  * a share of their line height, so they cover the glyphs fully.
  *
- * Uses `redactionBoundingBoxesModel` at low reasoning effort.
+ * Uses `redactionBoundingBoxesModel` at medium reasoning effort.
  */
 export async function getRedactionBoundingBoxes(
   image: Uint8Array
@@ -282,14 +291,14 @@ Remove empty spaces (e.g., even if represented in file as "0 3 0 5", return
 
 function mapRedactionBoxToBoundingBox(
   rawBox: RedactionBoxContent
-): SinglePageRedactionBoundingBox {
+): RedactionBoxWithPreExpansion {
   const box: BoundingBox = {
     minX: rawBox.minX / 1000,
     minY: rawBox.minY / 1000,
     maxX: rawBox.maxX / 1000,
     maxY: rawBox.maxY / 1000,
   };
-  const boundingBox: SinglePageRedactionBoundingBox = {
+  const boundingBox: RedactionBoxWithPreExpansion = {
     type: RedactionBoundingBoxType.automatic,
     dataType: rawBox.dataType,
     text: rawBox.text,
@@ -297,6 +306,7 @@ function mapRedactionBoxToBoundingBox(
       rawBox.object === 'formField' || rawBox.object === 'other'
         ? box
         : expandTextBox(box, rawBox.object.lineHeightY / 1000),
+    beforeExpansion: box,
     enabled: true,
   };
   return boundingBox;
@@ -310,14 +320,15 @@ function mapRedactionBoxToBoundingBox(
  * not a true 1/4 line height on pages whose width and height differ.
  */
 function expandTextBox(box: BoundingBox, lineHeight: number): BoundingBox {
-  // Padding on each side is a quarter line height. A smaller value left the
-  // descenders of g, j, p, q, and y partly visible.
-  const verticalPadding = lineHeight / 4;
-  const horizontalPadding = lineHeight / 4;
+  // Top padding: fairly small
+  const topPadding = lineHeight * 0.1;
+  // Bottom padding covers the descenders of g, j, p, q, and y.
+  const bottomPadding = lineHeight * 0.4;
+  const horizontalPadding = lineHeight * 0.25;
   return {
     minX: Math.max(0, box.minX - horizontalPadding),
-    minY: Math.max(0, box.minY - verticalPadding),
+    minY: Math.max(0, box.minY - topPadding),
     maxX: Math.min(1, box.maxX + horizontalPadding),
-    maxY: Math.min(1, box.maxY + verticalPadding),
+    maxY: Math.min(1, box.maxY + bottomPadding),
   };
 }
