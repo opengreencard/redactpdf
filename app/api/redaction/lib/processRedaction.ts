@@ -156,10 +156,18 @@ async function processImage({
       try {
         const result = await getRedactionBoundingBoxes(visionJPEG);
         const processResult: ProcessImageResult = {
-          boundingBoxes: result.boxes.map((box): RedactionBoundingBox => ({
-            ...box,
-            page,
-          })),
+          // Copy only stored fields, so the test-only `beforeExpansion` is
+          // not saved.
+          boundingBoxes: result.boxes.map(
+            ({ type, dataType, text, box, enabled }): RedactionBoundingBox => ({
+              type,
+              dataType,
+              text,
+              box,
+              enabled,
+              page,
+            })
+          ),
           timing: {
             page,
             visionTimeMs: Date.now() - visionStartedAt,

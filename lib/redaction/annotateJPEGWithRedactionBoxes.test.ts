@@ -24,6 +24,7 @@ describe(annotateJPEGWithRedactionBoxes, () => {
         dataType: RedactedDataType.email,
         text: 'person@example.com',
         box: { minX: 0.1, minY: 0.2, maxX: 0.4, maxY: 0.5 },
+        beforeExpansion: { minX: 0.15, minY: 0.25, maxX: 0.35, maxY: 0.45 },
         enabled: true,
       },
     ];
