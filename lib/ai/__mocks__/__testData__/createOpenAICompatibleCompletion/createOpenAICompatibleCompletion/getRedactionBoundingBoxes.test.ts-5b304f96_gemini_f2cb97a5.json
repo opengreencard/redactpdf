@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1047,
+    "prompt_tokens": 2925,
+    "total_tokens": 3972
+  },
+  "id": "ZP3baujyBKCR_uMPsvbdgQQ",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TthjUobxzzrlZTWDJP6GKC1nbLUWFrgH1wnsH4wMukzZ+dWJd7qah/XxM8lRL+RARKrmvGoBVgvivjoDzC3273tK7W8BzUol5lOqQTnM47LNFZQ=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"idNumber\",\"text\":\"SPECI2014\",\"minX\":880,\"minY\":98,\"maxX\":942,\"maxY\":426,\"object\":{\"type\":\"text\",\"lineHeightY\":37}},{\"dataType\":\"idNumber\",\"text\":\"SPECI2014\",\"minX\":725,\"minY\":574,\"maxX\":839,\"maxY\":585,\"object\":{\"type\":\"text\",\"lineHeightY\":11}},{\"dataType\":\"personPhoto\",\"text\":\"photo\",\"minX\":56,\"minY\":576,\"maxX\":302,\"maxY\":809,\"object\":\"other\"},{\"dataType\":\"personName\",\"text\":\"De Bruijn e/v Molenaar\",\"minX\":332,\"minY\":599,\"maxX\":476,\"maxY\":633,\"object\":{\"type\":\"text\",\"lineHeightY\":14}},{\"dataType\":\"personName\",\"text\":\"Willeke Liselotte\",\"minX\":332,\"minY\":643,\"maxX\":509,\"maxY\":655,\"object\":{\"type\":\"text\",\"lineHeightY\":12}},{\"dataType\":\"personPhoto\",\"text\":\"ghost photo\",\"minX\":621,\"minY\":667,\"maxX\":742,\"maxY\":768,\"object\":\"other\"},{\"dataType\":\"dateOfBirth\",\"text\":\"10 MAA/MAR 1965\",\"minX\":332,\"minY\":673,\"maxX\":552,\"maxY\":686,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"address\",\"text\":\"Specimen\",\"minX\":332,\"minY\":702,\"maxX\":437,\"maxY\":715,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"other\",\"text\":\"V/F\",\"minX\":332,\"minY\":730,\"maxX\":370,\"maxY\":743,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"other\",\"text\":\"1,75 m\",\"minX\":750,\"minY\":730,\"maxX\":825,\"maxY\":743,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"dateOfBirth\",\"text\":\"1965\",\"minX\":632,\"minY\":748,\"maxX\":729,\"maxY\":764,\"object\":{\"type\":\"text\",\"lineHeightY\":16}},{\"dataType\":\"issueDate\",\"text\":\"09 MAA/MAR 2014\",\"minX\":334,\"minY\":755,\"maxX\":535,\"maxY\":768,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"expiryDate\",\"text\":\"09 MAA/MAR 2024\",\"minX\":750,\"minY\":755,\"maxX\":954,\"maxY\":768,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"dateOfBirth\",\"text\":\"1965\",\"minX\":56,\"minY\":778,\"maxX\":151,\"maxY\":802,\"object\":{\"type\":\"text\",\"lineHeightY\":24}},{\"dataType\":\"address\",\"text\":\"Burg. van Stad en Dorp\",\"minX\":629,\"minY\":783,\"maxX\":856,\"maxY\":796,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"signature\",\"text\":\"W. L. de Bruijn\",\"minX\":334,\"minY\":803,\"maxX\":585,\"maxY\":839,\"object\":\"other\"},{\"dataType\":\"other\",\"text\":\"P<NLDDE<BRUIJN<<WILLEKE<LISELOTTE<<<<<<<<<<<\",\"minX\":69,\"minY\":882,\"maxX\":928,\"maxY\":897,\"object\":{\"type\":\"text\",\"lineHeightY\":15}},{\"dataType\":\"other\",\"text\":\"SPECI20142NLD6503101F2403096999999990<<<<<84\",\"minX\":69,\"minY\":917,\"maxX\":929,\"maxY\":931,\"object\":{\"type\":\"text\",\"lineHeightY\":14}}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792802160,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.00585,
+    "outputUSD": 0.01047,
+    "totalUSD": 0.01632
+  },
+  "timing": {
+    "msToFirstToken": 5298,
+    "outputTokensPerSecond": 131.59879336349925,
+    "totalTimeMs": 13254
+  }
+}

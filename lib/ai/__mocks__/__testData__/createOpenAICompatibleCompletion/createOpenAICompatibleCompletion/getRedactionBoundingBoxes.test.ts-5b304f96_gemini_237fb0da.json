@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 742,
+    "prompt_tokens": 2937,
+    "total_tokens": 3679
+  },
+  "id": "ff3baoH7BJii_uMPqPGDKQ",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0Tdl8ulQyd4v6h/9UqIVmXX4XAtEZnMseTjupi5SIJe8cll1/fctY9HTSpWaHBMvC2klyAvGh7shd4HNhBqzcwwz1wnfEpuhQ8+QVNlu3Q7BcNOA=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personPhoto\",\"text\":\"main passport card photo\",\"minX\":23,\"minY\":226,\"maxX\":341,\"maxY\":850,\"object\":\"other\"},{\"dataType\":\"personPhoto\",\"text\":\"secondary ghost photo on right\",\"minX\":835,\"minY\":445,\"maxX\":973,\"maxY\":711,\"object\":\"other\"},{\"dataType\":\"idNumber\",\"text\":\"C03005988\",\"minX\":715,\"minY\":249,\"maxX\":914,\"maxY\":303,\"object\":{\"type\":\"text\",\"lineHeightY\":48}},{\"dataType\":\"personName\",\"text\":\"TRAVELER\",\"minX\":401,\"minY\":381,\"maxX\":568,\"maxY\":429,\"object\":{\"type\":\"text\",\"lineHeightY\":42}},{\"dataType\":\"personName\",\"text\":\"HAPPY\",\"minX\":477,\"minY\":493,\"maxX\":583,\"maxY\":542,\"object\":{\"type\":\"text\",\"lineHeightY\":42}},{\"dataType\":\"other\",\"text\":\"M\",\"minX\":501,\"minY\":609,\"maxX\":531,\"maxY\":660,\"object\":{\"type\":\"text\",\"lineHeightY\":42}},{\"dataType\":\"dateOfBirth\",\"text\":\"1 JAN 1981\",\"minX\":579,\"minY\":602,\"maxX\":742,\"maxY\":654,\"object\":{\"type\":\"text\",\"lineHeightY\":42}},{\"dataType\":\"address\",\"text\":\"NEW YORK, U.S.A.\",\"minX\":479,\"minY\":718,\"maxX\":746,\"maxY\":771,\"object\":{\"type\":\"text\",\"lineHeightY\":42}},{\"dataType\":\"issueDate\",\"text\":\"30 NOV 2009\",\"minX\":483,\"minY\":815,\"maxX\":672,\"maxY\":866,\"object\":{\"type\":\"text\",\"lineHeightY\":42}},{\"dataType\":\"expiryDate\",\"text\":\"29 NOV 2019\",\"minX\":701,\"minY\":818,\"maxX\":887,\"maxY\":869,\"object\":{\"type\":\"text\",\"lineHeightY\":42}},{\"dataType\":\"idNumber\",\"text\":\"43309•W27S\",\"minX\":5,\"minY\":434,\"maxX\":27,\"maxY\":825,\"object\":{\"type\":\"text\",\"lineHeightY\":32}},{\"dataType\":\"idNumber\",\"text\":\"M-6131821-07\",\"minX\":62,\"minY\":861,\"maxX\":261,\"maxY\":908,\"object\":{\"type\":\"text\",\"lineHeightY\":38}},{\"dataType\":\"idNumber\",\"text\":\"1-02781-0\",\"minX\":805,\"minY\":874,\"maxX\":932,\"maxY\":916,\"object\":{\"type\":\"text\",\"lineHeightY\":32}}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792802182,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.005874,
+    "outputUSD": 0.00742,
+    "totalUSD": 0.013294
+  },
+  "timing": {
+    "msToFirstToken": 3969,
+    "outputTokensPerSecond": 131.88766441521508,
+    "totalTimeMs": 9595
+  }
+}

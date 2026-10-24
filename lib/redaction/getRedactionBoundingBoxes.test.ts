@@ -131,18 +131,25 @@ describe(getRedactionBoundingBoxes, () => {
           optional: true,
         },
         {
-          dataType: [RedactedDataType.idNumber, RedactedDataType.personName],
+          // The model sometimes labels the whole MRZ line as other.
+          dataType: [
+            RedactedDataType.idNumber,
+            RedactedDataType.personName,
+            RedactedDataType.other,
+          ],
           text: /DE<BRUIJN[\s\S]*WILLEKE[\s\S]*LISELOTTE/i,
           minimumCount: 1,
         },
         {
+          // The model may split this MRZ line into several boxes, so match any
+          // chunk that holds the document number or personal number. The model
+          // sometimes labels the whole MRZ line as other.
           dataType: [
             RedactedDataType.idNumber,
             RedactedDataType.dateOfBirth,
             RedactedDataType.expiryDate,
+            RedactedDataType.other,
           ],
-          // The model may split this MRZ line into several boxes, so match any
-          // chunk that holds the document number or personal number.
           text: /SPECI20142|6999999990/i,
           minimumCount: 1,
         },
