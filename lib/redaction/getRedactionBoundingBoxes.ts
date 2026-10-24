@@ -37,7 +37,7 @@ export interface GetRedactionBoundingBoxesResult {
  * converted to the normalized coordinates used by the app. Text boxes grow by
  * a share of their line height, so they cover the glyphs fully.
  *
- * Uses `redactionBoundingBoxesModel` at medium reasoning effort.
+ * Uses `redactionBoundingBoxesModel` at low reasoning effort.
  */
 export async function getRedactionBoundingBoxes(
   image: Uint8Array
