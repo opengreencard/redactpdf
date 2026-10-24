@@ -6,6 +6,7 @@ import {
   OpenAICompatibleProvider,
 } from '../ai/createOpenAICompatibleCompletion';
 import {
+  type BoundingBox,
   type SinglePageRedactionBoundingBox,
   RedactedDataType,
   RedactionBoundingBoxType,
@@ -24,7 +25,8 @@ export interface GetRedactionBoundingBoxesResult {
  * Detect identifying or sensitive content in one page image.
  *
  * Coordinates are integers from 0 through 1000 in the model response, then
- * converted to the normalized coordinates used by the app.
+ * converted to the normalized coordinates used by the app. Text boxes grow by
+ * a share of their line height, so they cover the glyphs fully.
  *
  * Uses `redactionBoundingBoxesModel` at low reasoning effort.
  */
@@ -54,7 +56,18 @@ interface RedactionBoxContent {
   minY: number;
   maxX: number;
   maxY: number;
+  object: RedactionObject;
 }
+
+/** Text in the box, with the height of one of its lines. */
+interface RedactionTextObject {
+  type: 'text';
+  /** Line height in the same 0–1000 units as the box coordinates. */
+  lineHeightY: number;
+}
+
+/** What a box covers. Text boxes grow; the other kinds keep the drawn box. */
+type RedactionObject = RedactionTextObject | 'formField' | 'other';
 
 interface RedactionResponse {
   boxes: RedactionBoxContent[];
@@ -112,6 +125,18 @@ const redactedDataTypeToDescription: Record<RedactedDataType, string> = {
 
 const redactionCoordinateSchema = z.number().finite().int().min(0).max(1000);
 
+// Keep at least 1 so a zero line height can't skip the text box padding.
+const redactionLineHeightSchema = z.number().finite().min(1).max(1000);
+
+const redactionObjectSchema: z.ZodType<RedactionObject> = z.union([
+  z.object({
+    type: z.literal('text'),
+    lineHeightY: redactionLineHeightSchema,
+  }),
+  // One enum for the two string-only kinds, so the JSON schema stays one list.
+  z.enum(['formField', 'other']),
+]);
+
 const redactionBoxSchema: z.ZodType<RedactionBoxContent> = z
   .object({
     dataType: redactedDataTypeSchema,
@@ -120,6 +145,7 @@ const redactionBoxSchema: z.ZodType<RedactionBoxContent> = z
     minY: redactionCoordinateSchema,
     maxX: redactionCoordinateSchema,
     maxY: redactionCoordinateSchema,
+    object: redactionObjectSchema,
   })
   .refine(
     ({ minX, minY, maxX, maxY }) => minX < maxX && minY < maxY,
@@ -203,10 +229,19 @@ Classify each box with exactly one of these dataType values:
 ${dataTypeLines}
 
 Return only this JSON shape:
-{"boxes":[{"dataType":"personName","text":"visible text or description","minX":0,"minY":0,"maxX":0,"maxY":0}]}
+{"boxes":[{"dataType":"personName","text":"visible text or description","minX":0,"minY":0,"maxX":0,"maxY":0,"object":{"type":"text","lineHeightY":20}}]}
 Coordinates are integers from 0 to 1000, normalized to this image, with the
 origin at the top-left, ordered minX, minY, maxX, maxY. Make boxes slightly too
 large rather than too small.
+
+Set object to what the box covers:
+- {"type":"text","lineHeightY":N}: printed or handwritten text. N is the height
+  of one line of that text, in the same 0 to 1000 units as minY and maxY. For a
+  multi-line box, use the height of one line. For vertical or rotated text, N is
+  still the height of one glyph, not the length of the text.
+- "formField": a printed form field, such as an entry box, a line, a row of
+  character cells, or a checkbox square.
+- "other": anything else, such as a photo, signature, barcode, or graphic.
 
 
 How big to make the box:
@@ -248,17 +283,39 @@ Remove empty spaces (e.g., even if represented in file as "0 3 0 5", return
 function mapRedactionBoxToBoundingBox(
   rawBox: RedactionBoxContent
 ): SinglePageRedactionBoundingBox {
+  const box: BoundingBox = {
+    minX: rawBox.minX / 1000,
+    minY: rawBox.minY / 1000,
+    maxX: rawBox.maxX / 1000,
+    maxY: rawBox.maxY / 1000,
+  };
   const boundingBox: SinglePageRedactionBoundingBox = {
     type: RedactionBoundingBoxType.automatic,
     dataType: rawBox.dataType,
     text: rawBox.text,
-    box: {
-      minX: rawBox.minX / 1000,
-      minY: rawBox.minY / 1000,
-      maxX: rawBox.maxX / 1000,
-      maxY: rawBox.maxY / 1000,
-    },
+    box:
+      rawBox.object === 'formField' || rawBox.object === 'other'
+        ? box
+        : expandTextBox(box, rawBox.object.lineHeightY / 1000),
     enabled: true,
   };
   return boundingBox;
+}
+
+/**
+ * Grow a text box past the glyphs. Padding is a share of the line height, so
+ * it scales with the text size.
+ *
+ * Padding uses normalized units on both axes, so the horizontal padding is
+ * not a true 1/4 line height on pages whose width and height differ.
+ */
+function expandTextBox(box: BoundingBox, lineHeight: number): BoundingBox {
+  const verticalPadding = lineHeight / 8;
+  const horizontalPadding = lineHeight / 4;
+  return {
+    minX: Math.max(0, box.minX - horizontalPadding),
+    minY: Math.max(0, box.minY - verticalPadding),
+    maxX: Math.min(1, box.maxX + horizontalPadding),
+    maxY: Math.min(1, box.maxY + verticalPadding),
+  };
 }

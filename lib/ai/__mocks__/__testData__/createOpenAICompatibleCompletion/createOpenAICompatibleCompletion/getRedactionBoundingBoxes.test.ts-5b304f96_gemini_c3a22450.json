@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 941,
+    "prompt_tokens": 2947,
+    "total_tokens": 3888
+  },
+  "id": "cf3baoanKqCR_uMPsvbdgQQ",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0T/+xvreeFSfsJVFzZ0swVqp0IuXE9kndKWXplwqPH+ytJwwea/+KNNGQnxcNnGC7ZWNuPHX+S51XG7NSATZBhuT+9bHpFswV8weyPtLn5PKMNFw=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean\",\"minX\":58,\"minY\":111,\"maxX\":387,\"maxY\":126,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"John\",\"minX\":389,\"minY\":111,\"maxX\":763,\"maxY\":126,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001038\",\"minX\":765,\"minY\":111,\"maxX\":942,\"maxY\":126,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Joan\",\"minX\":58,\"minY\":141,\"maxX\":387,\"maxY\":156,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":389,\"minY\":141,\"maxX\":763,\"maxY\":156,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":765,\"minY\":141,\"maxX\":942,\"maxY\":156,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"26 Dancing Daisy Drive\",\"minX\":58,\"minY\":171,\"maxX\":681,\"maxY\":186,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"Charleston\",\"minX\":58,\"minY\":201,\"maxX\":552,\"maxY\":216,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"SC\",\"minX\":554,\"minY\":199,\"maxX\":658,\"maxY\":216,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"29455\",\"minX\":660,\"minY\":201,\"maxX\":763,\"maxY\":216,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"You\",\"minX\":822,\"minY\":233,\"maxX\":835,\"maxY\":243,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Spouse\",\"minX\":882,\"minY\":233,\"maxX\":895,\"maxY\":243,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"If treating a nonresident alien or dual-status alien spouse as a U.S. resident for the entire tax year, check the box and enter their name (see instructions and attach statement if required):\",\"minX\":168,\"minY\":326,\"maxX\":181,\"maxY\":337,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":553,\"minY\":338,\"maxX\":930,\"maxY\":353,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Yes\",\"minX\":822,\"minY\":377,\"maxX\":835,\"maxY\":388,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"No\",\"minX\":882,\"minY\":377,\"maxX\":895,\"maxY\":388,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Sam\",\"minX\":149,\"minY\":475,\"maxX\":286,\"maxY\":489,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":286,\"minY\":475,\"maxX\":434,\"maxY\":489,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":436,\"minY\":475,\"maxX\":575,\"maxY\":489,\"object\":\"formField\"},{\"dataType\":\"other\",\"text\":\"son\",\"minX\":577,\"minY\":475,\"maxX\":681,\"maxY\":489,\"object\":\"formField\"}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792802172,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.005894,
+    "outputUSD": 0.00941,
+    "totalUSD": 0.015304
+  },
+  "timing": {
+    "msToFirstToken": 4261,
+    "outputTokensPerSecond": 129.9364816349075,
+    "totalTimeMs": 11503
+  }
+}
