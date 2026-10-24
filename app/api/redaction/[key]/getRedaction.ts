@@ -9,6 +9,8 @@ import { findRedactionByKeyOrError } from '../lib/findRedactionByKeyOrError';
 interface GetRedactionResponseCommon {
   pageCount: number;
   createdAt: string;
+  /** The uploaded file name, or null for documents uploaded before we stored it. */
+  originalFileName: string | null;
 }
 
 /**
@@ -56,12 +58,14 @@ export async function getRedaction({
       'pageSizes',
       'redactionBoundingBoxes',
       'createdAt',
+      'originalFileName',
     ],
   });
 
   const commonResponse: Omit<GenericGetRedactionResponse, 'status'> = {
     pageCount: redaction.pageCount,
     createdAt: redaction.createdAt.toISOString(),
+    originalFileName: redaction.originalFileName,
   };
 
   switch (redaction.status) {

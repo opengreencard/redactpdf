@@ -61,6 +61,7 @@ describe(generateRedactedPDFForKey, () => {
     const redaction = await FakeData.makeDBRedaction({
       status: RedactionStatus.redacted,
       redactionBoundingBoxes: [redactionBoundingBox],
+      originalFileName: 'Passport.pdf',
     });
     await putRedactionFile(sourcePDF, 'application/pdf', redaction.key);
 
@@ -70,7 +71,9 @@ describe(generateRedactedPDFForKey, () => {
       contentType: 'application/pdf',
       response: generatedPDF,
       additionalHeaders: {
-        'Content-Disposition': 'attachment; filename="redacted.pdf"',
+        // Named after the upload: "Passport.pdf" -> "Passport redacted.pdf".
+        'Content-Disposition':
+          "attachment; filename*=UTF-8''Passport%20redacted.pdf",
       },
     });
     expect(generateRedactedPDF).toHaveBeenCalledWith({

@@ -37,6 +37,7 @@ export const POST = makeAPIRouteWithBody<
 
     const uploadRequest: UploadFileForRedactionRequest = {
       buffer: Buffer.from(await file.arrayBuffer()),
+      fileName: file.name,
     };
     return uploadFileForRedaction(uploadRequest);
   },

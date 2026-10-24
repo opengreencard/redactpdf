@@ -5,6 +5,7 @@ import {
 } from '../../lib/findRedactionByKeyOrError';
 import { generateRedactedPDF } from '../../../../../lib/pdf/generateRedactedPDF';
 import { getRedactionFile } from '../../../../../lib/storage/storageFunctions/redactionFile';
+import { makeRedactedPDFFileName } from '../../../../../lib/redaction/makeRedactedPDFFileName';
 
 /** Parameters for generating a PDF for one redaction document. */
 export interface GenerateRedactedPDFForKeyRequest {
@@ -24,7 +25,7 @@ export async function generateRedactedPDFForKey({
 }: GenerateRedactedPDFForKeyRequest): Promise<RawResponse> {
   const redaction = await findRedactionByKeyOrError({
     key,
-    attributes: ['status', 'redactionBoundingBoxes'],
+    attributes: ['status', 'redactionBoundingBoxes', 'originalFileName'],
   });
   assertIsRedactedOrThrowApplicationError(redaction);
 
@@ -38,7 +39,10 @@ export async function generateRedactedPDFForKey({
     contentType: 'application/pdf',
     response,
     additionalHeaders: {
-      'Content-Disposition': 'attachment; filename="redacted.pdf"',
+      // RFC 5987 `filename*` so non-ASCII names survive the header.
+      'Content-Disposition': `attachment; filename*=UTF-8''${encodeURIComponent(
+        makeRedactedPDFFileName(redaction.originalFileName)
+      )}`,
     },
   };
   return rawResponse;
