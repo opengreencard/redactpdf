@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1155,
+    "prompt_tokens": 2947,
+    "total_tokens": 4102
+  },
+  "id": "3fjbar_1BNWa1MkPrIW7qQo",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TDOa03h/VUB/6RdDRfvD6imfZ1aOoFLdFEBo9sao4ls1iAChxYcezz8nUbtqqGBTZouwpQmAwkRCNoZ4b69p3PdwCysmZ6BFBBdhibraP6Tv3zQ=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean\",\"minX\":57,\"minY\":82,\"maxX\":388,\"maxY\":113,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"John\",\"minX\":387,\"minY\":82,\"maxX\":765,\"maxY\":113,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001038\",\"minX\":764,\"minY\":82,\"maxX\":942,\"maxY\":113,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Joan\",\"minX\":57,\"minY\":113,\"maxX\":388,\"maxY\":144,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":387,\"minY\":113,\"maxX\":765,\"maxY\":144,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":764,\"minY\":113,\"maxX\":942,\"maxY\":144,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"26 Dancing Daisy Drive\",\"minX\":57,\"minY\":143,\"maxX\":681,\"maxY\":174,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"Charleston\",\"minX\":57,\"minY\":174,\"maxX\":552,\"maxY\":205,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"SC\",\"minX\":551,\"minY\":174,\"maxX\":659,\"maxY\":205,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"29455\",\"minX\":657,\"minY\":174,\"maxX\":765,\"maxY\":205,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Single\",\"minX\":166,\"minY\":236,\"maxX\":182,\"maxY\":249,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Head of household (HOH) \",\"minX\":602,\"minY\":236,\"maxX\":618,\"maxY\":249,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Married filing jointly (even if only one had income) \",\"minX\":166,\"minY\":251,\"maxX\":182,\"maxY\":264,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Married filing separately (MFS) \",\"minX\":166,\"minY\":267,\"maxX\":182,\"maxY\":279,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Qualifying surviving spouse (QSS) \",\"minX\":602,\"minY\":267,\"maxX\":618,\"maxY\":279,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"If treating a nonresident alien or dual-status alien spouse as a U.S. resident for the entire tax year, check the box and enter their name (see instructions and attach statement if required): \",\"minX\":166,\"minY\":313,\"maxX\":183,\"maxY\":326,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":552,\"minY\":326,\"maxX\":932,\"maxY\":341,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Were born before January 2, 1960 \",\"minX\":190,\"minY\":421,\"maxX\":206,\"maxY\":433,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Are blind \",\"minX\":425,\"minY\":421,\"maxX\":441,\"maxY\":433,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Was born before January 2, 1960 \",\"minX\":590,\"minY\":421,\"maxX\":606,\"maxY\":433,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Is blind\",\"minX\":825,\"minY\":421,\"maxX\":841,\"maxY\":433,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Sam Jackson\",\"minX\":151,\"minY\":464,\"maxX\":436,\"maxY\":481,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":434,\"minY\":464,\"maxX\":574,\"maxY\":481,\"object\":\"formField\"},{\"dataType\":\"other\",\"text\":\"son\",\"minX\":572,\"minY\":464,\"maxX\":681,\"maxY\":481,\"object\":\"formField\"}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792801009,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.005894,
+    "outputUSD": 0.01155,
+    "totalUSD": 0.017444
+  },
+  "timing": {
+    "msToFirstToken": 10673,
+    "outputTokensPerSecond": 117.23507917174177,
+    "totalTimeMs": 20525
+  }
+}

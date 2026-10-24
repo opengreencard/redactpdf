@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1172,
+    "prompt_tokens": 2947,
+    "total_tokens": 4119
+  },
+  "id": "6vjbasO9HtHJ-sAPkZjiuAg",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TT+RTDJ807lVApNerjF2crIZVcC/07Da/WsNpJuK+HQbqd+JWzDHlAuDpG/4Twb5hK6dq9BJDxBryGQ+Tu3QD6DRzjvIfvyM8HMo962JjcaXQOw=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean\",\"minX\":58,\"minY\":109,\"maxX\":388,\"maxY\":126,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"John\",\"minX\":388,\"minY\":109,\"maxX\":765,\"maxY\":126,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001038\",\"minX\":765,\"minY\":109,\"maxX\":942,\"maxY\":126,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Joan\",\"minX\":58,\"minY\":139,\"maxX\":388,\"maxY\":156,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":388,\"minY\":139,\"maxX\":765,\"maxY\":156,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":765,\"minY\":139,\"maxX\":942,\"maxY\":156,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"26 Dancing Daisy Drive\",\"minX\":58,\"minY\":168,\"maxX\":682,\"maxY\":186,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"Charleston\",\"minX\":58,\"minY\":199,\"maxX\":553,\"maxY\":216,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"SC\",\"minX\":553,\"minY\":199,\"maxX\":659,\"maxY\":216,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"29455\",\"minX\":659,\"minY\":199,\"maxX\":765,\"maxY\":216,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"You\",\"minX\":821,\"minY\":231,\"maxX\":839,\"maxY\":245,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Spouse\",\"minX\":880,\"minY\":232,\"maxX\":896,\"maxY\":245,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Single\",\"minX\":166,\"minY\":249,\"maxX\":183,\"maxY\":262,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Married filing jointly (even if only one had income\",\"minX\":166,\"minY\":264,\"maxX\":183,\"maxY\":277,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Married filing separately (MFS\",\"minX\":166,\"minY\":279,\"maxX\":183,\"maxY\":292,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Head of household (HOH\",\"minX\":602,\"minY\":249,\"maxX\":619,\"maxY\":262,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Qualifying surviving spouse (QSS\",\"minX\":602,\"minY\":279,\"maxX\":619,\"maxY\":292,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"If treating a nonresident alien or dual-status alien spouse as a U.S. resident for the entire tax year, check the box and enter their name (see instructions and attach statement if required\",\"minX\":166,\"minY\":323,\"maxX\":185,\"maxY\":337,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":554,\"minY\":337,\"maxX\":930,\"maxY\":354,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Yes\",\"minX\":821,\"minY\":376,\"maxX\":839,\"maxY\":390,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"No\",\"minX\":880,\"minY\":377,\"maxX\":896,\"maxY\":390,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Sam\",\"minX\":149,\"minY\":475,\"maxX\":286,\"maxY\":490,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":286,\"minY\":475,\"maxX\":436,\"maxY\":490,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":435,\"minY\":475,\"maxX\":577,\"maxY\":490,\"object\":\"formField\"},{\"dataType\":\"other\",\"text\":\"son\",\"minX\":576,\"minY\":475,\"maxX\":683,\"maxY\":490,\"object\":\"formField\"}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792801013,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.005894,
+    "outputUSD": 0.01172,
+    "totalUSD": 0.017613999999999998
+  },
+  "timing": {
+    "msToFirstToken": 3058,
+    "outputTokensPerSecond": 133.4547938966067,
+    "totalTimeMs": 11840
+  }
+}

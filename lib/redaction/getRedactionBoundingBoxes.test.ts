@@ -141,7 +141,9 @@ describe(getRedactionBoundingBoxes, () => {
             RedactedDataType.dateOfBirth,
             RedactedDataType.expiryDate,
           ],
-          text: /SPECI20142NLD6503101|6999999990/i,
+          // The model may split this MRZ line into several boxes, so match any
+          // chunk that holds the document number or personal number.
+          text: /SPECI20142|6999999990/i,
           minimumCount: 1,
         },
       ],

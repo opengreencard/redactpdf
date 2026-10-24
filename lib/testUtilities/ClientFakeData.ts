@@ -132,6 +132,7 @@ function makeOpenAICompatibleCompletionResult(
                 minY: 200,
                 maxX: 300,
                 maxY: 400,
+                object: { type: 'text', lineHeightY: 20 },
               },
             ],
           }),
