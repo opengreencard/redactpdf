@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 675,
+    "prompt_tokens": 2954,
+    "total_tokens": 3629
+  },
+  "id": "4fzbaqn5BNSu1MkP1_reqAM",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TqPdp3e/znQwJss4B5xr4y9WhhmNHt+xy0kOHdMBhC+5FOz/SCfk4zrIS4SUj/+q4JY3Qt4MNrdT8e8RpkFR2akIgopltrj5KxaCqKy0prRbgOw=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Jane Doe\",\"minX\":62,\"minY\":63,\"maxX\":127,\"maxY\":74,\"object\":{\"type\":\"text\",\"lineHeightY\":11}},{\"dataType\":\"address\",\"text\":\"123 Example Street\\nSpringfield, IL 62701\",\"minX\":62,\"minY\":78,\"maxX\":210,\"maxY\":108,\"object\":{\"type\":\"text\",\"lineHeightY\":13.0909}},{\"dataType\":\"personName\",\"text\":\"Jane Doe\",\"minX\":180,\"minY\":263,\"maxX\":245,\"maxY\":274,\"object\":{\"type\":\"text\",\"lineHeightY\":11}},{\"dataType\":\"idNumber\",\"text\":\"123456789\",\"minX\":361,\"minY\":263,\"maxX\":437,\"maxY\":274,\"object\":{\"type\":\"text\",\"lineHeightY\":11}},{\"dataType\":\"personName\",\"text\":\"Jane Doe\",\"minX\":77,\"minY\":341,\"maxX\":142,\"maxY\":353,\"object\":{\"type\":\"text\",\"lineHeightY\":12}},{\"dataType\":\"other\",\"text\":\"pediatric infectious disease\",\"minX\":359,\"minY\":341,\"maxX\":550,\"maxY\":354,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"organizationName\",\"text\":\"Example Hospital\",\"minX\":63,\"minY\":356,\"maxX\":188,\"maxY\":370,\"object\":{\"type\":\"text\",\"lineHeightY\":14}},{\"dataType\":\"personName\",\"text\":\"John Roe\",\"minX\":63,\"minY\":372,\"maxX\":127,\"maxY\":383,\"object\":{\"type\":\"text\",\"lineHeightY\":11}},{\"dataType\":\"organizationName\",\"text\":\"State University\",\"minX\":450,\"minY\":372,\"maxX\":563,\"maxY\":385,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"other\",\"text\":\"April 15, 2023\",\"minX\":292,\"minY\":387,\"maxX\":394,\"maxY\":401,\"object\":{\"type\":\"text\",\"lineHeightY\":14}},{\"dataType\":\"address\",\"text\":\"Springfield\",\"minX\":63,\"minY\":403,\"maxX\":141,\"maxY\":416,\"object\":{\"type\":\"text\",\"lineHeightY\":13}},{\"dataType\":\"address\",\"text\":\"Springfield\",\"minX\":352,\"minY\":403,\"maxX\":430,\"maxY\":416,\"object\":{\"type\":\"text\",\"lineHeightY\":13}}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792802025,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.005908,
+    "outputUSD": 0.00675,
+    "totalUSD": 0.012657999999999999
+  },
+  "timing": {
+    "msToFirstToken": 3161,
+    "outputTokensPerSecond": 132.3788978231026,
+    "totalTimeMs": 8260
+  }
+}

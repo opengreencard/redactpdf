@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1458,
+    "prompt_tokens": 2954,
+    "total_tokens": 4412
+  },
+  "id": "0fzbaondLYCo1MkPlpb9gA8",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TI2f6r4M8Bgls1SB8HGelpcAwNmfzpgCSUtyVs0XfUH+JyI4Oc+nEkMMgGVwK9fdphKCT0ubGyXzsoQBrSERpcI12+TPmsVz5Q9hR67wdulZz+A=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"other\",\"text\":\"H-1B\",\"minX\":98,\"minY\":166,\"maxX\":480,\"maxY\":188,\"object\":\"formField\"},{\"dataType\":\"other\",\"text\":\"09/01/2022\",\"minX\":343,\"minY\":197,\"maxX\":480,\"maxY\":219,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"San Francisco\",\"minX\":98,\"minY\":264,\"maxX\":480,\"maxY\":287,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"CA\",\"minX\":196,\"minY\":295,\"maxX\":265,\"maxY\":317,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Yes\",\"minX\":352,\"minY\":361,\"maxX\":369,\"maxY\":373,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"No\",\"minX\":421,\"minY\":361,\"maxX\":438,\"maxY\":373,\"object\":\"formField\"},{\"dataType\":\"organizationName\",\"text\":\"Example Co.\",\"minX\":98,\"minY\":530,\"maxX\":480,\"maxY\":552,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"123 Fake St.\",\"minX\":205,\"minY\":560,\"maxX\":480,\"maxY\":583,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Hispanic or Latino\",\"minX\":561,\"minY\":569,\"maxX\":577,\"maxY\":582,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Not Hispanic or Latino\",\"minX\":561,\"minY\":588,\"maxX\":577,\"maxY\":600,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"San Francisco\",\"minX\":205,\"minY\":621,\"maxX\":480,\"maxY\":643,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"White\",\"minX\":561,\"minY\":638,\"maxX\":577,\"maxY\":650,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"94102\",\"minX\":313,\"minY\":651,\"maxX\":480,\"maxY\":674,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Asian\",\"minX\":561,\"minY\":656,\"maxX\":577,\"maxY\":669,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Black or African American\",\"minX\":561,\"minY\":675,\"maxX\":577,\"maxY\":687,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"American Indian or Alaska Native\",\"minX\":561,\"minY\":694,\"maxX\":577,\"maxY\":706,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Native Hawaiian or Other Pacific Islander\",\"minX\":561,\"minY\":712,\"maxX\":577,\"maxY\":725,\"object\":\"formField\"},{\"dataType\":\"sensitiveQuantity\",\"text\":\"6\",\"minX\":784,\"minY\":734,\"maxX\":833,\"maxY\":757,\"object\":\"formField\"},{\"dataType\":\"sensitiveQuantity\",\"text\":\"\",\"minX\":892,\"minY\":734,\"maxX\":941,\"maxY\":757,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"United States\",\"minX\":98,\"minY\":757,\"maxX\":480,\"maxY\":780,\"object\":\"formField\"},{\"dataType\":\"sensitiveQuantity\",\"text\":\"200\",\"minX\":862,\"minY\":765,\"maxX\":941,\"maxY\":787,\"object\":\"formField\"},{\"dataType\":\"other\",\"text\":\"Form Filler\",\"minX\":98,\"minY\":802,\"maxX\":480,\"maxY\":825,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Black\",\"minX\":561,\"minY\":819,\"maxX\":577,\"maxY\":831,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Blue\",\"minX\":669,\"minY\":819,\"maxX\":685,\"maxY\":831,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Brown\",\"minX\":767,\"minY\":819,\"maxX\":783,\"maxY\":831,\"object\":\"formField\"},{\"dataType\":\"other\",\"text\":\"09/01/2022\",\"minX\":343,\"minY\":833,\"maxX\":480,\"maxY\":855,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Gray\",\"minX\":561,\"minY\":838,\"maxX\":577,\"maxY\":850,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Green\",\"minX\":669,\"minY\":838,\"maxX\":685,\"maxY\":850,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Hazel\",\"minX\":767,\"minY\":838,\"maxX\":783,\"maxY\":850,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Maroon\",\"minX\":561,\"minY\":856,\"maxX\":577,\"maxY\":869,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Pink\",\"minX\":669,\"minY\":856,\"maxX\":685,\"maxY\":869,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Unknown/Other\",\"minX\":767,\"minY\":856,\"maxX\":783,\"maxY\":869,\"object\":\"formField\"},{\"dataType\":\"other\",\"text\":\"PRESENT\",\"minX\":343,\"minY\":863,\"maxX\":480,\"maxY\":886,\"object\":\"formField\"}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792802016,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.005908,
+    "outputUSD": 0.01458,
+    "totalUSD": 0.020488
+  },
+  "timing": {
+    "msToFirstToken": 4223,
+    "outputTokensPerSecond": 129.63456921845827,
+    "totalTimeMs": 15470
+  }
+}

@@ -125,7 +125,8 @@ const redactedDataTypeToDescription: Record<RedactedDataType, string> = {
 
 const redactionCoordinateSchema = z.number().finite().int().min(0).max(1000);
 
-const redactionLineHeightSchema = z.number().finite().min(0).max(1000);
+// Keep at least 1 so a zero line height can't skip the text box padding.
+const redactionLineHeightSchema = z.number().finite().min(1).max(1000);
 
 const redactionObjectSchema: z.ZodType<RedactionObject> = z.union([
   z.object({
@@ -235,9 +236,9 @@ large rather than too small.
 
 Set object to what the box covers:
 - {"type":"text","lineHeightY":N}: printed or handwritten text. N is the height
-  of one line of that text, in the same 0 to 1000 units as minY and maxY. For a
-  multi-line box, use the height of one line. For vertical or rotated text, N is
-  still the height of one glyph, not the length of the text.
+  of one line of that text, in the same 0 to 1000 units as minY and maxY. N is
+  at least 1. For a multi-line box, use the height of one line. For vertical or
+  rotated text, N is still the height of one glyph, not the length of the text.
 - "formField": a printed form field, such as an entry box, a line, a row of
   character cells, or a checkbox square.
 - "other": anything else, such as a photo, signature, barcode, or graphic.
