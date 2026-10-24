@@ -38,10 +38,10 @@ export interface RedactionAttributes {
   /** `redacting` while the background job runs, then `redacted` or `error`. */
   status: RedactionStatus;
   /**
-   * File name the user uploaded, used to name the download. Null for rows
+   * File name the user uploaded, used to name the download. Empty for rows
    * created before this column existed.
    */
-  originalFileName: string | null;
+  originalFileName: string;
   /** If the redaction errors, the error message that we got */
   errorMessage: string | null;
   /**
@@ -105,8 +105,7 @@ const Redaction = db.define<
     },
     originalFileName: {
       type: DataTypes.TEXT(),
-      allowNull: true,
-      defaultValue: null,
+      allowNull: false,
     },
     errorMessage: {
       type: DataTypes.TEXT(),
