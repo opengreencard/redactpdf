@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 600,
+    "prompt_tokens": 2947,
+    "total_tokens": 3547
+  },
+  "id": "2jLcasD5G9Td-sAPh87Y0AM",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TcjOs+Rcix9a6D1CeS9o0tnTaYxo7KUZKAulPFAwvaA0vxVGWwrPrBTcTPehqZ7RiC/4cio1Jlu2zuuF9Y/x9ta7IpGifGUak8azMcOQ3JHjjig=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean John\",\"minX\":427,\"minY\":114,\"maxX\":527,\"maxY\":129,\"object\":{\"type\":\"text\",\"lineHeightY\":12}},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":571,\"minY\":114,\"maxX\":704,\"maxY\":129,\"object\":{\"type\":\"text\",\"lineHeightY\":12}},{\"dataType\":\"idNumber\",\"text\":\"400-00-1038\",\"minX\":488,\"minY\":132,\"maxX\":603,\"maxY\":146,\"object\":{\"type\":\"text\",\"lineHeightY\":12}},{\"dataType\":\"dateOfBirth\",\"text\":\"August 2, 1966\",\"minX\":463,\"minY\":521,\"maxX\":591,\"maxY\":536,\"object\":{\"type\":\"text\",\"lineHeightY\":14}},{\"dataType\":\"dateOfBirth\",\"text\":\"March 19, 1965\",\"minX\":485,\"minY\":540,\"maxX\":613,\"maxY\":554,\"object\":{\"type\":\"text\",\"lineHeightY\":14}},{\"dataType\":\"dateOfBirth\",\"text\":\"July 20, 2006\",\"minX\":403,\"minY\":559,\"maxX\":516,\"maxY\":574,\"object\":{\"type\":\"text\",\"lineHeightY\":14}},{\"dataType\":\"idNumber\",\"text\":\"876543\",\"minX\":449,\"minY\":578,\"maxX\":512,\"maxY\":592,\"object\":{\"type\":\"text\",\"lineHeightY\":14}},{\"dataType\":\"dollarAmount\",\"text\":\"$425.00\",\"minX\":537,\"minY\":633,\"maxX\":605,\"maxY\":648,\"object\":{\"type\":\"text\",\"lineHeightY\":14}},{\"dataType\":\"dollarAmount\",\"text\":\"$200\",\"minX\":160,\"minY\":687,\"maxX\":201,\"maxY\":701,\"object\":{\"type\":\"text\",\"lineHeightY\":14}},{\"dataType\":\"dollarAmount\",\"text\":\"$250\",\"minX\":481,\"minY\":687,\"maxX\":523,\"maxY\":701,\"object\":{\"type\":\"text\",\"lineHeightY\":14}}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792815844,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.005894,
+    "outputUSD": 0.006,
+    "totalUSD": 0.011894
+  },
+  "timing": {
+    "msToFirstToken": 6511,
+    "outputTokensPerSecond": 132.013201320132,
+    "totalTimeMs": 11056
+  }
+}

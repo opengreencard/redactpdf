@@ -1,0 +1,39 @@
+{
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 1007,
+    "prompt_tokens": 2947,
+    "total_tokens": 3954
+  },
+  "id": "2jLcap_jHfvTjMcPwsja6Ao",
+  "choices": [
+    {
+      "message": {
+        "role": "assistant",
+        "extra_content": {
+          "google": {
+            "thought_signature": "ElkKVwFpFH0TH74Wgq+ZYFasSzVgCdmZvVvVn7MWHX+wh/4ZzYm1Qwl+w4QqpLrgSY/im1h6ex8sSSwQEhfLxvKPOzryST9agwcS91ndqFNEi9l6IxhJORbo/w=="
+          }
+        },
+        "content": "{\"boxes\":[{\"dataType\":\"personName\",\"text\":\"Sean\",\"minX\":58,\"minY\":82,\"maxX\":388,\"maxY\":113,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"John\",\"minX\":388,\"minY\":82,\"maxX\":765,\"maxY\":113,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001038\",\"minX\":765,\"minY\":82,\"maxX\":942,\"maxY\":113,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Joan\",\"minX\":58,\"minY\":113,\"maxX\":388,\"maxY\":143,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":388,\"minY\":113,\"maxX\":765,\"maxY\":143,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":765,\"minY\":113,\"maxX\":942,\"maxY\":143,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"26 Dancing Daisy Drive\",\"minX\":58,\"minY\":143,\"maxX\":683,\"maxY\":173,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"Charleston\",\"minX\":58,\"minY\":173,\"maxX\":552,\"maxY\":204,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"SC\",\"minX\":552,\"minY\":173,\"maxX\":659,\"maxY\":204,\"object\":\"formField\"},{\"dataType\":\"address\",\"text\":\"29455\",\"minX\":659,\"minY\":173,\"maxX\":765,\"maxY\":204,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Single\",\"minX\":166,\"minY\":236,\"maxX\":181,\"maxY\":248,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Married filing jointly (even if only one had income) \",\"minX\":166,\"minY\":252,\"maxX\":181,\"maxY\":263,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Married filing separately (MFS) \",\"minX\":166,\"minY\":267,\"maxX\":181,\"maxY\":278,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Head of household (HOH) \",\"minX\":601,\"minY\":236,\"maxX\":616,\"maxY\":248,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"Qualifying surviving spouse (QSS) \",\"minX\":601,\"minY\":267,\"maxX\":616,\"maxY\":278,\"object\":\"formField\"},{\"dataType\":\"checkbox\",\"text\":\"If treating a nonresident alien or dual-status alien spouse as a U.S. resident for the entire tax year, check the box and enter their name (see instructions and attach statement if required): \",\"minX\":166,\"minY\":313,\"maxX\":181,\"maxY\":324,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Joan Jackson\",\"minX\":552,\"minY\":326,\"maxX\":930,\"maxY\":341,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Sam\",\"minX\":152,\"minY\":465,\"maxX\":289,\"maxY\":481,\"object\":\"formField\"},{\"dataType\":\"personName\",\"text\":\"Jackson\",\"minX\":289,\"minY\":465,\"maxX\":436,\"maxY\":481,\"object\":\"formField\"},{\"dataType\":\"idNumber\",\"text\":\"400001071\",\"minX\":436,\"minY\":465,\"maxX\":574,\"maxY\":481,\"object\":\"formField\"},{\"dataType\":\"other\",\"text\":\"son\",\"minX\":574,\"minY\":465,\"maxX\":683,\"maxY\":481,\"object\":\"formField\"}]}",
+        "refusal": null,
+        "parsed": null
+      },
+      "finish_reason": "stop",
+      "index": 0,
+      "logprobs": null
+    }
+  ],
+  "created": 1792815854,
+  "model": "gemini-4-argon",
+  "cost": {
+    "inputUSD": 0.005894,
+    "outputUSD": 0.01007,
+    "totalUSD": 0.015964
+  },
+  "timing": {
+    "msToFirstToken": 12185,
+    "outputTokensPerSecond": 125.87499999999999,
+    "totalTimeMs": 20185
+  }
+}
