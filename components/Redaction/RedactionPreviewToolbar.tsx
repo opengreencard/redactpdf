@@ -12,6 +12,7 @@ import {
 import {
   Divider,
   Group,
+  Kbd,
   Menu,
   MenuDivider,
   MenuDropdown,
@@ -247,14 +248,24 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
         <Divider orientation="vertical" h={22} my="auto" visibleFrom="xs" />
         <Switch
           visibleFrom="xs"
-          label="Draw redaction"
+          label={
+            <Group
+              component="span"
+              gap="xs"
+              wrap="nowrap"
+              display="inline-flex"
+            >
+              Draw redaction
+              <Kbd size="xs">R</Kbd>
+            </Group>
+          }
           classNames={{ label: classes.switchLabel }}
           checked={isRedacting}
           onChange={handleDrawRedactionChange}
         />
         <ActionIcon
           hiddenFrom="xs"
-          tooltip="Toggle draw redaction"
+          tooltip={{ text: 'Toggle draw redaction', keyboardShortcut: ['R'] }}
           isPressed={isRedacting}
           onClick={handleDrawRedactionToggle}
         >

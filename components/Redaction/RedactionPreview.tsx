@@ -1,12 +1,13 @@
 'use client';
 
-import React, { RefObject, useMemo, useRef, useState } from 'react';
+import React, { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import _ from 'lodash';
 import { Box, Stack } from '@mantine/core';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
 import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
 import type { ManualRedactionBoundingBox } from '../../lib/redaction/redactionTypes';
 import RedactionPreviewPages, {
+  isPlainKeyPress,
   RedactionPreviewPagesProps,
   RedactionPreviewPagesRef,
 } from './RedactionPreviewPages';
@@ -98,6 +99,22 @@ const RedactionPreview: React.FunctionComponent<RedactionPreviewProps> =
       () => _.clamp(internalPage, 1, pageCount || 1),
       [internalPage, pageCount]
     );
+
+    // R switches draw mode on and off from anywhere on the page.
+    const handleDrawModeKeyDown = useMemoizedCallback(
+      (event: KeyboardEvent): void => {
+        if (isPlainKeyPress(event) && event.key.toLowerCase() === 'r') {
+          setIsRedacting((current) => !current);
+        }
+      },
+      []
+    );
+    useEffect(() => {
+      document.addEventListener('keydown', handleDrawModeKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleDrawModeKeyDown);
+      };
+    }, [handleDrawModeKeyDown]);
 
     const handleContainerReady = useMemoizedCallback((): void => {
       const fitZoomPercent = pagesRef.current?.getFitZoomPercent('fitToWidth');
