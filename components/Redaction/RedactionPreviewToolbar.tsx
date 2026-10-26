@@ -48,6 +48,11 @@ export interface RedactionPreviewToolbarProps {
   onIsRedactingChange: (isRedacting: boolean) => unknown;
 }
 
+/** Test ID for the desktop draw-redaction switch. Exported for tests. */
+export const _drawRedactionSwitchTestId = 'draw-redaction-switch';
+/** Test ID for the visible R hint on that switch. Exported for tests. */
+export const _drawRedactionShortcutTestId = 'draw-redaction-shortcut';
+
 const zoomPresets = [25, 50, 100, 125, 150, 200, 400, 800, 1600];
 
 /**
@@ -256,9 +261,18 @@ const RedactionPreviewToolbar: React.FunctionComponent<RedactionPreviewToolbarPr
               display="inline-flex"
             >
               Draw redaction
-              <Kbd size="xs">R</Kbd>
+              {/* Hidden from the accessible name; aria-keyshortcuts announces R. */}
+              <Kbd
+                size="xs"
+                aria-hidden
+                data-testid={_drawRedactionShortcutTestId}
+              >
+                R
+              </Kbd>
             </Group>
           }
+          aria-keyshortcuts="R"
+          data-testid={_drawRedactionSwitchTestId}
           classNames={{ label: classes.switchLabel }}
           checked={isRedacting}
           onChange={handleDrawRedactionChange}
