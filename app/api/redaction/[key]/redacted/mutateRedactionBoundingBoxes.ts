@@ -102,6 +102,14 @@ function applyRedactionBoundingBoxMutation({
       };
       return [...boxes, manualBox];
     }
+    case RedactionBoundingBoxMutationOp.restore: {
+      assertValidPageAndBoxOrThrowApplicationError({
+        page: mutation.box.page,
+        box: mutation.box.box,
+        pageCount,
+      });
+      return [...boxes, mutation.box];
+    }
     case RedactionBoundingBoxMutationOp.delete: {
       assertValidPageAndBoxOrThrowApplicationError({
         page: mutation.page,

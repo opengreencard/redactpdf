@@ -1,19 +1,18 @@
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import {
   RedactionBoundingBoxType,
-  type ManualRedactionBoundingBox,
   type RedactionBoundingBox,
 } from '../../lib/redaction/redactionTypes';
 import type { RedactedGetRedactionResponse } from '../../app/api/redaction/[key]/getRedaction';
 import { isSameRedactionBoundingBox } from '../../lib/redaction/redactionBoundingBoxIdentity';
 
 /**
- * Optimistic GET payload after the user draws a box, so the preview
- * updates before the POST returns.
+ * Optimistic GET payload after the user draws a box or undoes a delete, so
+ * the preview updates before the POST returns.
  */
 export function addBoundingBoxesToResponse(
   current: RedactedGetRedactionResponse,
-  boxes: ManualRedactionBoundingBox[]
+  boxes: RedactionBoundingBox[]
 ): RedactedGetRedactionResponse {
   const next: RedactedGetRedactionResponse = {
     ...current,
