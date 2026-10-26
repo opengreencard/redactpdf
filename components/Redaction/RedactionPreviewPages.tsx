@@ -609,11 +609,12 @@ export function _clientRectToNormalizedBox(
 
 /**
  * True for a bare key press that should trigger a single-key shortcut. Ignores
- * key repeats, Cmd/Ctrl/Alt combos, and presses while typing in a field.
+ * key repeats, Shift/Cmd/Ctrl/Alt combos, and presses while typing in a field.
  */
 export function isPlainKeyPress(event: KeyboardEvent): boolean {
   if (
     event.repeat ||
+    event.shiftKey ||
     event.metaKey ||
     event.ctrlKey ||
     event.altKey ||
