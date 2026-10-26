@@ -153,7 +153,7 @@ const forbiddenMockTargets = [
     symbol: 'renderPDFPages',
     filePattern: 'pdfRenderer',
     message:
-      'It is already mocked globally in lib/testUtilities/setup.ts with recorded renders, so Ghostscript differences between machines do not change test inputs.',
+      'It is already mocked globally in lib/testUtilities/setup.ts with recorded renders, so renderer differences between machines do not change test inputs.',
   },
 ];
 
@@ -615,16 +615,16 @@ const commonNoRestrictedSyntaxRules = [
       'Always pass { ignoreEncryption: true } as the second argument to PDFDocument.load() to handle encrypted PDFs.',
   },
   {
-    // Bad: execFile('gs', args), spawn('gm', args)
+    // Bad: execFile('pdftoppm', args), execFile('gs', args), spawn('gm', args)
     // Good: lib/pdf/pdfRenderer.ts, which calls the PDF renderer
     //
     // We match the call instead of the `child_process` import, because other
     // code may use child_process for other things. This only catches a binary
     // name passed as a string literal. Variables holding the name are missed.
     selector:
-      'CallExpression[arguments.0.type="Literal"][arguments.0.value=/^(gs|gm|magick|ghostscript)$/]',
+      'CallExpression[arguments.0.type="Literal"][arguments.0.value=/^(pdftoppm|qpdf|gs|gm|magick|ghostscript)$/]',
     message:
-      'Ghostscript and GraphicsMagick run only in pdf-renderer/. Use the PDF renderer client in lib/pdf/pdfRenderer.ts instead.',
+      'PDF tools (poppler, qpdf, Ghostscript, GraphicsMagick) run only in pdf-renderer/. Use the PDF renderer client in lib/pdf/pdfRenderer.ts instead.',
   },
   {
     // Bad: promise.then((value) => ...).catch((error) => ...)

@@ -2,10 +2,7 @@ import config from '../config';
 import {
   decryptPDF as decryptPDFInProcess,
   renderPages as renderPagesInProcess,
-} from '../../pdf-renderer/ghostscript';
-
-/** Ghostscript can take a while on large pages at high DPI. */
-const requestTimeoutMs = 180_000;
+} from '../../pdf-renderer/pdfTools';
 
 export interface RenderPDFPagesOptions {
   pdf: Uint8Array;
@@ -17,8 +14,8 @@ export interface RenderPDFPagesOptions {
 /**
  * Decrypt an encrypted PDF. The output has no encryption dictionary.
  *
- * Production sets PDF_RENDERER_URL so Ghostscript runs in the sidecar, which
- * has no app secrets. Without it, dev servers and tests run Ghostscript here.
+ * Production sets PDF_RENDERER_URL so the PDF tools run in the sidecar, which
+ * has no app secrets. Without it, dev servers and tests run them here.
  */
 export async function decryptPDF(pdf: Uint8Array): Promise<Buffer> {
   const { pdfRendererURL } = config;
@@ -56,6 +53,9 @@ export async function renderPDFPages({
     renderedPages.map(({ page, png }) => [page, Buffer.from(png, 'base64')])
   );
 }
+
+/** Rendering can take a while on large pages at high DPI. */
+const requestTimeoutMs = 180_000;
 
 async function postToRenderer(
   url: string,

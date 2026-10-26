@@ -43,11 +43,15 @@ rendering or compression misses the cache.
 
 ## PDF rendering
 
-- Ghostscript runs only in `pdf-renderer/`. ESLint enforces this for
-  `execFile('gs', ...)`-style calls and for the PDF wrapper packages.
+- poppler (`pdftoppm`) and qpdf run only in `pdf-renderer/`, in `pdfTools.ts`.
+  ESLint enforces this for `execFile('pdftoppm', ...)`-style calls and for the
+  Ghostscript and GraphicsMagick wrapper packages.
 - `lib/pdf/pdfRenderer.ts` is the client. It calls the renderer at
-  `PDF_RENDERER_URL` when that is set. Otherwise it runs Ghostscript in-process,
+  `PDF_RENDERER_URL` when that is set. Otherwise it runs the tools in-process,
   which is how dev and tests run.
+- Fonts come from the Dockerfile's apt packages, including the MS core fonts
+  and Carlito/Caladea. Poppler finds them through fontconfig. Local dev uses
+  the Mac's fonts, so Calibri and Cambria renders differ from production.
 - Production sets `PDF_RENDERER_URL` in `.env.production.nonsecret`. Each pod
   runs the renderer as a sidecar container with no app secrets (see
   `k8s/templates/cluster.template.yml`).
@@ -99,7 +103,7 @@ docker-compose exec -T mariadb mariadb -uroot -predaction-root \
   The image also has Node 22 earlier on `PATH`.
 - Signup and `yarn jest` do not need real Google, Spaces, or model keys.
   Uploading a PDF does.
-- Ghostscript is installed for the PDF tests and `yarn dev`. See
+- poppler and qpdf are installed for the PDF tests and `yarn dev`. See
   [PDF rendering](#pdf-rendering).
 
 <!-- BEGIN:nextjs-agent-rules -->

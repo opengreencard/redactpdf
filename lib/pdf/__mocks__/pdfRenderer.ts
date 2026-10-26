@@ -8,17 +8,14 @@ import {
 import { promiseAllThrottled } from '../../utilities/promiseAllThrottled';
 import type { RenderPDFPagesOptions } from '../pdfRenderer';
 
-/** Pages are read and written a few at a time. */
-const fileConcurrency = 4;
-
 const actualModule =
   jest.requireActual<typeof import('../pdfRenderer')>('../pdfRenderer');
 
 /**
- * Ghostscript output depends on its version and the installed fonts, so a
- * laptop, the CI runner, and the production image all render slightly
- * different pixels. Those bytes feed the vision request's cache key, so tests
- * replay recorded renders instead of running Ghostscript.
+ * Poppler output depends on its version and the installed fonts, so a laptop,
+ * the CI runner, and the production image all render slightly different
+ * pixels. Those bytes feed the vision request's cache key, so tests replay
+ * recorded renders instead of running poppler.
  */
 export const renderPDFPages = makeMockedPassThroughFunction(
   actualModule.renderPDFPages,
@@ -50,6 +47,9 @@ interface RenderedPagesManifest {
 function pageFilename(manifestBase: string, page: number): string {
   return `${manifestBase}_page${page}.png`;
 }
+
+/** Pages are read and written a few at a time. */
+const fileConcurrency = 4;
 
 /**
  * Writes one PNG per page, so a recording can be opened and reviewed, plus a

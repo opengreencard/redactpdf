@@ -44,7 +44,9 @@ interface Config {
     accessKeyId: string;
     secretAccessKey: string;
   };
-  /** PDF renderer sidecar URL. Unset means run Ghostscript in this process. */
+  /**
+   * PDF renderer sidecar URL. Unset means run the PDF tools in this process.
+   */
   pdfRendererURL: string | undefined;
 }
 

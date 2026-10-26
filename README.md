@@ -4,8 +4,10 @@ RedactPDF.ai is an open-source AI-assisted PDF redaction tool.
 
 ## Local development
 
-Requirements: Node 26, Yarn 4.14.1, Docker, and Ghostscript (`brew install
-ghostscript` on macOS, or `apt-get install ghostscript` on Debian).
+<!-- Keep in sync with the PDF tool packages in the Dockerfile and
+.github/workflows/ci.yml. -->
+Requirements: Node 26, Yarn 4.14.1, Docker, poppler, and qpdf (`brew install
+poppler qpdf` on macOS, or `apt-get install poppler-utils qpdf` on Debian).
 
 ```bash
 cp .env.development.example .env.development
@@ -15,7 +17,7 @@ yarn init-db-dev
 yarn dev
 ```
 
-Locally, the app runs Ghostscript itself. In production, Ghostscript runs in a
+Locally, the app runs poppler and qpdf itself. In production, they run in a
 sidecar container in the same pod, and the app reaches it at
 `PDF_RENDERER_URL`, which only the production env file sets.
 

@@ -26,7 +26,7 @@ jest.mock('../storage/storageAPI');
 // eslint-disable-next-line no-restricted-syntax
 jest.mock('../ai/createOpenAICompatibleCompletion');
 
-// Ghostscript renders differ across machines, which changes the vision cache
+// PDF renders differ across machines, which changes the vision cache
 // keys. Renders use a global record/replay mock for that reason. Tests of the
 // real client use jest.unmock().
 // eslint-disable-next-line no-restricted-syntax
