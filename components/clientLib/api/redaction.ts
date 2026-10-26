@@ -1,3 +1,5 @@
+import { ApplicationError } from '../../../lib/errors/applicationError';
+import { maxRedactionFileSizeMB } from '../../../lib/redaction/redactionFileLimits';
 import type { GetRedactionResponse } from '../../../app/api/redaction/[key]/getRedaction';
 import type { UploadFileForRedactionResponse } from '../../../app/api/redaction/uploadFileForRedaction';
 import type {
@@ -17,8 +19,7 @@ interface UploadFileForRedactionClientRequest {
   file: File;
 }
 
-/** Upload a PDF and return the key for its redaction page. */
-export const uploadFileForRedactionClient = makeClientAPIRouteWithBody<
+const uploadFileForRedactionRequest = makeClientAPIRouteWithBody<
   UploadFileForRedactionClientRequest,
   {},
   UploadFileForRedactionResponse
@@ -32,6 +33,27 @@ export const uploadFileForRedactionClient = makeClientAPIRouteWithBody<
     return { url: '/api/redaction', body: formData };
   },
 });
+
+/**
+ * Upload a PDF and return the key for its redaction page. A 413 here means
+ * the file is over the PDF limit, so the message names that limit. The
+ * shared client handles 413 for every route and doesn't know about PDFs.
+ */
+export async function uploadFileForRedactionClient(
+  request: UploadFileForRedactionClientRequest
+): Promise<UploadFileForRedactionResponse> {
+  try {
+    return await uploadFileForRedactionRequest(request);
+  } catch (error) {
+    if (error instanceof ApplicationError && error.statusCode === 413) {
+      throw new ApplicationError(
+        `The PDF is too large. Please upload a file smaller than ${maxRedactionFileSizeMB} MiB.`,
+        413
+      );
+    }
+    throw error;
+  }
+}
 
 /** Poll one document until processing finishes or fails. */
 export const getRedactionClient = makeClientAPIRouteWithoutBody<

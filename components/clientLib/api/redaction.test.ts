@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { makeClientAPIRouteWithoutBody } from './common';
+import { uploadFileForRedactionClient } from './redaction';
 
 // Only the default axios call is replaced. `isAxiosError` and `AxiosError`
 // stay real so the error handling sees a genuine Axios error.
@@ -14,8 +14,8 @@ jest.mock('axios', () => {
   };
 });
 
-describe(makeClientAPIRouteWithoutBody, () => {
-  it('explains the size limit when nginx returns its HTML 413 page', async () => {
+describe(uploadFileForRedactionClient, () => {
+  it('names the PDF size limit when nginx returns its HTML 413 page', async () => {
     jest.mocked(axios).mockRejectedValueOnce(
       new AxiosError(
         'Request failed',
@@ -28,13 +28,12 @@ describe(makeClientAPIRouteWithoutBody, () => {
         } as AxiosResponse
       )
     );
-    const getFile = makeClientAPIRouteWithoutBody<{}, {}>({
-      method: 'GET',
-      dataToUrlAndQueryString: () => ({ url: '/api/example' }),
+    const file = new File(['%PDF-1.4 test'], 'big.pdf', {
+      type: 'application/pdf',
     });
 
-    await expect(getFile({})).rejects.toThrow(
-      'The file is too large to upload. Please upload a PDF smaller than 50 MiB.'
+    await expect(uploadFileForRedactionClient({ file })).rejects.toThrow(
+      'The PDF is too large. Please upload a file smaller than 50 MiB.'
     );
   });
 });

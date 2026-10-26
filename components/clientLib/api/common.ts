@@ -4,7 +4,6 @@ import axios, {
   AxiosResponse,
 } from 'axios';
 import { ApplicationError } from '../../../lib/errors/applicationError';
-import { maxRedactionFileSizeMB } from '../../../lib/redaction/redactionFileLimits';
 
 /** URL, query, and body for a client request that sends a payload. */
 export interface ClientAPIRouteWithBodyData<RequestBodyT> {
@@ -125,11 +124,10 @@ async function makeRequestAndHandleErrors<ResponseT>(
     }
 
     // nginx rejects bodies over its limit with an HTML page, before the app
-    // runs, so there is no JSON message to show. Name the limit instead.
+    // runs, so there is no JSON message to show. Keep the 413 status so each
+    // caller can name the limit that applies to its request.
     if (axios.isAxiosError(error) && error.response?.status === 413) {
-      throw new ApplicationError(
-        `The file is too large to upload. Please upload a PDF smaller than ${maxRedactionFileSizeMB} MiB.`
-      );
+      throw new ApplicationError('The request is too large to send.', 413);
     }
 
     throw new ApplicationError(
