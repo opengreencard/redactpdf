@@ -1,15 +1,16 @@
 import { getDocument } from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { ApplicationError } from '../../../lib/errors/applicationError';
 import Redaction, { generateRedactionKey } from '../../../lib/models/Redaction';
+import {
+  maxRedactionFileSizeBytes,
+  maxRedactionFileSizeMB,
+} from '../../../lib/redaction/redactionFileLimits';
 import { RedactionStatus } from '../../../lib/redaction/redactionTypes';
 import {
   deleteRedactionFile,
   putRedactionFile,
 } from '../../../lib/storage/storageFunctions/redactionFile';
 import { processRedaction } from './lib/processRedaction';
-
-/** Maximum upload size. Exported for use in tests. */
-export const _maxRedactionFileSizeBytes = 50 * 1024 * 1024;
 
 /** Maximum page count. Exported for use in tests. */
 export const _maxRedactionPageCount = 100;
@@ -38,9 +39,9 @@ export async function uploadFileForRedaction({
   buffer,
   fileName,
 }: UploadFileForRedactionRequest): Promise<UploadFileForRedactionResponse> {
-  if (buffer.length > _maxRedactionFileSizeBytes) {
+  if (buffer.length > maxRedactionFileSizeBytes) {
     throw new ApplicationError(
-      'The PDF is too large. Please upload a file smaller than 50 MiB.',
+      `The PDF is too large. Please upload a file smaller than ${maxRedactionFileSizeMB} MiB.`,
       413
     );
   }

@@ -19,6 +19,10 @@ import {
 import Button from '../designSystem/Button/Button';
 import FontAwesomeIcon from '../designSystem/FontAwesomeIcon';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import {
+  maxRedactionFileSizeBytes,
+  maxRedactionFileSizeMB,
+} from '../../lib/redaction/redactionFileLimits';
 import { APICallState } from '../../lib/typescript/apiCallState';
 import { getUnreachableError } from '../../lib/typescript/getUnreachableError';
 import type { UploadFileForRedactionResponse } from '../../app/api/redaction/uploadFileForRedaction';
@@ -117,13 +121,17 @@ export const _uploadPDFInputTestId = 'upload-pdf-input';
 /** Test ID for drop-rejection or upload API error text. Exported for tests. */
 export const _uploadErrorMessageTestId = 'upload-error-message';
 
+// Matches the server's upload limit, so oversize files fail here with a
+// clear message instead of a generic upload error.
 const dropzoneFileConstraints: {
   accept: string[];
   maxFiles: number;
+  maxSize: number;
   multiple: boolean;
 } = {
   accept: [MIME_TYPES.pdf],
   maxFiles: 1,
+  maxSize: maxRedactionFileSizeBytes,
   multiple: false,
 };
 
@@ -240,7 +248,7 @@ export function _getDropRejectionMessage(rejections: FileRejection[]): string {
     case ErrorCode.TooManyFiles:
       return 'Please drop one PDF at a time.';
     case ErrorCode.FileTooLarge:
-      return `${rejection.file.name} is too large.`;
+      return `${rejection.file.name} is too large. Please upload a PDF smaller than ${maxRedactionFileSizeMB} MiB.`;
     case ErrorCode.FileTooSmall:
       return `${rejection.file.name} is too small.`;
     default:

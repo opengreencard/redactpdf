@@ -3,7 +3,9 @@
 import React, { useEffect, useRef } from 'react';
 import type { NotificationData } from '@mantine/notifications';
 import { notifications } from '@mantine/notifications';
+import Button from '../designSystem/Button/Button';
 import { useMemoizedCallback } from '../../lib/hookUtilities/useMemoizedCallback';
+import { useCallbackWithPrefix } from '../../lib/hookUtilities/useCallbackWithPrefix';
 import { useAPICall } from '../../lib/hookUtilities/useAPICall';
 import { useInterval } from '../../lib/hookUtilities/useInterval';
 import {
@@ -83,16 +85,18 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
     }, [redactionKey]);
     useInterval(pingOpenedAt, { delayMs: 60 * 1000, runOnMount: true });
 
+    // Returns whether the server saved the edit, so callers can tell if a
+    // rollback happened.
     const persistBoxMutation = useMemoizedCallback(
       async (
         applyOptimistic: (
           current: RedactedGetRedactionResponse
         ) => RedactedGetRedactionResponse,
         mutations: RedactionBoundingBoxMutation[]
-      ) => {
+      ): Promise<boolean> => {
         const previous = getRedactedResult(redactionState);
         if (!previous) {
-          return;
+          return false;
         }
 
         const optimistic: RedactedGetRedactionResponse =
@@ -106,6 +110,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
             key: redactionKey,
             mutations,
           });
+          return true;
         } catch (err) {
           // Roll back immediately, then reconcile with the server because a
           // later in-flight request may have saved newer edits.
@@ -122,6 +127,7 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
             'data-testid': _mutationErrorNotificationTestId,
           };
           notifications.show(notification);
+          return false;
         }
       },
       [fetchRedaction, redactionKey, redactionState, setStateResult]
@@ -142,9 +148,34 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
       [persistBoxMutation]
     );
 
-    const handleDeleteBoundingBoxes = useMemoizedCallback(
+    const handleRestoreBoundingBoxes = useMemoizedCallback(
       async (boxes: RedactionBoundingBox[]) => {
         await persistBoxMutation(
+          (current) => addBoundingBoxesToResponse(current, boxes),
+          boxes.map((box): RedactionBoundingBoxMutation => ({
+            op: RedactionBoundingBoxMutationOp.restore,
+            box,
+          }))
+        );
+      },
+      [persistBoxMutation]
+    );
+
+    const handleUndoDeleteBoundingBoxes = useMemoizedCallback(
+      (boxes: RedactionBoundingBox[]): Promise<void> => {
+        notifications.hide(undoDeleteNotificationId);
+        return handleRestoreBoundingBoxes(boxes);
+      },
+      [handleRestoreBoundingBoxes]
+    );
+    // Binds the boxes to the Undo button, so the button needs no inline arrow.
+    const undoDeleteWithBoxes = useCallbackWithPrefix<[RedactionBoundingBox[]]>(
+      handleUndoDeleteBoundingBoxes
+    );
+
+    const handleDeleteBoundingBoxes = useMemoizedCallback(
+      async (boxes: RedactionBoundingBox[]) => {
+        const didDelete = await persistBoxMutation(
           (current) => removeBoundingBoxesFromResponse(current, boxes),
           boxes.map((box): RedactionBoundingBoxMutation => ({
             op: RedactionBoundingBoxMutationOp.delete,
@@ -153,8 +184,28 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
             type: box.type,
           }))
         );
+        if (!didDelete) {
+          return;
+        }
+
+        // A fixed id means a newer delete replaces the Undo offer for an
+        // older one, so only the latest delete can be undone.
+        notifications.show({
+          id: undoDeleteNotificationId,
+          title:
+            boxes.length === 1 ? 'Redaction deleted' : 'Redactions deleted',
+          message: (
+            <Button
+              keyboardShortcut={null}
+              onClick={undoDeleteWithBoxes(boxes)}
+            >
+              Undo
+            </Button>
+          ),
+          autoClose: 8000,
+        });
       },
-      [persistBoxMutation]
+      [persistBoxMutation, undoDeleteWithBoxes]
     );
 
     const handleBoundingBoxesEnabledChange = useMemoizedCallback(
@@ -188,6 +239,9 @@ const RedactionPage: React.FunctionComponent<RedactionPageProps> = React.memo(
 );
 
 export default RedactionPage;
+
+/** Notification id for the Undo offer after a delete. */
+const undoDeleteNotificationId = 'redaction-undo-delete';
 
 /** Test ID for a failed box-mutation notification. Exported for tests. */
 export const _mutationErrorNotificationTestId =

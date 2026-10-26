@@ -1,14 +1,15 @@
-import type { BoundingBox } from './redactionTypes';
+import type { BoundingBox, RedactionBoundingBox } from './redactionTypes';
 import { RedactionBoundingBoxType } from './redactionTypes';
 
 /**
  * One kind of box edit the client can persist. Add draws a new box; delete
- * and setEnabled look up an existing one.
+ * and setEnabled look up an existing one; restore puts back a deleted box.
  */
 export enum RedactionBoundingBoxMutationOp {
   add = 'add',
   delete = 'delete',
   setEnabled = 'setEnabled',
+  restore = 'restore',
 }
 
 /**
@@ -18,7 +19,8 @@ export enum RedactionBoundingBoxMutationOp {
 export type RedactionBoundingBoxMutation =
   | AddRedactionBoundingBoxMutation
   | DeleteRedactionBoundingBoxMutation
-  | SetRedactionBoundingBoxEnabledMutation;
+  | SetRedactionBoundingBoxEnabledMutation
+  | RestoreRedactionBoundingBoxMutation;
 
 /** Page plus coordinates shared by add and by lookups of an existing box. */
 interface RedactionBoundingBoxPageAndBox {
@@ -55,4 +57,13 @@ interface DeleteRedactionBoundingBoxMutation extends LocateRedactionBoundingBoxR
 interface SetRedactionBoundingBoxEnabledMutation extends LocateRedactionBoundingBoxRequest {
   op: RedactionBoundingBoxMutationOp.setEnabled;
   enabled: boolean;
+}
+
+/**
+ * Put back a box the user deleted, keeping its type, text, and enabled
+ * state. Add always makes a manual box, so undo needs this op instead.
+ */
+interface RestoreRedactionBoundingBoxMutation {
+  op: RedactionBoundingBoxMutationOp.restore;
+  box: RedactionBoundingBox;
 }

@@ -436,6 +436,29 @@ const RedactionPreviewPages = forwardRef<
     const handleDeleteBoundingBox =
       useCallbackWithPrefix<[string]>(deleteBoxByKey);
 
+    // Keyboard shortcuts act on the selected redaction: T toggles it, and
+    // Delete or Backspace removes it.
+    const handleSelectedBoxKeyDown = useMemoizedCallback(
+      (event: KeyboardEvent): void => {
+        if (selectedBoxKey === null || !isPlainKeyPress(event)) {
+          return;
+        }
+        if (event.key.toLowerCase() === 't') {
+          toggleBoxByKey(selectedBoxKey);
+        } else if (event.key === 'Delete' || event.key === 'Backspace') {
+          setSelectedBoxKey(null);
+          deleteBoxByKey(selectedBoxKey);
+        }
+      },
+      [selectedBoxKey, toggleBoxByKey, deleteBoxByKey]
+    );
+    useEffect(() => {
+      document.addEventListener('keydown', handleSelectedBoxKeyDown);
+      return () => {
+        document.removeEventListener('keydown', handleSelectedBoxKeyDown);
+      };
+    }, [handleSelectedBoxKeyDown]);
+
     const setSelectedBoxOpened = useMemoizedCallback(
       (boxKey: string, opened: boolean): void => {
         setSelectedBoxKey(opened ? boxKey : null);
@@ -512,6 +535,10 @@ const RedactionPreviewPages = forwardRef<
                   h="100%"
                   style={{
                     cursor: onRedact === null ? 'default' : 'crosshair',
+                    // Drags across the page should draw a box, not highlight
+                    // the page image. Safari still needs the prefix.
+                    userSelect: 'none',
+                    WebkitUserSelect: 'none',
                   }}
                   onPointerDown={handlePointerDownWithPage(page)}
                   onPointerMove={handlePointerMove}
@@ -578,6 +605,47 @@ export function _clientRectToNormalizedBox(
     maxX: Math.max(startX, endX),
     maxY: Math.max(startY, endY),
   };
+}
+
+/**
+ * True for a bare key press that should trigger a single-key shortcut. Ignores
+ * key repeats, Shift/Cmd/Ctrl/Alt combos, and presses while typing in a field.
+ */
+export function isPlainKeyPress(event: KeyboardEvent): boolean {
+  if (
+    event.repeat ||
+    event.shiftKey ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.altKey ||
+    isTypingTarget(event.target)
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+  if (target.isContentEditable) {
+    return true;
+  }
+  if (
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
+  ) {
+    return true;
+  }
+  if (target instanceof HTMLInputElement) {
+    // Checkboxes and buttons don't take typed characters, so shortcuts still
+    // work after clicking the draw-mode switch.
+    return !['checkbox', 'radio', 'button', 'submit', 'reset'].includes(
+      target.type
+    );
+  }
+  return false;
 }
 
 interface RedactionBoxOverlayProps {
@@ -661,7 +729,10 @@ const RedactionBoxOverlay: React.FunctionComponent<RedactionBoxOverlayProps> =
         <PopoverDropdown p="xs" onPointerDown={stopPropagation}>
           <Group gap="xs" wrap="nowrap">
             <ActionIcon
-              tooltip="Toggle redaction on/off"
+              tooltip={{
+                text: 'Toggle redaction on/off',
+                keyboardShortcut: ['T'],
+              }}
               variant="subtle"
               color="gray"
               onClick={handleEnabledChange}
@@ -671,7 +742,10 @@ const RedactionBoxOverlay: React.FunctionComponent<RedactionBoxOverlayProps> =
               />
             </ActionIcon>
             <ActionIcon
-              tooltip="Delete redaction"
+              tooltip={{
+                text: 'Delete redaction',
+                keyboardShortcut: ['Del', '← Backspace'],
+              }}
               variant="subtle"
               color="red"
               onClick={handleDelete}

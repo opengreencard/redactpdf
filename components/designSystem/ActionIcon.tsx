@@ -4,20 +4,16 @@ import {
   // eslint-disable-next-line no-restricted-imports
   ActionIcon as MantineActionIcon,
   type ActionIconProps as MantineActionIconProps,
-  Tooltip,
 } from '@mantine/core';
+import Tooltip, { TooltipContent } from './Tooltip';
+import type { RequiredWithUndefined } from '../../lib/typescript/requiredWithUndefined';
 
-export interface ActionIconProps extends Omit<
-  MantineActionIconProps,
-  'aria-label'
-> {
-  // Optional because icon actions may be display-only; this follows the
-  // standard React button event-handler signature.
-  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+interface ActionIconOwnProps {
   /**
-   * Required so the tooltip and accessible name stay synchronized.
+   * Required so the tooltip and accessible name stay synchronized. Pass
+   * `{ text, keyboardShortcut }` to show a shortcut in the tooltip.
    */
-  tooltip: string;
+  tooltip: TooltipContent;
   /**
    * Set on toggle buttons only. It picks the variant, color, and aria-pressed,
    * so callers pass neither. Leave it unset for plain action buttons.
@@ -25,10 +21,28 @@ export interface ActionIconProps extends Omit<
   isPressed?: boolean;
 }
 
+interface ActionIconPassThroughProps extends Omit<
+  MantineActionIconProps,
+  'aria-label'
+> {
+  // Optional because icon actions may be display-only; this follows the
+  // standard React button event-handler signature.
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
+}
+
+export interface ActionIconProps
+  extends ActionIconOwnProps, ActionIconPassThroughProps {}
+
 /** Action icon with a synchronized tooltip and accessible name. */
 const ActionIcon: React.FunctionComponent<ActionIconProps> = React.memo(
   function ActionIcon(props: ActionIconProps) {
     const { tooltip, isPressed, ...passThroughProps } = props;
+    // Keep owned props explicit so new wrapper fields cannot silently become
+    // pass-through props.
+    const _ownProps: RequiredWithUndefined<ActionIconOwnProps> = {
+      tooltip,
+      isPressed,
+    };
 
     // Plain actions get no toggle props, so the caller's variant, color, and
     // aria-pressed pass through unchanged.
@@ -47,11 +61,12 @@ const ActionIcon: React.FunctionComponent<ActionIconProps> = React.memo(
     }
 
     return (
-      <Tooltip label={tooltip}>
+      <Tooltip content={tooltip}>
         <MantineActionIcon
           {...passThroughProps}
           {...toggleProps}
-          aria-label={tooltip}
+          // Screen readers get the text only, not the shortcut keys.
+          aria-label={typeof tooltip === 'string' ? tooltip : tooltip.text}
         />
       </Tooltip>
     );

@@ -123,6 +123,13 @@ async function makeRequestAndHandleErrors<ResponseT>(
       throw new ApplicationError(errorMessage);
     }
 
+    // nginx rejects bodies over its limit with an HTML page, before the app
+    // runs, so there is no JSON message to show. Keep the 413 status so each
+    // caller can name the limit that applies to its request.
+    if (axios.isAxiosError(error) && error.response?.status === 413) {
+      throw new ApplicationError('The request is too large to send.', 413);
+    }
+
     throw new ApplicationError(
       'We ran into an unexpected error; please try again later.'
     );

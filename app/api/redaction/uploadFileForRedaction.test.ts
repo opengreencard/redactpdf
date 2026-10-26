@@ -5,12 +5,12 @@ import Redaction, {
   RedactionAttributes,
   redactionKeyLength,
 } from '../../../lib/models/Redaction';
+import { maxRedactionFileSizeBytes } from '../../../lib/redaction/redactionFileLimits';
 import { RedactionStatus } from '../../../lib/redaction/redactionTypes';
 import { getRedactionFile } from '../../../lib/storage/storageFunctions/redactionFile';
 import { processRedaction } from './lib/processRedaction';
 import {
   _getPDFPageCount,
-  _maxRedactionFileSizeBytes,
   _maxRedactionPageCount,
   uploadFileForRedaction,
 } from './uploadFileForRedaction';
@@ -89,7 +89,7 @@ describe(uploadFileForRedaction, () => {
 
   it('rejects files over 50 MiB before parsing or writing', async () => {
     const redactionCountBefore = await Redaction.count();
-    const oversizedBuffer = Buffer.alloc(_maxRedactionFileSizeBytes + 1);
+    const oversizedBuffer = Buffer.alloc(maxRedactionFileSizeBytes + 1);
 
     await expect(
       uploadFileForRedaction({

@@ -19,3 +19,8 @@ export default metadata;
 const Template: StoryFn<ActionIconProps> = (args) => <ActionIcon {...args} />;
 
 export const Default: StoryFn<ActionIconProps> = Template.bind({});
+
+export const WithKeyboardShortcut: StoryFn<ActionIconProps> = Template.bind({});
+WithKeyboardShortcut.args = {
+  tooltip: { text: 'Toggle visibility', keyboardShortcut: ['T'] },
+};

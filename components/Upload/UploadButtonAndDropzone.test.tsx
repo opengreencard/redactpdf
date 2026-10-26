@@ -74,6 +74,23 @@ describe(_getDropRejectionMessage, () => {
       `${textFile.name} is not a PDF. Please upload a PDF.`
     );
   });
+
+  it('names the file and the size limit when the file is too large', () => {
+    const rejections: FileRejection[] = [
+      {
+        file: pdfWithPath,
+        errors: [
+          {
+            code: ErrorCode.FileTooLarge,
+            message: 'File is larger than 52428800 bytes',
+          },
+        ],
+      },
+    ];
+    expect(_getDropRejectionMessage(rejections)).toBe(
+      `${pdfWithPath.name} is too large. Please upload a PDF smaller than 50 MiB.`
+    );
+  });
 });
 
 const uploadedRedactionKey = 'test-redaction-key';
@@ -88,5 +105,12 @@ const textFile: FileWithPath = Object.assign(
   {
     path: 'notes.txt',
     relativePath: 'notes.txt',
+  }
+);
+const pdfWithPath: FileWithPath = Object.assign(
+  new File(['%PDF-1.4 test'], 'document.pdf', { type: 'application/pdf' }),
+  {
+    path: 'document.pdf',
+    relativePath: 'document.pdf',
   }
 );
