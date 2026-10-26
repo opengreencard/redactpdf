@@ -4,6 +4,8 @@ RedactPDF.ai is an open-source AI-assisted PDF redaction tool.
 
 ## Local development
 
+<!-- Keep in sync with the PDF tool packages in the Dockerfile and
+.github/workflows/ci.yml. -->
 Requirements: Node 26, Yarn 4.14.1, Docker, poppler, and qpdf (`brew install
 poppler qpdf` on macOS, or `apt-get install poppler-utils qpdf` on Debian).
 

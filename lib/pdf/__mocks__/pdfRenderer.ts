@@ -8,9 +8,6 @@ import {
 import { promiseAllThrottled } from '../../utilities/promiseAllThrottled';
 import type { RenderPDFPagesOptions } from '../pdfRenderer';
 
-/** Pages are read and written a few at a time. */
-const fileConcurrency = 4;
-
 const actualModule =
   jest.requireActual<typeof import('../pdfRenderer')>('../pdfRenderer');
 
@@ -50,6 +47,9 @@ interface RenderedPagesManifest {
 function pageFilename(manifestBase: string, page: number): string {
   return `${manifestBase}_page${page}.png`;
 }
+
+/** Pages are read and written a few at a time. */
+const fileConcurrency = 4;
 
 /**
  * Writes one PNG per page, so a recording can be opened and reviewed, plus a

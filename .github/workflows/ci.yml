@@ -79,8 +79,8 @@ jobs:
           node-version: 26
           cache: yarn
       # PDF tests run poppler and qpdf directly, so they must be installed.
-      # Keep in sync with the apt packages in the Dockerfile. CI doesn't install
-      # the MS core fonts, so its renders can differ from production.
+      # Keep in sync with the Dockerfile and README.md. CI doesn't install the
+      # MS core fonts, so its renders can differ from production.
       - run: sudo apt-get update && sudo apt-get install -y poppler-utils qpdf
       - run: corepack enable
       - run: yarn install --immutable

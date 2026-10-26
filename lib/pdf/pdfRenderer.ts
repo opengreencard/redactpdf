@@ -4,9 +4,6 @@ import {
   renderPages as renderPagesInProcess,
 } from '../../pdf-renderer/pdfTools';
 
-/** Rendering can take a while on large pages at high DPI. */
-const requestTimeoutMs = 180_000;
-
 export interface RenderPDFPagesOptions {
   pdf: Uint8Array;
   /** 1-based page numbers. */
@@ -56,6 +53,9 @@ export async function renderPDFPages({
     renderedPages.map(({ page, png }) => [page, Buffer.from(png, 'base64')])
   );
 }
+
+/** Rendering can take a while on large pages at high DPI. */
+const requestTimeoutMs = 180_000;
 
 async function postToRenderer(
   url: string,
