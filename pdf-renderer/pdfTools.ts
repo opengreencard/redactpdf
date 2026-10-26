@@ -77,8 +77,17 @@ const toolTimeoutMs = 120_000;
 
 /**
  * Fontconfig settings for pdftoppm. See fontconfig.conf for the font aliases.
+ *
+ * Use the working directory, not `__dirname`. Next bundles this file into
+ * `.next/`, where `__dirname` no longer points at `pdf-renderer/`. The app
+ * and the sidecar (see `k8s/templates/cluster.template.yml`) both start from
+ * the repo root.
  */
-const fontConfigPath = path.join(__dirname, 'fontconfig.conf');
+const fontConfigPath = path.join(
+  process.cwd(),
+  'pdf-renderer',
+  'fontconfig.conf'
+);
 const fontEnv: NodeJS.ProcessEnv = {
   ...process.env,
   FONTCONFIG_FILE: fontConfigPath,
