@@ -11,6 +11,8 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-issuer
     nginx.ingress.kubernetes.io/load-balance: ewma
+    # Keep in sync with maxRedactionFileSizeMB in
+    # lib/redaction/redactionFileLimits.ts.
     nginx.ingress.kubernetes.io/proxy-body-size: 50m
     # nginx gives up after 60s of waiting on the upstream by default, which
     # returns a 504 while a large PDF is still rendering. Five minutes gives

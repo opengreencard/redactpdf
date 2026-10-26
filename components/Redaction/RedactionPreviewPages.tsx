@@ -607,6 +607,46 @@ export function _clientRectToNormalizedBox(
   };
 }
 
+/**
+ * True for a bare key press that should trigger a single-key shortcut. Ignores
+ * key repeats, Cmd/Ctrl/Alt combos, and presses while typing in a field.
+ */
+export function isPlainKeyPress(event: KeyboardEvent): boolean {
+  if (
+    event.repeat ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.altKey ||
+    isTypingTarget(event.target)
+  ) {
+    return false;
+  }
+  return true;
+}
+
+function isTypingTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) {
+    return false;
+  }
+  if (target.isContentEditable) {
+    return true;
+  }
+  if (
+    target instanceof HTMLTextAreaElement ||
+    target instanceof HTMLSelectElement
+  ) {
+    return true;
+  }
+  if (target instanceof HTMLInputElement) {
+    // Checkboxes and buttons don't take typed characters, so shortcuts still
+    // work after clicking the draw-mode switch.
+    return !['checkbox', 'radio', 'button', 'submit', 'reset'].includes(
+      target.type
+    );
+  }
+  return false;
+}
+
 interface RedactionBoxOverlayProps {
   redactionBox: RedactionBoundingBox;
   isSelected: boolean;
@@ -742,46 +782,6 @@ const DrawingOverlay: React.FunctionComponent<DrawingOverlayProps> = React.memo(
     );
   }
 );
-
-/**
- * True for a bare key press that should trigger a single-key shortcut. Ignores
- * key repeats, Cmd/Ctrl/Alt combos, and presses while typing in a field.
- */
-export function isPlainKeyPress(event: KeyboardEvent): boolean {
-  if (
-    event.repeat ||
-    event.metaKey ||
-    event.ctrlKey ||
-    event.altKey ||
-    isTypingTarget(event.target)
-  ) {
-    return false;
-  }
-  return true;
-}
-
-function isTypingTarget(target: EventTarget | null): boolean {
-  if (!(target instanceof HTMLElement)) {
-    return false;
-  }
-  if (target.isContentEditable) {
-    return true;
-  }
-  if (
-    target instanceof HTMLTextAreaElement ||
-    target instanceof HTMLSelectElement
-  ) {
-    return true;
-  }
-  if (target instanceof HTMLInputElement) {
-    // Checkboxes and buttons don't take typed characters, so shortcuts still
-    // work after clicking the draw-mode switch.
-    return !['checkbox', 'radio', 'button', 'submit', 'reset'].includes(
-      target.type
-    );
-  }
-  return false;
-}
 
 function getPointerPoint(event: PointerEvent<HTMLDivElement>): Point {
   return { clientX: event.clientX, clientY: event.clientY };

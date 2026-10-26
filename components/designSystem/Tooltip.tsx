@@ -9,18 +9,14 @@ import { Group, Kbd, Tooltip as MantineTooltip } from '@mantine/core';
 export type TooltipContent =
   string | { text: string; keyboardShortcut: string[] };
 
-export interface TooltipProps {
+interface TooltipProps {
   /** Shown when the child is hovered or focused. */
   content: TooltipContent;
   /** Must forward its ref, which Mantine uses to position the tooltip. */
   children: React.ReactElement;
 }
 
-/**
- * Tooltip that can show a keyboard shortcut as a `Kbd` next to its text.
- * Use `getTooltipText` when the same copy is needed as a plain string, such
- * as an accessible name.
- */
+/** Tooltip that can show a keyboard shortcut as a `Kbd` next to its text. */
 const Tooltip: React.FunctionComponent<TooltipProps> = React.memo(
   function Tooltip(props: TooltipProps) {
     const { content, children } = props;
@@ -45,10 +41,5 @@ const Tooltip: React.FunctionComponent<TooltipProps> = React.memo(
     );
   }
 );
-
-/** Plain-text version of a tooltip, without any shortcut. */
-export function getTooltipText(content: TooltipContent): string {
-  return typeof content === 'string' ? content : content.text;
-}
 
 export default Tooltip;
