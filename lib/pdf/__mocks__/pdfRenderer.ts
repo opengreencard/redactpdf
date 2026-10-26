@@ -15,10 +15,10 @@ const actualModule =
   jest.requireActual<typeof import('../pdfRenderer')>('../pdfRenderer');
 
 /**
- * Ghostscript output depends on its version and the installed fonts, so a
- * laptop, the CI runner, and the production image all render slightly
- * different pixels. Those bytes feed the vision request's cache key, so tests
- * replay recorded renders instead of running Ghostscript.
+ * Poppler output depends on its version and the installed fonts, so a laptop,
+ * the CI runner, and the production image all render slightly different
+ * pixels. Those bytes feed the vision request's cache key, so tests replay
+ * recorded renders instead of running poppler.
  */
 export const renderPDFPages = makeMockedPassThroughFunction(
   actualModule.renderPDFPages,

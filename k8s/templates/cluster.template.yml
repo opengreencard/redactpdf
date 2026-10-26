@@ -98,12 +98,12 @@ items:
                 initialDelaySeconds: 30
                 periodSeconds: 30
             - name: pdf-renderer
-              # Same image as the app, which has Ghostscript and
+              # Same image as the app, which has poppler, qpdf, and
               # pdf-renderer/bin/www.ts. Keep in sync with the `pdf-renderer`
               # script in package.json. Only app pods run this sidecar; the
               # background worker doesn't call the renderer.
               #
-              # No envFrom Secret, so Ghostscript never sees app secrets. The
+              # No envFrom Secret, so the PDF tools never see app secrets. The
               # app reaches it at PDF_RENDERER_URL (see .env.production.nonsecret).
               image: opengreencard/redactpdf:%REVISION%
               command:

@@ -7,8 +7,9 @@ import { loadRoutes } from './app/main';
 const maxRequestBodySize = '100MB';
 
 /**
- * Make the Express app for the PDF renderer. It runs Ghostscript on untrusted
- * PDFs, so it stays small: no sessions, no database, and no app secrets.
+ * Make the Express app for the PDF renderer. It runs poppler and qpdf on
+ * untrusted PDFs, so it stays small: no sessions, no database, and no app
+ * secrets.
  */
 export function makeExpressApp(): express.Express {
   // eslint-disable-next-line no-restricted-syntax

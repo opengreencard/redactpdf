@@ -1,7 +1,7 @@
 import express from 'express';
 import { ApplicationError } from '../../../lib/errors/applicationError';
 import { sendError } from '../../errors';
-import { renderPages } from '../../ghostscript';
+import { renderPages } from '../../pdfTools';
 
 const router = express.Router();
 
